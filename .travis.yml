@@ -2,3 +2,15 @@ language: java
 
 jdk:
   - oraclejdk8
+
+notifications:
+  email:
+    recipients:
+      - e1225561@student.tuwien.ac.at
+      - e1128004@student.tuwien.ac.at
+      - e1228830@student.tuwien.ac.at
+      - e1325306@student.tuwien.ac.at
+      - paris.philipp@gmail.com
+      - emmanuelpescosta099@gmail.com
+    on_success: change
+    on_failure: always
