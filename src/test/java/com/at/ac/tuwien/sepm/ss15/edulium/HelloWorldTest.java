@@ -1,7 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium;
 
 import org.junit.Test;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class HelloWorldTest {
     @Test
