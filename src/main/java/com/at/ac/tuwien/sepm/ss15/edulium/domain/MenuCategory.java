@@ -7,16 +7,6 @@ public class MenuCategory {
     private Long identity = null;
     private String name = null;
 
-    public MenuCategory() {
-    }
-
-    /**
-     * @param name name of the category
-     */
-    public MenuCategory(String name) {
-        this.name = name;
-    }
-
     /**
      * @return  returns the category name
      *          can be null (if this instance does not represent
@@ -47,5 +37,24 @@ public class MenuCategory {
      */
     public void setIdentity(Long identity) {
         this.identity = identity;
+    }
+
+    @Override
+    public String toString() {
+        return "MenuCategory{" +
+                "identity=" + identity +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MenuCategory that = (MenuCategory) o;
+
+        if (identity != null ? !identity.equals(that.identity) : that.identity != null) return false;
+        return !(name != null ? !name.equals(that.name) : that.name != null);
     }
 }
