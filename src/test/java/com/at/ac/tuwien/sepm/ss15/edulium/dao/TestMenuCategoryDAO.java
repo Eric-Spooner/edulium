@@ -14,7 +14,7 @@ public class TestMenuCategoryDAO {
     MenuCategoryDAO menuCategoryDAO;    //TODO spring wiring
 
     @Test
-    void testCreate_shouldAddObject() throws DAOException {
+    public void testCreate_shouldAddObject() throws DAOException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setName("cat");
@@ -33,7 +33,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test(expected = DAOException.class)
-    void testCreate_addingObjectWithoutNameShouldFail() throws DAOException {
+    public void testCreate_addingObjectWithoutNameShouldFail() throws DAOException {
         // GIVEN
         MenuCategory category = new MenuCategory();
 
@@ -46,7 +46,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    void testUpdate_shouldUpdateObject() throws DAOException {
+    public void testUpdate_shouldUpdateObject() throws DAOException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setName("cat");
@@ -65,7 +65,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test(expected = DAOException.class)
-    void testUpdate_updatingObjectWithIdentityNullShouldFail() throws DAOException {
+    public void testUpdate_updatingObjectWithIdentityNullShouldFail() throws DAOException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setName("cat");
@@ -76,7 +76,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test(expected = DAOException.class)
-    void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException {
+    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setName("cat");
@@ -88,7 +88,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    void testDelete_shouldDeleteObject() throws DAOException {
+    public void testDelete_shouldDeleteObject() throws DAOException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setName("cat");
@@ -106,7 +106,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test(expected = DAOException.class)
-    void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException {
+    public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
 
@@ -115,7 +115,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test(expected = DAOException.class)
-    void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException {
+    public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setIdentity(Long.valueOf(99999));
@@ -125,7 +125,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    void testFind_byIdentityShouldReturnObject() throws DAOException {
+    public void testFind_byIdentityShouldReturnObject() throws DAOException {
         // GIVEN
         MenuCategory cat1 = new MenuCategory();
         MenuCategory cat2 = new MenuCategory();
@@ -151,7 +151,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    void testFind_byNameShouldReturnObjects() throws DAOException {
+    public void testFind_byNameShouldReturnObjects() throws DAOException {
         // GIVEN
         MenuCategory cat1 = new MenuCategory();
         MenuCategory cat2 = new MenuCategory();
@@ -179,7 +179,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    void testFind_shouldReturnEmptyList() throws DAOException {
+    public void testFind_shouldReturnEmptyList() throws DAOException {
         //WHEN
         MenuCategory matcher = new MenuCategory();
         matcher.setIdentity(Long.valueOf(1));
@@ -187,13 +187,13 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    void testGetAll_shouldReturnEmptyList() throws DAOException {
+    public void testGetAll_shouldReturnEmptyList() throws DAOException {
         //WHEN
         Assert.assertEquals(menuCategoryDAO.getAll().size(), 0);
     }
 
     @Test
-    void testGetAll_shouldReturnObjects() throws DAOException {
+    public void testGetAll_shouldReturnObjects() throws DAOException {
         // GIVEN
         MenuCategory cat1 = new MenuCategory();
         MenuCategory cat2 = new MenuCategory();
