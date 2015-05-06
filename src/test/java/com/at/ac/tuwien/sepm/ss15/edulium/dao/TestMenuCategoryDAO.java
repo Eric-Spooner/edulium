@@ -152,6 +152,7 @@ public class TestMenuCategoryDAO {
     @Test
     public void testFind_byIdentityShouldReturnObject() throws DAOException {
         // GIVEN
+        MenuCategory matcher = new MenuCategory();
         MenuCategory cat1 = new MenuCategory();
         MenuCategory cat2 = new MenuCategory();
         MenuCategory cat3 = new MenuCategory();
@@ -163,21 +164,31 @@ public class TestMenuCategoryDAO {
         menuCategoryDAO.create(cat3);
 
         // WHEN
-        MenuCategory matcher = new MenuCategory();
-
         matcher.setIdentity(cat1.getIdentity());
-        Assert.assertEquals(menuCategoryDAO.find(matcher).get(0), cat1);
+        List<MenuCategory> objects = menuCategoryDAO.find(matcher);
+        // THEN
+        Assert.assertEquals(objects.size(), 1);
+        Assert.assertEquals(objects.get(0), cat1);
 
+        // WHEN
         matcher.setIdentity(cat2.getIdentity());
-        Assert.assertEquals(menuCategoryDAO.find(matcher).get(0), cat2);
+        objects = menuCategoryDAO.find(matcher);
+        // THEN
+        Assert.assertEquals(objects.size(), 1);
+        Assert.assertEquals(objects.get(0), cat2);
 
+        // WHEN
         matcher.setIdentity(cat3.getIdentity());
-        Assert.assertEquals(menuCategoryDAO.find(matcher).get(0), cat3);
+        objects = menuCategoryDAO.find(matcher);
+        // THEN
+        Assert.assertEquals(objects.size(), 1);
+        Assert.assertEquals(objects.get(0), cat3);
     }
 
     @Test
     public void testFind_byNameShouldReturnObjects() throws DAOException {
         // GIVEN
+        MenuCategory matcher = new MenuCategory();
         MenuCategory cat1 = new MenuCategory();
         MenuCategory cat2 = new MenuCategory();
         MenuCategory cat3 = new MenuCategory();
@@ -189,7 +200,6 @@ public class TestMenuCategoryDAO {
         menuCategoryDAO.create(cat3);
 
         // WHEN
-        MenuCategory matcher = new MenuCategory();
         matcher.setName(cat1.getName());
         List<MenuCategory> objects = menuCategoryDAO.find(matcher);
 
@@ -200,14 +210,25 @@ public class TestMenuCategoryDAO {
 
         // WHEN
         matcher.setName(cat3.getName());
-        Assert.assertEquals(menuCategoryDAO.find(matcher).get(0), cat3);
+        objects = menuCategoryDAO.find(matcher);
+
+        // THEN
+        Assert.assertEquals(objects.size(), 1);
+        Assert.assertEquals(objects.get(0), cat3);
     }
 
     @Test
     public void testFind_shouldReturnEmptyList() throws DAOException {
         //WHEN
+        Long identity = (long) 99999;
         MenuCategory matcher = new MenuCategory();
-        matcher.setIdentity((long) 1);
+        matcher.setIdentity(identity);
+
+        // check if no item with the id IDENTITY exists
+        for(MenuCategory menuCat : menuCategoryDAO.getAll()) {
+            Assert.assertNotEquals(menuCat.getIdentity(), identity);
+        }
+
         Assert.assertEquals(menuCategoryDAO.find(matcher).size(), 0);
     }
 
@@ -239,5 +260,4 @@ public class TestMenuCategoryDAO {
         Assert.assertTrue(objects.contains(cat2));
         Assert.assertTrue(objects.contains(cat3));
     }
-
 }
