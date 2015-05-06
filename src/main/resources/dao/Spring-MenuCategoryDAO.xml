@@ -4,10 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="Spring-Context.xml" />
-    <import resource="Spring-DataSource.xml" />
-
-    <!-- DAO beans -->
-    <import resource="dao/Spring-MenuCategoryDAO.xml" />
+    <bean id="menuCategoryDAO" class="com.at.ac.tuwien.sepm.ss15.edulium.dao.impl.MenuCategoryDAOImpl">
+    </bean>
 
 </beans>
