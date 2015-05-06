@@ -4,34 +4,23 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.Assert;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
  * Unit Test for the MenuCategoryDAO
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("/Spring-DAO.xml")
+@Transactional
 public class TestMenuCategoryDAO {
-    private ApplicationContext context;
-    private Connection connection;
+    @Autowired
     private MenuCategoryDAO menuCategoryDAO;
-
-    public TestMenuCategoryDAO() throws SQLException {
-        context = new ClassPathXmlApplicationContext("Spring-DAO.xml");
-        menuCategoryDAO = context.getBean("menuCategoryDAO", MenuCategoryDAO.class);
-        connection = context.getBean("dataSource", DataSource.class).getConnection();
-
-        connection.setAutoCommit(false);
-    }
-
-    @After
-    public void tearDown() throws SQLException {
-        connection.rollback();
-    }
 
     @Test
     public void testCreate_shouldAddObject() throws DAOException {
