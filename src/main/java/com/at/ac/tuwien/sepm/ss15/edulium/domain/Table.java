@@ -7,51 +7,66 @@ public class Table {
     private int seats;
     private Long number;
     private int row;
-    private int col;
-    private boolean disabled;
+    private int column;
 
     public Table() {
 
     }
 
+    /**
+     * @return the number of seats on this table
+     */
     public int getSeats() {
         return seats;
     }
 
+    /**
+     * @param seats sets the number of seats on this table
+     */
     public void setSeats(int seats) {
         this.seats = seats;
     }
 
+    /**
+     * @return the unique number of this table
+     */
     public Long getNumber() {
         return number;
     }
 
+    /**
+     * @param number sets the unique number of this table
+     */
     public void setNumber(Long number) {
         this.number = number;
     }
 
+    /**
+     * @return the row of this table
+     */
     public int getRow() {
         return row;
     }
 
+    /**
+     * @param row sets the row of this table
+     */
     public void setRow(int row) {
         this.row = row;
     }
 
-    public int getCol() {
-        return col;
+    /**
+     * @return the column of this table
+     */
+    public int getColumn() {
+        return column;
     }
 
-    public void setCol(int col) {
-        this.col = col;
-    }
-
-    public boolean isDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
+    /**
+     * @param column sets the column of this table
+     */
+    public void setCol(int column) {
+        this.column = column;
     }
 
     @Override
@@ -60,8 +75,7 @@ public class Table {
                 "seats=" + seats +
                 ", number=" + number +
                 ", row=" + row +
-                ", col=" + col +
-                ", disabled=" + disabled +
+                ", col=" + column +
                 '}';
     }
 
@@ -72,8 +86,7 @@ public class Table {
 
         Table table = (Table) o;
 
-        if (col != table.col) return false;
-        if (disabled != table.disabled) return false;
+        if (column != table.column) return false;
         if (number != table.number) return false;
         if (row != table.row) return false;
         if (seats != table.seats) return false;
