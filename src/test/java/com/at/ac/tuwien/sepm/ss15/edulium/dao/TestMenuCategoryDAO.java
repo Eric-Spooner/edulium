@@ -9,6 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.*;
 import java.util.List;
 
 /**
@@ -45,7 +46,7 @@ public class TestMenuCategoryDAO {
 
     @Test(expected = DAOException.class)
     public void testCreate_addingObjectWithoutNameShouldFail() throws DAOException {
-        // PREPARE
+        // GIVEN
         MenuCategory category = new MenuCategory();
 
         // WHEN
@@ -92,14 +93,20 @@ public class TestMenuCategoryDAO {
     @Test(expected = DAOException.class)
     public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException {
         // GIVEN
-        Long identity = (long) 99999;
         MenuCategory cat = new MenuCategory();
+        Long identity = (long) 1;
         cat.setIdentity(identity);
         cat.setName("cat");
 
         // check if no item with the id IDENTITY exists
-        for(MenuCategory menuCat : menuCategoryDAO.getAll()) {
-            Assert.assertNotEquals(menuCat.getIdentity(), identity);
+        try {
+            while (!menuCategoryDAO.find(cat).isEmpty()) {
+                identity++;
+                cat.setIdentity(identity);
+            }
+        } catch (DAOException e) {
+            // exception should not occur here
+            Assert.assertTrue(false);
         }
 
         // WHEN
@@ -120,6 +127,7 @@ public class TestMenuCategoryDAO {
         MenuCategory matcher = new MenuCategory();
         matcher.setIdentity(cat.getIdentity());
 
+        // THEN
         Assert.assertEquals(menuCategoryDAO.find(matcher).size(), 0);
         Assert.assertEquals(menuCategoryDAO.getAll().size(), 0);
     }
@@ -136,13 +144,19 @@ public class TestMenuCategoryDAO {
     @Test(expected = DAOException.class)
     public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException {
         // GIVEN
-        Long identity = (long) 99999;
         MenuCategory cat = new MenuCategory();
+        Long identity = (long) 1;
         cat.setIdentity(identity);
 
         // check if no item with the id IDENTITY exists
-        for(MenuCategory menuCat : menuCategoryDAO.getAll()) {
-            Assert.assertNotEquals(menuCat.getIdentity(), identity);
+        try {
+            while (!menuCategoryDAO.find(cat).isEmpty()) {
+                identity++;
+                cat.setIdentity(identity);
+            }
+        } catch (DAOException e) {
+            // exception should not occur here
+            Assert.assertTrue(false);
         }
 
         // WHEN
@@ -219,22 +233,32 @@ public class TestMenuCategoryDAO {
 
     @Test
     public void testFind_shouldReturnEmptyList() throws DAOException {
-        //WHEN
-        Long identity = (long) 99999;
+        // GIVEN
+        Long identity = (long) 1;
         MenuCategory matcher = new MenuCategory();
         matcher.setIdentity(identity);
 
         // check if no item with the id IDENTITY exists
-        for(MenuCategory menuCat : menuCategoryDAO.getAll()) {
-            Assert.assertNotEquals(menuCat.getIdentity(), identity);
+        try {
+            while (!menuCategoryDAO.find(matcher).isEmpty()) {
+                identity++;
+                matcher.setIdentity(identity);
+            }
+        } catch (DAOException e) {
+            // exception should not occur here
+            Assert.assertTrue(false);
         }
 
-        Assert.assertEquals(menuCategoryDAO.find(matcher).size(), 0);
+        // WHEN
+        List<MenuCategory> storedObjects = menuCategoryDAO.find(matcher);
+
+        // THEN
+        Assert.assertEquals(storedObjects.size(), 0);
     }
 
     @Test
     public void testGetAll_shouldReturnEmptyList() throws DAOException {
-        //WHEN
+        // WHEN / THEN
         Assert.assertEquals(menuCategoryDAO.getAll().size(), 0);
     }
 
