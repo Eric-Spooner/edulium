@@ -1,7 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
@@ -38,12 +37,15 @@ public class TestMenuCategoryDAO {
         // check retrieving object
         MenuCategory matcher = new MenuCategory();
         matcher.setIdentity(cat.getIdentity());
-        Assert.assertEquals(menuCategoryDAO.find(matcher), cat);
+
+        List<MenuCategory> storedObjects = menuCategoryDAO.find(matcher);
+        Assert.assertEquals(storedObjects.size(), 1);
+        Assert.assertEquals(storedObjects.get(0), cat);
     }
 
     @Test(expected = DAOException.class)
     public void testCreate_addingObjectWithoutNameShouldFail() throws DAOException {
-        // GIVEN
+        // PREPARE
         MenuCategory category = new MenuCategory();
 
         // WHEN
@@ -59,8 +61,12 @@ public class TestMenuCategoryDAO {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setName("cat");
-
         menuCategoryDAO.create(cat);
+
+        // check if cat is stored
+        MenuCategory matcher = new MenuCategory();
+        matcher.setIdentity(cat.getIdentity());
+        Assert.assertEquals(menuCategoryDAO.find(matcher).get(0), cat);
 
         // WHEN
         cat.setName("newCat");
@@ -68,9 +74,9 @@ public class TestMenuCategoryDAO {
 
         // THEN
         // check if category name was updated
-        MenuCategory matcher = new MenuCategory();
-        matcher.setIdentity(cat.getIdentity());
-        Assert.assertEquals(menuCategoryDAO.find(matcher).get(0).getName(), "newCat");
+        List<MenuCategory> storedObjects = menuCategoryDAO.find(matcher);
+        Assert.assertEquals(storedObjects.size(), 1);
+        Assert.assertEquals(storedObjects.get(0), cat);
     }
 
     @Test(expected = DAOException.class)
@@ -80,19 +86,23 @@ public class TestMenuCategoryDAO {
         cat.setName("cat");
 
         // WHEN
-        cat.setName("newCat");
         menuCategoryDAO.update(cat);
     }
 
     @Test(expected = DAOException.class)
     public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException {
         // GIVEN
+        Long identity = (long) 99999;
         MenuCategory cat = new MenuCategory();
+        cat.setIdentity(identity);
         cat.setName("cat");
-        cat.setIdentity(Long.valueOf(99999));
+
+        // check if no item with the id IDENTITY exists
+        for(MenuCategory menuCat : menuCategoryDAO.getAll()) {
+            Assert.assertNotEquals(menuCat.getIdentity(), identity);
+        }
 
         // WHEN
-        cat.setName("newCat");
         menuCategoryDAO.update(cat);
     }
 
@@ -126,8 +136,14 @@ public class TestMenuCategoryDAO {
     @Test(expected = DAOException.class)
     public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException {
         // GIVEN
+        Long identity = (long) 99999;
         MenuCategory cat = new MenuCategory();
-        cat.setIdentity(Long.valueOf(99999));
+        cat.setIdentity(identity);
+
+        // check if no item with the id IDENTITY exists
+        for(MenuCategory menuCat : menuCategoryDAO.getAll()) {
+            Assert.assertNotEquals(menuCat.getIdentity(), identity);
+        }
 
         // WHEN
         menuCategoryDAO.delete(cat);
@@ -191,7 +207,7 @@ public class TestMenuCategoryDAO {
     public void testFind_shouldReturnEmptyList() throws DAOException {
         //WHEN
         MenuCategory matcher = new MenuCategory();
-        matcher.setIdentity(Long.valueOf(1));
+        matcher.setIdentity((long) 1);
         Assert.assertEquals(menuCategoryDAO.find(matcher).size(), 0);
     }
 
