@@ -38,8 +38,8 @@ CREATE TABLE InvoiceHistory (
 CREATE TABLE Instalment (
 	ID IDENTITY,
 	instalmentTime TIME,
-	paymentInfo VARCHAR(200),
-	type VARCHAR(200),
+	paymentInfo TEXT,
+	type TEXT,
 	amount DOUBLE,
 	invoice_ID FOREIGN KEY REFERENCES Invoice(ID),
 	PRIMARY KEY(ID, invoice_ID)
