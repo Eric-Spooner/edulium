@@ -65,7 +65,7 @@ public class Table {
     /**
      * @param column sets the column of this table
      */
-    public void setCol(int column) {
+    public void setColumn(int column) {
         this.column = column;
     }
 
@@ -75,7 +75,7 @@ public class Table {
                 "seats=" + seats +
                 ", number=" + number +
                 ", row=" + row +
-                ", col=" + column +
+                ", column=" + column +
                 '}';
     }
 
