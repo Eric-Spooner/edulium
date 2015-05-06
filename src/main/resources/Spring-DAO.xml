@@ -6,4 +6,9 @@
 
     <import resource="Spring-DataSource.xml" />
 
+    <!-- DAO beans -->
+    <bean id="menuCategoryDAO" class="com.at.ac.tuwien.sepm.ss15.edulium.dao.impl.MenuCategoryDAOImpl">
+          <property name="dataSource" ref="dataSource" />
+    </bean>
+
 </beans>
