@@ -6,9 +6,8 @@ import java.util.ArrayList;
  * domain object which represents a section in the restaurant
  */
 public class Section {
-    private Long id;
+    private Long identity;
     private String name;
-    private boolean deleted;
     private ArrayList<Table> tables;
 
     public Section() {
@@ -16,17 +15,17 @@ public class Section {
     }
 
     /**
-     * @return the unique id of the section
+     * @return the unique identity of the section
      */
-    public Long getId() {
-        return id;
+    public Long getIdentity() {
+        return identity;
     }
 
     /**
-     * @param id sets the unique id of the section
+     * @param id sets the unique identity of the section
      */
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdentity(Long id) {
+        this.identity = id;
     }
 
     /**
@@ -41,20 +40,6 @@ public class Section {
      */
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-     * @return true if section is deleted, false otherwise
-     */
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    /**
-     * @param deleted sets the section to deleted (true) or false otherwise
-     */
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
     }
 
     /**
@@ -83,9 +68,8 @@ public class Section {
     @Override
     public String toString() {
         return "Section{" +
-                "id=" + id +
+                "identity=" + identity +
                 ", name='" + name + '\'' +
-                ", deleted=" + deleted +
                 ", tables=" + tables +
                 '}';
     }
@@ -97,8 +81,7 @@ public class Section {
 
         Section section = (Section) o;
 
-        if (deleted != section.deleted) return false;
-        if (id != section.id) return false;
+        if (identity != section.identity) return false;
         if (name != null ? !name.equals(section.name) : section.name != null) return false;
         if (tables != null ? !tables.equals(section.tables) : section.tables != null) return false;
 
