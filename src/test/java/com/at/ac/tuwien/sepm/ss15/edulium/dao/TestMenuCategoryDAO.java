@@ -106,7 +106,7 @@ public class TestMenuCategoryDAO {
             }
         } catch (DAOException e) {
             // exception should not occur here
-            Assert.assertTrue(false);
+            Assert.fail();
         }
 
         // WHEN
@@ -156,7 +156,7 @@ public class TestMenuCategoryDAO {
             }
         } catch (DAOException e) {
             // exception should not occur here
-            Assert.assertTrue(false);
+            Assert.fail();
         }
 
         // WHEN
@@ -239,14 +239,9 @@ public class TestMenuCategoryDAO {
         matcher.setIdentity(identity);
 
         // check if no item with the id IDENTITY exists
-        try {
-            while (!menuCategoryDAO.find(matcher).isEmpty()) {
-                identity++;
-                matcher.setIdentity(identity);
-            }
-        } catch (DAOException e) {
-            // exception should not occur here
-            Assert.assertTrue(false);
+        while (!menuCategoryDAO.find(matcher).isEmpty()) {
+            identity++;
+            matcher.setIdentity(identity);
         }
 
         // WHEN
