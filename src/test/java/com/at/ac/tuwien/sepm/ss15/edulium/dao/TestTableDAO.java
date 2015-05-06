@@ -41,7 +41,9 @@ public class TestTableDAO {
         // check retrieving object
         Table matcher = new Table();
         matcher.setNumber(table.getNumber());
-        Assert.assertEquals(tableDAO.find(matcher), table);
+        List<Table> storedObjects = tableDAO.find(matcher);
+        Assert.assertEquals(storedObjects.size(), 1);
+        Assert.assertEquals(storedObjects.get(0), table);
     }
 
     @Test(expected = DAOException.class)
@@ -67,6 +69,11 @@ public class TestTableDAO {
 
         tableDAO.create(table);
 
+        // check if cat is stored
+        Table matcher = new Table();
+        matcher.setNumber(table.getNumber());
+        Assert.assertEquals(tableDAO.find(matcher).get(0), table);
+
         // WHEN
         table.setSeats(6);
         table.setColumn(7);
@@ -75,11 +82,9 @@ public class TestTableDAO {
 
         // THEN
         // check if category name was updated
-        Table matcher = new Table();
-        matcher.setNumber(table.getNumber());
-        Assert.assertEquals(tableDAO.find(matcher).get(0).getSeats(), 6);
-        Assert.assertEquals(tableDAO.find(matcher).get(0).getColumn(), 7);
-        Assert.assertEquals(tableDAO.find(matcher).get(0).getRow(), 8);
+        List<Table> storedObjects = tableDAO.find(matcher);
+        Assert.assertEquals(storedObjects.size(), 1);
+        Assert.assertEquals(storedObjects.get(0), table);
     }
 
     @Test(expected = DAOException.class)
@@ -91,9 +96,6 @@ public class TestTableDAO {
         table.setRow(5);
 
         // WHEN
-        table.setSeats(6);
-        table.setColumn(7);
-        table.setRow(8);
         tableDAO.update(table);
     }
 
@@ -104,12 +106,21 @@ public class TestTableDAO {
         table.setSeats(3);
         table.setColumn(4);
         table.setRow(5);
-        table.setNumber(Long.valueOf(99999));
+        Long number = (long) 1;
+        table.setNumber(number);
+
+        // check if no item with this number exists
+        try {
+            while (!tableDAO.find(table).isEmpty()) {
+                number++;
+                table.setNumber(number);
+            }
+        } catch (DAOException e) {
+            // exception should not occur here
+            Assert.assertTrue(false);
+        }
 
         // WHEN
-        table.setSeats(6);
-        table.setColumn(7);
-        table.setRow(8);
         tableDAO.update(table);
     }
 
@@ -146,7 +157,19 @@ public class TestTableDAO {
     public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException {
         // GIVEN
         Table table = new Table();
-        table.setNumber(Long.valueOf(99999));
+        Long number = (long) 1;
+        table.setNumber(number);
+
+        // check if no item with this number exists
+        try {
+            while (!tableDAO.find(table).isEmpty()) {
+                number++;
+                table.setNumber(number);
+            }
+        } catch (DAOException e) {
+            // exception should not occur here
+            Assert.assertTrue(false);
+        }
 
         // WHEN
         tableDAO.delete(table);
@@ -155,6 +178,7 @@ public class TestTableDAO {
     @Test
     public void testFind_byNumberShouldReturnObject() throws DAOException {
         // GIVEN
+        Table matcher = new Table();
         Table table1 = new Table();
         Table table2 = new Table();
         Table table3 = new Table();
@@ -172,16 +196,25 @@ public class TestTableDAO {
         tableDAO.create(table3);
 
         // WHEN
-        Table matcher = new Table();
-
         matcher.setNumber(table1.getNumber());
-        Assert.assertEquals(tableDAO.find(matcher).get(0), table1);
+        List<Table> objects = tableDAO.find(matcher);
+        // THEN
+        Assert.assertEquals(objects.size(), 1);
+        Assert.assertEquals(objects.get(0), table1);
 
+        // WHEN
         matcher.setNumber(table2.getNumber());
-        Assert.assertEquals(tableDAO.find(matcher).get(0), table2);
+        objects = tableDAO.find(matcher);
+        // THEN
+        Assert.assertEquals(objects.size(), 1);
+        Assert.assertEquals(objects.get(0), table3);
 
+        // WHEN
         matcher.setNumber(table3.getNumber());
-        Assert.assertEquals(tableDAO.find(matcher).get(0), table3);
+        objects = tableDAO.find(matcher);
+        // THEN
+        Assert.assertEquals(objects.size(), 1);
+        Assert.assertEquals(objects.get(0), table3);
     }
 
     @Test
@@ -219,20 +252,41 @@ public class TestTableDAO {
         matcher.setSeats(table3.getSeats());
         matcher.setColumn(table3.getColumn());
         matcher.setRow(table3.getRow());
-        Assert.assertEquals(tableDAO.find(matcher).get(0), table3);
+        objects = tableDAO.find(matcher);
+
+        // THEN
+        Assert.assertEquals(objects.size(), 1);
+        Assert.assertEquals(objects.get(0), table3);
     }
 
     @Test
     public void testFind_shouldReturnEmptyList() throws DAOException {
-        //WHEN
+        // GIVEN
+        Long number = (long) 1;
         Table matcher = new Table();
         matcher.setNumber(Long.valueOf(1));
-        Assert.assertEquals(tableDAO.find(matcher).size(), 0);
+
+        // check if no item with this number exists
+        try {
+            while (!tableDAO.find(matcher).isEmpty()) {
+                number++;
+                matcher.setNumber(number);
+            }
+        } catch (DAOException e) {
+            // exception should not occur here
+            Assert.assertTrue(false);
+        }
+
+        // WHEN
+        List<Table> storedObjects = tableDAO.find(matcher);
+
+        // THEN
+        Assert.assertEquals(storedObjects.size(), 0);
     }
 
     @Test
     public void testGetAll_shouldReturnEmptyList() throws DAOException {
-        //WHEN
+        // WHEN / THEN
         Assert.assertEquals(tableDAO.getAll().size(), 0);
     }
 
