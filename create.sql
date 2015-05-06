@@ -1,7 +1,3 @@
-#TODO:
-#ReservationAssocHistory?
-#PaymentInfo und Type was für ein typ?
-
 CREATE TABLE RestaurantUser (
 	ID IDENTITY PRIMARY KEY,
 	name VARCHAR(100),
@@ -43,7 +39,7 @@ CREATE TABLE Instalment (
 	ID IDENTITY,
 	instalmentTime TIME,
 	paymentInfo VARCHAR(200),
-	type VARCHAR(100),
+	type VARCHAR(200),
 	amount DOUBLE,
 	invoice_ID FOREIGN KEY REFERENCES Invoice(ID),
 	PRIMARY KEY(ID, invoice_ID)
@@ -116,7 +112,18 @@ CREATE TABLE ReservationHistory (
 CREATE TABLE ReservationAssoc (
 	table_ID FOREIGN KEY REFERENCES RestaurantTable(ID),
 	reservation_ID FOREIGN KEY REFERENCES Reservation(ID),
+	disabled BOOLEAN DEFAULT FALSE,
 	PRIMARY KEY(table_ID, reservation_ID)
+);
+
+CREATE TABLE ReservationAssocHistory (
+	reservationAssoc_table_ID FOREIGN KEY REFERENCES ReservationAssoc(table_ID),
+	reservationAssoc_reservationID FOREIGN KEY REFERENCES ReservationAssoc(reservation_ID),
+	disabled BOOLEAN DEFAULT FALSE,
+	changeNr IDENTITY,
+	changeTime TIME,
+	changeUser FOREIGN KEY REFERENCES RestaurantUser(ID),
+	PRIMARY KEY(reservationAssoc_table_ID, reservationAssoc_reservationID, changeNr)
 );
 
 CREATE TABLE MenuCategory (
