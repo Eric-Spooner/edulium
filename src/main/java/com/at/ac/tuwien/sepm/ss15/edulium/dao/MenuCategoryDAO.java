@@ -14,21 +14,21 @@ public interface MenuCategoryDAO {
      *
      * sets the identity parameter of menuCategory, if the data was stored
      * successfully
-     * @param menuCategory object to store (must not be null)
+     * @param menuCategory object to store
      * @throws DAOException if the object couldn't be stored
      */
     void create(MenuCategory menuCategory) throws DAOException;
 
     /**
-     * updates data of object menuCategory
-     * @param menuCategory object to update (must not be null)
+     * updates data of object menuCategory in the underlying datasource
+     * @param menuCategory object to update
      * @throws DAOException if the object couldn't be updated
      */
     void update(MenuCategory menuCategory) throws DAOException;
 
     /**
-     * removes the object menuCategory
-     * @param menuCategory object to remove (must not be null)
+     * removes the object menuCategory from the underlying datasource
+     * @param menuCategory object to remove
      * @throws DAOException if the object couldn't be removed
      */
     void delete(MenuCategory menuCategory) throws DAOException;

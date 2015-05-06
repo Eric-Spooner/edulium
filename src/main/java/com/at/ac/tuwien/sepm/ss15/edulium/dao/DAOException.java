@@ -1,7 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 /**
- * Exception indication an error in the persistence layer
+ * Exception indicating an error in the persistence layer
  */
 public class DAOException extends Exception {
 

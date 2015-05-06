@@ -24,8 +24,8 @@ public class MenuCategory {
     }
 
     /**
-     * @return  returns the identity if the object is persistent;
-     *          otherwise returns null
+     * @return  returns the identity of the object;
+     *          can be null
      */
     public Long getIdentity() {
         return identity;
@@ -33,7 +33,6 @@ public class MenuCategory {
 
     /**
      * @param identity sets the identity of this object
-     *                 should only be called if the object is persistent
      */
     public void setIdentity(Long identity) {
         this.identity = identity;

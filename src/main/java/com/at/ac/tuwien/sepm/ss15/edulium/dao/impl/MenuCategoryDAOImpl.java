@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * H2 Database Implementation of the MenuCategoryDAO interface
  */
-public class MenuCategoryDAOImpl implements MenuCategoryDAO {
+class MenuCategoryDAOImpl implements MenuCategoryDAO {
     private DataSource dataSource;
 
     public void setDataSource(DataSource dataSource) {
