@@ -1,6 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * domain object which represents a reservation
@@ -11,6 +12,7 @@ public class Reservation {
     private String name = null;
     private Integer quantity = null;
     private Integer duration = null;
+    private List<Table> tables = null;
 
     /**
      * @return the identity of the reservation (can be null)
@@ -85,6 +87,21 @@ public class Reservation {
         this.duration = duration;
     }
 
+    /**
+     * @return the reserved tables for the reservation (can be null)
+     */
+    public List<Table> getTables() {
+        return tables;
+    }
+
+    /**
+     * Sets the reserved tables for the reservation
+     * @param tables reserved tables for the reservation
+     */
+    public void setTables(List<Table> tables) {
+        this.tables = tables;
+    }
+
     @Override
     public String toString() {
         return "Reservation{" +
@@ -93,6 +110,7 @@ public class Reservation {
                 ", name='" + name + '\'' +
                 ", quantity=" + quantity +
                 ", duration=" + duration +
+                ", tables=" + tables +
                 '}';
     }
 
@@ -107,7 +125,8 @@ public class Reservation {
         if (time != null ? !time.equals(that.time) : that.time != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (quantity != null ? !quantity.equals(that.quantity) : that.quantity != null) return false;
-        return !(duration != null ? !duration.equals(that.duration) : that.duration != null);
+        if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
+        return !(tables != null ? !tables.equals(that.tables) : that.tables != null);
 
     }
 }
