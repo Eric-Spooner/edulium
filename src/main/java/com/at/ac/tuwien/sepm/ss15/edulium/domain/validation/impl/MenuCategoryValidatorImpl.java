@@ -16,6 +16,9 @@ public class MenuCategoryValidatorImpl implements MenuCategoryValidator {
      */
     @Override
     public void validateForCreate(MenuCategory menuCategory) throws ValidationException {
+        if(menuCategory == null) {
+            throw new ValidationException("object must not be null");
+        }
         if(menuCategory.getName() == null) {
             throw new ValidationException("name must not be null");
         }
@@ -31,6 +34,9 @@ public class MenuCategoryValidatorImpl implements MenuCategoryValidator {
      */
     @Override
     public void validateForUpdate(MenuCategory menuCategory) throws ValidationException {
+        if(menuCategory == null) {
+            throw new ValidationException("object must not be null");
+        }
         if(menuCategory.getIdentity() == null) {
             throw new ValidationException("identity must not be null");
         }
@@ -43,6 +49,9 @@ public class MenuCategoryValidatorImpl implements MenuCategoryValidator {
      */
     @Override
     public void validateForDelete(MenuCategory menuCategory) throws ValidationException {
+        if(menuCategory == null) {
+            throw new ValidationException("object must not be null");
+        }
         if(menuCategory.getIdentity() == null) {
             throw new ValidationException("identity must not be null");
         }
