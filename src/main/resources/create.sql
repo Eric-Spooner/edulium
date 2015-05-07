@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS RestaurantUser (
 );
 
 CREATE TABLE IF NOT EXISTS RestaurantUserHistory (
-    user_ID BIGINT REFERENCES RestaurantUser(ID),
+    user_ID VARCHAR(25) REFERENCES RestaurantUser(ID),
     name VARCHAR(100),
     userRole VARCHAR(100),
     deleted BOOLEAN,
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS Invoice (
     invoiceTime TIMESTAMP,
     brutto DECIMAL(20, 2),
     paid DECIMAL(20, 2),
-    user_ID BIGINT REFERENCES RestaurantUser(ID),
+    user_ID VARCHAR(25) REFERENCES RestaurantUser(ID),
     canceled BOOLEAN DEFAULT FALSE
 );
 
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS RestaurantTable (
     seats INT,
     tableRow INT,
     tableColumn INT,
-    user_ID BIGINT REFERENCES RestaurantUser(ID),
+    user_ID VARCHAR(25) REFERENCES RestaurantUser(ID),
     disabled BOOLEAN DEFAULT FALSE,
     PRIMARY KEY(section_ID, number)
 );
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS TableHistory (
     seats INT,
     tableRow INT,
     tableColumn INT,
-    user_ID BIGINT REFERENCES RestaurantUser(ID),
+    user_ID VARCHAR(25) REFERENCES RestaurantUser(ID),
     disabled BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
