@@ -3,6 +3,8 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.MenuCategoryDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.MenuCategoryValidator;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +20,8 @@ import java.util.List;
 class MenuCategoryDAOImpl implements MenuCategoryDAO {
     @Autowired
     private DataSource dataSource;
+    @Autowired
+    private MenuCategoryValidator validator;
 
     /**
      * writes the object into the database and sets the identity parameter of
@@ -26,8 +30,10 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
      * @throws DAOException if an error accessing the database occurred
      */
     @Override
-    public void create(MenuCategory menuCategory) throws DAOException {
+    public void create(MenuCategory menuCategory) throws DAOException, ValidationException {
         assert(menuCategory != null);
+
+        validator.validateForCreate(menuCategory);
 
         final String query = "INSERT INTO MenuCategory (name) VALUES (?)";
 
@@ -56,8 +62,10 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
      *         dataset was not found in the database
      */
     @Override
-    public void update(MenuCategory menuCategory) throws DAOException {
+    public void update(MenuCategory menuCategory) throws DAOException, ValidationException {
         assert(menuCategory != null);
+
+        validator.validateForUpdate(menuCategory);
 
         final String query = "UPDATE MenuCategory SET name = ? WHERE ID = ?";
 
@@ -83,8 +91,10 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
      *         the dataset was not found in the database
      */
     @Override
-    public void delete(MenuCategory menuCategory) throws DAOException {
+    public void delete(MenuCategory menuCategory) throws DAOException, ValidationException {
         assert(menuCategory != null);
+
+        validator.validateForDelete(menuCategory);
 
         final String query = "UPDATE MenuCategory SET deleted = true WHERE ID = ?";
 

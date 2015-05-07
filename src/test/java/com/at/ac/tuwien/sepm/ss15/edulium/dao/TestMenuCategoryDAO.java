@@ -1,6 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    public void testCreate_shouldAddObject() throws DAOException {
+    public void testCreate_shouldAddObject() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setName("cat");
@@ -58,8 +59,8 @@ public class TestMenuCategoryDAO {
         Assert.assertEquals(storedObjects.get(0), cat);
     }
 
-    @Test(expected = DAOException.class)
-    public void testCreate_addingObjectWithoutNameShouldFail() throws DAOException {
+    @Test(expected = ValidationException.class)
+    public void testCreate_addingObjectWithoutNameShouldFail() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory category = new MenuCategory();
 
@@ -71,8 +72,22 @@ public class TestMenuCategoryDAO {
         }
     }
 
+    @Test(expected = ValidationException.class)
+    public void testCreate_addingObjectWithEmptyNameShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        MenuCategory category = new MenuCategory();
+        category.setName("");
+
+        // WHEN
+        try {
+            menuCategoryDAO.create(category);
+        } finally {
+            Assert.assertNull(category.getIdentity());
+        }
+    }
+
     @Test
-    public void testUpdate_shouldUpdateObject() throws DAOException {
+    public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setName("cat");
@@ -94,8 +109,8 @@ public class TestMenuCategoryDAO {
         Assert.assertEquals(storedObjects.get(0), cat);
     }
 
-    @Test(expected = DAOException.class)
-    public void testUpdate_updatingObjectWithIdentityNullShouldFail() throws DAOException {
+    @Test(expected = ValidationException.class)
+    public void testUpdate_updatingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setName("cat");
@@ -105,7 +120,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException {
+    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         Long identity = (long) 1;
@@ -128,7 +143,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    public void testDelete_shouldDeleteObject() throws DAOException {
+    public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setName("cat");
@@ -151,8 +166,8 @@ public class TestMenuCategoryDAO {
         Assert.assertEquals(menuCategoryDAO.getAll().size(), 0);
     }
 
-    @Test(expected = DAOException.class)
-    public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException {
+    @Test(expected = ValidationException.class)
+    public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
 
@@ -161,7 +176,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException {
+    public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         Long identity = (long) 1;
@@ -183,7 +198,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    public void testFind_byIdentityShouldReturnObject() throws DAOException {
+    public void testFind_byIdentityShouldReturnObject() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory matcher = new MenuCategory();
         MenuCategory cat1 = new MenuCategory();
@@ -219,7 +234,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    public void testFind_byNameShouldReturnObjects() throws DAOException {
+    public void testFind_byNameShouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory matcher = new MenuCategory();
         MenuCategory cat1 = new MenuCategory();
@@ -277,7 +292,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    public void testGetAll_shouldReturnObjects() throws DAOException {
+    public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat1 = new MenuCategory();
         MenuCategory cat2 = new MenuCategory();
