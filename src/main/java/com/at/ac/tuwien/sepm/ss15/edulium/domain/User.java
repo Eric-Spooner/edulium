@@ -4,14 +4,14 @@ package com.at.ac.tuwien.sepm.ss15.edulium.domain;
  * domain object which represents a user
  */
 public class User {
-    private Long identity = null;
+    private String identity = null;
     private String name = null;
     private String role = null;
 
     /**
      * @return the identity of the user (can be null)
      */
-    public Long getIdentity() {
+    public String getIdentity() {
         return identity;
     }
 
@@ -19,7 +19,7 @@ public class User {
      * Sets the identity of the user
      * @param identity identity of the user
      */
-    public void setIdentity(Long identity) {
+    public void setIdentity(String identity) {
         this.identity = identity;
     }
 
