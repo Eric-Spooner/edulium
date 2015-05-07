@@ -1,6 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 
 import java.util.List;
 
@@ -16,21 +17,21 @@ public interface ReservationDAO {
      * @param reservation object to store
      * @throws DAOException if the object couldn't be stored
      */
-    void create(Reservation reservation) throws DAOException;
+    void create(Reservation reservation) throws DAOException, ValidationException;
 
     /**
      * updates data of object reservation in the underlying datasource
      * @param reservation object to update
      * @throws DAOException if the object couldn't be updated
      */
-    void update(Reservation reservation) throws DAOException;
+    void update(Reservation reservation) throws DAOException, ValidationException;
 
     /**
      * removes the object reservation from the underlying datasource
      * @param reservation object to remove
      * @throws DAOException if the object couldn't be removed
      */
-    void delete(Reservation reservation) throws DAOException;
+    void delete(Reservation reservation) throws DAOException, ValidationException;
 
     /**
      * returns all objects whose parameters match the parameters of the object reservation

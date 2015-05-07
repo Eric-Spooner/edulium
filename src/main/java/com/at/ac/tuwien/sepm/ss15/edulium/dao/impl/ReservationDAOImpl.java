@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.ReservationDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,17 +14,17 @@ import java.util.List;
 @Repository
 class ReservationDAOImpl implements ReservationDAO {
     @Override
-    public void create(Reservation reservation) throws DAOException {
+    public void create(Reservation reservation) throws DAOException, ValidationException {
 
     }
 
     @Override
-    public void update(Reservation reservation) throws DAOException {
+    public void update(Reservation reservation) throws DAOException, ValidationException {
 
     }
 
     @Override
-    public void delete(Reservation reservation) throws DAOException {
+    public void delete(Reservation reservation) throws DAOException, ValidationException {
 
     }
 
