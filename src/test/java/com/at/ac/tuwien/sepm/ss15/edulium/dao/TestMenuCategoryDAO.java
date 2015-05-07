@@ -1,15 +1,17 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import org.junit.Test;
-import org.junit.Assert;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.*;
+import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 /**
@@ -21,9 +23,22 @@ import java.util.List;
 public class TestMenuCategoryDAO {
     @Autowired
     private MenuCategoryDAO menuCategoryDAO;
+    @Autowired
+    private DataSource dataSource;
+
+    // FIXME database rollback not working -> workaround:
+    @After
+    public void tearDown() {
+        try {
+            Statement stmt = dataSource.getConnection().createStatement();
+            stmt.execute("DELETE FROM MENUCATEGORY; DELETE FROM MENUCATEGORYHISTORY;");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
-    public void testCreate_shouldAddObject() throws DAOException {
+    public void testCreate_shouldAddObject() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setName("cat");
@@ -44,8 +59,8 @@ public class TestMenuCategoryDAO {
         Assert.assertEquals(storedObjects.get(0), cat);
     }
 
-    @Test(expected = DAOException.class)
-    public void testCreate_addingObjectWithoutNameShouldFail() throws DAOException {
+    @Test(expected = ValidationException.class)
+    public void testCreate_addingObjectWithoutNameShouldFail() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory category = new MenuCategory();
 
@@ -57,8 +72,22 @@ public class TestMenuCategoryDAO {
         }
     }
 
+    @Test(expected = ValidationException.class)
+    public void testCreate_addingObjectWithEmptyNameShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        MenuCategory category = new MenuCategory();
+        category.setName("");
+
+        // WHEN
+        try {
+            menuCategoryDAO.create(category);
+        } finally {
+            Assert.assertNull(category.getIdentity());
+        }
+    }
+
     @Test
-    public void testUpdate_shouldUpdateObject() throws DAOException {
+    public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setName("cat");
@@ -80,8 +109,8 @@ public class TestMenuCategoryDAO {
         Assert.assertEquals(storedObjects.get(0), cat);
     }
 
-    @Test(expected = DAOException.class)
-    public void testUpdate_updatingObjectWithIdentityNullShouldFail() throws DAOException {
+    @Test(expected = ValidationException.class)
+    public void testUpdate_updatingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setName("cat");
@@ -91,14 +120,14 @@ public class TestMenuCategoryDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException {
+    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         Long identity = (long) 1;
         cat.setIdentity(identity);
         cat.setName("cat");
 
-        // check if no item with the id IDENTITY exists
+        // generate identity which is not used by any persistent object
         try {
             while (!menuCategoryDAO.find(cat).isEmpty()) {
                 identity++;
@@ -106,7 +135,7 @@ public class TestMenuCategoryDAO {
             }
         } catch (DAOException e) {
             // exception should not occur here
-            Assert.assertTrue(false);
+            Assert.fail();
         }
 
         // WHEN
@@ -114,26 +143,31 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    public void testDelete_shouldDeleteObject() throws DAOException {
+    public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         cat.setName("cat");
         menuCategoryDAO.create(cat);
 
-        // WHEN
-        menuCategoryDAO.delete(cat);
-
-        // check if category was removed
         MenuCategory matcher = new MenuCategory();
         matcher.setIdentity(cat.getIdentity());
 
+        // check if cat created
+        List<MenuCategory> objects = menuCategoryDAO.find(matcher);
+        Assert.assertEquals(objects.size(), 1);
+        Assert.assertEquals(objects.get(0), cat);
+
+        // WHEN
+        menuCategoryDAO.delete(cat);
+
         // THEN
+        // check if category was removed
         Assert.assertEquals(menuCategoryDAO.find(matcher).size(), 0);
         Assert.assertEquals(menuCategoryDAO.getAll().size(), 0);
     }
 
-    @Test(expected = DAOException.class)
-    public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException {
+    @Test(expected = ValidationException.class)
+    public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
 
@@ -142,13 +176,13 @@ public class TestMenuCategoryDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException {
+    public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
         Long identity = (long) 1;
         cat.setIdentity(identity);
 
-        // check if no item with the id IDENTITY exists
+        // generate identity which is not used by any persistent object
         try {
             while (!menuCategoryDAO.find(cat).isEmpty()) {
                 identity++;
@@ -156,7 +190,7 @@ public class TestMenuCategoryDAO {
             }
         } catch (DAOException e) {
             // exception should not occur here
-            Assert.assertTrue(false);
+            Assert.fail();
         }
 
         // WHEN
@@ -164,7 +198,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    public void testFind_byIdentityShouldReturnObject() throws DAOException {
+    public void testFind_byIdentityShouldReturnObject() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory matcher = new MenuCategory();
         MenuCategory cat1 = new MenuCategory();
@@ -200,7 +234,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    public void testFind_byNameShouldReturnObjects() throws DAOException {
+    public void testFind_byNameShouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory matcher = new MenuCategory();
         MenuCategory cat1 = new MenuCategory();
@@ -238,15 +272,10 @@ public class TestMenuCategoryDAO {
         MenuCategory matcher = new MenuCategory();
         matcher.setIdentity(identity);
 
-        // check if no item with the id IDENTITY exists
-        try {
-            while (!menuCategoryDAO.find(matcher).isEmpty()) {
-                identity++;
-                matcher.setIdentity(identity);
-            }
-        } catch (DAOException e) {
-            // exception should not occur here
-            Assert.assertTrue(false);
+        // generate identity which is not used by any persistent object
+        while (!menuCategoryDAO.find(matcher).isEmpty()) {
+            identity++;
+            matcher.setIdentity(identity);
         }
 
         // WHEN
@@ -263,7 +292,7 @@ public class TestMenuCategoryDAO {
     }
 
     @Test
-    public void testGetAll_shouldReturnObjects() throws DAOException {
+    public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat1 = new MenuCategory();
         MenuCategory cat2 = new MenuCategory();

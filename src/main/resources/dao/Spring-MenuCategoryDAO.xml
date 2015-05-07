@@ -6,5 +6,7 @@
 
     <bean id="menuCategoryDAO" class="com.at.ac.tuwien.sepm.ss15.edulium.dao.impl.MenuCategoryDAOImpl">
     </bean>
+    <bean id="MenuCategoryValidator" class="com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl.MenuCategoryValidatorImpl">
+    </bean>
 
 </beans>
