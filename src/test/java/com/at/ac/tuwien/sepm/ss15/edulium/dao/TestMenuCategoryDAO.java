@@ -1,15 +1,16 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import org.junit.Test;
-import org.junit.Assert;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.*;
+import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 /**
@@ -21,6 +22,19 @@ import java.util.List;
 public class TestMenuCategoryDAO {
     @Autowired
     private MenuCategoryDAO menuCategoryDAO;
+    @Autowired
+    private DataSource dataSource;
+
+    // FIXME database rollback not working -> workaround:
+    @After
+    public void tearDown() {
+        try {
+            Statement stmt = dataSource.getConnection().createStatement();
+            stmt.execute("DELETE FROM MENUCATEGORY; DELETE FROM MENUCATEGORYHISTORY;");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void testCreate_shouldAddObject() throws DAOException {
@@ -98,7 +112,7 @@ public class TestMenuCategoryDAO {
         cat.setIdentity(identity);
         cat.setName("cat");
 
-        // check if no item with the id IDENTITY exists
+        // generate identity which is not used by any persistent object
         try {
             while (!menuCategoryDAO.find(cat).isEmpty()) {
                 identity++;
@@ -120,14 +134,19 @@ public class TestMenuCategoryDAO {
         cat.setName("cat");
         menuCategoryDAO.create(cat);
 
-        // WHEN
-        menuCategoryDAO.delete(cat);
-
-        // check if category was removed
         MenuCategory matcher = new MenuCategory();
         matcher.setIdentity(cat.getIdentity());
 
+        // check if cat created
+        List<MenuCategory> objects = menuCategoryDAO.find(matcher);
+        Assert.assertEquals(objects.size(), 1);
+        Assert.assertEquals(objects.get(0), cat);
+
+        // WHEN
+        menuCategoryDAO.delete(cat);
+
         // THEN
+        // check if category was removed
         Assert.assertEquals(menuCategoryDAO.find(matcher).size(), 0);
         Assert.assertEquals(menuCategoryDAO.getAll().size(), 0);
     }
@@ -148,7 +167,7 @@ public class TestMenuCategoryDAO {
         Long identity = (long) 1;
         cat.setIdentity(identity);
 
-        // check if no item with the id IDENTITY exists
+        // generate identity which is not used by any persistent object
         try {
             while (!menuCategoryDAO.find(cat).isEmpty()) {
                 identity++;
@@ -238,7 +257,7 @@ public class TestMenuCategoryDAO {
         MenuCategory matcher = new MenuCategory();
         matcher.setIdentity(identity);
 
-        // check if no item with the id IDENTITY exists
+        // generate identity which is not used by any persistent object
         while (!menuCategoryDAO.find(matcher).isEmpty()) {
             identity++;
             matcher.setIdentity(identity);
