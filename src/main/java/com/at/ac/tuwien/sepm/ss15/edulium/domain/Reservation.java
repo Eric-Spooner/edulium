@@ -23,7 +23,7 @@ public class Reservation {
 
     /**
      * Sets the identity of the reservation
-     * @param identity sets the identity of the reservation
+     * @param identity identity of the reservation
      */
     public void setIdentity(Long identity) {
         this.identity = identity;
