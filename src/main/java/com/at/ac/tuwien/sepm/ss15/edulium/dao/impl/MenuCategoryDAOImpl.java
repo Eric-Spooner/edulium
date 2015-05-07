@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -17,44 +18,29 @@ import java.util.List;
 class MenuCategoryDAOImpl implements MenuCategoryDAO {
     @Autowired
     private DataSource dataSource;
-    private Connection connection;
-
-    public MenuCategoryDAOImpl() throws DAOException {
-        try {
-            connection = dataSource.getConnection();
-        } catch (SQLException e) {
-            throw new DAOException(e);
-        }
-    }
 
     @Override
     public void create(MenuCategory menuCategory) throws DAOException {
         assert(menuCategory != null);
 
-        try {
-            PreparedStatement stmt = connection.prepareStatement("" +
-                    "INSERT INTO MenuCategory VALUES (NULL, ?, FALSE);", Statement.RETURN_GENERATED_KEYS);
-            try {
-                stmt.setString(1, menuCategory.getName());  // name
-                stmt.executeUpdate();
+        final String query = "INSERT INTO MenuCategory (name) VALUES (?)";
 
-                ResultSet key = stmt.getGeneratedKeys();
-                try {
-                    key.next();
-                    menuCategory.setIdentity(key.getLong(1));
-                } finally {
-                    key.close();
-                }
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query,
+                Statement.RETURN_GENERATED_KEYS)) {
 
-            } finally {
-                stmt.close();
+            stmt.setString(1, menuCategory.getName());
+            stmt.executeUpdate();
+
+            try (ResultSet key = stmt.getGeneratedKeys()) {
+                key.next();
+                menuCategory.setIdentity(key.getLong(1));
             }
 
         } catch (SQLException e) {
             throw new DAOException(e);
         }
 
-        generateHistory_create(menuCategory);
+        generateHistory(menuCategory.getIdentity());
     }
 
     @Override
@@ -80,31 +66,19 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
         return null;
     }
 
-    private void generateHistory_create(MenuCategory menuCategory) throws DAOException {
-        try {
-            PreparedStatement stmt = connection.prepareStatement(
-                    "INSERT INTO MenuCategoryHistory VALUES (?, ?, ?, ?, ?, ?);");
-            try {
-                stmt.setLong(1, menuCategory.getIdentity());    // dataset id
-                stmt.setBoolean(2, false);                      // deleted
-                stmt.setString(3, menuCategory.getName());      // name
-                stmt.setInt(4, 1);                              // changeNr
-                stmt.setTime(5, null);                          // time TODO
-                stmt.setInt(6, 0);                              // user TODO
+    private void generateHistory(long identity) throws DAOException {
+        final String query = "INSERT INTO MenuCategoryHistory " +
+                "(SELECT ID, name, deleted, ?, ?, NULL FROM MenuCategory WHERE ID = ?)";
+        final Timestamp timestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
 
-                stmt.executeUpdate();
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setTimestamp(1, timestamp);    // time
+            stmt.setInt(2, 0);                  // user TODO
+            stmt.setLong(3, identity);          // dataset id
 
-            } finally {
-                stmt.close();
-            }
-
+            stmt.executeUpdate();
         } catch (SQLException e) {
             throw new DAOException(e);
         }
-    }
-
-    private void generateHistory_update(MenuCategory menuCategory) throws DAOException {
-
-
     }
 }
