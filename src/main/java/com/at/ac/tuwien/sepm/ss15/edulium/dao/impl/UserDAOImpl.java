@@ -12,7 +12,7 @@ import java.util.List;
  * H2 Database Implementation of the UserDAO interface
  */
 @Repository
-public class UserDAOImpl implements UserDAO {
+class UserDAOImpl implements UserDAO {
     @Override
     public void create(User user) throws DAOException, ValidationException {
 
