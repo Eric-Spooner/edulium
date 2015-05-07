@@ -4,6 +4,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import static org.junit.Assert.*;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class TestReservationDAO {
     private TableDAO tableDAO; // only to create test tables
 
     @Test
-    public void testCreate_shouldAddValidObject() throws DAOException {
+    public void testCreate_shouldAddValidObject() throws DAOException, ValidationException {
         // PREPARE
         List<Table> tables = new ArrayList<>();
 
@@ -74,8 +75,8 @@ public class TestReservationDAO {
         assertEquals(reservation, storedObjects.get(0));
     }
 
-    @Test(expected = DAOException.class)
-    public void testCreate_addingInvalidObjecShouldFail() throws DAOException {
+    @Test(expected = ValidationException.class)
+    public void testCreate_addingInvalidObjecShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Reservation reservation = new Reservation();
 
@@ -84,7 +85,7 @@ public class TestReservationDAO {
     }
 
     @Test
-    public void testUpdate_shouldUpdateObject() throws DAOException {
+    public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // PREPARE
         Calendar calendar = new GregorianCalendar();
         calendar.set(Calendar.DAY_OF_MONTH, 1);
@@ -163,7 +164,7 @@ public class TestReservationDAO {
      * 3. Set the quantity from 4 to 16 - re-add tables 1 (6 seats) and 3 (6 seats)
      */
     @Test
-    public void testUpdate_shouldUpdateObjectThreeTimes() throws DAOException {
+    public void testUpdate_shouldUpdateObjectThreeTimes() throws DAOException, ValidationException {
         // PREPARE
         List<Table> tablesReservation = new ArrayList<>(); // table 1, table 3
         List<Table> tablesReservationUpdated1 = new ArrayList<>(); // table 2
@@ -253,8 +254,8 @@ public class TestReservationDAO {
         assertEquals(updatedReservation2, storedObjects2.get(0));
     }
 
-    @Test(expected = DAOException.class)
-    public void testUpdate_updatingObjectWithIdentityNullShouldFail() throws DAOException {
+    @Test(expected = ValidationException.class)
+    public void testUpdate_updatingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Reservation reservation = new Reservation();
         reservation.setName("Breezy Badger");
@@ -267,13 +268,9 @@ public class TestReservationDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException {
+    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Reservation reservation = new Reservation();
-        reservation.setName("Dapper Drake");
-        reservation.setTime(new Date());
-        reservation.setDuration(160);
-        reservation.setQuantity(14);
 
         // search for a non-existing reservation identity
         try {
@@ -285,12 +282,17 @@ public class TestReservationDAO {
             fail("DAOException should not occur while searching for a non-existing reservation identity");
         }
 
+        reservation.setName("Dapper Drake");
+        reservation.setTime(new Date());
+        reservation.setDuration(160);
+        reservation.setQuantity(14);
+
         // WHEN
         reservationDAO.update(reservation);
     }
 
     @Test
-    public void testDelete_shouldDeleteObject() throws DAOException {
+    public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // PREPARE
         final int numberOfReservationsBefore = reservationDAO.getAll().size();
 
@@ -341,8 +343,8 @@ public class TestReservationDAO {
         assertEquals(numberOfReservationsBefore, reservationDAO.getAll().size());
     }
 
-    @Test(expected = DAOException.class)
-    public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException {
+    @Test(expected = ValidationException.class)
+    public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Reservation reservation = new Reservation();
         reservation.setName("Feisty Fawn");
@@ -355,13 +357,9 @@ public class TestReservationDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException {
+    public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Reservation reservation = new Reservation();
-        reservation.setName("Gutsy Gibbon");
-        reservation.setTime(new Date());
-        reservation.setDuration(170);
-        reservation.setQuantity(18);
 
         // search for a non-existing reservation identity
         try {
@@ -373,12 +371,17 @@ public class TestReservationDAO {
             fail("DAOException should not occur while searching for a non-existing reservation identity");
         }
 
+        reservation.setName("Gutsy Gibbon");
+        reservation.setTime(new Date());
+        reservation.setDuration(170);
+        reservation.setQuantity(18);
+
         // WHEN
         reservationDAO.delete(reservation);
     }
 
     @Test
-    public void testFind_byIdentityShouldReturnObject() throws DAOException {
+    public void testFind_byIdentityShouldReturnObject() throws DAOException, ValidationException {
         // PREPARE
         Calendar calendar = new GregorianCalendar();
 
@@ -418,19 +421,19 @@ public class TestReservationDAO {
         reservationDAO.create(reservation3);
         assertEquals(1, reservationDAO.find(reservation3).size());
         // GIVEN
-        Reservation matcher1 = new Reservation();
+        Reservation matcher1 = new Reservation(); // for reservation 1
         matcher1.setIdentity(reservation1.getIdentity());
 
-        Reservation matcher2 = new Reservation();
+        Reservation matcher2 = new Reservation(); // for reservation 2
         matcher2.setIdentity(reservation2.getIdentity());
 
-        Reservation matcher3 = new Reservation();
+        Reservation matcher3 = new Reservation(); // for reservation 3
         matcher3.setIdentity(reservation3.getIdentity());
 
         // WHEN
-        List<Reservation> result1 = reservationDAO.find(matcher1); // for reservation 1
-        List<Reservation> result2 = reservationDAO.find(matcher2); // for reservation 2
-        List<Reservation> result3 = reservationDAO.find(matcher3); // for reservation 3
+        List<Reservation> result1 = reservationDAO.find(matcher1);
+        List<Reservation> result2 = reservationDAO.find(matcher2);
+        List<Reservation> result3 = reservationDAO.find(matcher3);
 
         // THEN
         assertEquals(1, result1.size());
@@ -444,7 +447,7 @@ public class TestReservationDAO {
     }
 
     @Test
-    public void testFind_byNameShouldReturnObjects() throws DAOException {
+    public void testFind_byNameShouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
         Calendar calendar = new GregorianCalendar();
 
@@ -505,7 +508,7 @@ public class TestReservationDAO {
     }
 
     @Test
-    public void testFind_byDateShouldReturnObjects() throws DAOException {
+    public void testFind_byDateShouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
         Calendar calendar = new GregorianCalendar();
 
@@ -566,7 +569,7 @@ public class TestReservationDAO {
     }
 
     @Test
-    public void testFind_byQuantityShouldReturnObjects() throws DAOException {
+    public void testFind_byQuantityShouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
         Calendar calendar = new GregorianCalendar();
 
@@ -627,7 +630,7 @@ public class TestReservationDAO {
     }
 
     @Test
-    public void testFind_byDurationShouldReturnObjects() throws DAOException {
+    public void testFind_byDurationShouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
         Calendar calendar = new GregorianCalendar();
 
@@ -682,7 +685,7 @@ public class TestReservationDAO {
     }
 
     @Test
-    public void testFind_byTablesShouldReturnObjects() throws DAOException {
+    public void testFind_byTablesShouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
         List<Table> tablesReservation1 = new ArrayList<>(); // table 1
         List<Table> tablesReservation2 = new ArrayList<>(); // table 1, table 2
@@ -782,11 +785,11 @@ public class TestReservationDAO {
         List<Reservation> result = reservationDAO.find(matcher);
 
         // THEN
-        assertEquals(0, result.size());
+        assertTrue(result.isEmpty());
     }
 
     @Test
-    public void testGetAll_shouldReturnObjects() throws DAOException {
+    public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
         final int numberOfReservationsBefore = reservationDAO.getAll().size();
 
