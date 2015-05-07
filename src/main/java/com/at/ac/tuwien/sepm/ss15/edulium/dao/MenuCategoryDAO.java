@@ -1,6 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 
 import java.util.List;
 
@@ -17,21 +18,21 @@ public interface MenuCategoryDAO {
      * @param menuCategory object to store
      * @throws DAOException if the object couldn't be stored
      */
-    void create(MenuCategory menuCategory) throws DAOException;
+    void create(MenuCategory menuCategory) throws DAOException, ValidationException;
 
     /**
      * updates data of object menuCategory in the underlying datasource
      * @param menuCategory object to update
      * @throws DAOException if the object couldn't be updated
      */
-    void update(MenuCategory menuCategory) throws DAOException;
+    void update(MenuCategory menuCategory) throws DAOException, ValidationException;
 
     /**
      * removes the object menuCategory from the underlying datasource
      * @param menuCategory object to remove
      * @throws DAOException if the object couldn't be removed
      */
-    void delete(MenuCategory menuCategory) throws DAOException;
+    void delete(MenuCategory menuCategory) throws DAOException, ValidationException;
 
     /**
      * returns all objects which parameters match the
