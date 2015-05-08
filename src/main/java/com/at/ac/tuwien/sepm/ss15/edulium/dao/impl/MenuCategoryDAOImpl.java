@@ -37,26 +37,21 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
         validator.validateForCreate(menuCategory);
         final String query = "INSERT INTO MenuCategory (name) VALUES (?)";
 
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query,
-                Statement.RETURN_GENERATED_KEYS)) {
-
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, menuCategory.getName());
-            if (stmt.executeUpdate() == 0) {
-                LOGGER.error("inserting menuCategory into database failed");
-                throw new DAOException("inserting menuCategory into database failed");
-            }
+            stmt.executeUpdate();
 
-            try (ResultSet key = stmt.getGeneratedKeys()) {
-                key.next();
+            ResultSet key = stmt.getGeneratedKeys();
+            if(key.next()) {
                 menuCategory.setIdentity(key.getLong(1));
             }
-
+            key.close();
         } catch (SQLException e) {
             LOGGER.error("inserting menuCategory into database failed");
             throw new DAOException("inserting menuCategory into database failed", e);
         }
 
-        generateHistory(menuCategory.getIdentity());
+        generateHistory(menuCategory);
     }
 
     /**
@@ -80,13 +75,12 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
                 LOGGER.error("updating menuCategory in database failed, dataset not found");
                 throw new DAOException("updating menuCategory in database failed, dataset not found");
             }
-
         } catch (SQLException e) {
             LOGGER.error("updating menuCategory in database failed");
             throw new DAOException(e);
         }
 
-        generateHistory(menuCategory.getIdentity());
+        generateHistory(menuCategory);
     }
 
     /**
@@ -104,17 +98,17 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, menuCategory.getIdentity());
+
             if (stmt.executeUpdate() == 0) {
                 LOGGER.error("deleting menuCategory failed, dataset not found");
                 throw new DAOException("deleting menuCategory failed, dataset not found");
             }
-
         } catch (SQLException e) {
             LOGGER.error("deleting menuCategory failed");
             throw new DAOException("deleting menuCategory failed", e);
         }
 
-        generateHistory(menuCategory.getIdentity());
+        generateHistory(menuCategory);
     }
 
     /**
@@ -141,19 +135,16 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setObject(1, menuCategory.getIdentity());
             stmt.setObject(2, menuCategory.getName());
-            stmt.execute();
 
-            try (ResultSet result = stmt.getResultSet()) {
-                while (result.next()) {
-                    objects.add(parseResult(result));
-                }
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                objects.add(parseResult(result));
             }
-
         } catch (SQLException e) {
-            LOGGER.error("retrieving data failed");
-            throw new DAOException("retrieving data failed", e);
+            LOGGER.error("searching for categories failed");
+            throw new DAOException("searching for categories failed", e);
         }
-        LOGGER.debug("return " + objects.size() + " datasets");
+
         return objects;
     }
 
@@ -168,32 +159,28 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
         final String query = "SELECT * FROM MenuCategory WHERE deleted = false";
         final List<MenuCategory> objects = new ArrayList<>();
 
-        try (Statement stmt = dataSource.getConnection().createStatement()) {
-            stmt.execute(query);
-
-            try (ResultSet result = stmt.getResultSet()) {
-                while (result.next()) {
-                    objects.add(parseResult(result));
-                }
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                objects.add(parseResult(result));
             }
-
         } catch (SQLException e) {
-            LOGGER.error("retrieving data failed");
-            throw new DAOException("retrieving data failed", e);
+            LOGGER.error("searching for all categories failed");
+            throw new DAOException("searching for all categories failed", e);
         }
-        LOGGER.debug("return " + objects.size() + " datasets");
+
         return objects;
     }
 
     // FIXME add implementation when session object is implemented
     /**
-     * writes the changes of the dataset with the id IDENTITY into the database
+     * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed
      * the changes
-     * @param identity identity of the changed dataset
+     * @param menuCategory updated dataset
      * @throws DAOException if an error accessing the database occurred
      */
-    private void generateHistory(long identity) throws DAOException {
+    private void generateHistory(MenuCategory menuCategory) throws DAOException {
         /*
         final String query = "INSERT INTO MenuCategoryHistory " +
                 "(SELECT ID, name, deleted, ?, ?, NULL FROM MenuCategory WHERE ID = ?)";
@@ -219,8 +206,8 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
      */
     private MenuCategory parseResult(ResultSet result) throws SQLException {
         MenuCategory menuCategory = new MenuCategory();
-        menuCategory.setIdentity(result.getLong(1));
-        menuCategory.setName(result.getString(2));
+        menuCategory.setIdentity(result.getLong("ID"));
+        menuCategory.setName(result.getString("name"));
         return menuCategory;
     }
 }
