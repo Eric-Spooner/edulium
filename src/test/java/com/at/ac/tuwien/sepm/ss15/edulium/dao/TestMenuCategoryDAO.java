@@ -4,39 +4,16 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.*;
 import static org.junit.Assert.*;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
 /**
  * Unit Test for the MenuCategoryDAO
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/Spring-DAO.xml")
-@Transactional
-public class TestMenuCategoryDAO {
+public class TestMenuCategoryDAO extends AbstractDAOTest {
     @Autowired
     private MenuCategoryDAO menuCategoryDAO;
-    @Autowired
-    private DataSource dataSource;
-
-    // FIXME database rollback not working -> workaround:
-    @After
-    public void tearDown() {
-        try {
-            Statement stmt = dataSource.getConnection().createStatement();
-            stmt.execute("DELETE FROM MENUCATEGORY; DELETE FROM MENUCATEGORYHISTORY;");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
