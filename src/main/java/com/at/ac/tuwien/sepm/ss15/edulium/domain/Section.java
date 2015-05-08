@@ -8,10 +8,9 @@ import java.util.ArrayList;
 public class Section {
     private Long identity;
     private String name;
-    private ArrayList<Table> tables;
 
     public Section() {
-        tables = new ArrayList<Table>();
+
     }
 
     /**
@@ -43,21 +42,6 @@ public class Section {
     }
 
     /**
-     * @return list of all tables in this section
-     */
-    public ArrayList<Table> getTables() {
-        return tables;
-    }
-
-    /**
-     * @param table adds specified table to this section,
-     *              already existing tables are not changed
-     */
-    public void addTable(Table table) {
-        tables.add(table);
-    }
-
-    /**
      * @param tables adds multiple tables to this section,
      *               already existing tables are not changed
      */
@@ -70,7 +54,6 @@ public class Section {
         return "Section{" +
                 "identity=" + identity +
                 ", name='" + name + '\'' +
-                ", tables=" + tables +
                 '}';
     }
 
@@ -83,7 +66,6 @@ public class Section {
 
         if (identity != section.identity) return false;
         if (name != null ? !name.equals(section.name) : section.name != null) return false;
-        if (tables != null ? !tables.equals(section.tables) : section.tables != null) return false;
 
         return true;
     }

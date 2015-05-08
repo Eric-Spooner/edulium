@@ -1,6 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 
 import java.util.List;
 
@@ -17,21 +18,21 @@ public interface SectionDAO {
      * @param section object to store
      * @throws DAOException if the object couldn't be stored
      */
-    void create(Section section) throws DAOException;
+    void create(Section section) throws DAOException, ValidationException;
 
     /**
      * updates data of object section in the underlying datasource
      * @param section object to update
      * @throws DAOException if the object couldn't be updated
      */
-    void update(Section section) throws DAOException;
+    void update(Section section) throws DAOException, ValidationException;
 
     /**
      * removes the object section from the underlying datasource
      * @param section object to remove
      * @throws DAOException if the object couldn't be removed
      */
-    void delete(Section section) throws DAOException;
+    void delete(Section section) throws DAOException, ValidationException;
 
     /**
      * returns all objects which parameters match the

@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.TableDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,9 +25,11 @@ public class TestTableDAO {
     private TableDAO tableDAO;
 
     @Test
-    public void testCreate_shouldAddObject() throws DAOException {
+    public void testCreate_shouldAddObject() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
+        table.setSection_id((long)1);
+        table.setUser_id((long)2);
         table.setSeats(3);
         table.setColumn(4);
         table.setRow(5);
@@ -47,7 +50,7 @@ public class TestTableDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testCreate_addingObjectWithoutSeatsAndRowAndColumnShouldFail() throws DAOException {
+    public void testCreate_addingObjectWithoutSeatsAndRowAndColumnShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
 
@@ -60,9 +63,11 @@ public class TestTableDAO {
     }
 
     @Test
-    public void testUpdate_shouldUpdateObject() throws DAOException {
+    public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
+        table.setSection_id((long)1);
+        table.setUser_id((long)2);
         table.setSeats(3);
         table.setColumn(4);
         table.setRow(5);
@@ -88,7 +93,7 @@ public class TestTableDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testUpdate_updatingObjectWithNumberNullShouldFail() throws DAOException {
+    public void testUpdate_updatingObjectWithNumberNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setSeats(3);
@@ -100,7 +105,7 @@ public class TestTableDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException {
+    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setSeats(3);
@@ -125,7 +130,7 @@ public class TestTableDAO {
     }
 
     @Test
-    public void testDelete_shouldDeleteObject() throws DAOException {
+    public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setSeats(3);
@@ -145,7 +150,7 @@ public class TestTableDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testDelete_deletingObjectWithNumberNullShouldFail() throws DAOException {
+    public void testDelete_deletingObjectWithNumberNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
 
@@ -154,7 +159,7 @@ public class TestTableDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException {
+    public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
         Long number = (long) 1;
@@ -176,7 +181,7 @@ public class TestTableDAO {
     }
 
     @Test
-    public void testFind_byNumberShouldReturnObject() throws DAOException {
+    public void testFind_byNumberShouldReturnObject() throws DAOException, ValidationException {
         // GIVEN
         Table matcher = new Table();
         Table table1 = new Table();
@@ -218,7 +223,7 @@ public class TestTableDAO {
     }
 
     @Test
-    public void testFind_bySeatsAndRowAndColumnShouldReturnObjects() throws DAOException {
+    public void testFind_bySeatsAndRowAndColumnShouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         Table table1 = new Table();
         Table table2 = new Table();
@@ -291,7 +296,7 @@ public class TestTableDAO {
     }
 
     @Test
-    public void testGetAll_shouldReturnObjects() throws DAOException {
+    public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         Table table1 = new Table();
         Table table2 = new Table();

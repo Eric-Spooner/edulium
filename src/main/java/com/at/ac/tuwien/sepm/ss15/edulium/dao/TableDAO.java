@@ -1,6 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 
 import java.util.List;
 
@@ -16,21 +17,21 @@ public interface TableDAO {
      * @param table object to store
      * @throws DAOException if the object couldn't be stored
      */
-    void create(Table table) throws DAOException;
+    void create(Table table) throws DAOException, ValidationException;
 
     /**
      * updates data of object table in the underlying datasource
      * @param table object to update
      * @throws DAOException if the object couldn't be updated
      */
-    void update(Table table) throws DAOException;
+    void update(Table table) throws DAOException, ValidationException;
 
     /**
      * removes the object table from the underlying datasource
      * @param table object to remove
      * @throws DAOException if the object couldn't be removed
      */
-    void delete(Table table) throws DAOException;
+    void delete(Table table) throws DAOException, ValidationException;
 
     /**
      * returns all objects which parameters match the
