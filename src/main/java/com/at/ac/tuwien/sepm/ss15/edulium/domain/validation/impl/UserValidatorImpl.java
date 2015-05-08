@@ -8,9 +8,9 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
  * implementation of the UserValidator
  */
 public class UserValidatorImpl implements UserValidator {
-    private final int IDENTITY_MAX_LENGTH = 25;
-    private final int NAME_MAX_LENGTH = 100;
-    private final int ROLE_MAX_LENGTH = 100;
+    private static final int IDENTITY_MAX_LENGTH = 25;
+    private static final int NAME_MAX_LENGTH = 100;
+    private static final int ROLE_MAX_LENGTH = 100;
 
     @Override
     public void validateForCreate(User user) throws ValidationException {
