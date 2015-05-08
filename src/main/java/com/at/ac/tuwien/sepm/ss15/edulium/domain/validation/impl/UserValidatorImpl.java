@@ -8,9 +8,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
  * implementation of the UserValidator
  */
 public class UserValidatorImpl implements UserValidator {
-    private static final int IDENTITY_MAX_LENGTH = 25;
-    private static final int NAME_MAX_LENGTH = 100;
-    private static final int ROLE_MAX_LENGTH = 100;
 
     @Override
     public void validateForCreate(User user) throws ValidationException {
@@ -52,9 +49,6 @@ public class UserValidatorImpl implements UserValidator {
         if (user.getIdentity().isEmpty()) {
             throw new ValidationException("identity must not be empty");
         }
-        if (user.getIdentity().length() > IDENTITY_MAX_LENGTH) {
-            throw new ValidationException("identity must not be longer than " + IDENTITY_MAX_LENGTH + " characters");
-        }
     }
 
     private void checkForRequiredDataAttributesForCreateAndUpdate(User user) throws ValidationException {
@@ -64,18 +58,12 @@ public class UserValidatorImpl implements UserValidator {
         if (user.getName().isEmpty()) {
             throw new ValidationException("name must not be empty");
         }
-        if (user.getName().length() > NAME_MAX_LENGTH) {
-            throw new ValidationException("name must not be longer than " + NAME_MAX_LENGTH + " characters");
-        }
 
         if (user.getRole() == null) {
             throw new ValidationException("role must not be null");
         }
         if (user.getRole().isEmpty()) {
             throw new ValidationException("role must not be empty");
-        }
-        if (user.getRole().length() > ROLE_MAX_LENGTH) {
-            throw new ValidationException("role must not be longer than " + ROLE_MAX_LENGTH + " characters");
         }
     }
 }
