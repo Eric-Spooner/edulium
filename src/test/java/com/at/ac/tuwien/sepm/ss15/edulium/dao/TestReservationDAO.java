@@ -347,10 +347,6 @@ public class TestReservationDAO {
     public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Reservation reservation = new Reservation();
-        reservation.setName("Feisty Fawn");
-        reservation.setTime(new Date());
-        reservation.setDuration(130);
-        reservation.setQuantity(12);
 
         // WHEN
         reservationDAO.delete(reservation);
@@ -370,11 +366,6 @@ public class TestReservationDAO {
         } catch (DAOException e) {
             fail("DAOException should not occur while searching for a non-existing reservation identity");
         }
-
-        reservation.setName("Gutsy Gibbon");
-        reservation.setTime(new Date());
-        reservation.setDuration(170);
-        reservation.setQuantity(18);
 
         // WHEN
         reservationDAO.delete(reservation);
