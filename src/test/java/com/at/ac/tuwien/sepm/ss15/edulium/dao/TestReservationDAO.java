@@ -84,6 +84,15 @@ public class TestReservationDAO {
         reservationDAO.create(reservation);
     }
 
+    @Test(expected = ValidationException.class)
+    public void testCreate_addingNullObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        Reservation reservation = null;
+
+        // WHEN
+        reservationDAO.create(reservation);
+    }
+
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // PREPARE
@@ -164,7 +173,7 @@ public class TestReservationDAO {
      * 3. Set the quantity from 4 to 16 - re-add tables 1 (6 seats) and 3 (6 seats)
      */
     @Test
-    public void testUpdate_shouldUpdateObjectThreeTimes() throws DAOException, ValidationException {
+    public void testUpdate_shouldUpdateObjectTwoTimes() throws DAOException, ValidationException {
         // PREPARE
         List<Table> tablesReservation = new ArrayList<>(); // table 1, table 3
         List<Table> tablesReservationUpdated1 = new ArrayList<>(); // table 2
@@ -267,6 +276,15 @@ public class TestReservationDAO {
         reservationDAO.update(reservation);
     }
 
+    @Test(expected = ValidationException.class)
+    public void testUpdate_updatingNullObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        Reservation reservation = null;
+
+        // WHEN
+        reservationDAO.update(reservation);
+    }
+
     @Test(expected = DAOException.class)
     public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
@@ -347,6 +365,15 @@ public class TestReservationDAO {
     public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Reservation reservation = new Reservation();
+
+        // WHEN
+        reservationDAO.delete(reservation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testDelete_deletingNullObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        Reservation reservation = null;
 
         // WHEN
         reservationDAO.delete(reservation);
