@@ -11,6 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * Unit Test for the UserDAO
@@ -213,8 +214,15 @@ public class TestUserDAO {
     public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         User user = new User();
-        user.setIdentity("zzzzzzzzzzzzzz");
-        assertTrue(userDAO.find(user).isEmpty());
+
+        // search for a non-existing user identity
+        try {
+            do {
+                user.setIdentity(buildRandomString(15));
+            } while (!userDAO.find(user).isEmpty());
+        } catch (DAOException e) {
+            fail("DAOException should not occur while searching for a non-existing user identity");
+        }
 
         user.setName("Feisty Fawn");
         user.setRole("developer");
@@ -272,8 +280,15 @@ public class TestUserDAO {
     public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         User user = new User();
-        user.setIdentity("zzzzzzzzzzzzzz");
-        assertTrue(userDAO.find(user).isEmpty());
+
+        // search for a non-existing user identity
+        try {
+            do {
+                user.setIdentity(buildRandomString(15));
+            } while (!userDAO.find(user).isEmpty());
+        } catch (DAOException e) {
+            fail("DAOException should not occur while searching for a non-existing user identity");
+        }
 
         // WHEN
         userDAO.delete(user);
@@ -439,8 +454,15 @@ public class TestUserDAO {
     public void testFind_shouldReturnEmptyList() throws DAOException {
         // GIVEN
         User matcher = new User();
-        matcher.setIdentity("zzzzzzzzzzzzzz");
-        assertTrue(userDAO.find(matcher).isEmpty());
+
+        // search for a non-existing user identity
+        try {
+            do {
+                matcher.setIdentity(buildRandomString(15));
+            } while (!userDAO.find(matcher).isEmpty());
+        } catch (DAOException e) {
+            fail("DAOException should not occur while searching for a non-existing user identity");
+        }
 
         // WHEN
         List<User> result = userDAO.find(matcher);
@@ -489,5 +511,19 @@ public class TestUserDAO {
         assertTrue(result.contains(user1));
         assertTrue(result.contains(user2));
         assertTrue(result.contains(user3));
+    }
+
+    /**
+     * Generates a random string which consists of characters from 'a' to 'z' with the given length.
+     * @param length Length of the string
+     * @return A random string which consists of characters 'a' to 'z'
+     */
+    private String buildRandomString(int length) {
+        Random random = new Random();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            stringBuilder.append(random.nextInt('z' - 'a') + 'a');
+        }
+        return stringBuilder.toString();
     }
 }
