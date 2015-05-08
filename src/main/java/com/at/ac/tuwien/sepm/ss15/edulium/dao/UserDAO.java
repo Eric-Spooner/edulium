@@ -12,7 +12,6 @@ public interface UserDAO {
     /**
      * writes the object user to the underlying datasource;
      *
-     * sets the identity parameter of user, if the data was stored successfully
      * @param user object to store
      * @throws DAOException if the object couldn't be stored
      */
