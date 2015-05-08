@@ -27,4 +27,11 @@ public interface MenuCategoryValidator {
      * @throws ValidationException if the object is not valid
      */
     void validateForDelete(MenuCategory menuCategory) throws ValidationException;
+
+    /**
+     * validates if all parameters needed for identification are set
+     * @param menuCategory object to validate
+     * @throws ValidationException if the identity of the object is not set
+     */
+    void validateIdentity(MenuCategory menuCategory) throws ValidationException;
 }
