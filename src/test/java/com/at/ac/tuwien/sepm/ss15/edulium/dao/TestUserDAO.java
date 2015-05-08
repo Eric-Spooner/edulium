@@ -4,11 +4,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import static org.junit.Assert.*;
 import org.junit.*;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Random;
@@ -16,10 +12,7 @@ import java.util.Random;
 /**
  * Unit Test for the UserDAO
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/Spring-DAO.xml")
-@Transactional
-public class TestUserDAO {
+public class TestUserDAO extends AbstractDAOTest {
     @Autowired
     private UserDAO userDAO;
 
@@ -153,8 +146,8 @@ public class TestUserDAO {
         userDAO.update(updatedUser);
 
         // THEN
-        // check if the user has been updated
-        List<User> storedObjects = userDAO.find(user);
+        // check if the user has been updated;
+        List<User> storedObjects = userDAO.find(updatedUser);
         assertEquals(1, storedObjects.size());
         assertEquals(updatedUser, storedObjects.get(0));
     }
@@ -237,6 +230,7 @@ public class TestUserDAO {
         final int numberOfUsersBefore = userDAO.getAll().size();
 
         User user = new User();
+        user.setIdentity("gutsy");
         user.setName("Gutsy Gibbon");
         user.setRole("garbageman");
 
@@ -522,7 +516,7 @@ public class TestUserDAO {
         Random random = new Random();
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < length; i++) {
-            stringBuilder.append(random.nextInt('z' - 'a') + 'a');
+            stringBuilder.append((char)(random.nextInt('z' - 'a') + 'a'));
         }
         return stringBuilder.toString();
     }
