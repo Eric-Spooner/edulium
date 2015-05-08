@@ -18,4 +18,8 @@
         <jdbc:script location="classpath:create.sql" />
     </jdbc:initialize-database>
 
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
 </beans>
