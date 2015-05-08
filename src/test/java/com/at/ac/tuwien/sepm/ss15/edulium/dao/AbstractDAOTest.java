@@ -8,5 +8,5 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:Spring-DAO.xml")
 @Transactional
-public class AbstractDAOTest {
+public abstract class AbstractDAOTest {
 }
