@@ -4,8 +4,8 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="Spring-Context.xml" />
     <import resource="Spring-DataSource.xml" />
+    <import resource="Spring-Domain.xml" />
 
     <!-- DAO beans -->
     <import resource="dao/Spring-MenuCategoryDAO.xml" />

@@ -34,7 +34,6 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
         assert(menuCategory != null);
 
         validator.validateForCreate(menuCategory);
-
         final String query = "INSERT INTO MenuCategory (name) VALUES (?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query,
@@ -66,7 +65,6 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
         assert(menuCategory != null);
 
         validator.validateForUpdate(menuCategory);
-
         final String query = "UPDATE MenuCategory SET name = ? WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
@@ -95,7 +93,6 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
         assert(menuCategory != null);
 
         validator.validateForDelete(menuCategory);
-
         final String query = "UPDATE MenuCategory SET deleted = true WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
