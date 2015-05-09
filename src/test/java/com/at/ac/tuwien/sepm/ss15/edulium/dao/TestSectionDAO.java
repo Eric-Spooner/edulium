@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,13 +25,10 @@ public class TestSectionDAO {
     private SectionDAO sectionDAO;
 
     @Test
-    public void testCreate_shouldAddObject() throws DAOException {
+    public void testCreate_shouldAddObject() throws DAOException, ValidationException {
         // GIVEN
         Section section = new Section();
         section.setName("section");
-        Table table = new Table();
-        table.setNumber((long)3);
-        section.addTable(table);
 
         // WHEN
         sectionDAO.create(section);
@@ -48,7 +46,7 @@ public class TestSectionDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testCreate_addingObjectWithoutNameShouldFail() throws DAOException {
+    public void testCreate_addingObjectWithoutNameShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Section section = new Section();
 
@@ -61,13 +59,10 @@ public class TestSectionDAO {
     }
 
     @Test
-    public void testUpdate_shouldUpdateObject() throws DAOException {
+    public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // GIVEN
         Section section = new Section();
         section.setName("section");
-        Table table = new Table();
-        table.setNumber((long) 3);
-        section.addTable(table);
         sectionDAO.create(section);
 
         // check if section is stored
@@ -77,7 +72,6 @@ public class TestSectionDAO {
 
         // WHEN
         section.setName("newSection");
-        section.getTables().get(0).setNumber((long)4);
         sectionDAO.update(section);
 
         // THEN
@@ -88,28 +82,22 @@ public class TestSectionDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testUpdate_updatingObjectWithIdentityNullShouldFail() throws DAOException {
+    public void testUpdate_updatingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Section section = new Section();
         section.setName("section");
-        Table table = new Table();
-        table.setNumber((long) 3);
-        section.addTable(table);
 
         // WHEN
         sectionDAO.update(section);
     }
 
     @Test(expected = DAOException.class)
-    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException {
+    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Section section = new Section();
         Long identity = (long) 1;
         section.setIdentity(identity);
         section.setName("section");
-        Table table = new Table();
-        table.setNumber((long) 3);
-        section.addTable(table);
 
         // check if no item with the id IDENTITY exists
         try {
@@ -119,7 +107,7 @@ public class TestSectionDAO {
             }
         } catch (DAOException e) {
             // exception should not occur here
-            Assert.assertTrue(false);
+            Assert.fail();
         }
 
         // WHEN
@@ -127,13 +115,10 @@ public class TestSectionDAO {
     }
 
     @Test
-    public void testDelete_shouldDeleteObject() throws DAOException {
+    public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // GIVEN
         Section section = new Section();
         section.setName("section");
-        Table table = new Table();
-        table.setNumber((long) 3);
-        section.addTable(table);
         sectionDAO.create(section);
 
         // WHEN
@@ -149,7 +134,7 @@ public class TestSectionDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException {
+    public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Section section = new Section();
 
@@ -158,14 +143,11 @@ public class TestSectionDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException {
+    public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Section section = new Section();
         Long identity = (long) 1;
         section.setIdentity(identity);
-        Table table = new Table();
-        table.setNumber((long)3);
-        section.addTable(table);
 
         // check if no item with the id IDENTITY exists
         try {
@@ -175,7 +157,7 @@ public class TestSectionDAO {
             }
         } catch (DAOException e) {
             // exception should not occur here
-            Assert.assertTrue(false);
+            Assert.fail();
         }
 
         // WHEN
@@ -183,7 +165,7 @@ public class TestSectionDAO {
     }
 
     @Test
-    public void testFind_byIdentityShouldReturnObject() throws DAOException {
+    public void testFind_byIdentityShouldReturnObject() throws DAOException, ValidationException {
         // GIVEN
         Section matcher = new Section();
         Section section1 = new Section();
@@ -192,15 +174,6 @@ public class TestSectionDAO {
         section1.setName("section1");
         section2.setName("section2");
         section3.setName("section3");
-        Table table1 = new Table();
-        table1.setNumber((long)3);
-        section1.addTable(table1);
-        Table table2 = new Table();
-        table2.setNumber((long)4);
-        section2.addTable(table2);
-        Table table3 = new Table();
-        table3.setNumber((long)5);
-        section3.addTable(table3);
         sectionDAO.create(section1);
         sectionDAO.create(section2);
         sectionDAO.create(section3);
@@ -228,7 +201,7 @@ public class TestSectionDAO {
     }
 
     @Test
-    public void testFind_byNameShouldReturnObjects() throws DAOException {
+    public void testFind_byNameShouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         Section matcher = new Section();
         Section section1 = new Section();
@@ -237,15 +210,6 @@ public class TestSectionDAO {
         section1.setName("section");
         section2.setName("section");
         section3.setName("section2");
-        Table table1 = new Table();
-        table1.setNumber((long)3);
-        section1.addTable(table1);
-        Table table2 = new Table();
-        table2.setNumber((long)3);
-        section2.addTable(table2);
-        Table table3 = new Table();
-        table3.setNumber((long)5);
-        section3.addTable(table3);
         sectionDAO.create(section1);
         sectionDAO.create(section2);
         sectionDAO.create(section3);
@@ -276,14 +240,9 @@ public class TestSectionDAO {
         matcher.setIdentity(identity);
 
         // check if no item with the id IDENTITY exists
-        try {
-            while (!sectionDAO.find(matcher).isEmpty()) {
-                identity++;
-                matcher.setIdentity(identity);
-            }
-        } catch (DAOException e) {
-            // exception should not occur here
-            Assert.assertTrue(false);
+        while (!sectionDAO.find(matcher).isEmpty()) {
+            identity++;
+            matcher.setIdentity(identity);
         }
 
         // WHEN
@@ -300,7 +259,7 @@ public class TestSectionDAO {
     }
 
     @Test
-    public void testGetAll_shouldReturnObjects() throws DAOException {
+    public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         Section section1 = new Section();
         Section section2 = new Section();
@@ -308,15 +267,6 @@ public class TestSectionDAO {
         section1.setName("section1");
         section2.setName("section2");
         section3.setName("section3");
-        Table table1 = new Table();
-        table1.setNumber((long)3);
-        section1.addTable(table1);
-        Table table2 = new Table();
-        table2.setNumber((long)4);
-        section2.addTable(table2);
-        Table table3 = new Table();
-        table3.setNumber((long)5);
-        section3.addTable(table3);
         sectionDAO.create(section1);
         sectionDAO.create(section2);
         sectionDAO.create(section3);

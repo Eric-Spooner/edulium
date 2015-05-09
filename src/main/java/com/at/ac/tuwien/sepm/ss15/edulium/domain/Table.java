@@ -1,11 +1,13 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
 /**
- * Created by Administrator on 06.05.2015.
+ * domain object which represents a table in the restaurant
  */
 public class Table {
     private int seats;
     private Long number;
+    private Long section_id;
+    private Long user_id;
     private int row;
     private int column;
 
@@ -69,11 +71,41 @@ public class Table {
         this.column = column;
     }
 
+    /**
+     * @return the id of the section the table is located
+     */
+    public Long getSection_id() {
+        return section_id;
+    }
+
+    /**
+     * @param section_id sets the id of the section the table is located
+     */
+    public void setSection_id(Long section_id) {
+        this.section_id = section_id;
+    }
+
+    /**
+     * @return the id of the user responsible for the table
+     */
+    public Long getUser_id() {
+        return user_id;
+    }
+
+    /**
+     * @param user_id sets the id of the user responsible for the table
+     */
+    public void setUser_id(Long user_id) {
+        this.user_id = user_id;
+    }
+
     @Override
     public String toString() {
         return "Table{" +
                 "seats=" + seats +
                 ", number=" + number +
+                ", section_id=" + section_id +
+                ", user_id=" + user_id +
                 ", row=" + row +
                 ", column=" + column +
                 '}';
@@ -87,9 +119,11 @@ public class Table {
         Table table = (Table) o;
 
         if (column != table.column) return false;
-        if (number != table.number) return false;
         if (row != table.row) return false;
         if (seats != table.seats) return false;
+        if (number != null ? !number.equals(table.number) : table.number != null) return false;
+        if (section_id != null ? !section_id.equals(table.section_id) : table.section_id != null) return false;
+        if (user_id != null ? !user_id.equals(table.user_id) : table.user_id != null) return false;
 
         return true;
     }
