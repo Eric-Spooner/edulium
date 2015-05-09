@@ -1,6 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -22,6 +23,8 @@ public interface MenuCategoryDAO {
      * successfully
      * @param menuCategory object to store
      * @throws DAOException if the object couldn't be stored
+     * @throws ValidationException if the menuCategory object parameters are
+     *         not valid for this action
      */
     void create(MenuCategory menuCategory) throws DAOException, ValidationException;
 
@@ -29,6 +32,8 @@ public interface MenuCategoryDAO {
      * updates data of object menuCategory in the underlying datasource
      * @param menuCategory object to update
      * @throws DAOException if the object couldn't be updated
+     * @throws ValidationException if the menuCategory object parameters are
+     *         not valid for this action
      */
     void update(MenuCategory menuCategory) throws DAOException, ValidationException;
 
@@ -36,6 +41,8 @@ public interface MenuCategoryDAO {
      * removes the object menuCategory from the underlying datasource
      * @param menuCategory object to remove
      * @throws DAOException if the object couldn't be removed
+     * @throws ValidationException if the menuCategory object parameters are
+     *         not valid for this action
      */
     void delete(MenuCategory menuCategory) throws DAOException, ValidationException;
 
@@ -55,4 +62,13 @@ public interface MenuCategoryDAO {
      * @throws DAOException if the data couldn't be retrieved
      */
     List<MenuCategory> getAll() throws DAOException;
+
+    /**
+     * @param menuCategory object to get the history for
+     * @return returns the history of changes for the menuCategory object
+     * @throws DAOException if the data couldn't be retrieved
+     * @throws ValidationException if the menuCategory object parameters are
+     *         not valid for this action
+     */
+    List<History<MenuCategory>> getHistory(MenuCategory menuCategory) throws DAOException, ValidationException;
 }

@@ -2,7 +2,10 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.MenuCategoryDAO;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.UserDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.MenuCategoryValidator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +25,8 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
     private DataSource dataSource;
     @Autowired
     private MenuCategoryValidator validator;
+    @Autowired
+    private UserDAO userDAO;
     private static final Logger LOGGER = LogManager.getLogger(MenuCategoryDAO.class);
 
     /**
@@ -172,6 +177,34 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
         return objects;
     }
 
+    /**
+     * @param menuCategory object to get the history for
+     * @return returns the history of changes for the menuCategory object
+     * @throws DAOException if the data couldn't be retrieved
+     * @throws ValidationException if the menuCategory object parameters are
+     *         not valid for this action
+     */
+    @Override
+    public List<History<MenuCategory>> getHistory(MenuCategory menuCategory) throws DAOException, ValidationException {
+        LOGGER.debug("entering getHistory with parameters " + menuCategory);
+
+        validator.validateIdentity(menuCategory);
+        List<History<MenuCategory>> history = new ArrayList<>();
+        final String query = "";
+
+        try (PreparedStatement statement = dataSource.getConnection().prepareStatement(query)) {
+            ResultSet result = statement.executeQuery();
+            while(result.next()) {
+                history.add(parseHistoryEntry(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("retrieving history failed");
+            throw new DAOException("retrieving history failed", e);
+        }
+
+        return history;
+    }
+
     // FIXME add implementation when session object is implemented
     /**
      * writes the changes of the dataset into the database
@@ -209,5 +242,37 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
         menuCategory.setIdentity(result.getLong("ID"));
         menuCategory.setName(result.getString("name"));
         return menuCategory;
+    }
+
+    /**
+     * converts the database query output into a history entry object
+     * @param result database output
+     * @return History object with the data of the resultSet set
+     * @throws SQLException if an error accessing the database occurred
+     * @throws DAOException if an error retrieving the user ocurred
+     */
+    private History<MenuCategory> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
+        // get user
+        User userMatcher = new User();
+        userMatcher.setIdentity(result.getString("changeUser"));
+        List<User> storedUsers = userDAO.find(userMatcher);
+        if(storedUsers.size() != 1) {
+            LOGGER.error("user not found");
+            throw new DAOException("user not found");
+        }
+
+        // get data
+        MenuCategory data = new MenuCategory();
+        data.setIdentity(result.getLong("category_ID"));
+        data.setName(result.getString("name"));
+
+        // create history entry
+        History<MenuCategory> historyEntry = new History<>();
+        historyEntry.setTimeOfChange(result.getTimestamp("changeTime"));
+        historyEntry.setChangeNumber(result.getLong("changeNr"));
+        historyEntry.setUser(storedUsers.get(0));
+        historyEntry.setData(data);
+
+        return historyEntry;
     }
 }
