@@ -14,7 +14,7 @@ import java.util.Random;
  */
 public class TestUserDAO extends AbstractDAOTest {
     @Autowired
-    private UserDAO userDAO;
+    private DAO<User> userDAO;
 
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
