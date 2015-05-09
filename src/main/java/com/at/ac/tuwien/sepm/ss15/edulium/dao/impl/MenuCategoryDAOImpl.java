@@ -3,7 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.MenuCategoryDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.MenuCategoryValidator;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +21,7 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
     @Autowired
     private DataSource dataSource;
     @Autowired
-    private MenuCategoryValidator validator;
+    private Validator<MenuCategory> validator;
     private static final Logger LOGGER = LogManager.getLogger(MenuCategoryDAO.class);
 
     /**

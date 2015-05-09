@@ -3,8 +3,8 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.UserDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.UserValidator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ class UserDAOImpl implements UserDAO {
     @Autowired
     private DataSource dataSource;
     @Autowired
-    private UserValidator validator;
+    private Validator<User> validator;
 
     @Override
     public void create(User user) throws DAOException, ValidationException {
