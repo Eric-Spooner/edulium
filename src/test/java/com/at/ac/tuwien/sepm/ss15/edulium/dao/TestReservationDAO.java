@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class TestReservationDAO extends AbstractDAOTest {
     @Autowired
-    private ReservationDAO reservationDAO;
+    private DAO<Reservation> reservationDAO;
     @Autowired
     private TableDAO tableDAO; // only to create test tables
 
