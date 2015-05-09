@@ -38,7 +38,7 @@ public class TestUserDAO extends AbstractDAOTest {
     }
 
     @Test(expected = DAOException.class)
-    public void testCreate_addingTwoObjectWithSameIdentityShouldFail() throws DAOException, ValidationException {
+    public void testCreate_addingTwoObjectsWithSameIdentityShouldFail() throws DAOException, ValidationException {
         // PREPARE
         User user1 = new User();
         user1.setIdentity("quantal");
