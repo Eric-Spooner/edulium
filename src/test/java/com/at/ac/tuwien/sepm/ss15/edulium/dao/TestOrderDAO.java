@@ -14,7 +14,7 @@ import java.util.Random;
 import static org.junit.Assert.*;
 
 /**
- * Unit Test for the UserDAO
+ * Unit Test for the OrderDAO
  */
 public class TestOrderDAO extends AbstractDAOTest {
     @Autowired
