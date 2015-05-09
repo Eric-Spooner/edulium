@@ -6,21 +6,16 @@ import static org.junit.Assert.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
  * Unit Test for the ReservationDAO
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/Spring-DAO.xml")
-@Transactional
-public class TestReservationDAO {
+public class TestReservationDAO extends AbstractDAOTest {
     @Autowired
     private ReservationDAO reservationDAO;
     @Autowired
@@ -54,8 +49,8 @@ public class TestReservationDAO {
         // GIVEN
         Reservation reservation = new Reservation();
         reservation.setName("Saucy Salamander");
-        reservation.setTime(new Date());
-        reservation.setDuration(140);
+        reservation.setTime(LocalDateTime.now());
+        reservation.setDuration(Duration.ofMinutes(140));
         reservation.setQuantity(6);
         reservation.setTables(tables);
 
@@ -96,9 +91,6 @@ public class TestReservationDAO {
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // PREPARE
-        Calendar calendar = new GregorianCalendar();
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-
         List<Table> tablesReservation = new ArrayList<>(); // table 1
         List<Table> tablesReservationUpdated = new ArrayList<>(); // table 2, table 3
 
@@ -138,8 +130,8 @@ public class TestReservationDAO {
         // reservation
         Reservation reservation = new Reservation();
         reservation.setName("Hoary Hedgehog");
-        reservation.setTime(calendar.getTime());
-        reservation.setDuration(60);
+        reservation.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
+        reservation.setDuration(Duration.ofMinutes(60));
         reservation.setQuantity(4);
         reservation.setTables(tablesReservation);
 
@@ -147,13 +139,11 @@ public class TestReservationDAO {
         assertEquals(1, reservationDAO.find(reservation).size());
 
         // GIVEN
-        calendar.set(Calendar.DAY_OF_MONTH, 2);
-
         Reservation updatedReservation = new Reservation();
         updatedReservation.setIdentity(reservation.getIdentity());
         updatedReservation.setName("Warty Warthog");
-        updatedReservation.setTime(calendar.getTime());
-        updatedReservation.setDuration(120);
+        updatedReservation.setTime(LocalDateTime.of(2016, 06, 17, 12, 00));
+        updatedReservation.setDuration(Duration.ofMinutes(120));
         updatedReservation.setQuantity(10);
         updatedReservation.setTables(tablesReservationUpdated);
 
@@ -218,8 +208,8 @@ public class TestReservationDAO {
         // reservation
         Reservation reservation = new Reservation();
         reservation.setName("Oneiric Ocelot");
-        reservation.setTime(new Date());
-        reservation.setDuration(60);
+        reservation.setTime(LocalDateTime.now());
+        reservation.setDuration(Duration.ofMinutes(60));
         reservation.setQuantity(10);
         reservation.setTables(tablesReservation);
 
@@ -230,8 +220,8 @@ public class TestReservationDAO {
         Reservation updatedReservation1 = new Reservation();
         updatedReservation1.setIdentity(reservation.getIdentity());
         updatedReservation1.setName("Oneiric Ocelot");
-        updatedReservation1.setTime(new Date());
-        updatedReservation1.setDuration(60);
+        updatedReservation1.setTime(LocalDateTime.now());
+        updatedReservation1.setDuration(Duration.ofMinutes(60));
         updatedReservation1.setQuantity(4);
         updatedReservation1.setTables(tablesReservationUpdated1);
 
@@ -248,8 +238,8 @@ public class TestReservationDAO {
         Reservation updatedReservation2 = new Reservation();
         updatedReservation2.setIdentity(reservation.getIdentity());
         updatedReservation2.setName("Oneiric Ocelot");
-        updatedReservation2.setTime(new Date());
-        updatedReservation2.setDuration(60);
+        updatedReservation2.setTime(LocalDateTime.now());
+        updatedReservation2.setDuration(Duration.ofMinutes(60));
         updatedReservation2.setQuantity(16);
         updatedReservation2.setTables(tablesReservationUpdated2);
 
@@ -268,8 +258,8 @@ public class TestReservationDAO {
         // GIVEN
         Reservation reservation = new Reservation();
         reservation.setName("Breezy Badger");
-        reservation.setTime(new Date());
-        reservation.setDuration(90);
+        reservation.setTime(LocalDateTime.now());
+        reservation.setDuration(Duration.ofMinutes(90));
         reservation.setQuantity(8);
 
         // WHEN
@@ -301,8 +291,8 @@ public class TestReservationDAO {
         }
 
         reservation.setName("Dapper Drake");
-        reservation.setTime(new Date());
-        reservation.setDuration(160);
+        reservation.setTime(LocalDateTime.now());
+        reservation.setDuration(Duration.ofMinutes(160));
         reservation.setQuantity(14);
 
         // WHEN
@@ -338,8 +328,8 @@ public class TestReservationDAO {
 
         Reservation reservation = new Reservation();
         reservation.setName("Edgy Eft");
-        reservation.setTime(new Date());
-        reservation.setDuration(130);
+        reservation.setTime(LocalDateTime.now());
+        reservation.setDuration(Duration.ofMinutes(130));
         reservation.setQuantity(12);
         reservation.setTables(tables);
 
@@ -401,19 +391,11 @@ public class TestReservationDAO {
     @Test
     public void testFind_byIdentityShouldReturnObject() throws DAOException, ValidationException {
         // PREPARE
-        Calendar calendar = new GregorianCalendar();
-
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        Date date1 = calendar.getTime();
-
-        calendar.set(Calendar.DAY_OF_MONTH, 3);
-        Date date2 = calendar.getTime();
-
         // reservation 1
         Reservation reservation1 = new Reservation();
         reservation1.setName("Hardy Heron");
-        reservation1.setTime(date1);
-        reservation1.setDuration(200);
+        reservation1.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
+        reservation1.setDuration(Duration.ofMinutes(200));
         reservation1.setQuantity(21);
 
         reservationDAO.create(reservation1);
@@ -422,8 +404,8 @@ public class TestReservationDAO {
         // reservation 2
         Reservation reservation2 = new Reservation();
         reservation2.setName("Hardy Heron");
-        reservation2.setTime(date2);
-        reservation2.setDuration(200);
+        reservation2.setTime(LocalDateTime.of(2015, 05, 18, 17, 30));
+        reservation2.setDuration(Duration.ofMinutes(200));
         reservation2.setQuantity(30);
 
         reservationDAO.create(reservation2);
@@ -432,12 +414,13 @@ public class TestReservationDAO {
         // reservation 3
         Reservation reservation3 = new Reservation();
         reservation3.setName("Jaunty Jackalope");
-        reservation3.setTime(date1);
-        reservation3.setDuration(200);
+        reservation3.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
+        reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
 
         reservationDAO.create(reservation3);
         assertEquals(1, reservationDAO.find(reservation3).size());
+
         // GIVEN
         Reservation matcher1 = new Reservation(); // for reservation 1
         matcher1.setIdentity(reservation1.getIdentity());
@@ -467,19 +450,11 @@ public class TestReservationDAO {
     @Test
     public void testFind_byNameShouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
-        Calendar calendar = new GregorianCalendar();
-
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        Date date1 = calendar.getTime();
-
-        calendar.set(Calendar.DAY_OF_MONTH, 3);
-        Date date2 = calendar.getTime();
-
         // reservation 1
         Reservation reservation1 = new Reservation();
         reservation1.setName("Hardy Heron");
-        reservation1.setTime(date1);
-        reservation1.setDuration(200);
+        reservation1.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
+        reservation1.setDuration(Duration.ofMinutes(200));
         reservation1.setQuantity(21);
 
         reservationDAO.create(reservation1);
@@ -488,8 +463,8 @@ public class TestReservationDAO {
         // reservation 2
         Reservation reservation2 = new Reservation();
         reservation2.setName("Hardy Heron");
-        reservation2.setTime(date2);
-        reservation2.setDuration(200);
+        reservation2.setTime(LocalDateTime.of(2015, 05, 18, 17, 30));
+        reservation2.setDuration(Duration.ofMinutes(200));
         reservation2.setQuantity(30);
 
         reservationDAO.create(reservation2);
@@ -498,8 +473,8 @@ public class TestReservationDAO {
         // reservation 3
         Reservation reservation3 = new Reservation();
         reservation3.setName("Jaunty Jackalope");
-        reservation3.setTime(date1);
-        reservation3.setDuration(200);
+        reservation3.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
+        reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
 
         reservationDAO.create(reservation3);
@@ -528,19 +503,11 @@ public class TestReservationDAO {
     @Test
     public void testFind_byDateShouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
-        Calendar calendar = new GregorianCalendar();
-
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        Date date1 = calendar.getTime();
-
-        calendar.set(Calendar.DAY_OF_MONTH, 3);
-        Date date2 = calendar.getTime();
-
         // reservation 1
         Reservation reservation1 = new Reservation();
         reservation1.setName("Hardy Heron");
-        reservation1.setTime(date1);
-        reservation1.setDuration(200);
+        reservation1.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
+        reservation1.setDuration(Duration.ofMinutes(200));
         reservation1.setQuantity(21);
 
         reservationDAO.create(reservation1);
@@ -549,8 +516,8 @@ public class TestReservationDAO {
         // reservation 2
         Reservation reservation2 = new Reservation();
         reservation2.setName("Hardy Heron");
-        reservation2.setTime(date2);
-        reservation2.setDuration(200);
+        reservation2.setTime(LocalDateTime.of(2015, 05, 18, 17, 30));
+        reservation2.setDuration(Duration.ofMinutes(200));
         reservation2.setQuantity(30);
 
         reservationDAO.create(reservation2);
@@ -559,8 +526,8 @@ public class TestReservationDAO {
         // reservation 3
         Reservation reservation3 = new Reservation();
         reservation3.setName("Jaunty Jackalope");
-        reservation3.setTime(date1);
-        reservation3.setDuration(200);
+        reservation3.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
+        reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
 
         reservationDAO.create(reservation3);
@@ -568,10 +535,10 @@ public class TestReservationDAO {
 
         // GIVEN
         Reservation matcher1 = new Reservation(); // for reservation 1 and reservation 3
-        matcher1.setTime(date1);
+        matcher1.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
 
         Reservation matcher2 = new Reservation(); // for reservation 2
-        matcher2.setTime(date2);
+        matcher2.setTime(LocalDateTime.of(2015, 05, 18, 17, 30));
 
         // WHEN
         List<Reservation> result1 = reservationDAO.find(matcher1);
@@ -589,19 +556,11 @@ public class TestReservationDAO {
     @Test
     public void testFind_byQuantityShouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
-        Calendar calendar = new GregorianCalendar();
-
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        Date date1 = calendar.getTime();
-
-        calendar.set(Calendar.DAY_OF_MONTH, 3);
-        Date date2 = calendar.getTime();
-
         // reservation 1
         Reservation reservation1 = new Reservation();
         reservation1.setName("Hardy Heron");
-        reservation1.setTime(date1);
-        reservation1.setDuration(200);
+        reservation1.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
+        reservation1.setDuration(Duration.ofMinutes(200));
         reservation1.setQuantity(21);
 
         reservationDAO.create(reservation1);
@@ -610,8 +569,8 @@ public class TestReservationDAO {
         // reservation 2
         Reservation reservation2 = new Reservation();
         reservation2.setName("Hardy Heron");
-        reservation2.setTime(date2);
-        reservation2.setDuration(200);
+        reservation2.setTime(LocalDateTime.of(2015, 05, 18, 17, 30));
+        reservation2.setDuration(Duration.ofMinutes(200));
         reservation2.setQuantity(30);
 
         reservationDAO.create(reservation2);
@@ -620,8 +579,8 @@ public class TestReservationDAO {
         // reservation 3
         Reservation reservation3 = new Reservation();
         reservation3.setName("Jaunty Jackalope");
-        reservation3.setTime(date1);
-        reservation3.setDuration(200);
+        reservation3.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
+        reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
 
         reservationDAO.create(reservation3);
@@ -650,19 +609,11 @@ public class TestReservationDAO {
     @Test
     public void testFind_byDurationShouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
-        Calendar calendar = new GregorianCalendar();
-
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        Date date1 = calendar.getTime();
-
-        calendar.set(Calendar.DAY_OF_MONTH, 3);
-        Date date2 = calendar.getTime();
-
         // reservation 1
         Reservation reservation1 = new Reservation();
         reservation1.setName("Hardy Heron");
-        reservation1.setTime(date1);
-        reservation1.setDuration(200);
+        reservation1.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
+        reservation1.setDuration(Duration.ofMinutes(200));
         reservation1.setQuantity(21);
 
         reservationDAO.create(reservation1);
@@ -671,8 +622,8 @@ public class TestReservationDAO {
         // reservation 2
         Reservation reservation2 = new Reservation();
         reservation2.setName("Hardy Heron");
-        reservation2.setTime(date2);
-        reservation2.setDuration(200);
+        reservation2.setTime(LocalDateTime.of(2015, 05, 18, 17, 30));
+        reservation2.setDuration(Duration.ofMinutes(200));
         reservation2.setQuantity(30);
 
         reservationDAO.create(reservation2);
@@ -681,8 +632,8 @@ public class TestReservationDAO {
         // reservation 3
         Reservation reservation3 = new Reservation();
         reservation3.setName("Jaunty Jackalope");
-        reservation3.setTime(date1);
-        reservation3.setDuration(200);
+        reservation3.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
+        reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
 
         reservationDAO.create(reservation3);
@@ -690,7 +641,7 @@ public class TestReservationDAO {
 
         // GIVEN
         Reservation matcher = new Reservation(); // for reservation 1, reservation 2 and reservation 3
-        matcher.setDuration(200);
+        matcher.setDuration(Duration.ofMinutes(200));
 
         // WHEN
         List<Reservation> result = reservationDAO.find(matcher);
@@ -732,8 +683,8 @@ public class TestReservationDAO {
         // reservation 1
         Reservation reservation1 = new Reservation();
         reservation1.setName("Hardy Heron");
-        reservation1.setTime(new Date());
-        reservation1.setDuration(200);
+        reservation1.setTime(LocalDateTime.now());
+        reservation1.setDuration(Duration.ofMinutes(200));
         reservation1.setQuantity(21);
         reservation1.setTables(tablesReservation1);
 
@@ -743,8 +694,8 @@ public class TestReservationDAO {
         // reservation 2
         Reservation reservation2 = new Reservation();
         reservation2.setName("Hardy Heron");
-        reservation2.setTime(new Date());
-        reservation2.setDuration(200);
+        reservation2.setTime(LocalDateTime.now());
+        reservation2.setDuration(Duration.ofMinutes(200));
         reservation2.setQuantity(30);
         reservation2.setTables(tablesReservation2);
 
@@ -754,8 +705,8 @@ public class TestReservationDAO {
         // reservation 3
         Reservation reservation3 = new Reservation();
         reservation3.setName("Jaunty Jackalope");
-        reservation3.setTime(new Date());
-        reservation3.setDuration(200);
+        reservation3.setTime(LocalDateTime.now());
+        reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
         reservation3.setTables(tablesReservation2);
 
@@ -814,8 +765,8 @@ public class TestReservationDAO {
         // reservation 1
         Reservation reservation1 = new Reservation();
         reservation1.setName("Karmic Koala");
-        reservation1.setTime(new Date());
-        reservation1.setDuration(200);
+        reservation1.setTime(LocalDateTime.now());
+        reservation1.setDuration(Duration.ofMinutes(200));
         reservation1.setQuantity(21);
 
         reservationDAO.create(reservation1);
@@ -824,8 +775,8 @@ public class TestReservationDAO {
         // reservation 2
         Reservation reservation2 = new Reservation();
         reservation2.setName("Lucid Lynx");
-        reservation2.setTime(new Date());
-        reservation2.setDuration(200);
+        reservation2.setTime(LocalDateTime.now());
+        reservation2.setDuration(Duration.ofMinutes(200));
         reservation2.setQuantity(30);
 
         reservationDAO.create(reservation2);
@@ -834,8 +785,8 @@ public class TestReservationDAO {
         // reservation 3
         Reservation reservation3 = new Reservation();
         reservation3.setName("Maverick Meerkat");
-        reservation3.setTime(new Date());
-        reservation3.setDuration(200);
+        reservation3.setTime(LocalDateTime.now());
+        reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
 
         reservationDAO.create(reservation3);

@@ -1,6 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
-import java.util.Date;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -8,10 +9,10 @@ import java.util.List;
  */
 public class Reservation {
     private Long identity = null;
-    private Date time = null;
+    private LocalDateTime time = null;
     private String name = null;
     private Integer quantity = null;
-    private Integer duration = null;
+    private Duration duration = null;
     private List<Table> tables = null;
 
     /**
@@ -32,13 +33,13 @@ public class Reservation {
     /**
      * @return the start time of the reservation (can be null)
      */
-    public Date getTime() { return time; }
+    public LocalDateTime getTime() { return time; }
 
     /**
      * Sets the start time of the reservation
      * @param time start time of the reservation
      */
-    public void setTime(Date time) {
+    public void setTime(LocalDateTime time) {
         this.time = time;
     }
 
@@ -73,17 +74,17 @@ public class Reservation {
     }
 
     /**
-     * @return duration of the reservation in minutes (can be null)
+     * @return duration of the reservation (can be null)
      */
-    public Integer getDuration() {
+    public Duration getDuration() {
         return duration;
     }
 
     /**
      * Sets the duration of the reservation
-     * @param duration duration of the reservation in minutes
+     * @param duration duration of the reservation
      */
-    public void setDuration(Integer duration) {
+    public void setDuration(Duration duration) {
         this.duration = duration;
     }
 
