@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS RestaurantUser (
-    ID VARCHAR(25),
+    ID VARCHAR(25) PRIMARY KEY,
     name VARCHAR(100),
     userRole VARCHAR(100),
     deleted BOOLEAN DEFAULT FALSE
