@@ -1,13 +1,13 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.UserValidator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 
 /**
- * implementation of the UserValidator
+ * validator implementation for the User domain object
  */
-public class UserValidatorImpl implements UserValidator {
+public class UserValidator implements Validator<User> {
 
     @Override
     public void validateForCreate(User user) throws ValidationException {

@@ -14,7 +14,7 @@ import java.util.Random;
  */
 public class TestUserDAO extends AbstractDAOTest {
     @Autowired
-    private UserDAO userDAO;
+    private DAO<User> userDAO;
 
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
@@ -35,6 +35,33 @@ public class TestUserDAO extends AbstractDAOTest {
         List<User> storedObjects = userDAO.find(matcher);
         assertEquals(1, storedObjects.size());
         assertEquals(user, storedObjects.get(0));
+    }
+
+    @Test(expected = DAOException.class)
+    public void testCreate_addingTwoObjectsWithSameIdentityShouldFail() throws DAOException, ValidationException {
+        // PREPARE
+        User user1 = new User();
+        user1.setIdentity("quantal");
+        user1.setName("Quantal Quetzal");
+        user1.setRole("bugfixer");
+
+        try {
+            userDAO.create(user1);
+        } catch (DAOException e) {
+            fail("DAOException should not occur while adding a new user with a non-existing identity");
+        }
+
+        // check if user is stored
+        assertEquals(1, userDAO.find(user1).size());
+
+        // GIVEN
+        User user2 = new User();
+        user2.setIdentity(user1.getIdentity());
+        user2.setName("Trusty Tahr");
+        user2.setRole("tester");
+
+        // WHEN
+        userDAO.create(user2);
     }
 
     @Test(expected = ValidationException.class)

@@ -1,12 +1,12 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.MenuCategoryDAO;
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.UserDAO;
+
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.MenuCategoryValidator;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,14 +20,14 @@ import java.util.List;
 /**
  * H2 Database Implementation of the MenuCategoryDAO interface
  */
-class MenuCategoryDAOImpl implements MenuCategoryDAO {
+class MenuCategoryDAOImpl implements DAO<MenuCategory> {
     @Autowired
     private DataSource dataSource;
     @Autowired
-    private MenuCategoryValidator validator;
+    private DAO<User> userDAO;
     @Autowired
-    private UserDAO userDAO;
-    private static final Logger LOGGER = LogManager.getLogger(MenuCategoryDAO.class);
+    private Validator<MenuCategory> validator;
+    private static final Logger LOGGER = LogManager.getLogger(MenuCategoryDAOImpl.class);
 
     /**
      * writes the object into the database and sets the identity parameter of
