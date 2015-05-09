@@ -1,7 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.GenericDAO;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * H2 Database Implementation of the UserDAO interface
  */
-class UserDAOImpl implements GenericDAO<User> {
+class UserDAOImpl implements DAO<User> {
     private static final Logger LOGGER = LogManager.getLogger(UserDAOImpl.class);
 
     @Autowired

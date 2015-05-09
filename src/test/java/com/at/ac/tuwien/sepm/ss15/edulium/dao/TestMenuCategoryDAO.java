@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class TestMenuCategoryDAO extends AbstractDAOTest {
     @Autowired
-    private GenericDAO<MenuCategory> menuCategoryDAO;
+    private DAO<MenuCategory> menuCategoryDAO;
 
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
