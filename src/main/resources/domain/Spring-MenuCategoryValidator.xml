@@ -4,7 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="menuCategoryValidator" class="com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl.MenuCategoryValidatorImpl">
+    <bean id="menuCategoryValidator" class="com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl.MenuCategoryValidator">
     </bean>
 
 </beans>
