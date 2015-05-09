@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,7 @@ import java.util.List;
  * data access object for the menu category domain
  */
 @Repository
+@PreAuthorize("isAuthenticated()")
 @Transactional(propagation = Propagation.MANDATORY)
 public interface MenuCategoryDAO {
 
