@@ -2,12 +2,17 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
  * data access object for the reservation domain
  */
+@Repository
+@Transactional(propagation = Propagation.MANDATORY)
 public interface ReservationDAO {
 
     /**

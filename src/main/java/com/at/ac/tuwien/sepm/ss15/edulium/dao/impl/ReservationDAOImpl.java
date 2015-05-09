@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * H2 Database Implementation of the ReservationDAO interface
  */
-@Repository
 class ReservationDAOImpl implements ReservationDAO {
     @Override
     public void create(Reservation reservation) throws DAOException, ValidationException {
