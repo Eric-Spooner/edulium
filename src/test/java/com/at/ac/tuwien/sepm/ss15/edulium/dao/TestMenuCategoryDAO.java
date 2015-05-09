@@ -1,11 +1,15 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -290,5 +294,84 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         assertTrue(objects.contains(cat1));
         assertTrue(objects.contains(cat2));
         assertTrue(objects.contains(cat3));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_withoutIdentityShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        MenuCategory cat = new MenuCategory();
+
+        // WHEN
+        menuCategoryDAO.getHistory(cat);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_notPersistentDataShouldReturnEmptyList() throws DAOException, ValidationException {
+        // GIVEN
+        Long identity = (long) 1;
+        MenuCategory cat = new MenuCategory();
+        cat.setIdentity(identity);
+
+        // generate identity which is not used by any persistent object
+        while (!menuCategoryDAO.find(cat).isEmpty()) {
+            identity++;
+            cat.setIdentity(identity);
+        }
+
+        // WHEN / THEN
+        assertTrue(menuCategoryDAO.getHistory(cat).isEmpty());
+    }
+
+    @Test
+    public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
+        // GIVEN
+        // create data
+        User user = new User();
+        MenuCategory cat_v1 = new MenuCategory();
+        cat_v1.setName("cat");
+        Date createTime = Calendar.getInstance().getTime();
+        menuCategoryDAO.create(cat_v1);
+
+        // update data
+        MenuCategory cat_v2 = new MenuCategory();
+        cat_v2.setIdentity(cat_v1.getIdentity());
+        cat_v2.setName("update");
+        Date updateTime = Calendar.getInstance().getTime();
+        menuCategoryDAO.update(cat_v2);
+
+        // delete data
+        Date deleteTime = Calendar.getInstance().getTime();
+        menuCategoryDAO.delete(cat_v2);
+
+        // WHEN
+        List<History<MenuCategory>> history = menuCategoryDAO.getHistory(cat_v1);
+        assertEquals(3, history.size());
+
+        // THEN
+        // check create history
+        History<MenuCategory> entry = history.get(0);
+        assertEquals(Long.valueOf(1), entry.getChangeNumber());
+        assertEquals(cat_v1, entry.getData());
+        assertEquals(user, entry.getUser());
+        assertTrue(createTime.before(entry.getTimeOfChange()));
+        assertTrue(updateTime.after(entry.getTimeOfChange()));
+        assertFalse(entry.isDeleted());
+
+        // check update history
+        entry = history.get(1);
+        assertEquals(Long.valueOf(2), entry.getChangeNumber());
+        assertEquals(cat_v2, entry.getData());
+        assertEquals(user, entry.getUser());
+        assertTrue(updateTime.before(entry.getTimeOfChange()));
+        assertTrue(deleteTime.after(entry.getTimeOfChange()));
+        assertFalse(entry.isDeleted());
+
+        // check delete history
+        entry = history.get(2);
+        assertEquals(Long.valueOf(3), entry.getChangeNumber());
+        assertEquals(cat_v2, entry.getData());
+        assertEquals(user, entry.getUser());
+        assertTrue(deleteTime.before(entry.getTimeOfChange()));
+        assertTrue(entry.isDeleted());
     }
 }

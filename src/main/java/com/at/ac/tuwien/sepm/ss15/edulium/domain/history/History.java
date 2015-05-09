@@ -12,7 +12,23 @@ public class History<T> {
     private User user;
     private Date timeOfChange;
     private Long changeNumber;
+    private boolean deleted;
     private T data;
+
+    /**
+     * @return if the dataset is deleted
+     */
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    /**
+     * sets if the dataset is deleted
+     * @param deleted dataset deleted
+     */
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
     /**
      * @return returns the user which made the changes

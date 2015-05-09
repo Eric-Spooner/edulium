@@ -270,6 +270,7 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
         History<MenuCategory> historyEntry = new History<>();
         historyEntry.setTimeOfChange(result.getTimestamp("changeTime"));
         historyEntry.setChangeNumber(result.getLong("changeNr"));
+        historyEntry.setDeleted(result.getBoolean("deleted"));
         historyEntry.setUser(storedUsers.get(0));
         historyEntry.setData(data);
 
