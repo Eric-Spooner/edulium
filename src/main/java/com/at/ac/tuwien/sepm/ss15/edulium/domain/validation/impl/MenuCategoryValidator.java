@@ -1,13 +1,13 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.MenuCategoryValidator;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 
 /**
- * implementation of the MenuCategoryValidator
+ * validator implementation for the MenuCategory domain object
  */
-public class MenuCategoryValidatorImpl implements MenuCategoryValidator {
+public class MenuCategoryValidator implements Validator<MenuCategory> {
     private final int NAME_MAX_LENGTH = 100;
     /**
      * validates the object for the create action
