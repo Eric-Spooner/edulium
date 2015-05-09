@@ -1,12 +1,13 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
 import java.sql.Timestamp;
+import java.util.stream.LongStream;
 
 /**
  * domain object, which represents orders
  */
 public class Order {
-    private String identity = null;
+    private Long identity = null;
     private Timestamp time = null;
     private Boolean canceled = null;
     private Double brutto = null;
@@ -17,7 +18,7 @@ public class Order {
      *
      * @return the identity of the Order
      */
-    public String getIdentity() {
+    public Long getIdentity() {
         return identity;
     }
 
@@ -25,7 +26,7 @@ public class Order {
      * sets the identity of the order
      * @param identity
      */
-    public void setIdentity(String identity) {
+    public void setIdentity(Long identity) {
         this.identity = identity;
     }
 
