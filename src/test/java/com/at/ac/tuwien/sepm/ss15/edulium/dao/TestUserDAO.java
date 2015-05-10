@@ -29,10 +29,7 @@ public class TestUserDAO extends AbstractDAOTest {
 
         // THEN
         // try to find the user and compare it
-        User matcher = new User();
-        matcher.setIdentity(user.getIdentity());
-
-        List<User> storedObjects = userDAO.find(matcher);
+        List<User> storedObjects = userDAO.find(User.withIdentity(user.getIdentity()));
         assertEquals(1, storedObjects.size());
         assertEquals(user, storedObjects.get(0));
     }
@@ -278,14 +275,9 @@ public class TestUserDAO extends AbstractDAOTest {
         assertEquals(1, userDAO.find(user3).size());
 
         // GIVEN
-        User matcher1 = new User(); // for user 1
-        matcher1.setIdentity("hardy");
-
-        User matcher2 = new User(); // for user 2
-        matcher2.setIdentity("intrepid");
-
-        User matcher3 = new User(); // for user 3
-        matcher3.setIdentity("precise");
+        User matcher1 = User.withIdentity("hardy"); // for user 1
+        User matcher2 = User.withIdentity("intrepid"); // for user 2
+        User matcher3 = User.withIdentity("precise"); // for user 3
 
         // WHEN
         List<User> result1 = userDAO.find(matcher1);
