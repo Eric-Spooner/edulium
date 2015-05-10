@@ -132,13 +132,13 @@ CREATE TABLE IF NOT EXISTS MenuCategory (
 );
 
 CREATE TABLE IF NOT EXISTS MenuCategoryHistory (
-    category_ID BIGINT REFERENCES MenuCategory(ID),
+    ID BIGINT REFERENCES MenuCategory(ID),
     name VARCHAR(100),
     deleted BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT,
-    PRIMARY KEY(category_ID, changeNr)
+    PRIMARY KEY(ID, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS TaxRate (

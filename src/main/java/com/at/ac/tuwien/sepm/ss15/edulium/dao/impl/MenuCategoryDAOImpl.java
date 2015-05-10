@@ -193,7 +193,7 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
 
         validator.validateIdentity(menuCategory);
         List<History<MenuCategory>> history = new ArrayList<>();
-        final String query = "SELECT * FROM MenuCategoryHistory WHERE category_ID = ? ORDER BY changeNr";
+        final String query = "SELECT * FROM MenuCategoryHistory WHERE ID = ? ORDER BY changeNr";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, menuCategory.getIdentity());
@@ -221,7 +221,7 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
 
         final String query = "INSERT INTO MenuCategoryHistory " +
                 "(SELECT ID, name, deleted, ?, ?, " +
-                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM MenuCategoryHistory WHERE category_ID = ?) " +
+                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM MenuCategoryHistory WHERE ID = ?) " +
                 "FROM MenuCategory WHERE ID = ?)";
 
         User matcher = new User();
@@ -275,18 +275,13 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
             throw new DAOException("user not found");
         }
 
-        // get data
-        MenuCategory data = new MenuCategory();
-        data.setIdentity(result.getLong("category_ID"));
-        data.setName(result.getString("name"));
-
         // create history entry
         History<MenuCategory> historyEntry = new History<>();
         historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
         historyEntry.setChangeNumber(result.getLong("changeNr"));
         historyEntry.setDeleted(result.getBoolean("deleted"));
         historyEntry.setUser(storedUsers.get(0));
-        historyEntry.setData(data);
+        historyEntry.setData(parseResult(result));
 
         return historyEntry;
     }

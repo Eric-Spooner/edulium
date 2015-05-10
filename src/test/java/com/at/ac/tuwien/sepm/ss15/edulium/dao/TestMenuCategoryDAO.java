@@ -9,6 +9,7 @@ import static org.junit.Assert.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -357,7 +358,6 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         // delete data
         LocalDateTime deleteTime = LocalDateTime.now();
         menuCategoryDAO.delete(cat_v2);
-        LocalDateTime afterDeleteTime = LocalDateTime.now();
 
         // WHEN
         List<History<MenuCategory>> history = menuCategoryDAO.getHistory(cat_v1);
@@ -369,8 +369,7 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         assertEquals(Long.valueOf(1), entry.getChangeNumber());
         assertEquals(cat_v1, entry.getData());
         assertEquals(user, entry.getUser());
-        assertTrue(createTime.isBefore(entry.getTimeOfChange()));
-        assertTrue(updateTime.isAfter(entry.getTimeOfChange()));
+        assertTrue(Duration.between(createTime, entry.getTimeOfChange()).getSeconds() < 1);
         assertFalse(entry.isDeleted());
 
         // check update history
@@ -378,8 +377,7 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         assertEquals(Long.valueOf(2), entry.getChangeNumber());
         assertEquals(cat_v2, entry.getData());
         assertEquals(user, entry.getUser());
-        assertTrue(updateTime.isBefore(entry.getTimeOfChange()));
-        assertTrue(deleteTime.isAfter(entry.getTimeOfChange()));
+        assertTrue(Duration.between(updateTime, entry.getTimeOfChange()).getSeconds() < 1);
         assertFalse(entry.isDeleted());
 
         // check delete history
@@ -387,8 +385,7 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         assertEquals(Long.valueOf(3), entry.getChangeNumber());
         assertEquals(cat_v2, entry.getData());
         assertEquals(user, entry.getUser());
-        assertTrue(deleteTime.isBefore(entry.getTimeOfChange()));
-        assertTrue(afterDeleteTime.isAfter(entry.getTimeOfChange()));
+        assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
         assertTrue(entry.isDeleted());
     }
 }
