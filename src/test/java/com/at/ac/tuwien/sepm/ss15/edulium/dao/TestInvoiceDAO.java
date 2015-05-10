@@ -267,8 +267,6 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         Invoice inv1 = new Invoice();
         Invoice inv2 = new Invoice();
         Invoice inv3 = new Invoice();
-        Invoice matcher = new Invoice();
-        List<Invoice> invoiceList;
 
         inv1.setTime(new Date());
         inv1.setGross(11.0d);
