@@ -36,10 +36,7 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         assertNotNull(cat.getIdentity());
 
         // check retrieving object
-        MenuCategory matcher = new MenuCategory();
-        matcher.setIdentity(cat.getIdentity());
-
-        List<MenuCategory> storedObjects = menuCategoryDAO.find(matcher);
+        List<MenuCategory> storedObjects = menuCategoryDAO.find(MenuCategory.withIdentity(cat.getIdentity()));
         assertEquals(1, storedObjects.size());
         assertEquals(cat, storedObjects.get(0));
     }
@@ -79,9 +76,7 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         menuCategoryDAO.create(cat);
 
         // check if cat is stored
-        MenuCategory matcher = new MenuCategory();
-        matcher.setIdentity(cat.getIdentity());
-        assertEquals(cat, menuCategoryDAO.find(matcher).get(0));
+        assertEquals(cat, menuCategoryDAO.find(MenuCategory.withIdentity(cat.getIdentity())).get(0));
 
         // WHEN
         cat.setName("newCat");
@@ -89,7 +84,7 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
 
         // THEN
         // check if category name was updated
-        List<MenuCategory> storedObjects = menuCategoryDAO.find(matcher);
+        List<MenuCategory> storedObjects = menuCategoryDAO.find(MenuCategory.withIdentity(cat.getIdentity()));
         assertEquals(1, storedObjects.size());
         assertEquals(cat, storedObjects.get(0));
     }
@@ -134,11 +129,8 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         cat.setName("cat");
         menuCategoryDAO.create(cat);
 
-        MenuCategory matcher = new MenuCategory();
-        matcher.setIdentity(cat.getIdentity());
-
         // check if cat created
-        List<MenuCategory> objects = menuCategoryDAO.find(matcher);
+        List<MenuCategory> objects = menuCategoryDAO.find(MenuCategory.withIdentity(cat.getIdentity()));
         assertEquals(1, objects.size());
         assertEquals(cat, objects.get(0));
 
@@ -147,7 +139,7 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
 
         // THEN
         // check if category was removed
-        assertTrue(menuCategoryDAO.find(matcher).isEmpty());
+        assertTrue(menuCategoryDAO.find(MenuCategory.withIdentity(cat.getIdentity())).isEmpty());
         assertTrue(menuCategoryDAO.getAll().isEmpty());
     }
 
@@ -185,7 +177,6 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
     @Test
     public void testFind_byIdentityShouldReturnObject() throws DAOException, ValidationException {
         // GIVEN
-        MenuCategory matcher = new MenuCategory();
         MenuCategory cat1 = new MenuCategory();
         MenuCategory cat2 = new MenuCategory();
         MenuCategory cat3 = new MenuCategory();
@@ -197,22 +188,19 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         menuCategoryDAO.create(cat3);
 
         // WHEN
-        matcher.setIdentity(cat1.getIdentity());
-        List<MenuCategory> objects = menuCategoryDAO.find(matcher);
+        List<MenuCategory> objects = menuCategoryDAO.find(MenuCategory.withIdentity(cat1.getIdentity()));
         // THEN
         assertEquals(1, objects.size());
         assertEquals(cat1, objects.get(0));
 
         // WHEN
-        matcher.setIdentity(cat2.getIdentity());
-        objects = menuCategoryDAO.find(matcher);
+        objects = menuCategoryDAO.find(MenuCategory.withIdentity(cat2.getIdentity()));
         // THEN
         assertEquals(1, objects.size());
         assertEquals(cat2, objects.get(0));
 
         // WHEN
-        matcher.setIdentity(cat3.getIdentity());
-        objects = menuCategoryDAO.find(matcher);
+        objects = menuCategoryDAO.find(MenuCategory.withIdentity(cat3.getIdentity()));
         // THEN
         assertEquals(1, objects.size());
         assertEquals(cat3, objects.get(0));
