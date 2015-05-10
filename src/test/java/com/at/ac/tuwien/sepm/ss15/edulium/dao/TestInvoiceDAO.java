@@ -89,4 +89,75 @@ public class TestInvoiceDAO extends AbstractDAOTest {
             assertNull(invoice.getIdentity());
         }
     }
+
+    @Test
+    public void testUpdate_shouldUpdateObject() throws ValidationException, DAOException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setTime(new Date());
+        invoice.setGross(26.7d);
+        invoiceDAO.create(invoice);
+
+        // Make sure the invoice was stored successfully
+        assertNotNull(invoice.getIdentity()); // Check if identity was set
+        Invoice matcher = new Invoice();
+        matcher.setIdentity(invoice.getIdentity());
+        assertEquals(invoice, invoiceDAO.find(matcher).get(0));
+
+        // WHEN
+        invoice.setPaid(28.0d);
+        invoiceDAO.update(invoice);
+
+        // THEN
+        List<Invoice> invoiceList = invoiceDAO.find(invoice);
+        assertEquals(1, invoiceList.size());
+        assertEquals(invoice, invoiceList.get(0));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdate_shouldFailWhenObjectIsNull() throws ValidationException {
+        // GIVEN
+        Invoice invoice = null;
+
+        // WHEN
+        try {
+            invoiceDAO.update(invoice);
+        } catch (DAOException e) {
+            fail("DAOException was thrown instead");
+        }
+    }
+
+    @Test (expected = ValidationException.class)
+    public void testUpdate_shouldFailWhenPaidAmountIsNegative() throws ValidationException, DAOException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setTime(new Date());
+        invoice.setGross(20.0d);
+        invoice.setCanceled(false);
+        invoiceDAO.create(invoice);
+
+        // Make sure invoice was stored successfully
+        assertNotNull(invoice.getIdentity()); // Check if identity was set
+        Invoice matcher = new Invoice();
+        matcher.setIdentity(invoice.getIdentity());
+        assertEquals(invoice, invoiceDAO.find(matcher).get(0));
+
+        // WHEN
+        invoice.setPaid(-20.0d);
+        invoiceDAO.update(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdate_shouldFailWhenObjectIdentityIsMissing() throws ValidationException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setPaid(13.0d);
+
+        //WHEN
+        try {
+            invoiceDAO.update(invoice);
+        } catch (DAOException e) {
+            fail("DAOException was thrown instead");
+        }
+    }
 }
