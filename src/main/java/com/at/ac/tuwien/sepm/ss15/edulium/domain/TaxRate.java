@@ -10,8 +10,8 @@ public class TaxRate {
     private BigDecimal value = null;
 
     /**
-     * Creates a new user object and assigns the given identity to it.
-     * @param identity the identity of the user
+     * Creates a new tax rate object and assigns the given identity to it.
+     * @param identity the identity of the tax rate
      * @return TaxRate object with the given identity
      */
     public static TaxRate withIdentity(long identity) {
