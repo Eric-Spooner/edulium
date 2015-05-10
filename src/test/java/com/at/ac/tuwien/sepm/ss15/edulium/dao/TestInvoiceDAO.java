@@ -186,7 +186,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         assertTrue(invoiceDAO.find(matcher).isEmpty());
     }
 
-    @Test
+    @Test(expected = ValidationException.class)
     public void testDelete_shouldFailWhenIdentityIsMissing() throws ValidationException {
         // GIVEN
         Invoice invoice = new Invoice();
@@ -197,5 +197,63 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         } catch (DAOException e) {
             fail("DAOException was thrown instead");
         }
+    }
+
+    @Test
+    public void testFind_shouldFindObject() throws ValidationException, DAOException {
+        // GIVEN
+        Invoice inv1 = new Invoice();
+        Invoice inv2 = new Invoice();
+        Invoice inv3 = new Invoice();
+        Invoice matcher = new Invoice();
+        List<Invoice> invoiceList;
+
+        inv1.setTime(new Date());
+        inv1.setGross(11.0d);
+        inv2.setTime(new Date());
+        inv2.setGross(12.0d);
+        inv3.setTime(new Date());
+        inv3.setGross(13.0d);
+
+        invoiceDAO.create(inv1);
+        invoiceDAO.create(inv2);
+        invoiceDAO.create(inv3);
+
+        // WHEN
+        matcher.setIdentity(inv1.getIdentity());
+        invoiceList = invoiceDAO.find(matcher);
+
+        // THEN
+        assertEquals(1, invoiceList.size());
+        assertEquals(inv1, invoiceList.get(0));
+
+        // WHEN
+        matcher.setIdentity(inv2.getIdentity());
+        invoiceList = invoiceDAO.find(matcher);
+
+        // THEN
+        assertEquals(1, invoiceList.size());
+        assertEquals(inv2, invoiceList.get(0));
+
+        // WHEN
+        matcher.setIdentity(inv3.getIdentity());
+        invoiceList = invoiceDAO.find(matcher);
+
+        // THEN
+        assertEquals(1, invoiceList.size());
+        assertEquals(inv3, invoiceList.get(0));
+    }
+
+    @Test
+    public void testFind_shouldReturnEmptyListWhenNoObjectIsStored() throws DAOException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setIdentity(1l); // Arbitrary identity
+
+        // WHEN
+        assertTrue(invoiceDAO.getAll().isEmpty());
+
+        // THEN
+        assertTrue(invoiceDAO.find(invoice).isEmpty());
     }
 }
