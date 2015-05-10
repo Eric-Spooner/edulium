@@ -140,7 +140,9 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         assertNotNull(invoice.getIdentity()); // Check if identity was set
         Invoice matcher = new Invoice();
         matcher.setIdentity(invoice.getIdentity());
-        assertEquals(invoice, invoiceDAO.find(matcher).get(0));
+        List<Invoice> invoiceList = invoiceDAO.find(matcher);
+        assertEquals(1, invoiceList.size());
+        assertEquals(invoice, invoiceList.get(0));
 
         // WHEN
         invoice.setPaid(-20.0d);
@@ -156,6 +158,42 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         //WHEN
         try {
             invoiceDAO.update(invoice);
+        } catch (DAOException e) {
+            fail("DAOException was thrown instead");
+        }
+    }
+
+    @Test
+    public void testDelete_shouldDeleteObject() throws ValidationException, DAOException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setTime(new Date());
+        invoice.setGross(22.0d);
+        invoiceDAO.create(invoice);
+
+        // Make sure invoice was stored successfully
+        assertNotNull(invoice.getIdentity()); // Check if identity was set
+        Invoice matcher = new Invoice();
+        matcher.setIdentity(invoice.getIdentity());
+        List<Invoice> invoiceList = invoiceDAO.find(matcher);
+        assertEquals(1, invoiceList.size());
+        assertEquals(invoice, invoiceList.get(0));
+
+        // WHEN
+        invoiceDAO.delete(invoice);
+
+        // THEN
+        assertTrue(invoiceDAO.find(matcher).isEmpty());
+    }
+
+    @Test
+    public void testDelete_shouldFailWhenIdentityIsMissing() throws ValidationException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+
+        // WHEN
+        try {
+            invoiceDAO.delete(invoice);
         } catch (DAOException e) {
             fail("DAOException was thrown instead");
         }
