@@ -62,10 +62,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         assertNotNull(reservation.getIdentity());
 
         // try to find the reservation and compare it
-        Reservation matcher = new Reservation();
-        matcher.setIdentity(reservation.getIdentity());
-
-        List<Reservation> storedObjects = reservationDAO.find(matcher);
+        List<Reservation> storedObjects = reservationDAO.find(Reservation.withIdentity(reservation.getIdentity()));
         assertEquals(1, storedObjects.size());
         assertEquals(reservation, storedObjects.get(0));
     }
@@ -422,14 +419,9 @@ public class TestReservationDAO extends AbstractDAOTest {
         assertEquals(1, reservationDAO.find(reservation3).size());
 
         // GIVEN
-        Reservation matcher1 = new Reservation(); // for reservation 1
-        matcher1.setIdentity(reservation1.getIdentity());
-
-        Reservation matcher2 = new Reservation(); // for reservation 2
-        matcher2.setIdentity(reservation2.getIdentity());
-
-        Reservation matcher3 = new Reservation(); // for reservation 3
-        matcher3.setIdentity(reservation3.getIdentity());
+        Reservation matcher1 = Reservation.withIdentity(reservation1.getIdentity()); // for reservation 1
+        Reservation matcher2 = Reservation.withIdentity(reservation2.getIdentity()); // for reservation 2
+        Reservation matcher3 = Reservation.withIdentity(reservation3.getIdentity()); // for reservation 3
 
         // WHEN
         List<Reservation> result1 = reservationDAO.find(matcher1);

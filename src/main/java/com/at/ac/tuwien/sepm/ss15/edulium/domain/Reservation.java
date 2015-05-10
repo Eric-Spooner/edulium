@@ -16,6 +16,17 @@ public class Reservation {
     private List<Table> tables = null;
 
     /**
+     * Creates a new reservation object and assigns the given identity to it.
+     * @param identity the identity of the reservation
+     * @return Reservation object with the given identity
+     */
+    public static Reservation withIdentity(long identity) {
+        Reservation reservation = new Reservation();
+        reservation.setIdentity(identity);
+        return reservation;
+    }
+
+    /**
      * @return the identity of the reservation (can be null)
      */
     public Long getIdentity() {
