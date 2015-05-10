@@ -220,7 +220,7 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
         LOGGER.debug("entering generateHistory with parameters " + menuCategory);
 
         final String query = "INSERT INTO MenuCategoryHistory " +
-                "(SELECT ID, name, deleted, ?, ?, " +
+                "(SELECT *, ?, ?, " +
                 "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM MenuCategoryHistory WHERE ID = ?) " +
                 "FROM MenuCategory WHERE ID = ?)";
 

@@ -6,14 +6,14 @@ CREATE TABLE IF NOT EXISTS RestaurantUser (
 );
 
 CREATE TABLE IF NOT EXISTS RestaurantUserHistory (
-    user_ID VARCHAR(25) REFERENCES RestaurantUser(ID),
+    ID VARCHAR(25) REFERENCES RestaurantUser(ID),
     name VARCHAR(100),
     userRole VARCHAR(100),
     deleted BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(user_ID, changeNr)
+    PRIMARY KEY(ID, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS Invoice (

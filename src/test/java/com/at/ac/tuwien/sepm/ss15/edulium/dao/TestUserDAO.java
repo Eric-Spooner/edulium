@@ -1,11 +1,15 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import static org.junit.Assert.*;
 import org.junit.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -470,5 +474,97 @@ public class TestUserDAO extends AbstractDAOTest {
             stringBuilder.append((char)(random.nextInt('z' - 'a') + 'a'));
         }
         return stringBuilder.toString();
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_withoutObjectShouldFail() throws DAOException, ValidationException {
+        userDAO.getHistory(null);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_withoutIdentityShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        User user = new User();
+
+        // WHEN
+        userDAO.getHistory(user);
+    }
+
+    @Test
+    public void testGetHistory_notPersistentDataShouldReturnEmptyList() throws DAOException, ValidationException {
+        // GIVEN
+        User user = new User();
+
+        // search for a non-existing user identity
+        try {
+            do {
+                user.setIdentity(buildRandomString(15));
+            } while (!userDAO.find(user).isEmpty());
+        } catch (DAOException e) {
+            fail("DAOException should not occur while searching for a non-existing user identity");
+        }
+
+        // WHEN / THEN
+        assertTrue(userDAO.getHistory(user).isEmpty());
+    }
+
+    @Test
+    public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // get test user
+        List<User> users = userDAO.find(User.withIdentity(
+                SecurityContextHolder.getContext().getAuthentication().getName()));
+
+        assertEquals(1, users.size());
+        User user = users.get(0);
+
+        // GIVEN
+        // create data
+        User user_v1 = new User();
+        user_v1.setIdentity("identity");
+        user_v1.setName("user");
+        user_v1.setRole("user_role");
+        LocalDateTime createTime = LocalDateTime.now();
+        userDAO.create(user_v1);
+
+        // update data
+        User user_v2 = User.withIdentity(user_v1.getIdentity());
+        user_v2.setName("update");
+        user_v2.setRole("update_role");
+        LocalDateTime updateTime = LocalDateTime.now();
+        userDAO.update(user_v2);
+
+        // delete data
+        LocalDateTime deleteTime = LocalDateTime.now();
+        userDAO.delete(user_v2);
+
+        // WHEN
+        List<History<User>> history = userDAO.getHistory(user_v1);
+        assertEquals(3, history.size());
+
+        // THEN
+        // check create history
+        History<User> entry = history.get(0);
+        assertEquals(Long.valueOf(1), entry.getChangeNumber());
+        assertEquals(user_v1, entry.getData());
+        assertEquals(user, entry.getUser());
+        assertTrue(Duration.between(createTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(entry.isDeleted());
+
+        // check update history
+        entry = history.get(1);
+        assertEquals(Long.valueOf(2), entry.getChangeNumber());
+        assertEquals(user_v2, entry.getData());
+        assertEquals(user, entry.getUser());
+        assertTrue(Duration.between(updateTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(entry.isDeleted());
+
+        // check delete history
+        entry = history.get(2);
+        assertEquals(Long.valueOf(3), entry.getChangeNumber());
+        assertEquals(user_v2, entry.getData());
+        assertEquals(user, entry.getUser());
+        assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertTrue(entry.isDeleted());
     }
 }
