@@ -106,9 +106,11 @@ public class Invoice {
             return false;
 
         Invoice that = (Invoice) o;
-        if (this.identity != null && that.identity != null)
-            return this.identity == that.identity;
 
-        return false;
+        return (this.identity == that.getIdentity() &&
+                this.time.equals(that.getTime()) &&
+                this.gross == that.getGross() &&
+                this.paid == that.getPaid() &&
+                this.canceled == that.canceled);
     }
 }
