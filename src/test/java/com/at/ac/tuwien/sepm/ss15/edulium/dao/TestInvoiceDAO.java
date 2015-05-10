@@ -222,6 +222,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         // WHEN
         matcher.setIdentity(inv1.getIdentity());
         invoiceList = invoiceDAO.find(matcher);
+        assertNotNull(invoiceList);
 
         // THEN
         assertEquals(1, invoiceList.size());
@@ -251,9 +252,51 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice.setIdentity(1l); // Arbitrary identity
 
         // WHEN
-        assertTrue(invoiceDAO.getAll().isEmpty());
+        List<Invoice> allInvoices = invoiceDAO.getAll();
+        assertNotNull(allInvoices);
+        assertTrue(allInvoices.isEmpty());
 
         // THEN
-        assertTrue(invoiceDAO.find(invoice).isEmpty());
+        List<Invoice> search = invoiceDAO.find(invoice);
+        assertTrue(search.isEmpty());
+    }
+
+    @Test
+    public void tesetGetAll_shouldReturnAllObjects() throws ValidationException, DAOException {
+        // GIVEN
+        Invoice inv1 = new Invoice();
+        Invoice inv2 = new Invoice();
+        Invoice inv3 = new Invoice();
+        Invoice matcher = new Invoice();
+        List<Invoice> invoiceList;
+
+        inv1.setTime(new Date());
+        inv1.setGross(11.0d);
+        inv2.setTime(new Date());
+        inv2.setGross(12.0d);
+        inv3.setTime(new Date());
+        inv3.setGross(13.0d);
+
+        invoiceDAO.create(inv1);
+        invoiceDAO.create(inv2);
+        invoiceDAO.create(inv3);
+
+        // WHEN
+        List<Invoice> all = invoiceDAO.getAll();
+        assertNotNull(all);
+
+        // THEN
+        assertEquals(3, all.size());
+        assertTrue(all.contains(inv1));
+        assertTrue(all.contains(inv2));
+        assertTrue(all.contains(inv3));
+    }
+
+    @Test
+    public void testGetAll_shouldReturnEmptyList() throws DAOException {
+        // WHEN / THEN
+        List<Invoice> all = invoiceDAO.getAll();
+        assertNotNull(all);
+        assertTrue(all.isEmpty());
     }
 }
