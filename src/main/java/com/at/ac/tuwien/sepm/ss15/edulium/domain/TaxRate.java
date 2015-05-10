@@ -12,7 +12,7 @@ public class TaxRate {
     /**
      * Creates a new user object and assigns the given identity to it.
      * @param identity the identity of the user
-     * @return User object with the given identity
+     * @return TaxRate object with the given identity
      */
     public static TaxRate withIdentity(long identity) {
         TaxRate taxRate = new TaxRate();
