@@ -1,13 +1,13 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.InvoiceDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 
 import java.util.List;
 
-public class DBInvoiceDAO implements InvoiceDAO {
+public class DBInvoiceDAO implements DAO<Invoice> {
 
     /**
      * Writes the invoice object into the database and sets the identity

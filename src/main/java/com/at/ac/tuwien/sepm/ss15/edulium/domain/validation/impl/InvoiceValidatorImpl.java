@@ -1,10 +1,10 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.InvoiceValidator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 
-public class InvoiceValidatorImpl implements InvoiceValidator {
+public class InvoiceValidatorImpl implements Validator<Invoice> {
 
     /**
      * Validates the invoice object for the create action

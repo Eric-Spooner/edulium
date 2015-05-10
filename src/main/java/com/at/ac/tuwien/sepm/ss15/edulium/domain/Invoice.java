@@ -13,6 +13,17 @@ public class Invoice {
     private Boolean canceled;
 
     /**
+     * Creates a new invoice object and assigns the given identity to it
+     * @param identity The identity of the invoice
+     * @return New invoice object with the provided identity
+     */
+    public static Invoice withIdentity(long identity) {
+        Invoice invoice = new Invoice();
+        invoice.setIdentity(identity);
+        return invoice;
+    }
+
+    /**
      * @return Returns the unique identity of the invoice
      */
     public Long getIdentity() {
