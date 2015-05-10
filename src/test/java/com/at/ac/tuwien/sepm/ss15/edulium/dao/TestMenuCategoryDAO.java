@@ -7,9 +7,9 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -18,6 +18,8 @@ import java.util.List;
 public class TestMenuCategoryDAO extends AbstractDAOTest {
     @Autowired
     private DAO<MenuCategory> menuCategoryDAO;
+    @Autowired
+    private DAO<User> userDAO;
 
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
@@ -297,6 +299,11 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void testGetHistory_withoutObjectShouldFail() throws DAOException, ValidationException {
+        menuCategoryDAO.getHistory(null);
+    }
+
+    @Test(expected = ValidationException.class)
     public void testGetHistory_withoutIdentityShouldFail() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory cat = new MenuCategory();
@@ -305,7 +312,7 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         menuCategoryDAO.getHistory(cat);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     public void testGetHistory_notPersistentDataShouldReturnEmptyList() throws DAOException, ValidationException {
         // GIVEN
         Long identity = (long) 1;
@@ -324,24 +331,33 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
 
     @Test
     public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // get test user
+        User matcher = new User();
+        matcher.setIdentity(SecurityContextHolder.getContext().getAuthentication().getName());
+        List<User> users = userDAO.find(matcher);
+
+        assertEquals(1, users.size());
+        User user = users.get(0);
+
         // GIVEN
         // create data
-        User user = new User();
         MenuCategory cat_v1 = new MenuCategory();
         cat_v1.setName("cat");
-        Date createTime = Calendar.getInstance().getTime();
+        LocalDateTime createTime = LocalDateTime.now();
         menuCategoryDAO.create(cat_v1);
 
         // update data
         MenuCategory cat_v2 = new MenuCategory();
         cat_v2.setIdentity(cat_v1.getIdentity());
         cat_v2.setName("update");
-        Date updateTime = Calendar.getInstance().getTime();
+        LocalDateTime updateTime = LocalDateTime.now();
         menuCategoryDAO.update(cat_v2);
 
         // delete data
-        Date deleteTime = Calendar.getInstance().getTime();
+        LocalDateTime deleteTime = LocalDateTime.now();
         menuCategoryDAO.delete(cat_v2);
+        LocalDateTime afterDeleteTime = LocalDateTime.now();
 
         // WHEN
         List<History<MenuCategory>> history = menuCategoryDAO.getHistory(cat_v1);
@@ -353,8 +369,8 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         assertEquals(Long.valueOf(1), entry.getChangeNumber());
         assertEquals(cat_v1, entry.getData());
         assertEquals(user, entry.getUser());
-        assertTrue(createTime.before(entry.getTimeOfChange()));
-        assertTrue(updateTime.after(entry.getTimeOfChange()));
+        assertTrue(createTime.isBefore(entry.getTimeOfChange()));
+        assertTrue(updateTime.isAfter(entry.getTimeOfChange()));
         assertFalse(entry.isDeleted());
 
         // check update history
@@ -362,8 +378,8 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         assertEquals(Long.valueOf(2), entry.getChangeNumber());
         assertEquals(cat_v2, entry.getData());
         assertEquals(user, entry.getUser());
-        assertTrue(updateTime.before(entry.getTimeOfChange()));
-        assertTrue(deleteTime.after(entry.getTimeOfChange()));
+        assertTrue(updateTime.isBefore(entry.getTimeOfChange()));
+        assertTrue(deleteTime.isAfter(entry.getTimeOfChange()));
         assertFalse(entry.isDeleted());
 
         // check delete history
@@ -371,7 +387,8 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         assertEquals(Long.valueOf(3), entry.getChangeNumber());
         assertEquals(cat_v2, entry.getData());
         assertEquals(user, entry.getUser());
-        assertTrue(deleteTime.before(entry.getTimeOfChange()));
+        assertTrue(deleteTime.isBefore(entry.getTimeOfChange()));
+        assertTrue(afterDeleteTime.isAfter(entry.getTimeOfChange()));
         assertTrue(entry.isDeleted());
     }
 }

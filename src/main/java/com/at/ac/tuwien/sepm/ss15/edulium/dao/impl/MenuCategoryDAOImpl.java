@@ -11,10 +11,13 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import sun.rmi.runtime.Log;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -190,10 +193,11 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
 
         validator.validateIdentity(menuCategory);
         List<History<MenuCategory>> history = new ArrayList<>();
-        final String query = "";
+        final String query = "SELECT * FROM MenuCategoryHistory WHERE category_ID = ? ORDER BY changeNr";
 
-        try (PreparedStatement statement = dataSource.getConnection().prepareStatement(query)) {
-            ResultSet result = statement.executeQuery();
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, menuCategory.getIdentity());
+            ResultSet result = stmt.executeQuery();
             while(result.next()) {
                 history.add(parseHistoryEntry(result));
             }
@@ -205,7 +209,6 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
         return history;
     }
 
-    // FIXME add implementation when session object is implemented
     /**
      * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed
@@ -214,21 +217,32 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
      * @throws DAOException if an error accessing the database occurred
      */
     private void generateHistory(MenuCategory menuCategory) throws DAOException {
-        /*
+        LOGGER.debug("entering generateHistory with parameters " + menuCategory);
+
         final String query = "INSERT INTO MenuCategoryHistory " +
-                "(SELECT ID, name, deleted, ?, ?, NULL FROM MenuCategory WHERE ID = ?)";
-        final Timestamp timestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                "(SELECT ID, name, deleted, ?, ?, " +
+                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM MenuCategoryHistory WHERE category_ID = ?) " +
+                "FROM MenuCategory WHERE ID = ?)";
+
+        User matcher = new User();
+        matcher.setIdentity(SecurityContextHolder.getContext().getAuthentication().getName());
+        List<User> user = userDAO.find(matcher);
+
+        if(user.size() != 1) {
+            throw new DAOException("user not found");
+        }
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setTimestamp(1, timestamp);    // time
-            stmt.setInt(2, 0);                  // user TODO
-            stmt.setLong(3, identity);          // dataset id
+            stmt.setTimestamp(1, new Timestamp(Calendar.getInstance().getTimeInMillis()));    // time
+            stmt.setString(2, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+            stmt.setLong(3, menuCategory.getIdentity());          // dataset id
+            stmt.setLong(4, menuCategory.getIdentity());          // dataset id
 
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DAOException(e);
+            LOGGER.error("generating history failed");
+            throw new DAOException("generating history failed", e);
         }
-        */
     }
 
     /**
@@ -268,7 +282,7 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
 
         // create history entry
         History<MenuCategory> historyEntry = new History<>();
-        historyEntry.setTimeOfChange(result.getTimestamp("changeTime"));
+        historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
         historyEntry.setChangeNumber(result.getLong("changeNr"));
         historyEntry.setDeleted(result.getBoolean("deleted"));
         historyEntry.setUser(storedUsers.get(0));

@@ -1,5 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
@@ -57,4 +58,13 @@ public interface DAO<T> {
      * @throws DAOException if the data couldn't be retrieved
      */
     List<T> getAll() throws DAOException;
+
+    /**
+     * @param object object to get the history for
+     * @return returns the history of changes for the object
+     * @throws DAOException if the data couldn't be retrieved
+     * @throws ValidationException if the menuCategory object parameters are
+     *         not valid for this action
+     */
+    List<History<T>> getHistory(T object) throws DAOException, ValidationException;
 }

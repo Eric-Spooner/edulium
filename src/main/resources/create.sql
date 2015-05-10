@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS MenuCategoryHistory (
     deleted BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
-    changeNr BIGINT AUTO_INCREMENT,
+    changeNr BIGINT,
     PRIMARY KEY(category_ID, changeNr)
 );
 

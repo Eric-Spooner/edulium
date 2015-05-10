@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.domain.history;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Date;
  */
 public class History<T> {
     private User user;
-    private Date timeOfChange;
+    private LocalDateTime timeOfChange;
     private Long changeNumber;
     private boolean deleted;
     private T data;
@@ -49,7 +50,7 @@ public class History<T> {
      * @return returns the date and time when the changes
      *         were made
      */
-    public Date getTimeOfChange() {
+    public LocalDateTime getTimeOfChange() {
         return timeOfChange;
     }
 
@@ -57,7 +58,7 @@ public class History<T> {
      * sets the date and time when the changes were made
      * @param timeOfChange date and time
      */
-    public void setTimeOfChange(Date timeOfChange) {
+    public void setTimeOfChange(LocalDateTime timeOfChange) {
         this.timeOfChange = timeOfChange;
     }
 
