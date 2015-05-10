@@ -14,7 +14,7 @@ import java.util.Random;
  */
 public class TestUserDAO extends AbstractDAOTest {
     @Autowired
-    private UserDAO userDAO;
+    private DAO<User> userDAO;
 
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
@@ -29,10 +29,7 @@ public class TestUserDAO extends AbstractDAOTest {
 
         // THEN
         // try to find the user and compare it
-        User matcher = new User();
-        matcher.setIdentity(user.getIdentity());
-
-        List<User> storedObjects = userDAO.find(matcher);
+        List<User> storedObjects = userDAO.find(User.withIdentity(user.getIdentity()));
         assertEquals(1, storedObjects.size());
         assertEquals(user, storedObjects.get(0));
     }
@@ -76,22 +73,12 @@ public class TestUserDAO extends AbstractDAOTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithoutNameShouldFail() throws DAOException, ValidationException {
+    public void testCreate_addingObjectWithEmptyIdentityShouldFail() throws DAOException, ValidationException {
         // GIVEN
         User user = new User();
-        user.setIdentity("jaunty");
+        user.setIdentity("");
+        user.setName("Breezy Badger");
         user.setRole("tester");
-
-        // WHEN
-        userDAO.create(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithoutRoleShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-        user.setIdentity("jaunty");
-        user.setName("Jaunty Jackalope");
 
         // WHEN
         userDAO.create(user);
@@ -110,42 +97,6 @@ public class TestUserDAO extends AbstractDAOTest {
     public void testCreate_addingNullObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         User user = null;
-
-        // WHEN
-        userDAO.create(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithEmptyIdentityShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-        user.setIdentity("");
-        user.setName("Breezy Badger");
-        user.setRole("tester");
-
-        // WHEN
-        userDAO.create(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithEmptyNameShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-        user.setIdentity("breezy");
-        user.setName("");
-        user.setRole("tester");
-
-        // WHEN
-        userDAO.create(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithEmptyRoleShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-        user.setIdentity("breezy");
-        user.setName("Breezy Badger");
-        user.setRole("");
 
         // WHEN
         userDAO.create(user);
@@ -185,28 +136,6 @@ public class TestUserDAO extends AbstractDAOTest {
         User user = new User();
         user.setName("Oneiric Ocelot");
         user.setRole("thrower");
-
-        // WHEN
-        userDAO.update(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testUpdate_updatingObjectWithoutNameShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-        user.setIdentity("oneiric");
-        user.setRole("thrower");
-
-        // WHEN
-        userDAO.update(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testUpdate_updatingObjectWithoutRoleShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-        user.setIdentity("oneiric");
-        user.setName("Oneiric Ocelot");
 
         // WHEN
         userDAO.update(user);
@@ -346,14 +275,9 @@ public class TestUserDAO extends AbstractDAOTest {
         assertEquals(1, userDAO.find(user3).size());
 
         // GIVEN
-        User matcher1 = new User(); // for user 1
-        matcher1.setIdentity("hardy");
-
-        User matcher2 = new User(); // for user 2
-        matcher2.setIdentity("intrepid");
-
-        User matcher3 = new User(); // for user 3
-        matcher3.setIdentity("precise");
+        User matcher1 = User.withIdentity("hardy"); // for user 1
+        User matcher2 = User.withIdentity("intrepid"); // for user 2
+        User matcher3 = User.withIdentity("precise"); // for user 3
 
         // WHEN
         List<User> result1 = userDAO.find(matcher1);
