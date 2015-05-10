@@ -322,9 +322,8 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
     public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
         // get test user
-        User matcher = new User();
-        matcher.setIdentity(SecurityContextHolder.getContext().getAuthentication().getName());
-        List<User> users = userDAO.find(matcher);
+        List<User> users = userDAO.find(User.withIdentity(
+                SecurityContextHolder.getContext().getAuthentication().getName()));
 
         assertEquals(1, users.size());
         User user = users.get(0);
@@ -337,8 +336,7 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         menuCategoryDAO.create(cat_v1);
 
         // update data
-        MenuCategory cat_v2 = new MenuCategory();
-        cat_v2.setIdentity(cat_v1.getIdentity());
+        MenuCategory cat_v2 = MenuCategory.withIdentity(cat_v1.getIdentity());
         cat_v2.setName("update");
         LocalDateTime updateTime = LocalDateTime.now();
         menuCategoryDAO.update(cat_v2);

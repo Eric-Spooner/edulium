@@ -224,14 +224,6 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
                 "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM MenuCategoryHistory WHERE ID = ?) " +
                 "FROM MenuCategory WHERE ID = ?)";
 
-        User matcher = new User();
-        matcher.setIdentity(SecurityContextHolder.getContext().getAuthentication().getName());
-        List<User> user = userDAO.find(matcher);
-
-        if(user.size() != 1) {
-            throw new DAOException("user not found");
-        }
-
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setTimestamp(1, new Timestamp(Calendar.getInstance().getTimeInMillis()));    // time
             stmt.setString(2, SecurityContextHolder.getContext().getAuthentication().getName()); // user
@@ -267,9 +259,7 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
      */
     private History<MenuCategory> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
         // get user
-        User userMatcher = new User();
-        userMatcher.setIdentity(result.getString("changeUser"));
-        List<User> storedUsers = userDAO.find(userMatcher);
+        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
         if(storedUsers.size() != 1) {
             LOGGER.error("user not found");
             throw new DAOException("user not found");
