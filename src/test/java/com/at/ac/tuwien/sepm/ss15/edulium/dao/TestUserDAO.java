@@ -76,22 +76,12 @@ public class TestUserDAO extends AbstractDAOTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithoutNameShouldFail() throws DAOException, ValidationException {
+    public void testCreate_addingObjectWithEmptyIdentityShouldFail() throws DAOException, ValidationException {
         // GIVEN
         User user = new User();
-        user.setIdentity("jaunty");
+        user.setIdentity("");
+        user.setName("Breezy Badger");
         user.setRole("tester");
-
-        // WHEN
-        userDAO.create(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithoutRoleShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-        user.setIdentity("jaunty");
-        user.setName("Jaunty Jackalope");
 
         // WHEN
         userDAO.create(user);
@@ -110,42 +100,6 @@ public class TestUserDAO extends AbstractDAOTest {
     public void testCreate_addingNullObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         User user = null;
-
-        // WHEN
-        userDAO.create(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithEmptyIdentityShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-        user.setIdentity("");
-        user.setName("Breezy Badger");
-        user.setRole("tester");
-
-        // WHEN
-        userDAO.create(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithEmptyNameShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-        user.setIdentity("breezy");
-        user.setName("");
-        user.setRole("tester");
-
-        // WHEN
-        userDAO.create(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithEmptyRoleShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-        user.setIdentity("breezy");
-        user.setName("Breezy Badger");
-        user.setRole("");
 
         // WHEN
         userDAO.create(user);
@@ -185,28 +139,6 @@ public class TestUserDAO extends AbstractDAOTest {
         User user = new User();
         user.setName("Oneiric Ocelot");
         user.setRole("thrower");
-
-        // WHEN
-        userDAO.update(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testUpdate_updatingObjectWithoutNameShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-        user.setIdentity("oneiric");
-        user.setRole("thrower");
-
-        // WHEN
-        userDAO.update(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testUpdate_updatingObjectWithoutRoleShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-        user.setIdentity("oneiric");
-        user.setName("Oneiric Ocelot");
 
         // WHEN
         userDAO.update(user);
