@@ -4,6 +4,8 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 
+import java.math.BigDecimal;
+
 public class InvoiceValidatorImpl implements Validator<Invoice> {
 
     /**
@@ -21,17 +23,13 @@ public class InvoiceValidatorImpl implements Validator<Invoice> {
             throw  new ValidationException("Time and gross must not be null");
         }
 
-        if (invoice.getGross() < 0.0d) {
+        if (invoice.getGross().compareTo(new BigDecimal("0.0")) < 0) {
             throw new ValidationException("The total gross amount cannot be negative");
         }
 
-        if (invoice.getPaid() != null && invoice.getPaid() != 0.0d) {
+        if (invoice.getPaid() != null && invoice.getPaid().compareTo(new BigDecimal("0.0")) != 0) {
             throw new ValidationException("The amount that was already paid can only" +
                     "be 0 upon creation");
-        }
-
-        if (invoice.getCanceled()) {
-            throw new ValidationException("Invoice cannot be cancelled upon creation");
         }
     }
 
@@ -46,7 +44,7 @@ public class InvoiceValidatorImpl implements Validator<Invoice> {
             throw new ValidationException("Object must not be null");
         }
 
-        if (invoice.getPaid() < 0.0d) {
+        if (invoice.getPaid().compareTo(new BigDecimal("0.0")) < 0) {
             throw new ValidationException("The amount that was already paid cannot be negative");
         }
 

@@ -7,7 +7,10 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 
 import java.util.List;
 
-public class DBInvoiceDAO implements DAO<Invoice> {
+/**
+ * Database implementation of the DAO interface for Invoice objects
+ */
+class DBInvoiceDAO implements DAO<Invoice> {
 
     /**
      * Writes the invoice object into the database and sets the identity
