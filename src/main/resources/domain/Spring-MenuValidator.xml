@@ -4,11 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="Spring-Context.xml" />
-
-    <!-- Validator beans -->
-    <import resource="domain/Spring-MenuCategoryValidator.xml" />
-    <import resource="domain/Spring-UserValidator.xml" />
-    <import resource="domain/Spring-MenuValidator.xml"/>
+    <bean id="menuValidator" class="com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl.MenuValidator">
+    </bean>
 
 </beans>

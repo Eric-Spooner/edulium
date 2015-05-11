@@ -10,5 +10,6 @@
     <!-- DAO beans -->
     <import resource="dao/Spring-MenuCategoryDAO.xml" />
     <import resource="dao/Spring-UserDAO.xml" />
+    <import resource="dao/Spring-ManueDAO.xml" />
 
 </beans>
