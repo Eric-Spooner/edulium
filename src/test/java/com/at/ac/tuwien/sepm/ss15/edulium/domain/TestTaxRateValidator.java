@@ -153,7 +153,7 @@ public class TestTaxRateValidator extends AbstractDomainTest {
     }
 
     @Test
-    public void testValidateForIdentity_shouldAcceptTaxRate() throws ValidationException {
+    public void testValidateIdentity_shouldAcceptTaxRate() throws ValidationException {
         // GIVEN
         TaxRate taxRate = new TaxRate();
         taxRate.setIdentity(0L);
@@ -163,7 +163,7 @@ public class TestTaxRateValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForIdentity_taxRateWithoutIdentityShouldThrow() throws ValidationException {
+    public void testValidateIdentity_taxRateWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
         TaxRate taxRate = new TaxRate();
 
@@ -172,7 +172,7 @@ public class TestTaxRateValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForIdentity_nullObjectShouldThrow() throws ValidationException {
+    public void testValidateIdentity_nullObjectShouldThrow() throws ValidationException {
         // GIVEN
         TaxRate taxRate = null;
 
