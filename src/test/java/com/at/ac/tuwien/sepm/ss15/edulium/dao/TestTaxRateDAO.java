@@ -1,16 +1,19 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Unit Test for the TaxRate DAO
@@ -335,5 +338,99 @@ public class TestTaxRateDAO extends AbstractDAOTest {
         assertTrue(result.contains(taxRate1));
         assertTrue(result.contains(taxRate2));
         assertTrue(result.contains(taxRate3));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_withoutObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        TaxRate taxRate = null;
+
+        // WHEN
+        taxRateDAO.getHistory(taxRate);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_withoutIdentityShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        TaxRate taxRate = new TaxRate();
+
+        // WHEN
+        taxRateDAO.getHistory(taxRate);
+    }
+
+    @Test
+    public void testGetHistory_notPersistentDataShouldReturnEmptyList() throws DAOException, ValidationException {
+        // GIVEN
+        TaxRate taxRate = new TaxRate();
+
+        // search for a non-existing tax rate identity
+        try {
+            taxRate.setIdentity(0L);
+            while (!taxRateDAO.find(taxRate).isEmpty()) {
+                taxRate.setIdentity(taxRate.getIdentity() + 1L);
+            }
+        } catch (DAOException e) {
+            fail("DAOException should not occur while searching for a non-existing tax rate identity");
+        }
+
+        // WHEN
+        List<TaxRate> result = taxRateDAO.find(taxRate);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // get test user
+        User testUser = getCurrentUser();
+
+        // GIVEN
+        // create data
+        TaxRate taxRate1 = new TaxRate();
+        taxRate1.setValue(BigDecimal.valueOf(50.0));
+        LocalDateTime createTime = LocalDateTime.now();
+        taxRateDAO.create(taxRate1);
+
+        // update data
+        TaxRate taxRate2 = new TaxRate();
+        taxRate2.setValue(BigDecimal.valueOf(40.0));
+        LocalDateTime updateTime = LocalDateTime.now();
+        taxRateDAO.update(taxRate2);
+
+        // delete data
+        LocalDateTime deleteTime = LocalDateTime.now();
+        taxRateDAO.delete(taxRate2);
+
+        // WHEN
+        List<History<TaxRate>> history = taxRateDAO.getHistory(taxRate1);
+
+        // THEN
+        assertEquals(3, history.size());
+
+        // check create history
+        History<TaxRate> entry = history.get(0);
+        assertEquals(Long.valueOf(1), entry.getChangeNumber());
+        assertEquals(taxRate1, entry.getData());
+        assertEquals(testUser, entry.getUser());
+        assertTrue(Duration.between(createTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(entry.isDeleted());
+
+        // check update history
+        entry = history.get(1);
+        assertEquals(Long.valueOf(2), entry.getChangeNumber());
+        assertEquals(taxRate2, entry.getData());
+        assertEquals(testUser, entry.getUser());
+        assertTrue(Duration.between(updateTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(entry.isDeleted());
+
+        // check delete history
+        entry = history.get(2);
+        assertEquals(Long.valueOf(3), entry.getChangeNumber());
+        assertEquals(taxRate2, entry.getData());
+        assertEquals(testUser, entry.getUser());
+        assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertTrue(entry.isDeleted());
     }
 }
