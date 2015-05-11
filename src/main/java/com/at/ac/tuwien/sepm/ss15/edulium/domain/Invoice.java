@@ -12,6 +12,7 @@ public class Invoice {
     private LocalDateTime time;
     private BigDecimal gross;
     private BigDecimal paid;
+    private User creator;
     private List<Installment> installments;
 
     /**
@@ -85,6 +86,20 @@ public class Invoice {
     }
 
     /**
+     * @return Returns the creator of this invoice
+     */
+    public User getCreator() {
+        return creator;
+    }
+
+    /**
+     * @param creator The creator of this invoice
+     */
+    public void setCreator(User creator) {
+        this.creator = creator;
+    }
+
+    /**
      * @return The list of installments (can be null)
      */
     public List<Installment> getInstallments() {
@@ -113,6 +128,7 @@ public class Invoice {
                 ", time=" + time +
                 ", gross=" + gross +
                 ", paid=" + paid +
+                ", creator=" + creator +
                 ", installments={" + instListStr.trim() + "}" +
                 "}";
     }
