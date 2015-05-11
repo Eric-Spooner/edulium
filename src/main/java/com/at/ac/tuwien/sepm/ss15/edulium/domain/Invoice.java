@@ -101,11 +101,16 @@ public class Invoice {
 
     @Override
     public String toString() {
+        String instListStr = "";
+        for (Installment i : installments) {
+            instListStr += i + "\n";
+        }
         return "Invoice{" +
                 "identity=" + identity +
                 ", time=" + time +
                 ", gross=" + gross +
                 ", paid=" + paid +
+                ", installments" + instListStr.trim() +
                 "}";
     }
 

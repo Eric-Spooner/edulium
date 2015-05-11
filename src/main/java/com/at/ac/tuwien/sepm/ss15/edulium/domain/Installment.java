@@ -100,6 +100,16 @@ public class Installment {
     }
 
     @Override
+    public String toString() {
+        return "Installment{" +
+                "identity=" + identity +
+                ", time=" + time +
+                ", paymentInfo=" + paymentInfo +
+                ", type=" + type +
+                ", amount" + amount;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
