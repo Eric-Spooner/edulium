@@ -36,7 +36,7 @@ public class TaxRate {
     }
 
     /**
-     * @return the tax rate value in percent (can be null)
+     * @return the tax rate value which is between 0.0 and 1.0
      */
     public BigDecimal getValue() {
         return value;
@@ -44,7 +44,7 @@ public class TaxRate {
 
     /**
      * Sets the tax rate value of the tax rate
-     * @param value tax rate value in percent
+     * @param value tax rate value which is between 0.0 and 1.0
      */
     public void setValue(BigDecimal value) {
         this.value = value;

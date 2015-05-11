@@ -26,7 +26,7 @@ public class TestTaxRateDAO extends AbstractDAOTest {
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
         // GIVEN
         TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(20.25));
+        taxRate.setValue(BigDecimal.valueOf(0.2025));
 
         // WHEN
         taxRateDAO.create(taxRate);
@@ -60,7 +60,7 @@ public class TestTaxRateDAO extends AbstractDAOTest {
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // PREPARE
         TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(19.0));
+        taxRate.setValue(BigDecimal.valueOf(0.19));
 
         // check if tax rate is stored
         taxRateDAO.create(taxRate);
@@ -69,7 +69,7 @@ public class TestTaxRateDAO extends AbstractDAOTest {
         // GIVEN
         TaxRate updatedTaxRate = new TaxRate();
         updatedTaxRate.setIdentity(taxRate.getIdentity());
-        updatedTaxRate.setValue(BigDecimal.valueOf(10.0));
+        updatedTaxRate.setValue(BigDecimal.valueOf(0.1));
 
         // WHEN
         taxRateDAO.update(updatedTaxRate);
@@ -85,7 +85,7 @@ public class TestTaxRateDAO extends AbstractDAOTest {
     public void testUpdate_updatingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
         // GIVEN
         TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(15.0));
+        taxRate.setValue(BigDecimal.valueOf(0.15));
 
         // WHEN
         taxRateDAO.update(taxRate);
@@ -124,7 +124,7 @@ public class TestTaxRateDAO extends AbstractDAOTest {
             fail("DAOException should not occur while searching for a non-existing tax rate identity");
         }
 
-        taxRate.setValue(BigDecimal.valueOf(25.0));
+        taxRate.setValue(BigDecimal.valueOf(0.25));
 
         // WHEN
         taxRateDAO.update(taxRate);
@@ -136,7 +136,7 @@ public class TestTaxRateDAO extends AbstractDAOTest {
         final int numberOfTaxRatesBefore = taxRateDAO.getAll().size();
 
         TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(30.0));
+        taxRate.setValue(BigDecimal.valueOf(0.3));
 
         // check if taxRate is stored
         taxRateDAO.create(taxRate);
@@ -198,21 +198,21 @@ public class TestTaxRateDAO extends AbstractDAOTest {
         // PREPARE
         // tax rate 1
         TaxRate taxRate1 = new TaxRate();
-        taxRate1.setValue(BigDecimal.valueOf(11.11));
+        taxRate1.setValue(BigDecimal.valueOf(0.1111));
 
         taxRateDAO.create(taxRate1);
         assertEquals(1, taxRateDAO.find(taxRate1).size());
 
         // tax rate 2
         TaxRate taxRate2 = new TaxRate();
-        taxRate2.setValue(BigDecimal.valueOf(22.22));
+        taxRate2.setValue(BigDecimal.valueOf(0.2222));
 
         taxRateDAO.create(taxRate2);
         assertEquals(1, taxRateDAO.find(taxRate2).size());
 
         // tax rate 3
         TaxRate taxRate3 = new TaxRate();
-        taxRate3.setValue(BigDecimal.valueOf(22.22));
+        taxRate3.setValue(BigDecimal.valueOf(0.2222));
 
         taxRateDAO.create(taxRate3);
         assertEquals(1, taxRateDAO.find(taxRate3).size());
@@ -243,31 +243,31 @@ public class TestTaxRateDAO extends AbstractDAOTest {
         // PREPARE
         // tax rate 1
         TaxRate taxRate1 = new TaxRate();
-        taxRate1.setValue(BigDecimal.valueOf(11.11));
+        taxRate1.setValue(BigDecimal.valueOf(0.1111));
 
         taxRateDAO.create(taxRate1);
         assertEquals(1, taxRateDAO.find(taxRate1).size());
 
         // tax rate 2
         TaxRate taxRate2 = new TaxRate();
-        taxRate2.setValue(BigDecimal.valueOf(22.22));
+        taxRate2.setValue(BigDecimal.valueOf(0.2222));
 
         taxRateDAO.create(taxRate2);
         assertEquals(1, taxRateDAO.find(taxRate2).size());
 
         // tax rate 3
         TaxRate taxRate3 = new TaxRate();
-        taxRate3.setValue(BigDecimal.valueOf(22.22));
+        taxRate3.setValue(BigDecimal.valueOf(0.2222));
 
         taxRateDAO.create(taxRate3);
         assertEquals(1, taxRateDAO.find(taxRate3).size());
 
         // GIVEN
         TaxRate matcher1 = new TaxRate(); // for tax rate 1
-        matcher1.setValue(BigDecimal.valueOf(11.11));
+        matcher1.setValue(BigDecimal.valueOf(0.1111));
 
         TaxRate matcher2 = new TaxRate(); // for tax rate 2 and tax rate 3
-        matcher2.setValue(BigDecimal.valueOf(22.22));
+        matcher2.setValue(BigDecimal.valueOf(0.2222));
 
         // WHEN
         List<TaxRate> result1 = taxRateDAO.find(matcher1);
@@ -311,21 +311,21 @@ public class TestTaxRateDAO extends AbstractDAOTest {
 
         // tax rate 1
         TaxRate taxRate1 = new TaxRate();
-        taxRate1.setValue(BigDecimal.valueOf(11.11));
+        taxRate1.setValue(BigDecimal.valueOf(0.1111));
 
         taxRateDAO.create(taxRate1);
         assertEquals(1, taxRateDAO.find(taxRate1).size());
 
         // tax rate 2
         TaxRate taxRate2 = new TaxRate();
-        taxRate2.setValue(BigDecimal.valueOf(22.22));
+        taxRate2.setValue(BigDecimal.valueOf(0.2222));
 
         taxRateDAO.create(taxRate2);
         assertEquals(1, taxRateDAO.find(taxRate2).size());
 
         // tax rate 3
         TaxRate taxRate3 = new TaxRate();
-        taxRate3.setValue(BigDecimal.valueOf(22.22));
+        taxRate3.setValue(BigDecimal.valueOf(0.2222));
 
         taxRateDAO.create(taxRate3);
         assertEquals(1, taxRateDAO.find(taxRate3).size());
@@ -389,13 +389,13 @@ public class TestTaxRateDAO extends AbstractDAOTest {
         // GIVEN
         // create data
         TaxRate taxRate1 = new TaxRate();
-        taxRate1.setValue(BigDecimal.valueOf(50.0));
+        taxRate1.setValue(BigDecimal.valueOf(0.5));
         LocalDateTime createTime = LocalDateTime.now();
         taxRateDAO.create(taxRate1);
 
         // update data
         TaxRate taxRate2 = new TaxRate();
-        taxRate2.setValue(BigDecimal.valueOf(40.0));
+        taxRate2.setValue(BigDecimal.valueOf(0.4));
         LocalDateTime updateTime = LocalDateTime.now();
         taxRateDAO.update(taxRate2);
 
