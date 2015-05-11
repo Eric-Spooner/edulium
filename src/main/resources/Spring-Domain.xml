@@ -9,6 +9,6 @@
     <!-- Validator beans -->
     <import resource="domain/Spring-MenuCategoryValidator.xml" />
     <import resource="domain/Spring-UserValidator.xml" />
-    <import resource="domain/Spring-MenuValidator.xml"/>
+    <import resource="domain/Spring-TaxRateValidator.xml" />
 
 </beans>
