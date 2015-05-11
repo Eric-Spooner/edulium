@@ -8,6 +8,7 @@ public class Menu {
     private String name = null;
     private Boolean deleted = null;
 
+
     /**
      *
      * @param identity
