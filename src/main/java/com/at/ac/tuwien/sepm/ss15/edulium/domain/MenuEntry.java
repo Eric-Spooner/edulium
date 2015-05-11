@@ -18,7 +18,7 @@ public class MenuEntry {
     /**
      * Creates a new MenuEntry object and assigns the given identity to it.
      * @param identity the identity of the category
-     * @return MenuCategory object with the given identity
+     * @return MenuEntry object with the given identity
      */
     public static MenuEntry withIdentity(long identity) {
         MenuEntry menuEntry = new MenuEntry();
