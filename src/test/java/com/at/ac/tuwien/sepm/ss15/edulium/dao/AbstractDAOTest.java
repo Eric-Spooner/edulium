@@ -30,7 +30,7 @@ public abstract class AbstractDAOTest {
             fail("retrieving test user failed");
         }
 
-        assertEquals(1, users.size());
+        assertEquals("retrieving test user failed", 1, users.size());
         return users.get(0);
     }
 }
