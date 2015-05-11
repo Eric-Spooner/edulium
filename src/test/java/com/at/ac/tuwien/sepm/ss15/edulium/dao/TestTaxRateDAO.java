@@ -395,6 +395,7 @@ public class TestTaxRateDAO extends AbstractDAOTest {
 
         // update data
         TaxRate taxRate2 = new TaxRate();
+        taxRate2.setIdentity(taxRate1.getIdentity());
         taxRate2.setValue(BigDecimal.valueOf(0.4));
         LocalDateTime updateTime = LocalDateTime.now();
         taxRateDAO.update(taxRate2);
