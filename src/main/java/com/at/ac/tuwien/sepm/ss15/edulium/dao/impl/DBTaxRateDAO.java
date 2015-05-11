@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 
 import java.util.List;
@@ -33,6 +34,11 @@ class DBTaxRateDAO implements DAO<TaxRate> {
 
     @Override
     public List<TaxRate> getAll() throws DAOException {
+        return null;
+    }
+
+    @Override
+    public List<History<TaxRate>> getHistory(TaxRate object) throws DAOException, ValidationException {
         return null;
     }
 }
