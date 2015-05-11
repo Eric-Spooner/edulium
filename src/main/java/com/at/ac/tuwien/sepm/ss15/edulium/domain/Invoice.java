@@ -1,16 +1,16 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 /**
  * Domain object representing an invoice
  */
 public class Invoice {
     private Long identity;
-    private Date time;
-    private Double gross;
-    private Double paid;
-    private Boolean canceled;
+    private LocalDateTime time;
+    private BigDecimal gross;
+    private BigDecimal paid;
 
     /**
      * Creates a new invoice object and assigns the given identity to it
@@ -24,7 +24,7 @@ public class Invoice {
     }
 
     /**
-     * @return Returns the unique identity of the invoice
+     * @return Returns the unique identity of the invoice (can be null)
      */
     public Long getIdentity() {
         return identity;
@@ -41,61 +41,45 @@ public class Invoice {
     }
 
     /**
-     * @return Returns the date when the invoice was created
+     * @return Returns the date when the invoice was created (can be null)
      */
-    public Date getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 
     /**
      * @param time Sets the date when the invoice was created
      */
-    public void setTime(Date time) {
+    public void setTime(LocalDateTime time) {
         this.time = time;
     }
 
     /**
-     * @return Returns the total gross amount of the invoice
+     * @return Returns the total gross amount of the invoice (can be null)
      */
-    public Double getGross() {
+    public BigDecimal getGross() {
         return gross;
     }
 
     /**
      * @param gross Sets the total gross amount of the invoice
      */
-    public void setGross(Double gross) {
+    public void setGross(BigDecimal gross) {
         this.gross = gross;
     }
 
     /**
-     * @return Returns the paid amount
+     * @return Returns the paid amount (can be null)
      */
-    public Double getPaid() {
+    public BigDecimal getPaid() {
         return paid;
     }
 
     /**
      * @param paid Returns the paid amount
      */
-    public void setPaid(Double paid) {
+    public void setPaid(BigDecimal paid) {
         this.paid = paid;
-    }
-
-    /**
-     * @return Returns true if the invoice has been cancelled
-     * and false otherwise.
-     */
-    public Boolean getCanceled() {
-        return canceled;
-    }
-
-    /**
-     * @param canceled Set to true if the invoice was cancelled,
-     *                 otherwise to false.
-     */
-    public void setCanceled(Boolean canceled) {
-        this.canceled = canceled;
     }
 
     @Override
@@ -105,23 +89,19 @@ public class Invoice {
                 ", time=" + time +
                 ", gross=" + gross +
                 ", paid=" + paid +
-                ", canceled=" + canceled +
                 "}";
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || this.getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        Invoice that = (Invoice) o;
+        Invoice invoice = (Invoice) o;
 
-        return (this.identity == that.getIdentity() &&
-                this.time.equals(that.getTime()) &&
-                this.gross == that.getGross() &&
-                this.paid == that.getPaid() &&
-                this.canceled == that.canceled);
+        if (identity != null ? !identity.equals(invoice.identity) : invoice.identity != null) return false;
+        if (time != null ? !time.equals(invoice.time) : invoice.time != null) return false;
+        if (gross != null ? !gross.equals(invoice.gross) : invoice.gross != null) return false;
+        return !(paid != null ? !paid.equals(invoice.paid) : invoice.paid != null);
     }
 }
