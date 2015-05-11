@@ -24,7 +24,6 @@ public class MenuDAOImpl implements DAO<Menu> {
 
     @Override
     public void delete(Menu object) throws DAOException, ValidationException {
-
     }
 
     @Override

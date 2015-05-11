@@ -8,6 +8,11 @@ public class Menu {
     private String name = null;
     private Boolean deleted = null;
 
+    /**
+     *
+     * @param identity
+     * @return a menu with the given identity
+     */
     private static Menu withIdentity(long identity){
         Menu menu = new Menu();
         menu.setIdentity(identity);
