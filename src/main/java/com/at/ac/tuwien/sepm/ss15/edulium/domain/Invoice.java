@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Domain object representing an invoice
@@ -11,6 +12,7 @@ public class Invoice {
     private LocalDateTime time;
     private BigDecimal gross;
     private BigDecimal paid;
+    private List<Installment> installments;
 
     /**
      * Creates a new invoice object and assigns the given identity to it
@@ -82,6 +84,21 @@ public class Invoice {
         this.paid = paid;
     }
 
+    /**
+     * @return The list of installments (can be null)
+     */
+    public List<Installment> getInstallments() {
+        return installments;
+    }
+
+    /**
+     * @param installments The list of installments we want to assign to
+     *                     the invoice
+     */
+    public void setInstallments(List<Installment> installments) {
+        this.installments = installments;
+    }
+
     @Override
     public String toString() {
         return "Invoice{" +
@@ -102,6 +119,8 @@ public class Invoice {
         if (identity != null ? !identity.equals(invoice.identity) : invoice.identity != null) return false;
         if (time != null ? !time.equals(invoice.time) : invoice.time != null) return false;
         if (gross != null ? !gross.equals(invoice.gross) : invoice.gross != null) return false;
-        return !(paid != null ? !paid.equals(invoice.paid) : invoice.paid != null);
+        if (paid != null ? !paid.equals(invoice.paid) : invoice.paid != null) return false;
+        return !(installments != null ? !installments.equals(invoice.installments) : invoice.installments != null);
+
     }
 }
