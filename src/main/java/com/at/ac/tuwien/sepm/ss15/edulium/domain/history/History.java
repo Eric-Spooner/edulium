@@ -3,7 +3,6 @@ package com.at.ac.tuwien.sepm.ss15.edulium.domain.history;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * represents a snapshot of the change history of

@@ -512,58 +512,55 @@ public class TestUserDAO extends AbstractDAOTest {
     public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
         // get test user
-        List<User> users = userDAO.find(User.withIdentity(
-                SecurityContextHolder.getContext().getAuthentication().getName()));
-
-        assertEquals(1, users.size());
-        User user = users.get(0);
+        User testUser = getCurrentUser();
 
         // GIVEN
         // create data
-        User user_v1 = new User();
-        user_v1.setIdentity("identity");
-        user_v1.setName("user");
-        user_v1.setRole("user_role");
+        User user1 = new User();
+        user1.setIdentity("identity");
+        user1.setName("user");
+        user1.setRole("user_role");
         LocalDateTime createTime = LocalDateTime.now();
-        userDAO.create(user_v1);
+        userDAO.create(user1);
 
         // update data
-        User user_v2 = User.withIdentity(user_v1.getIdentity());
-        user_v2.setName("update");
-        user_v2.setRole("update_role");
+        User user2 = User.withIdentity(user1.getIdentity());
+        user2.setName("update");
+        user2.setRole("update_role");
         LocalDateTime updateTime = LocalDateTime.now();
-        userDAO.update(user_v2);
+        userDAO.update(user2);
 
         // delete data
         LocalDateTime deleteTime = LocalDateTime.now();
-        userDAO.delete(user_v2);
+        userDAO.delete(user2);
 
         // WHEN
-        List<History<User>> history = userDAO.getHistory(user_v1);
-        assertEquals(3, history.size());
+        List<History<User>> history = userDAO.getHistory(user1);
 
         // THEN
+        assertEquals(3, history.size());
+
         // check create history
         History<User> entry = history.get(0);
         assertEquals(Long.valueOf(1), entry.getChangeNumber());
-        assertEquals(user_v1, entry.getData());
-        assertEquals(user, entry.getUser());
+        assertEquals(user1, entry.getData());
+        assertEquals(testUser, entry.getUser());
         assertTrue(Duration.between(createTime, entry.getTimeOfChange()).getSeconds() < 1);
         assertFalse(entry.isDeleted());
 
         // check update history
         entry = history.get(1);
         assertEquals(Long.valueOf(2), entry.getChangeNumber());
-        assertEquals(user_v2, entry.getData());
-        assertEquals(user, entry.getUser());
+        assertEquals(user2, entry.getData());
+        assertEquals(testUser, entry.getUser());
         assertTrue(Duration.between(updateTime, entry.getTimeOfChange()).getSeconds() < 1);
         assertFalse(entry.isDeleted());
 
         // check delete history
         entry = history.get(2);
         assertEquals(Long.valueOf(3), entry.getChangeNumber());
-        assertEquals(user_v2, entry.getData());
-        assertEquals(user, entry.getUser());
+        assertEquals(user2, entry.getData());
+        assertEquals(testUser, entry.getUser());
         assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
         assertTrue(entry.isDeleted());
     }

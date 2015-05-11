@@ -160,11 +160,11 @@ class UserDAOImpl implements DAO<User> {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, user.getIdentity());
             ResultSet result = stmt.executeQuery();
-            while(result.next()) {
+            while (result.next()) {
                 history.add(historyFromResultSet(result));
             }
         } catch (SQLException e) {
-            LOGGER.error("retrieving history failed");
+            LOGGER.error("retrieving history failed", e);
             throw new DAOException("retrieving history failed", e);
         }
 
@@ -175,19 +175,18 @@ class UserDAOImpl implements DAO<User> {
         LOGGER.debug("entering generateHistory with parameters " + user);
 
         final String query = "INSERT INTO RestaurantUserHistory " +
-                "(SELECT *, ?, ?, " +
+                "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
                 "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM RestaurantUserHistory WHERE ID = ?) " +
                 "FROM RestaurantUser WHERE ID = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setTimestamp(1, new Timestamp(Calendar.getInstance().getTimeInMillis()));    // time
-            stmt.setString(2, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+            stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+            stmt.setString(2, user.getIdentity());          // dataset id
             stmt.setString(3, user.getIdentity());          // dataset id
-            stmt.setString(4, user.getIdentity());          // dataset id
 
             stmt.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.error("generating history failed");
+            LOGGER.error("generating history failed", e);
             throw new DAOException("generating history failed", e);
         }
     }
@@ -216,7 +215,7 @@ class UserDAOImpl implements DAO<User> {
     private History<User> historyFromResultSet(ResultSet result) throws DAOException, SQLException {
         // get user
         List<User> storedUsers = find(User.withIdentity(result.getString("changeUser")));
-        if(storedUsers.size() != 1) {
+        if (storedUsers.size() != 1) {
             LOGGER.error("user not found");
             throw new DAOException("user not found");
         }

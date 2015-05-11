@@ -50,12 +50,12 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
             stmt.executeUpdate();
 
             ResultSet key = stmt.getGeneratedKeys();
-            if(key.next()) {
+            if (key.next()) {
                 menuCategory.setIdentity(key.getLong(1));
             }
             key.close();
         } catch (SQLException e) {
-            LOGGER.error("inserting menuCategory into database failed");
+            LOGGER.error("inserting menuCategory into database failed", e);
             throw new DAOException("inserting menuCategory into database failed", e);
         }
 
@@ -84,8 +84,8 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
                 throw new DAOException("updating menuCategory in database failed, dataset not found");
             }
         } catch (SQLException e) {
-            LOGGER.error("updating menuCategory in database failed");
-            throw new DAOException(e);
+            LOGGER.error("updating menuCategory in database failed", e);
+            throw new DAOException("updating menuCategory in database failed", e);
         }
 
         generateHistory(menuCategory);
@@ -112,7 +112,7 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
                 throw new DAOException("deleting menuCategory failed, dataset not found");
             }
         } catch (SQLException e) {
-            LOGGER.error("deleting menuCategory failed");
+            LOGGER.error("deleting menuCategory failed", e);
             throw new DAOException("deleting menuCategory failed", e);
         }
 
@@ -149,7 +149,7 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
                 objects.add(parseResult(result));
             }
         } catch (SQLException e) {
-            LOGGER.error("searching for categories failed");
+            LOGGER.error("searching for categories failed", e);
             throw new DAOException("searching for categories failed", e);
         }
 
@@ -173,7 +173,7 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
                 objects.add(parseResult(result));
             }
         } catch (SQLException e) {
-            LOGGER.error("searching for all categories failed");
+            LOGGER.error("searching for all categories failed", e);
             throw new DAOException("searching for all categories failed", e);
         }
 
@@ -198,11 +198,11 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, menuCategory.getIdentity());
             ResultSet result = stmt.executeQuery();
-            while(result.next()) {
+            while (result.next()) {
                 history.add(parseHistoryEntry(result));
             }
         } catch (SQLException e) {
-            LOGGER.error("retrieving history failed");
+            LOGGER.error("retrieving history failed", e);
             throw new DAOException("retrieving history failed", e);
         }
 
@@ -220,19 +220,18 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
         LOGGER.debug("entering generateHistory with parameters " + menuCategory);
 
         final String query = "INSERT INTO MenuCategoryHistory " +
-                "(SELECT *, ?, ?, " +
+                "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
                 "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM MenuCategoryHistory WHERE ID = ?) " +
                 "FROM MenuCategory WHERE ID = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setTimestamp(1, new Timestamp(Calendar.getInstance().getTimeInMillis()));    // time
-            stmt.setString(2, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+            stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+            stmt.setLong(2, menuCategory.getIdentity());          // dataset id
             stmt.setLong(3, menuCategory.getIdentity());          // dataset id
-            stmt.setLong(4, menuCategory.getIdentity());          // dataset id
 
             stmt.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.error("generating history failed");
+            LOGGER.error("generating history failed", e);
             throw new DAOException("generating history failed", e);
         }
     }
@@ -260,7 +259,7 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
     private History<MenuCategory> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
         // get user
         List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
-        if(storedUsers.size() != 1) {
+        if (storedUsers.size() != 1) {
             LOGGER.error("user not found");
             throw new DAOException("user not found");
         }
