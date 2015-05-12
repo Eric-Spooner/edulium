@@ -9,13 +9,11 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +23,10 @@ import java.util.List;
 public class TableDAOImpl implements DAO<Table> {
     @Autowired
     private DataSource dataSource;
+    @Autowired
+    private DAO<User> userDAO;
+    @Autowired
+    private DAO<Section> sectionDAO;
     @Autowired
     private Validator<Table> validator;
 
@@ -106,7 +108,7 @@ public class TableDAOImpl implements DAO<Table> {
 
         validator.validateForDelete(table);
 
-        final String query = "UPDATE RestaurantTable SET deleted = true WHERE number = ?";
+        final String query = "UPDATE RestaurantTable SET disabled = true WHERE number = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, table.getNumber());
@@ -135,17 +137,35 @@ public class TableDAOImpl implements DAO<Table> {
         String query = "SELECT * FROM RestaurantTable WHERE number = ISNULL(?, number) " +
                 "AND seats = ISNULL(?, seats) AND section_ID = ISNULL(?, section_ID)" +
                 "AND tableRow = ISNULL(?, tableRow) AND tableColumn = ISNULL(?, tableColumn)" +
-                "AND user_ID = ISNULL(?, user_ID) AND deleted = false";
+                "AND user_ID = ISNULL(?, user_ID) AND disabled = false";
 
         final List<Table> objects = new ArrayList<>();
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, table.getNumber());
-            stmt.setInt(2, table.getSeats());
-            stmt.setLong(3, table.getSection().getIdentity());
-            stmt.setInt(4, table.getRow());
-            stmt.setInt(5, table.getColumn());
-            stmt.setString(6, table.getUser().getIdentity());
+            if(table.getNumber() == null)
+                stmt.setNull(1, Types.VARCHAR);
+            else
+                stmt.setLong(1, table.getNumber());
+            if(table.getSeats() == null)
+                stmt.setNull(2, Types.VARCHAR);
+            else
+                stmt.setInt(2, table.getSeats());
+            if(table.getSection() == null)
+                stmt.setNull(3, Types.VARCHAR);
+            else
+                stmt.setLong(3, table.getSection().getIdentity());
+            if(table.getRow() == null)
+                stmt.setNull(4, Types.VARCHAR);
+            else
+                stmt.setInt(4, table.getRow());
+            if(table.getColumn() == null)
+                stmt.setNull(5, Types.VARCHAR);
+            else
+                stmt.setInt(5, table.getColumn());
+            if(table.getUser() == null)
+                stmt.setNull(6, Types.VARCHAR);
+            else
+                stmt.setString(6, table.getUser().getIdentity());
             stmt.execute();
 
             try (ResultSet result = stmt.getResultSet()) {
@@ -167,7 +187,7 @@ public class TableDAOImpl implements DAO<Table> {
      */
     @Override
     public List<Table> getAll() throws DAOException {
-        final String query = "SELECT * FROM RestaurantTable WHERE deleted = false";
+        final String query = "SELECT * FROM RestaurantTable WHERE disabled = false";
         final List<Table> objects = new ArrayList<>();
 
         try (Statement stmt = dataSource.getConnection().createStatement()) {
@@ -186,9 +206,54 @@ public class TableDAOImpl implements DAO<Table> {
         return objects;
     }
 
+    /**
+     * @param table object to get the history for
+     * @return returns the history of changes for the table object
+     * @throws DAOException if the data couldn't be retrieved
+     * @throws ValidationException if the table object parameters are
+     *         not valid for this action
+     */
     @Override
-    public List<History<Table>> getHistory(Table object) throws DAOException, ValidationException {
-        return null;
+    public List<History<Table>> getHistory(Table table) throws DAOException, ValidationException {
+        validator.validateIdentity(table);
+        List<History<Table>> history = new ArrayList<>();
+        final String query = "SELECT * FROM TableHistory WHERE number = ? ORDER BY changeNr";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, table.getNumber());
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                history.add(parseHistoryEntry(result));
+            }
+        } catch (SQLException e) {
+            throw new DAOException("retrieving history failed", e);
+        }
+
+        return history;
+    }
+
+    /**
+     * writes the changes of the dataset into the database
+     * stores the time; number of the change and the user which executed
+     * the changes
+     * @param table updated dataset
+     * @throws DAOException if an error accessing the database occurred
+     */
+    private void generateHistory(Table table) throws DAOException {
+        final String query = "INSERT INTO TableHistory " +
+                "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
+                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM TableHistory WHERE number = ?) " +
+                "FROM TableHistory WHERE number = ?)";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+            stmt.setLong(2, table.getNumber());          // dataset id
+            stmt.setLong(3, table.getNumber());          // dataset id
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DAOException("generating history failed", e);
+        }
     }
 
     /**
@@ -198,19 +263,42 @@ public class TableDAOImpl implements DAO<Table> {
      * @throws SQLException if an error accessing the database occurred
      */
     private Table parseResult(ResultSet result) throws SQLException, DAOException {
-        DAO sectionDAO = new SectionDAOImpl();
         Section matcherSection = new Section();
-        matcherSection.setIdentity(result.getLong(0));
-        DAO userDAO = new UserDAOImpl();
+        matcherSection.setIdentity(result.getLong(1));
         User matcherUser = new User();
         matcherUser.setIdentity(result.getString(6));
         Table table = new Table();
-        table.setSection((Section)sectionDAO.find(matcherSection).get(0));
+        table.setSection((Section) sectionDAO.find(matcherSection).get(0));
         table.setNumber(result.getLong(2));
         table.setSeats(result.getInt(3));
         table.setRow(result.getInt(4));
         table.setColumn(result.getInt(5));
         table.setUser((User)userDAO.find(matcherUser).get(0));
         return table;
+    }
+
+    /**
+     * converts the database query output into a history entry object
+     * @param result database output
+     * @return History object with the data of the resultSet set
+     * @throws SQLException if an error accessing the database occurred
+     * @throws DAOException if an error retrieving the user ocurred
+     */
+    private History<Table> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
+        // get user
+        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        if (storedUsers.size() != 1) {
+            throw new DAOException("user not found");
+        }
+
+        // create history entry
+        History<Table> historyEntry = new History<>();
+        historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
+        historyEntry.setChangeNumber(result.getLong("changeNr"));
+        historyEntry.setDeleted(result.getBoolean("disabled"));
+        historyEntry.setUser(storedUsers.get(0));
+        historyEntry.setData(parseResult(result));
+
+        return historyEntry;
     }
 }

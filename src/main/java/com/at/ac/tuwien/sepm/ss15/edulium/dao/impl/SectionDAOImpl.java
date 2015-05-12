@@ -7,10 +7,12 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -27,6 +29,8 @@ import java.util.List;
 public class SectionDAOImpl implements DAO<Section> {
     @Autowired
     private DataSource dataSource;
+    @Autowired
+    private DAO<User> userDAO;
     @Autowired
     private Validator<Section> validator;
 
@@ -177,9 +181,54 @@ public class SectionDAOImpl implements DAO<Section> {
         return objects;
     }
 
+    /**
+     * @param section object to get the history for
+     * @return returns the history of changes for the section object
+     * @throws DAOException if the data couldn't be retrieved
+     * @throws ValidationException if the section object parameters are
+     *         not valid for this action
+     */
     @Override
-    public List<History<Section>> getHistory(Section object) throws DAOException, ValidationException {
-        return null;
+    public List<History<Section>> getHistory(Section section) throws DAOException, ValidationException {
+        validator.validateIdentity(section);
+        List<History<Section>> history = new ArrayList<>();
+        final String query = "SELECT * FROM RestaurantSectionHistory WHERE ID = ? ORDER BY changeNr";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, section.getIdentity());
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                history.add(parseHistoryEntry(result));
+            }
+        } catch (SQLException e) {
+            throw new DAOException("retrieving history failed", e);
+        }
+
+        return history;
+    }
+
+    /**
+     * writes the changes of the dataset into the database
+     * stores the time; number of the change and the user which executed
+     * the changes
+     * @param section updated dataset
+     * @throws DAOException if an error accessing the database occurred
+     */
+    private void generateHistory(Section section) throws DAOException {
+        final String query = "INSERT INTO RestaurantSectionHistory " +
+                "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
+                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM RestaurantSectionHistory WHERE ID = ?) " +
+                "FROM RestaurantSectionHistory WHERE ID = ?)";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+            stmt.setLong(2, section.getIdentity());          // dataset id
+            stmt.setLong(3, section.getIdentity());          // dataset id
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DAOException("generating history failed", e);
+        }
     }
 
     /**
@@ -193,5 +242,30 @@ public class SectionDAOImpl implements DAO<Section> {
         section.setIdentity(result.getLong(1));
         section.setName(result.getString(2));
         return section;
+    }
+
+    /**
+     * converts the database query output into a history entry object
+     * @param result database output
+     * @return History object with the data of the resultSet set
+     * @throws SQLException if an error accessing the database occurred
+     * @throws DAOException if an error retrieving the user ocurred
+     */
+    private History<Section> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
+        // get user
+        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        if (storedUsers.size() != 1) {
+            throw new DAOException("user not found");
+        }
+
+        // create history entry
+        History<Section> historyEntry = new History<>();
+        historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
+        historyEntry.setChangeNumber(result.getLong("changeNr"));
+        historyEntry.setDeleted(result.getBoolean("deleted"));
+        historyEntry.setUser(storedUsers.get(0));
+        historyEntry.setData(parseResult(result));
+
+        return historyEntry;
     }
 }

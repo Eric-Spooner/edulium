@@ -17,10 +17,7 @@ import java.util.List;
 /**
  * Unit Test for the SectionDAO
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/Spring-DAO.xml")
-@Transactional
-public class TestSectionDAO {
+public class TestSectionDAO extends AbstractDAOTest {
     @Autowired
     private DAO sectionDAO;
 

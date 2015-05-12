@@ -5,6 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.impl.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import com.sun.xml.internal.ws.developer.MemberSubmissionAddressing;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,45 +20,60 @@ import java.util.List;
 /**
  * Unit Test for the TableDAO
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/Spring-DAO.xml")
-@Transactional
-public class TestTableDAO {
+public class TestTableDAO extends AbstractDAOTest {
     @Autowired
     private DAO tableDAO;
-    private User user1, user2, user3;
-    private Section section1, section2, section3;
-    
-    @Before
-    public void setUp() throws ValidationException, DAOException {
-        DAO userDAO = new UserDAOImpl();
-        User user1 = new User();
+    @Autowired
+    private DAO userDAO;
+    @Autowired
+    private DAO sectionDAO;
+    /*@Autowired
+    private User user1;
+    @Autowired
+    private User user2;
+    @Autowired
+    private User user3;
+    @Autowired
+    private Section section1;
+    @Autowired
+    private Section section2;
+    @Autowired
+    private Section section3;*/
+    private User user1;
+    private User user2;
+    private User user3;
+    private Section section1;
+    private Section section2;
+    private Section section3;
+
+    public void before() throws ValidationException, DAOException {
+        user1 = new User();
+        user2 = new User();
+        user3 = new User();
+        section1 = new Section();
+        section2 = new Section();
+        section3 = new Section();
+
         user1.setIdentity("A");
         user1.setName("User1");
         user1.setRole("Role1");
         userDAO.create(user1);
-        User user2 = new User();
         user2.setIdentity("B");
         user2.setName("User2");
         user2.setRole("Role2");
         userDAO.create(user2);
-        User user3 = new User();
         user3.setIdentity("C");
         user3.setName("User3");
         user3.setRole("Role3");
         userDAO.create(user3);
 
-        DAO sectionDAO = new SectionDAOImpl();
-        Section section1 = new Section();
-        section1.setIdentity((long)1);
+        section1.setIdentity((long) 1);
         section1.setName("Section1");
         sectionDAO.create(section1);
-        Section section2 = new Section();
-        section2.setIdentity((long)2);
+        section2.setIdentity((long) 2);
         section2.setName("Section2");
         sectionDAO.create(section2);
-        Section section3 = new Section();
-        section3.setIdentity((long)3);
+        section3.setIdentity((long) 3);
         section3.setName("Section3");
         sectionDAO.create(section3);
     }
@@ -65,6 +81,7 @@ public class TestTableDAO {
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
         // GIVEN
+        before();
         Table table = new Table();
         table.setNumber((long)1);
         table.setSection(section1);
@@ -88,16 +105,11 @@ public class TestTableDAO {
         Assert.assertEquals(storedObjects.get(0), table);
     }
 
-    @Test(expected = DAOException.class)
-    public void testCreate_addingObjectWithoutNumberAndSeatsAndRowAndColumnShouldFail() throws DAOException, ValidationException {
+    @Test(expected = ValidationException.class)
+    public void testCreate_addingObjectWithoutParametersShouldFail() throws DAOException, ValidationException {
         // GIVEN
+        before();
         Table table = new Table();
-        table.setNumber((long)1);
-        table.setSection(section1);
-        table.setUser(user1);
-        table.setSeats(3);
-        table.setColumn(4);
-        table.setRow(5);
 
         // WHEN
         tableDAO.create(table);
@@ -106,6 +118,7 @@ public class TestTableDAO {
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // GIVEN
+        before();
         Table table = new Table();
         table.setNumber((long)1);
         table.setSection(section1);
@@ -134,9 +147,10 @@ public class TestTableDAO {
         Assert.assertEquals(storedObjects.get(0), table);
     }
 
-    @Test(expected = DAOException.class)
+    @Test(expected = ValidationException.class)
     public void testUpdate_updatingObjectWithNumberNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
+        before();
         Table table = new Table();
         table.setNumber(null);
         table.setSeats(3);
@@ -152,6 +166,7 @@ public class TestTableDAO {
     @Test(expected = DAOException.class)
     public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
+        before();
         Table table = new Table();
         table.setSeats(3);
         table.setColumn(4);
@@ -179,8 +194,10 @@ public class TestTableDAO {
     @Test
     public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // GIVEN
+        before();
         Table table = new Table();
         User user = new User();
+        table.setNumber((long)2);
         table.setSeats(3);
         table.setColumn(4);
         table.setRow(5);
@@ -203,6 +220,7 @@ public class TestTableDAO {
     @Test(expected = DAOException.class)
     public void testDelete_deletingObjectWithNumberNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
+        before();
         Table table = new Table();
         table.setNumber((long)1);
         table.setSection(section1);
@@ -218,6 +236,7 @@ public class TestTableDAO {
     @Test(expected = DAOException.class)
     public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
+        before();
         Table table = new Table();
         Long number = (long) 1;
         table.setNumber(number);
@@ -245,6 +264,7 @@ public class TestTableDAO {
     @Test
     public void testFind_byNumberShouldReturnObject() throws DAOException, ValidationException {
         // GIVEN
+        before();
         Table matcher = new Table();
         Table table1 = new Table();
         Table table2 = new Table();
@@ -283,7 +303,7 @@ public class TestTableDAO {
         objects = tableDAO.find(matcher);
         // THEN
         Assert.assertEquals(objects.size(), 1);
-        Assert.assertEquals(objects.get(0), table3);
+        Assert.assertEquals(objects.get(0), table2);
 
         // WHEN
         matcher.setNumber(table3.getNumber());
@@ -296,6 +316,7 @@ public class TestTableDAO {
     @Test
     public void testFind_bySeatsAndRowAndColumnShouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
+        before();
         Table table1 = new Table();
         Table table2 = new Table();
         Table table3 = new Table();
@@ -378,6 +399,7 @@ public class TestTableDAO {
     @Test
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
+        before();
         Table matcher = new Table();
         Table table1 = new Table();
         Table table2 = new Table();
