@@ -23,11 +23,11 @@ public class InvoiceValidatorImpl implements Validator<Invoice> {
             throw  new ValidationException("Time and gross must not be null");
         }
 
-        if (invoice.getGross().compareTo(new BigDecimal("0.0")) < 0) {
+        if (invoice.getGross().compareTo(BigDecimal.ZERO) < 0) {
             throw new ValidationException("The total gross amount cannot be negative");
         }
 
-        if (invoice.getPaid() != null && invoice.getPaid().compareTo(new BigDecimal("0.0")) != 0) {
+        if (invoice.getPaid() != null && invoice.getPaid().compareTo(BigDecimal.ZERO) != 0) {
             throw new ValidationException("The amount that was already paid can only" +
                     "be 0 upon creation");
         }
@@ -44,7 +44,7 @@ public class InvoiceValidatorImpl implements Validator<Invoice> {
             throw new ValidationException("Object must not be null");
         }
 
-        if (invoice.getPaid().compareTo(new BigDecimal("0.0")) < 0) {
+        if (invoice.getPaid() != null && invoice.getPaid().compareTo(BigDecimal.ZERO) < 0) {
             throw new ValidationException("The amount that was already paid cannot be negative");
         }
 
