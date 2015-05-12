@@ -119,7 +119,6 @@ public class Installment {
         if (time != null ? !time.equals(that.time) : that.time != null) return false;
         if (paymentInfo != null ? !paymentInfo.equals(that.paymentInfo) : that.paymentInfo != null) return false;
         if (type != null ? !type.equals(that.type) : that.type != null) return false;
-        return !(amount != null ? !amount.equals(that.amount) : that.amount != null);
-
+        return !(amount != null ? amount.compareTo(that.amount) != 0 : that.amount != null);
     }
 }
