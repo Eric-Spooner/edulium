@@ -5,8 +5,9 @@ import com.at.ac.tuwien.sepm.ss15.edulium.dao.MenuCategoryDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.MenuCategoryValidator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -16,12 +17,12 @@ import java.util.List;
 /**
  * H2 Database Implementation of the MenuCategoryDAO interface
  */
-@Repository
 class MenuCategoryDAOImpl implements MenuCategoryDAO {
     @Autowired
     private DataSource dataSource;
     @Autowired
     private MenuCategoryValidator validator;
+    private static final Logger LOGGER = LogManager.getLogger(MenuCategoryDAO.class);
 
     /**
      * writes the object into the database and sets the identity parameter of
@@ -31,28 +32,26 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
      */
     @Override
     public void create(MenuCategory menuCategory) throws DAOException, ValidationException {
-        assert(menuCategory != null);
+        LOGGER.debug("entering create with parameters " + menuCategory);
 
         validator.validateForCreate(menuCategory);
-
         final String query = "INSERT INTO MenuCategory (name) VALUES (?)";
 
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query,
-                Statement.RETURN_GENERATED_KEYS)) {
-
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, menuCategory.getName());
             stmt.executeUpdate();
 
-            try (ResultSet key = stmt.getGeneratedKeys()) {
-                key.next();
+            ResultSet key = stmt.getGeneratedKeys();
+            if(key.next()) {
                 menuCategory.setIdentity(key.getLong(1));
             }
-
+            key.close();
         } catch (SQLException e) {
-            throw new DAOException(e);
+            LOGGER.error("inserting menuCategory into database failed");
+            throw new DAOException("inserting menuCategory into database failed", e);
         }
 
-        generateHistory(menuCategory.getIdentity());
+        generateHistory(menuCategory);
     }
 
     /**
@@ -63,10 +62,9 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
      */
     @Override
     public void update(MenuCategory menuCategory) throws DAOException, ValidationException {
-        assert(menuCategory != null);
+        LOGGER.debug("entering update with parameters " + menuCategory);
 
         validator.validateForUpdate(menuCategory);
-
         final String query = "UPDATE MenuCategory SET name = ? WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
@@ -74,14 +72,15 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
             stmt.setLong(2, menuCategory.getIdentity());
 
             if (stmt.executeUpdate() == 0) {
-                throw new DAOException("updating failed: dataset not found");
+                LOGGER.error("updating menuCategory in database failed, dataset not found");
+                throw new DAOException("updating menuCategory in database failed, dataset not found");
             }
-
         } catch (SQLException e) {
+            LOGGER.error("updating menuCategory in database failed");
             throw new DAOException(e);
         }
 
-        generateHistory(menuCategory.getIdentity());
+        generateHistory(menuCategory);
     }
 
     /**
@@ -92,23 +91,24 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
      */
     @Override
     public void delete(MenuCategory menuCategory) throws DAOException, ValidationException {
-        assert(menuCategory != null);
+        LOGGER.debug("entering delete with parameters " + menuCategory);
 
         validator.validateForDelete(menuCategory);
-
         final String query = "UPDATE MenuCategory SET deleted = true WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, menuCategory.getIdentity());
-            if (stmt.executeUpdate() == 0) {
-                throw new DAOException("delete failed: dataset not found");
-            }
 
+            if (stmt.executeUpdate() == 0) {
+                LOGGER.error("deleting menuCategory failed, dataset not found");
+                throw new DAOException("deleting menuCategory failed, dataset not found");
+            }
         } catch (SQLException e) {
-            throw new DAOException(e);
+            LOGGER.error("deleting menuCategory failed");
+            throw new DAOException("deleting menuCategory failed", e);
         }
 
-        generateHistory(menuCategory.getIdentity());
+        generateHistory(menuCategory);
     }
 
     /**
@@ -121,7 +121,12 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
      */
     @Override
     public List<MenuCategory> find(MenuCategory menuCategory) throws DAOException {
-        assert(menuCategory != null);
+        LOGGER.debug("entering find with parameters " + menuCategory);
+
+        if (menuCategory == null) {
+            return new ArrayList<>();
+        }
+
         String query = "SELECT * FROM MenuCategory WHERE ID = ISNULL(?, ID) " +
                 "AND name = ISNULL(?, name) AND deleted = false";
 
@@ -130,16 +135,14 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setObject(1, menuCategory.getIdentity());
             stmt.setObject(2, menuCategory.getName());
-            stmt.execute();
 
-            try (ResultSet result = stmt.getResultSet()) {
-                while (result.next()) {
-                    objects.add(parseResult(result));
-                }
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                objects.add(parseResult(result));
             }
-
         } catch (SQLException e) {
-            throw new DAOException(e);
+            LOGGER.error("searching for categories failed");
+            throw new DAOException("searching for categories failed", e);
         }
 
         return objects;
@@ -151,20 +154,19 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
      */
     @Override
     public List<MenuCategory> getAll() throws DAOException {
+        LOGGER.debug("entering getAll");
+
         final String query = "SELECT * FROM MenuCategory WHERE deleted = false";
         final List<MenuCategory> objects = new ArrayList<>();
 
-        try (Statement stmt = dataSource.getConnection().createStatement()) {
-            stmt.execute(query);
-
-            try (ResultSet result = stmt.getResultSet()) {
-                while (result.next()) {
-                    objects.add(parseResult(result));
-                }
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                objects.add(parseResult(result));
             }
-
         } catch (SQLException e) {
-            throw new DAOException(e);
+            LOGGER.error("searching for all categories failed");
+            throw new DAOException("searching for all categories failed", e);
         }
 
         return objects;
@@ -172,13 +174,13 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
 
     // FIXME add implementation when session object is implemented
     /**
-     * writes the changes of the dataset with the id IDENTITY into the database
+     * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed
      * the changes
-     * @param identity identity of the changed dataset
+     * @param menuCategory updated dataset
      * @throws DAOException if an error accessing the database occurred
      */
-    private void generateHistory(long identity) throws DAOException {
+    private void generateHistory(MenuCategory menuCategory) throws DAOException {
         /*
         final String query = "INSERT INTO MenuCategoryHistory " +
                 "(SELECT ID, name, deleted, ?, ?, NULL FROM MenuCategory WHERE ID = ?)";
@@ -204,8 +206,8 @@ class MenuCategoryDAOImpl implements MenuCategoryDAO {
      */
     private MenuCategory parseResult(ResultSet result) throws SQLException {
         MenuCategory menuCategory = new MenuCategory();
-        menuCategory.setIdentity(result.getLong(1));
-        menuCategory.setName(result.getString(2));
+        menuCategory.setIdentity(result.getLong("ID"));
+        menuCategory.setName(result.getString("name"));
         return menuCategory;
     }
 }

@@ -4,13 +4,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="Spring-DataSource.xml" />
-    <import resource="Spring-Domain.xml" />
+    <import resource="Spring-Context.xml" />
 
-    <!-- DAO beans -->
-    <import resource="dao/Spring-MenuCategoryDAO.xml" />
-    <import resource="dao/Spring-SectionDAO.xml" />
-    <import resource="dao/Spring-TableDAO.xml" />
-    <import resource="dao/Spring-UserDAO.xml" />
+    <!-- Validator beans -->
+    <import resource="domain/Spring-MenuCategoryValidator.xml" />
+    <import resource="domain/Spring-UserValidator.xml" />
 
 </beans>

@@ -3,39 +3,17 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.*;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
 /**
  * Unit Test for the MenuCategoryDAO
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("/Spring-DAO.xml")
-@Transactional
-public class TestMenuCategoryDAO {
+public class TestMenuCategoryDAO extends AbstractDAOTest {
     @Autowired
     private MenuCategoryDAO menuCategoryDAO;
-    @Autowired
-    private DataSource dataSource;
-
-    // FIXME database rollback not working -> workaround:
-    @After
-    public void tearDown() {
-        try {
-            Statement stmt = dataSource.getConnection().createStatement();
-            stmt.execute("DELETE FROM MENUCATEGORY; DELETE FROM MENUCATEGORYHISTORY;");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
@@ -48,15 +26,15 @@ public class TestMenuCategoryDAO {
 
         // THEN
         // check if identity is set
-        Assert.assertNotNull(cat.getIdentity());
+        assertNotNull(cat.getIdentity());
 
         // check retrieving object
         MenuCategory matcher = new MenuCategory();
         matcher.setIdentity(cat.getIdentity());
 
         List<MenuCategory> storedObjects = menuCategoryDAO.find(matcher);
-        Assert.assertEquals(storedObjects.size(), 1);
-        Assert.assertEquals(storedObjects.get(0), cat);
+        assertEquals(1, storedObjects.size());
+        assertEquals(cat, storedObjects.get(0));
     }
 
     @Test(expected = ValidationException.class)
@@ -68,7 +46,7 @@ public class TestMenuCategoryDAO {
         try {
             menuCategoryDAO.create(category);
         } finally {
-            Assert.assertNull(category.getIdentity());
+            assertNull(category.getIdentity());
         }
     }
 
@@ -82,7 +60,7 @@ public class TestMenuCategoryDAO {
         try {
             menuCategoryDAO.create(category);
         } finally {
-            Assert.assertNull(category.getIdentity());
+            assertNull(category.getIdentity());
         }
     }
 
@@ -96,7 +74,7 @@ public class TestMenuCategoryDAO {
         // check if cat is stored
         MenuCategory matcher = new MenuCategory();
         matcher.setIdentity(cat.getIdentity());
-        Assert.assertEquals(menuCategoryDAO.find(matcher).get(0), cat);
+        assertEquals(cat, menuCategoryDAO.find(matcher).get(0));
 
         // WHEN
         cat.setName("newCat");
@@ -105,8 +83,8 @@ public class TestMenuCategoryDAO {
         // THEN
         // check if category name was updated
         List<MenuCategory> storedObjects = menuCategoryDAO.find(matcher);
-        Assert.assertEquals(storedObjects.size(), 1);
-        Assert.assertEquals(storedObjects.get(0), cat);
+        assertEquals(1, storedObjects.size());
+        assertEquals(cat, storedObjects.get(0));
     }
 
     @Test(expected = ValidationException.class)
@@ -135,7 +113,7 @@ public class TestMenuCategoryDAO {
             }
         } catch (DAOException e) {
             // exception should not occur here
-            Assert.fail();
+            fail();
         }
 
         // WHEN
@@ -154,16 +132,16 @@ public class TestMenuCategoryDAO {
 
         // check if cat created
         List<MenuCategory> objects = menuCategoryDAO.find(matcher);
-        Assert.assertEquals(objects.size(), 1);
-        Assert.assertEquals(objects.get(0), cat);
+        assertEquals(1, objects.size());
+        assertEquals(cat, objects.get(0));
 
         // WHEN
         menuCategoryDAO.delete(cat);
 
         // THEN
         // check if category was removed
-        Assert.assertEquals(menuCategoryDAO.find(matcher).size(), 0);
-        Assert.assertEquals(menuCategoryDAO.getAll().size(), 0);
+        assertTrue(menuCategoryDAO.find(matcher).isEmpty());
+        assertTrue(menuCategoryDAO.getAll().isEmpty());
     }
 
     @Test(expected = ValidationException.class)
@@ -190,7 +168,7 @@ public class TestMenuCategoryDAO {
             }
         } catch (DAOException e) {
             // exception should not occur here
-            Assert.fail();
+            fail();
         }
 
         // WHEN
@@ -215,22 +193,22 @@ public class TestMenuCategoryDAO {
         matcher.setIdentity(cat1.getIdentity());
         List<MenuCategory> objects = menuCategoryDAO.find(matcher);
         // THEN
-        Assert.assertEquals(objects.size(), 1);
-        Assert.assertEquals(objects.get(0), cat1);
+        assertEquals(1, objects.size());
+        assertEquals(cat1, objects.get(0));
 
         // WHEN
         matcher.setIdentity(cat2.getIdentity());
         objects = menuCategoryDAO.find(matcher);
         // THEN
-        Assert.assertEquals(objects.size(), 1);
-        Assert.assertEquals(objects.get(0), cat2);
+        assertEquals(1, objects.size());
+        assertEquals(cat2, objects.get(0));
 
         // WHEN
         matcher.setIdentity(cat3.getIdentity());
         objects = menuCategoryDAO.find(matcher);
         // THEN
-        Assert.assertEquals(objects.size(), 1);
-        Assert.assertEquals(objects.get(0), cat3);
+        assertEquals(1, objects.size());
+        assertEquals(cat3, objects.get(0));
     }
 
     @Test
@@ -252,17 +230,17 @@ public class TestMenuCategoryDAO {
         List<MenuCategory> objects = menuCategoryDAO.find(matcher);
 
         // THEN
-        Assert.assertEquals(objects.size(), 2);
-        Assert.assertTrue(objects.contains(cat1));
-        Assert.assertTrue(objects.contains(cat2));
+        assertEquals(2, objects.size());
+        assertTrue(objects.contains(cat1));
+        assertTrue(objects.contains(cat2));
 
         // WHEN
         matcher.setName(cat3.getName());
         objects = menuCategoryDAO.find(matcher);
 
         // THEN
-        Assert.assertEquals(objects.size(), 1);
-        Assert.assertEquals(objects.get(0), cat3);
+        assertEquals(1, objects.size());
+        assertEquals(cat3, objects.get(0));
     }
 
     @Test
@@ -282,13 +260,13 @@ public class TestMenuCategoryDAO {
         List<MenuCategory> storedObjects = menuCategoryDAO.find(matcher);
 
         // THEN
-        Assert.assertEquals(storedObjects.size(), 0);
+        assertTrue(storedObjects.isEmpty());
     }
 
     @Test
     public void testGetAll_shouldReturnEmptyList() throws DAOException {
         // WHEN / THEN
-        Assert.assertEquals(menuCategoryDAO.getAll().size(), 0);
+        assertTrue(menuCategoryDAO.getAll().isEmpty());
     }
 
     @Test
@@ -308,9 +286,9 @@ public class TestMenuCategoryDAO {
         List<MenuCategory> objects = menuCategoryDAO.getAll();
 
         // THEN
-        Assert.assertEquals(objects.size(), 3);
-        Assert.assertTrue(objects.contains(cat1));
-        Assert.assertTrue(objects.contains(cat2));
-        Assert.assertTrue(objects.contains(cat3));
+        assertEquals(3, objects.size());
+        assertTrue(objects.contains(cat1));
+        assertTrue(objects.contains(cat2));
+        assertTrue(objects.contains(cat3));
     }
 }
