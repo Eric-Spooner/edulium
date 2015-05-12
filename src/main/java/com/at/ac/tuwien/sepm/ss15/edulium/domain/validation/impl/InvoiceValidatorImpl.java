@@ -28,8 +28,18 @@ public class InvoiceValidatorImpl implements Validator<Invoice> {
         }
 
         if (invoice.getPaid() != null && invoice.getPaid().compareTo(BigDecimal.ZERO) != 0) {
-            throw new ValidationException("The amount that was already paid can only" +
+            throw new ValidationException("The amount that was already paid can only " +
                     "be 0 upon creation");
+        }
+
+        if (invoice.getCreator() == null) {
+            throw new ValidationException("Upon creation, the creator of the invoice " +
+                    "must be provided");
+        }
+
+        if (invoice.getIdentity() != null && invoice.getInstallments().size() != 0) {
+            throw new ValidationException("Installments where a payment occurred cannot " +
+                    "be provided upon creation");
         }
     }
 
@@ -46,6 +56,13 @@ public class InvoiceValidatorImpl implements Validator<Invoice> {
 
         if (invoice.getPaid() != null && invoice.getPaid().compareTo(BigDecimal.ZERO) < 0) {
             throw new ValidationException("The amount that was already paid cannot be negative");
+        }
+
+        // If a payment is going to be updated but not the installment where it took place
+        if (invoice.getPaid() != null && invoice.getInstallments() != null &&
+                invoice.getInstallments().size() == 0) {
+            throw new ValidationException("When updating the payed amount, you have to provide " +
+                    "the installment(s) where the payment took place");
         }
 
         validateIdentity(invoice);
@@ -73,7 +90,7 @@ public class InvoiceValidatorImpl implements Validator<Invoice> {
     @Override
     public void validateIdentity(Invoice invoice) throws ValidationException {
         if (invoice.getIdentity() == null) {
-            throw new ValidationException("The unique identity of the invoice must be" +
+            throw new ValidationException("The unique identity of the invoice must be " +
                     "present in order to be identified");
         }
     }
