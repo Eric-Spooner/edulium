@@ -41,6 +41,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         assertEquals(invoice, invoiceList.get(0));
     }
 
+    // TODO: Test the add functionality of the paid amount in Invoice
     @Test
     public void testUpdate_shouldUpdateObject() throws ValidationException, DAOException {
         // GIVEN

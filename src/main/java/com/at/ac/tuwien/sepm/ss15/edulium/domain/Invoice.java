@@ -11,7 +11,7 @@ public class Invoice {
     private Long identity;
     private LocalDateTime time;
     private BigDecimal gross;
-    private BigDecimal paid;
+    private BigDecimal paid; // TODO: instead of setters, make an add method (The paid amount will be calculated here)
     private User creator;
     private List<Installment> installments;
 
