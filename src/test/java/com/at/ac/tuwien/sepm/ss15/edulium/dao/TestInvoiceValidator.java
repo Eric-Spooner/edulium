@@ -54,7 +54,7 @@ public class TestInvoiceValidator {
 
         Installment in1 = new Installment();
         Installment in2 = new Installment();
-        List<Installment> inList = new ArrayList<Installment>();
+        List<Installment> inList = new ArrayList<>();
         inList.add(in1);
         inList.add(in2);
         invoice.setInstallments(inList);
@@ -103,7 +103,7 @@ public class TestInvoiceValidator {
         invoice.setPaid(new BigDecimal("12"));
 
         Installment in1 = new Installment();
-        List<Installment> inList = new ArrayList<Installment>();
+        List<Installment> inList = new ArrayList<>();
         inList.add(in1);
         invoice.setInstallments(inList);
 
