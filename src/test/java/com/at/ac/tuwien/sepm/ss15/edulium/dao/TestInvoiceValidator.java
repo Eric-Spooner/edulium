@@ -100,6 +100,21 @@ public class TestInvoiceValidator {
     public void testValidateForUpdate_shouldAcceptInvoice() throws ValidationException {
         Invoice invoice = new Invoice();
         invoice.setIdentity(1L);
+        invoice.setPaid(new BigDecimal("12"));
+
+        Installment in1 = new Installment();
+        List<Installment> inList = new ArrayList<Installment>();
+        inList.add(in1);
+        invoice.setInstallments(inList);
+
+        invoiceValidator.validateForUpdate(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_shouldFailWhenInstallmentsAreMissing() throws ValidationException {
+        Invoice invoice = new Invoice();
+        invoice.setIdentity(1L);
+        invoice.setPaid(new BigDecimal("12"));
 
         invoiceValidator.validateForUpdate(invoice);
     }
