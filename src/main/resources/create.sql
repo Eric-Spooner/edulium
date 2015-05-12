@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS RestaurantSectionHistory (
 
 CREATE TABLE IF NOT EXISTS RestaurantTable (
     section_ID BIGINT REFERENCES RestaurantSection(ID),
-    number BIGINT,
+    number BIGINT AUTO_INCREMENT,
     seats INT,
     tableRow INT,
     tableColumn INT,

@@ -1,10 +1,13 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.TableDAO;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.TableValidator;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -19,12 +22,11 @@ import java.util.List;
 /**
  * H2 Database Implementation of the MenuCategoryDAO interface
  */
-@Repository
-class TableDAOImpl implements TableDAO {
+public class TableDAOImpl implements DAO<Table> {
     @Autowired
     private DataSource dataSource;
     @Autowired
-    private TableValidator validator;
+    private Validator<Table> validator;
 
     /**
      * writes the object into the database and sets the identity parameter of
@@ -38,23 +40,18 @@ class TableDAOImpl implements TableDAO {
 
         validator.validateForCreate(table);
 
-        final String query = "INSERT INTO RestaurantTable (section_ID, seats, row, column, user_id) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        final String query = "INSERT INTO RestaurantTable (section_ID, seats, tableRow, tableColumn, user_ID, number) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query,
-                Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
 
-            stmt.setLong(1, table.getSection_id());
+            stmt.setLong(1, table.getSection().getIdentity());
             stmt.setInt(2, table.getSeats());
             stmt.setInt(3, table.getRow());
             stmt.setInt(4, table.getColumn());
-            stmt.setLong(5, table.getUser_id());
+            stmt.setString(5, table.getUser().getIdentity());
+            stmt.setLong(6, table.getNumber());
             stmt.executeUpdate();
-
-            try (ResultSet key = stmt.getGeneratedKeys()) {
-                key.next();
-                table.setNumber(key.getLong(1));
-            }
 
         } catch (SQLException e) {
             throw new DAOException(e);
@@ -79,11 +76,11 @@ class TableDAOImpl implements TableDAO {
                 "section_ID = ?, seats = ?, tableRow = ?, tableColumn = ?, user_ID = ? WHERE number = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, table.getSection_id());
+            stmt.setLong(1, table.getSection().getIdentity());
             stmt.setInt(2, table.getSeats());
             stmt.setInt(3, table.getRow());
             stmt.setInt(4, table.getColumn());
-            stmt.setLong(5, table.getUser_id());
+            stmt.setString(5, table.getUser().getIdentity());
             stmt.setLong(6, table.getNumber());
 
             if (stmt.executeUpdate() == 0) {
@@ -145,10 +142,10 @@ class TableDAOImpl implements TableDAO {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, table.getNumber());
             stmt.setInt(2, table.getSeats());
-            stmt.setLong(3, table.getSection_id());
+            stmt.setLong(3, table.getSection().getIdentity());
             stmt.setInt(4, table.getRow());
             stmt.setInt(5, table.getColumn());
-            stmt.setLong(6, table.getUser_id());
+            stmt.setString(6, table.getUser().getIdentity());
             stmt.execute();
 
             try (ResultSet result = stmt.getResultSet()) {
@@ -189,20 +186,31 @@ class TableDAOImpl implements TableDAO {
         return objects;
     }
 
+    @Override
+    public List<History<Table>> getHistory(Table object) throws DAOException, ValidationException {
+        return null;
+    }
+
     /**
      * converts the database query output into a object
      * @param result database output
      * @return Table object with the data of the resultSet set
      * @throws SQLException if an error accessing the database occurred
      */
-    private Table parseResult(ResultSet result) throws SQLException {
+    private Table parseResult(ResultSet result) throws SQLException, DAOException {
+        DAO sectionDAO = new SectionDAOImpl();
+        Section matcherSection = new Section();
+        matcherSection.setIdentity(result.getLong(0));
+        DAO userDAO = new UserDAOImpl();
+        User matcherUser = new User();
+        matcherUser.setIdentity(result.getString(6));
         Table table = new Table();
-        table.setSection_id(result.getLong(1));
+        table.setSection((Section)sectionDAO.find(matcherSection).get(0));
         table.setNumber(result.getLong(2));
         table.setSeats(result.getInt(3));
         table.setRow(result.getInt(4));
         table.setColumn(result.getInt(5));
-        table.setUser_id(result.getLong(6));
+        table.setUser((User)userDAO.find(matcherUser).get(0));
         return table;
     }
 }

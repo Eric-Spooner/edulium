@@ -4,11 +4,12 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
  * Created by Administrator on 06.05.2015.
  */
 
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.SectionDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.SectionValidator;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -23,12 +24,11 @@ import java.util.List;
 /**
  * H2 Database Implementation of the section interface
  */
-@Repository
-class SectionDAOImpl implements SectionDAO {
+public class SectionDAOImpl implements DAO<Section> {
     @Autowired
     private DataSource dataSource;
     @Autowired
-    private SectionValidator validator;
+    private Validator<Section> validator;
 
     /**
      * writes the object into the database and sets the identity parameter of
@@ -175,6 +175,11 @@ class SectionDAOImpl implements SectionDAO {
         }
 
         return objects;
+    }
+
+    @Override
+    public List<History<Section>> getHistory(Section object) throws DAOException, ValidationException {
+        return null;
     }
 
     /**

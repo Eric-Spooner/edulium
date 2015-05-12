@@ -1,10 +1,12 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.TableDAO;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.impl.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +24,51 @@ import java.util.List;
 @Transactional
 public class TestTableDAO {
     @Autowired
-    private TableDAO tableDAO;
+    private DAO tableDAO;
+    private User user1, user2, user3;
+    private Section section1, section2, section3;
+    
+    @Before
+    public void setUp() throws ValidationException, DAOException {
+        DAO userDAO = new UserDAOImpl();
+        User user1 = new User();
+        user1.setIdentity("A");
+        user1.setName("User1");
+        user1.setRole("Role1");
+        userDAO.create(user1);
+        User user2 = new User();
+        user2.setIdentity("B");
+        user2.setName("User2");
+        user2.setRole("Role2");
+        userDAO.create(user2);
+        User user3 = new User();
+        user3.setIdentity("C");
+        user3.setName("User3");
+        user3.setRole("Role3");
+        userDAO.create(user3);
+
+        DAO sectionDAO = new SectionDAOImpl();
+        Section section1 = new Section();
+        section1.setIdentity((long)1);
+        section1.setName("Section1");
+        sectionDAO.create(section1);
+        Section section2 = new Section();
+        section2.setIdentity((long)2);
+        section2.setName("Section2");
+        sectionDAO.create(section2);
+        Section section3 = new Section();
+        section3.setIdentity((long)3);
+        section3.setName("Section3");
+        sectionDAO.create(section3);
+    }
 
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
-        table.setSection_id((long)1);
-        table.setUser_id((long)2);
+        table.setNumber((long)1);
+        table.setSection(section1);
+        table.setUser(user1);
         table.setSeats(3);
         table.setColumn(4);
         table.setRow(5);
@@ -50,24 +89,27 @@ public class TestTableDAO {
     }
 
     @Test(expected = DAOException.class)
-    public void testCreate_addingObjectWithoutSeatsAndRowAndColumnShouldFail() throws DAOException, ValidationException {
+    public void testCreate_addingObjectWithoutNumberAndSeatsAndRowAndColumnShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
+        table.setNumber((long)1);
+        table.setSection(section1);
+        table.setUser(user1);
+        table.setSeats(3);
+        table.setColumn(4);
+        table.setRow(5);
 
         // WHEN
-        try {
-            tableDAO.create(table);
-        } finally {
-            Assert.assertNull(table.getNumber());
-        }
+        tableDAO.create(table);
     }
 
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
-        table.setSection_id((long)1);
-        table.setUser_id((long)2);
+        table.setNumber((long)1);
+        table.setSection(section1);
+        table.setUser(user1);
         table.setSeats(3);
         table.setColumn(4);
         table.setRow(5);
@@ -96,9 +138,12 @@ public class TestTableDAO {
     public void testUpdate_updatingObjectWithNumberNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
+        table.setNumber(null);
         table.setSeats(3);
         table.setColumn(4);
         table.setRow(5);
+        table.setUser(user1);
+        table.setSection(section1);
 
         // WHEN
         tableDAO.update(table);
@@ -113,6 +158,8 @@ public class TestTableDAO {
         table.setRow(5);
         Long number = (long) 1;
         table.setNumber(number);
+        table.setSection(section1);
+        table.setUser(user1);
 
         // check if no item with this number exists
         try {
@@ -133,9 +180,13 @@ public class TestTableDAO {
     public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
+        User user = new User();
         table.setSeats(3);
         table.setColumn(4);
         table.setRow(5);
+        table.setSection(section1);
+        table.setUser(user1);
+
         tableDAO.create(table);
 
         // WHEN
@@ -153,6 +204,12 @@ public class TestTableDAO {
     public void testDelete_deletingObjectWithNumberNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
+        table.setNumber((long)1);
+        table.setSection(section1);
+        table.setUser(user1);
+        table.setSeats(3);
+        table.setColumn(4);
+        table.setRow(5);
 
         // WHEN
         tableDAO.delete(table);
@@ -164,6 +221,11 @@ public class TestTableDAO {
         Table table = new Table();
         Long number = (long) 1;
         table.setNumber(number);
+        table.setSeats(3);
+        table.setColumn(4);
+        table.setRow(5);
+        table.setSection(section1);
+        table.setUser(user1);
 
         // check if no item with this number exists
         try {
@@ -173,7 +235,7 @@ public class TestTableDAO {
             }
         } catch (DAOException e) {
             // exception should not occur here
-            Assert.assertTrue(false);
+            Assert.fail();
         }
 
         // WHEN
@@ -190,12 +252,21 @@ public class TestTableDAO {
         table1.setSeats(3);
         table1.setColumn(4);
         table1.setRow(5);
+        table1.setNumber((long) 1);
+        table1.setUser(user1);
+        table1.setSection(section1);
         table2.setSeats(13);
         table2.setColumn(14);
         table2.setRow(15);
+        table2.setNumber((long)2);
+        table2.setUser(user2);
+        table2.setSection(section2);
         table3.setSeats(23);
         table3.setColumn(24);
         table3.setRow(25);
+        table3.setNumber((long)3);
+        table3.setUser(user3);
+        table3.setSection(section3);
         tableDAO.create(table1);
         tableDAO.create(table2);
         tableDAO.create(table3);
@@ -228,12 +299,21 @@ public class TestTableDAO {
         Table table1 = new Table();
         Table table2 = new Table();
         Table table3 = new Table();
+        table1.setNumber((long)1);
+        table1.setSection(section1);
+        table1.setUser(user1);
         table1.setSeats(3);
         table1.setColumn(4);
         table1.setRow(5);
+        table2.setNumber((long)2);
+        table2.setSection(section2);
+        table2.setUser(user2);
         table2.setSeats(3);
         table2.setColumn(4);
         table2.setRow(5);
+        table3.setNumber((long)3);
+        table3.setSection(section3);
+        table3.setUser(user3);
         table3.setSeats(23);
         table3.setColumn(24);
         table3.setRow(25);
@@ -298,18 +378,28 @@ public class TestTableDAO {
     @Test
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
+        Table matcher = new Table();
         Table table1 = new Table();
         Table table2 = new Table();
         Table table3 = new Table();
         table1.setSeats(3);
         table1.setColumn(4);
         table1.setRow(5);
+        table1.setNumber((long) 1);
+        table1.setUser(user1);
+        table1.setSection(section1);
         table2.setSeats(13);
         table2.setColumn(14);
         table2.setRow(15);
+        table2.setNumber((long)2);
+        table2.setUser(user2);
+        table2.setSection(section2);
         table3.setSeats(23);
         table3.setColumn(24);
         table3.setRow(25);
+        table3.setNumber((long)3);
+        table3.setUser(user3);
+        table3.setSection(section3);
         tableDAO.create(table1);
         tableDAO.create(table2);
         tableDAO.create(table3);

@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * H2 Database Implementation of the UserDAO interface
  */
-class UserDAOImpl implements DAO<User> {
+public class UserDAOImpl implements DAO<User> {
     private static final Logger LOGGER = LogManager.getLogger(UserDAOImpl.class);
 
     @Autowired

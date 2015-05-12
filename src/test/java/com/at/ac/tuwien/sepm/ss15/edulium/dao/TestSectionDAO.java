@@ -22,7 +22,7 @@ import java.util.List;
 @Transactional
 public class TestSectionDAO {
     @Autowired
-    private SectionDAO sectionDAO;
+    private DAO sectionDAO;
 
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
