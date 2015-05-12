@@ -171,6 +171,12 @@ class DBUserDAO implements DAO<User> {
         return history;
     }
 
+    /**
+     * writes the changes of the dataset into the database
+     * stores the time; number of the change and the user which executed the changes
+     * @param user updated dataset
+     * @throws DAOException if an error accessing the database occurred
+     */
     private void generateHistory(User user) throws DAOException {
         LOGGER.debug("entering generateHistory with parameters " + user);
 
