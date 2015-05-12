@@ -36,7 +36,7 @@ class UserDAOImpl implements DAO<User> {
 
         final String query = "INSERT INTO RestaurantUser (ID, name, userRole) VALUES (?, ?, ?)";
 
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, user.getIdentity());
             stmt.setString(2, user.getName());
             stmt.setString(3, user.getRole());
