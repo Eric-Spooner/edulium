@@ -1,36 +1,37 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 
 /**
- * Validator for the User domain object
+ * Validator interface for domain objects
  */
-public interface UserValidator {
+public interface Validator<T> {
+
     /**
      * validates the object for the create action
-     * @param user object to validate
+     * @param object object to validate
      * @throws ValidationException if the object is not valid
      */
-    void validateForCreate(User user) throws ValidationException;
+    void validateForCreate(T object) throws ValidationException;
 
     /**
      * validates the object for the update action
-     * @param user object to validate
+     * @param object object to validate
      * @throws ValidationException if the object is not valid
      */
-    void validateForUpdate(User user) throws ValidationException;
+    void validateForUpdate(T object) throws ValidationException;
 
     /**
      * validates the object for the delete action
-     * @param user object to validate
+     * @param object object to validate
      * @throws ValidationException if the object is not valid
      */
-    void validateForDelete(User user) throws ValidationException;
+    void validateForDelete(T object) throws ValidationException;
 
     /**
      * validates if all parameters needed for identification are set
-     * @param user object to validate
+     * @param object object to validate
      * @throws ValidationException if the identity of the object is not set
      */
-    void validateIdentity(User user) throws ValidationException;
+    void validateIdentity(T object) throws ValidationException;
 }

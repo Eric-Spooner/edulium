@@ -9,6 +9,17 @@ public class User {
     private String role = null;
 
     /**
+     * Creates a new user object and assigns the given identity to it.
+     * @param identity the identity of the user
+     * @return User object with the given identity
+     */
+    public static User withIdentity(String identity) {
+        User user = new User();
+        user.setIdentity(identity);
+        return user;
+    }
+
+    /**
      * @return the identity of the user (can be null)
      */
     public String getIdentity() {
