@@ -37,39 +37,6 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         assertEquals(invoice, invoiceList.get(0));
     }
 
-    // TODO: Create new test class for InvoiceValidator and move it there
-    @Test(expected = ValidationException.class)
-    public void testCreate_shouldFailWithNoGrossAmount() throws ValidationException {
-        // GIVEN
-        Invoice invoice = new Invoice();
-        invoice.setTime(LocalDateTime.now());
-
-        // WHEN
-        try {
-            invoiceDAO.create(invoice);
-        } catch (DAOException e) {
-            fail("DAOException was thrown instead");
-        } finally {
-            assertNull(invoice.getIdentity());
-        }
-    }
-
-    // TODO: Create new test class for InvoiceValidator and move it there
-    @Test(expected = ValidationException.class)
-    public void testCreate_shouldFailWithNegativeGrossAmount() throws ValidationException, DAOException {
-        // GIVEN
-        Invoice invoice = new Invoice();
-        invoice.setTime(LocalDateTime.now());
-        invoice.setGross(new BigDecimal("-19.0"));
-
-        // WHEN
-        try {
-            invoiceDAO.create(invoice);
-        } finally {
-            assertNull(invoice.getIdentity());
-        }
-    }
-
     @Test
     public void testUpdate_shouldUpdateObject() throws ValidationException, DAOException {
         // GIVEN
@@ -88,38 +55,6 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         assertEquals(invoice, invoiceList.get(0));
     }
 
-    @Test(expected = ValidationException.class)
-    public void testUpdate_shouldFailWhenObjectIsNull() throws ValidationException, DAOException {
-        // GIVEN
-        Invoice invoice = null;
-
-        // WHEN
-        invoiceDAO.update(invoice);
-    }
-
-    @Test (expected = ValidationException.class)
-    public void testUpdate_shouldFailWhenPaidAmountIsNegative() throws ValidationException, DAOException {
-        // GIVEN
-        Invoice invoice = new Invoice();
-        invoice.setTime(LocalDateTime.now());
-        invoice.setGross(new BigDecimal("20.0"));
-        invoiceDAO.create(invoice);
-
-        // WHEN
-        invoice.setPaid(new BigDecimal("-20.0"));
-        invoiceDAO.update(invoice);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testUpdate_shouldFailWhenObjectIdentityIsMissing() throws ValidationException, DAOException {
-        // GIVEN
-        Invoice invoice = new Invoice();
-        invoice.setPaid(new BigDecimal("13.0"));
-
-        //WHEN
-        invoiceDAO.update(invoice);
-    }
-
     @Test
     public void testDelete_shouldDeleteObject() throws ValidationException, DAOException {
         // GIVEN
@@ -134,15 +69,6 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         // THEN
         Long identity = invoice.getIdentity();
         assertTrue(invoiceDAO.find(Invoice.withIdentity(identity)).isEmpty());
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testDelete_shouldFailWhenIdentityIsMissing() throws ValidationException, DAOException {
-        // GIVEN
-        Invoice invoice = new Invoice();
-
-        // WHEN
-        invoiceDAO.delete(invoice);
     }
 
     @Test
@@ -209,7 +135,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
     }
 
     @Test
-    public void tesetGetAll_shouldReturnAllObjects() throws ValidationException, DAOException {
+    public void testGetAll_shouldReturnAllObjects() throws ValidationException, DAOException {
         // GIVEN
         Invoice inv1 = new Invoice();
         Invoice inv2 = new Invoice();
