@@ -16,14 +16,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 /**
  * H2 Database Implementation of the MenuCategoryDAO interface
  */
-class MenuCategoryDAOImpl implements DAO<MenuCategory> {
-    private static final Logger LOGGER = LogManager.getLogger(MenuCategoryDAOImpl.class);
+class DBMenuCategoryDAO implements DAO<MenuCategory> {
+    private static final Logger LOGGER = LogManager.getLogger(DBMenuCategoryDAO.class);
 
     @Autowired
     private DataSource dataSource;

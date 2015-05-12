@@ -20,8 +20,8 @@ import java.util.List;
 /**
  * H2 Database Implementation of the UserDAO interface
  */
-class UserDAOImpl implements DAO<User> {
-    private static final Logger LOGGER = LogManager.getLogger(UserDAOImpl.class);
+class DBUserDAO implements DAO<User> {
+    private static final Logger LOGGER = LogManager.getLogger(DBUserDAO.class);
 
     @Autowired
     private DataSource dataSource;
