@@ -151,14 +151,17 @@ class DBUserDAO implements DAO<User> {
 
     @Override
     public List<History<User>> getHistory(User user) throws DAOException, ValidationException {
-        LOGGER.debug("entering getHistory with parameters " + user);
+        LOGGER.debug("Entering getHistory with parameters: " + user);
 
         validator.validateIdentity(user);
-        List<History<User>> history = new ArrayList<>();
+
         final String query = "SELECT * FROM RestaurantUserHistory WHERE ID = ? ORDER BY changeNr";
+
+        List<History<User>> history = new ArrayList<>();
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, user.getIdentity());
+
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 history.add(historyFromResultSet(result));
@@ -178,7 +181,7 @@ class DBUserDAO implements DAO<User> {
      * @throws DAOException if an error accessing the database occurred
      */
     private void generateHistory(User user) throws DAOException {
-        LOGGER.debug("entering generateHistory with parameters " + user);
+        LOGGER.debug("Entering generateHistory with parameters: " + user);
 
         final String query = "INSERT INTO RestaurantUserHistory " +
                 "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
