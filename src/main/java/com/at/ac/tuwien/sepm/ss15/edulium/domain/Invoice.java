@@ -119,7 +119,7 @@ public class Invoice {
                 ", gross=" + gross +
                 ", paid=" + paid +
                 ", creator=" + creator +
-                ", installments=[" + installments + "]" +
+                ", installments=" + installments + "" +
                 "}";
     }
 
