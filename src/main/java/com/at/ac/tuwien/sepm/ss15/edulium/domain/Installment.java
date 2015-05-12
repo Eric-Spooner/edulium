@@ -106,7 +106,8 @@ public class Installment {
                 ", time=" + time +
                 ", paymentInfo=" + paymentInfo +
                 ", type=" + type +
-                ", amount" + amount;
+                ", amount" + amount +
+                "}";
     }
 
     @Override
