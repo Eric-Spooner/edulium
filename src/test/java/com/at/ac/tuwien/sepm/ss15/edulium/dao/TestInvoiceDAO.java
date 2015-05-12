@@ -1,6 +1,8 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Installment;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,6 +26,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(new User());
 
         // WHEN
         invoiceDAO.create(invoice);
@@ -43,16 +47,24 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("26.7"));
+        invoice.setCreator(new User());
         invoiceDAO.create(invoice);
 
         // WHEN
         invoice.setPaid(new BigDecimal("28.0"));
+        Installment in1 = new Installment();
+        Installment in2 = new Installment();
+        List<Installment> inList = new ArrayList<Installment>();
+        inList.add(in1);
+        inList.add(in2);
+        invoice.setInstallments(inList);
         invoiceDAO.update(invoice);
 
         // THEN
         List<Invoice> invoiceList = invoiceDAO.find(invoice);
         assertEquals(1, invoiceList.size());
         assertEquals(invoice, invoiceList.get(0));
+        assertEquals(2, invoiceList.get(0).getInstallments().size());
     }
 
     @Test
@@ -61,6 +73,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("22.0"));
+        invoice.setCreator(new User());
         invoiceDAO.create(invoice);
 
         // WHEN
@@ -83,10 +96,13 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         LocalDateTime now = LocalDateTime.now();
         inv1.setTime(now);
         inv1.setGross(new BigDecimal("11.0"));
+        inv1.setCreator(new User());
         inv2.setTime(now);
         inv2.setGross(new BigDecimal("12.0"));
+        inv2.setCreator(new User());
         inv3.setTime(now);
         inv3.setGross(new BigDecimal("13.0"));
+        inv3.setCreator(new User());
 
         invoiceDAO.create(inv1);
         invoiceDAO.create(inv2);
@@ -144,10 +160,13 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         LocalDateTime now = LocalDateTime.now();
         inv1.setTime(now);
         inv1.setGross(new BigDecimal("11.0"));
+        inv1.setCreator(new User());
         inv2.setTime(now);
         inv2.setGross(new BigDecimal("12.0"));
+        inv2.setCreator(new User());
         inv3.setTime(now);
         inv3.setGross(new BigDecimal("13.0"));
+        inv3.setCreator(new User());
 
         invoiceDAO.create(inv1);
         invoiceDAO.create(inv2);
