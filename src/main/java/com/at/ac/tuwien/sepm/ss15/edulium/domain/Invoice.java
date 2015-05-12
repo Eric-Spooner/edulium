@@ -35,9 +35,6 @@ public class Invoice {
 
     /**
      * @param identity Sets the unique identity of the object.
-     *                 This method should only be used when creating
-     *                 a new entry in the datasource, where the identity
-     *                 is being generated
      */
     public void setIdentity(Long identity) {
         this.identity = identity;

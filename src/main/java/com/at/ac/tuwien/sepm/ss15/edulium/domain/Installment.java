@@ -33,8 +33,6 @@ public class Installment {
 
     /**
      * Sets the unique identity of the installment object.
-     * This method should only be used when creating a new entry in the
-     * datasource, where the identity is being generated.
      * @param identity The unique identity we want to assign to the
      *                 installment object.
      */
