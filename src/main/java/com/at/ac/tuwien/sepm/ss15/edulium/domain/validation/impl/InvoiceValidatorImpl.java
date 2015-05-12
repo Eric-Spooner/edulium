@@ -37,7 +37,7 @@ public class InvoiceValidatorImpl implements Validator<Invoice> {
                     "must be provided");
         }
 
-        if (invoice.getIdentity() != null && invoice.getInstallments().size() != 0) {
+        if (invoice.getInstallments() != null && invoice.getInstallments().size() != 0) {
             throw new ValidationException("Installments where a payment occurred cannot " +
                     "be provided upon creation");
         }
