@@ -66,7 +66,7 @@ public class TaxRate {
         TaxRate taxRate = (TaxRate) o;
 
         if (identity != null ? !identity.equals(taxRate.identity) : taxRate.identity != null) return false;
-        return !(value != null ? !value.equals(taxRate.value) : taxRate.value != null);
+        return !(value != null ? (value.compareTo(taxRate.value) != 0) : taxRate.value != null);
 
     }
 }
