@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by - on 11.05.2015.
  */
-public class MenuDAOImpl implements DAO<Menu> {
+public class DBMenuDAOImpl implements DAO<Menu> {
     @Override
     public void create(Menu object) throws DAOException, ValidationException {
 

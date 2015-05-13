@@ -18,8 +18,8 @@ public class TestMenuValidator extends AbstractDomainTest {
     public void testValidateForCreate_shouldAcceptMenu() throws ValidationException {
         // GIVEN
         Menu menu = new Menu();
-        menu.setDeleted(false);
         menu.setName("Menu");
+        //TODO add MenuEntry
 
         // WHEN
         menuValidator.validateForCreate(menu);
@@ -43,21 +43,11 @@ public class TestMenuValidator extends AbstractDomainTest {
         menuValidator.validateForCreate(menu);
     }
 
-    @Test(expected = ValidationException.class)
-    public void testValidateForCreate_MenuWithDeleteTrueShouldThrow() throws ValidationException {
-        // GIVEN
-        Menu menu = new Menu();
-        menu.setDeleted(true);
-
-        // WHEN
-        menuValidator.validateForCreate(menu);
-    }
 
     @Test(expected = ValidationException.class)
     public void testValidateForCreate_MenuWithoutNameShouldThrow() throws ValidationException {
         // GIVEN
         Menu menu = new Menu();
-        menu.setDeleted(false);
         menu.setName("");
 
         // WHEN
@@ -70,7 +60,6 @@ public class TestMenuValidator extends AbstractDomainTest {
         Menu menu = new Menu();
         menu.setIdentity(0L);
         menu.setName("Menu");
-        menu.setDeleted(false);
 
         // WHEN
         menuValidator.validateForUpdate(menu);
@@ -81,7 +70,6 @@ public class TestMenuValidator extends AbstractDomainTest {
         // GIVEN
         Menu menu = new Menu();
         menu.setName("Menu");
-        menu.setDeleted(false);
 
         // WHEN
         menuValidator.validateForUpdate(menu);
