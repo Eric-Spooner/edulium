@@ -1,11 +1,15 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import static org.junit.Assert.*;
 import org.junit.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -73,27 +77,6 @@ public class TestUserDAO extends AbstractDAOTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithEmptyIdentityShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-        user.setIdentity("");
-        user.setName("Breezy Badger");
-        user.setRole("tester");
-
-        // WHEN
-        userDAO.create(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testCreate_addingEmptyObjectShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-
-        // WHEN
-        userDAO.create(user);
-    }
-
-    @Test(expected = ValidationException.class)
     public void testCreate_addingNullObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         User user = null;
@@ -136,15 +119,6 @@ public class TestUserDAO extends AbstractDAOTest {
         User user = new User();
         user.setName("Oneiric Ocelot");
         user.setRole("thrower");
-
-        // WHEN
-        userDAO.update(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testUpdate_updatingEmptyObjectShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
 
         // WHEN
         userDAO.update(user);
@@ -206,15 +180,6 @@ public class TestUserDAO extends AbstractDAOTest {
         // check if user was removed
         assertEquals(0, userDAO.find(user).size());
         assertEquals(numberOfUsersBefore, userDAO.getAll().size());
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-
-        // WHEN
-        userDAO.delete(user);
     }
 
     @Test(expected = ValidationException.class)
@@ -470,5 +435,94 @@ public class TestUserDAO extends AbstractDAOTest {
             stringBuilder.append((char)(random.nextInt('z' - 'a') + 'a'));
         }
         return stringBuilder.toString();
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_withoutObjectShouldFail() throws DAOException, ValidationException {
+        userDAO.getHistory(null);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_withoutIdentityShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        User user = new User();
+
+        // WHEN
+        userDAO.getHistory(user);
+    }
+
+    @Test
+    public void testGetHistory_notPersistentDataShouldReturnEmptyList() throws DAOException, ValidationException {
+        // GIVEN
+        User user = new User();
+
+        // search for a non-existing user identity
+        try {
+            do {
+                user.setIdentity(buildRandomString(15));
+            } while (!userDAO.find(user).isEmpty());
+        } catch (DAOException e) {
+            fail("DAOException should not occur while searching for a non-existing user identity");
+        }
+
+        // WHEN / THEN
+        assertTrue(userDAO.getHistory(user).isEmpty());
+    }
+
+    @Test
+    public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // get test user
+        User testUser = getCurrentUser();
+
+        // GIVEN
+        // create data
+        User user1 = new User();
+        user1.setIdentity("identity");
+        user1.setName("user");
+        user1.setRole("user_role");
+        LocalDateTime createTime = LocalDateTime.now();
+        userDAO.create(user1);
+
+        // update data
+        User user2 = User.withIdentity(user1.getIdentity());
+        user2.setName("update");
+        user2.setRole("update_role");
+        LocalDateTime updateTime = LocalDateTime.now();
+        userDAO.update(user2);
+
+        // delete data
+        LocalDateTime deleteTime = LocalDateTime.now();
+        userDAO.delete(user2);
+
+        // WHEN
+        List<History<User>> history = userDAO.getHistory(user1);
+
+        // THEN
+        assertEquals(3, history.size());
+
+        // check create history
+        History<User> entry = history.get(0);
+        assertEquals(Long.valueOf(1), entry.getChangeNumber());
+        assertEquals(user1, entry.getData());
+        assertEquals(testUser, entry.getUser());
+        assertTrue(Duration.between(createTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(entry.isDeleted());
+
+        // check update history
+        entry = history.get(1);
+        assertEquals(Long.valueOf(2), entry.getChangeNumber());
+        assertEquals(user2, entry.getData());
+        assertEquals(testUser, entry.getUser());
+        assertTrue(Duration.between(updateTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(entry.isDeleted());
+
+        // check delete history
+        entry = history.get(2);
+        assertEquals(Long.valueOf(3), entry.getChangeNumber());
+        assertEquals(user2, entry.getData());
+        assertEquals(testUser, entry.getUser());
+        assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertTrue(entry.isDeleted());
     }
 }

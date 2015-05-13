@@ -1,13 +1,17 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -17,19 +21,16 @@ import java.util.List;
 /**
  * H2 Database Implementation of the MenuCategoryDAO interface
  */
-class MenuCategoryDAOImpl implements DAO<MenuCategory> {
+class DBMenuCategoryDAO implements DAO<MenuCategory> {
+    private static final Logger LOGGER = LogManager.getLogger(DBMenuCategoryDAO.class);
+
     @Autowired
     private DataSource dataSource;
     @Autowired
+    private DAO<User> userDAO;
+    @Autowired
     private Validator<MenuCategory> validator;
-    private static final Logger LOGGER = LogManager.getLogger(MenuCategoryDAOImpl.class);
 
-    /**
-     * writes the object into the database and sets the identity parameter of
-     * menuCategory
-     * @param menuCategory object to store
-     * @throws DAOException if an error accessing the database occurred
-     */
     @Override
     public void create(MenuCategory menuCategory) throws DAOException, ValidationException {
         LOGGER.debug("entering create with parameters " + menuCategory);
@@ -42,24 +43,18 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
             stmt.executeUpdate();
 
             ResultSet key = stmt.getGeneratedKeys();
-            if(key.next()) {
+            if (key.next()) {
                 menuCategory.setIdentity(key.getLong(1));
             }
             key.close();
         } catch (SQLException e) {
-            LOGGER.error("inserting menuCategory into database failed");
+            LOGGER.error("inserting menuCategory into database failed", e);
             throw new DAOException("inserting menuCategory into database failed", e);
         }
 
         generateHistory(menuCategory);
     }
 
-    /**
-     * updates the object in the database
-     * @param menuCategory object to update
-     * @throws DAOException if an error accessing the database ocurred or if the
-     *         dataset was not found in the database
-     */
     @Override
     public void update(MenuCategory menuCategory) throws DAOException, ValidationException {
         LOGGER.debug("entering update with parameters " + menuCategory);
@@ -76,19 +71,13 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
                 throw new DAOException("updating menuCategory in database failed, dataset not found");
             }
         } catch (SQLException e) {
-            LOGGER.error("updating menuCategory in database failed");
-            throw new DAOException(e);
+            LOGGER.error("updating menuCategory in database failed", e);
+            throw new DAOException("updating menuCategory in database failed", e);
         }
 
         generateHistory(menuCategory);
     }
 
-    /**
-     * removes the object from the database
-     * @param menuCategory object to remove
-     * @throws DAOException if an error accessing the database occurred or if
-     *         the dataset was not found in the database
-     */
     @Override
     public void delete(MenuCategory menuCategory) throws DAOException, ValidationException {
         LOGGER.debug("entering delete with parameters " + menuCategory);
@@ -104,21 +93,13 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
                 throw new DAOException("deleting menuCategory failed, dataset not found");
             }
         } catch (SQLException e) {
-            LOGGER.error("deleting menuCategory failed");
+            LOGGER.error("deleting menuCategory failed", e);
             throw new DAOException("deleting menuCategory failed", e);
         }
 
         generateHistory(menuCategory);
     }
 
-    /**
-     * returns all objects from the database which parameters match the
-     * parameters of the object menuCategory
-     * all parameters with value NULL will not be used for matching
-     * @param menuCategory object used for matching
-     * @return returns a list of objects from the database which match the criteria
-     * @throws DAOException if an error accessing the database occurred
-     */
     @Override
     public List<MenuCategory> find(MenuCategory menuCategory) throws DAOException {
         LOGGER.debug("entering find with parameters " + menuCategory);
@@ -141,17 +122,13 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
                 objects.add(parseResult(result));
             }
         } catch (SQLException e) {
-            LOGGER.error("searching for categories failed");
+            LOGGER.error("searching for categories failed", e);
             throw new DAOException("searching for categories failed", e);
         }
 
         return objects;
     }
 
-    /**
-     * @return returns all objects in the database
-     * @throws DAOException if an error accessing the database occurred
-     */
     @Override
     public List<MenuCategory> getAll() throws DAOException {
         LOGGER.debug("entering getAll");
@@ -165,14 +142,35 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
                 objects.add(parseResult(result));
             }
         } catch (SQLException e) {
-            LOGGER.error("searching for all categories failed");
+            LOGGER.error("searching for all categories failed", e);
             throw new DAOException("searching for all categories failed", e);
         }
 
         return objects;
     }
 
-    // FIXME add implementation when session object is implemented
+    @Override
+    public List<History<MenuCategory>> getHistory(MenuCategory menuCategory) throws DAOException, ValidationException {
+        LOGGER.debug("entering getHistory with parameters " + menuCategory);
+
+        validator.validateIdentity(menuCategory);
+        List<History<MenuCategory>> history = new ArrayList<>();
+        final String query = "SELECT * FROM MenuCategoryHistory WHERE ID = ? ORDER BY changeNr";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, menuCategory.getIdentity());
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                history.add(parseHistoryEntry(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("retrieving history failed", e);
+            throw new DAOException("retrieving history failed", e);
+        }
+
+        return history;
+    }
+
     /**
      * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed
@@ -181,21 +179,23 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
      * @throws DAOException if an error accessing the database occurred
      */
     private void generateHistory(MenuCategory menuCategory) throws DAOException {
-        /*
+        LOGGER.debug("entering generateHistory with parameters " + menuCategory);
+
         final String query = "INSERT INTO MenuCategoryHistory " +
-                "(SELECT ID, name, deleted, ?, ?, NULL FROM MenuCategory WHERE ID = ?)";
-        final Timestamp timestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
+                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM MenuCategoryHistory WHERE ID = ?) " +
+                "FROM MenuCategory WHERE ID = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setTimestamp(1, timestamp);    // time
-            stmt.setInt(2, 0);                  // user TODO
-            stmt.setLong(3, identity);          // dataset id
+            stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+            stmt.setLong(2, menuCategory.getIdentity());          // dataset id
+            stmt.setLong(3, menuCategory.getIdentity());          // dataset id
 
             stmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DAOException(e);
+            LOGGER.error("generating history failed", e);
+            throw new DAOException("generating history failed", e);
         }
-        */
     }
 
     /**
@@ -209,5 +209,31 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
         menuCategory.setIdentity(result.getLong("ID"));
         menuCategory.setName(result.getString("name"));
         return menuCategory;
+    }
+
+    /**
+     * converts the database query output into a history entry object
+     * @param result database output
+     * @return History object with the data of the resultSet set
+     * @throws SQLException if an error accessing the database occurred
+     * @throws DAOException if an error retrieving the user ocurred
+     */
+    private History<MenuCategory> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
+        // get user
+        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        if (storedUsers.size() != 1) {
+            LOGGER.error("user not found");
+            throw new DAOException("user not found");
+        }
+
+        // create history entry
+        History<MenuCategory> historyEntry = new History<>();
+        historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
+        historyEntry.setChangeNumber(result.getLong("changeNr"));
+        historyEntry.setDeleted(result.getBoolean("deleted"));
+        historyEntry.setUser(storedUsers.get(0));
+        historyEntry.setData(parseResult(result));
+
+        return historyEntry;
     }
 }
