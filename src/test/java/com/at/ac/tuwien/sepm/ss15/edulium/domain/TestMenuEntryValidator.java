@@ -66,6 +66,16 @@ public class TestMenuEntryValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void testValidateForCreate_withEmptyNameShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        MenuEntry entry = createMenuEntry("entry", "desc", "cat", 20.0, 0.2, true);
+        entry.setName("");
+
+        // WHEN
+        menuEntryValidator.validateForCreate(entry);
+    }
+
+    @Test(expected = ValidationException.class)
     public void testValidateForCreate_withoutPriceShouldThrow() throws ValidationException, DAOException {
         // GIVEN
         MenuEntry entry = createMenuEntry("entry", "desc", "cat", 20.0, 0.2, true);
@@ -166,6 +176,17 @@ public class TestMenuEntryValidator extends AbstractDomainTest {
         // GIVEN
         MenuEntry entry = createMenuEntry("entry", "desc", "cat", 20.0, 0.2, true);
         entry.setName(null);
+        entry.setIdentity(0L);
+
+        // WHEN
+        menuEntryValidator.validateForUpdate(entry);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_withEmptyNameShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        MenuEntry entry = createMenuEntry("entry", "desc", "cat", 20.0, 0.2, true);
+        entry.setName("");
         entry.setIdentity(0L);
 
         // WHEN
