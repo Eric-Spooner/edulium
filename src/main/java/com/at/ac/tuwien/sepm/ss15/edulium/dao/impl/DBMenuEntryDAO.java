@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * H2 Database Implementation of the MenuEntry DAO interface
  */
-public class DBMenuEntryDAO implements DAO<MenuEntry> {
+class DBMenuEntryDAO implements DAO<MenuEntry> {
     @Override
     public void create(MenuEntry object) throws DAOException, ValidationException {
 

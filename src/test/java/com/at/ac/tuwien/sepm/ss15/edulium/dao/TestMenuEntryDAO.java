@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 /**
  * Unit Test for the MenuEntryDAO
  */
-public class MenuEntryDAOTest extends AbstractDAOTest {
+public class TestMenuEntryDAO extends AbstractDAOTest {
     @Autowired
     private DAO<MenuEntry> menuEntryDAO;
     @Autowired
@@ -239,6 +239,178 @@ public class MenuEntryDAOTest extends AbstractDAOTest {
 
         // WHEN
         matcher.setName(entry3.getName());
+        objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(1, objects.size());
+        assertEquals(entry3, objects.get(0));
+    }
+
+    @Test
+    public void testFind_byAvailabilityShouldReturnObjects() throws DAOException, ValidationException {
+        // GIVEN
+        MenuEntry matcher = new MenuEntry();
+
+        MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);
+        menuEntryDAO.create(entry1);
+
+        MenuEntry entry2 = createMenuEntry("entry1", "desc2", "cat2", 20.0, 0.2, true);
+        menuEntryDAO.create(entry2);
+
+        MenuEntry entry3 = createMenuEntry("entry2", "desc3", "cat3", 30.0, 0.3, false);
+        menuEntryDAO.create(entry3);
+
+        // WHEN
+        matcher.setAvailable(true);
+        List<MenuEntry> objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(2, objects.size());
+        assertTrue(objects.contains(entry1));
+        assertTrue(objects.contains(entry2));
+
+        // WHEN
+        matcher.setAvailable(false);
+        objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(1, objects.size());
+        assertEquals(entry3, objects.get(0));
+    }
+
+    @Test
+    public void testFind_byPriceShouldReturnObjects() throws DAOException, ValidationException {
+        // GIVEN
+        MenuEntry matcher = new MenuEntry();
+
+        MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);
+        menuEntryDAO.create(entry1);
+
+        MenuEntry entry2 = createMenuEntry("entry1", "desc2", "cat2", 10.0, 0.2, true);
+        menuEntryDAO.create(entry2);
+
+        MenuEntry entry3 = createMenuEntry("entry2", "desc3", "cat3", 20.0, 0.3, true);
+        menuEntryDAO.create(entry3);
+
+        // WHEN
+        matcher.setPrice(BigDecimal.valueOf(10.00));
+        List<MenuEntry> objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(2, objects.size());
+        assertTrue(objects.contains(entry1));
+        assertTrue(objects.contains(entry2));
+
+        // WHEN
+        matcher.setPrice(BigDecimal.valueOf(20.000));
+        objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(1, objects.size());
+        assertEquals(entry3, objects.get(0));
+    }
+
+    @Test
+    public void testFind_byCategoryShouldReturnObjects() throws DAOException, ValidationException {
+        // PREPARE
+        MenuEntry matcher = new MenuEntry();
+
+        // create categories
+        MenuCategory cat1 = new MenuCategory();
+        cat1.setName("cat1");
+        MenuCategory cat2 = new MenuCategory();
+        cat2.setName("cat2");
+
+        menuCategoryDAO.create(cat1);
+        menuCategoryDAO.create(cat2);
+
+        // check if categories created
+        List<MenuCategory> entries = menuCategoryDAO.find(cat1);
+        assertEquals(1, entries.size());
+        assertEquals(cat1, entries.get(0));
+
+        entries = menuCategoryDAO.find(cat2);
+        assertEquals(1, entries.size());
+        assertEquals(cat2, entries.get(0));
+
+        // GIVEN
+        MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);
+        entry1.setCategory(cat1);
+        menuEntryDAO.create(entry1);
+
+        MenuEntry entry2 = createMenuEntry("entry1", "desc2", "cat2", 20.0, 0.2, true);
+        entry2.setCategory(cat1);
+        menuEntryDAO.create(entry2);
+
+        MenuEntry entry3 = createMenuEntry("entry2", "desc3", "cat3", 30.0, 0.3, true);
+        entry3.setCategory(cat2);
+        menuEntryDAO.create(entry3);
+
+        // WHEN
+        matcher.setCategory(cat1);
+        List<MenuEntry> objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(2, objects.size());
+        assertTrue(objects.contains(entry1));
+        assertTrue(objects.contains(entry2));
+
+        // WHEN
+        matcher.setCategory(cat2);
+        objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(1, objects.size());
+        assertEquals(entry3, objects.get(0));
+    }
+
+    @Test
+    public void testFind_byTaxRateShouldReturnObjects() throws DAOException, ValidationException {
+        // PREPARE
+        MenuEntry matcher = new MenuEntry();
+
+        // create tax rates
+        TaxRate tax1 = new TaxRate();
+        tax1.setValue(BigDecimal.valueOf(0.1));
+        TaxRate tax2 = new TaxRate();
+        tax1.setValue(BigDecimal.valueOf(0.2));
+
+        taxRateDAO.create(tax1);
+        taxRateDAO.create(tax2);
+
+        // check if tax rates created
+        List<TaxRate> storedObjects = taxRateDAO.find(tax1);
+        assertEquals(1, storedObjects.size());
+        assertEquals(tax1, storedObjects.get(0));
+
+        storedObjects = taxRateDAO.find(tax2);
+        assertEquals(1, storedObjects.size());
+        assertEquals(tax2, storedObjects.get(0));
+
+        // GIVEN
+        MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);
+        entry1.setTaxRate(tax1);
+        menuEntryDAO.create(entry1);
+
+        MenuEntry entry2 = createMenuEntry("entry1", "desc2", "cat2", 20.0, 0.2, true);
+        entry2.setTaxRate(tax1);
+        menuEntryDAO.create(entry2);
+
+        MenuEntry entry3 = createMenuEntry("entry2", "desc3", "cat3", 30.0, 0.3, true);
+        entry3.setTaxRate(tax2);
+        menuEntryDAO.create(entry3);
+
+        // WHEN
+        matcher.setTaxRate(tax1);
+        List<MenuEntry> objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(2, objects.size());
+        assertTrue(objects.contains(entry1));
+        assertTrue(objects.contains(entry2));
+
+        // WHEN
+        matcher.setTaxRate(tax2);
         objects = menuEntryDAO.find(matcher);
 
         // THEN

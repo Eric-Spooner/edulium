@@ -7,7 +7,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 /**
  * validator implementation for the MenuEntry domain object
  */
-public class MenuEntryValidator implements Validator<MenuEntry> {
+class MenuEntryValidator implements Validator<MenuEntry> {
     @Override
     public void validateForCreate(MenuEntry object) throws ValidationException {
 
