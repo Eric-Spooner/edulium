@@ -9,11 +9,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
  */
 public class MenuCategoryValidator implements Validator<MenuCategory> {
     private final int NAME_MAX_LENGTH = 100;
-    /**
-     * validates the object for the create action
-     * @param menuCategory object to validate
-     * @throws ValidationException if name is null or empty
-     */
+
     @Override
     public void validateForCreate(MenuCategory menuCategory) throws ValidationException {
         if(menuCategory == null) {
@@ -23,11 +19,6 @@ public class MenuCategoryValidator implements Validator<MenuCategory> {
         checkForRequiredDataAttributesForCreateAndUpdate(menuCategory);
     }
 
-    /**
-     * validates the object for the update action
-     * @param menuCategory object to validate
-     * @throws ValidationException if identity is null
-     */
     @Override
     public void validateForUpdate(MenuCategory menuCategory) throws ValidationException {
         if(menuCategory == null) {
@@ -38,11 +29,6 @@ public class MenuCategoryValidator implements Validator<MenuCategory> {
         checkForRequiredDataAttributesForCreateAndUpdate(menuCategory);
     }
 
-    /**
-     * validates the object for the delete action
-     * @param menuCategory object to validate
-     * @throws ValidationException if identity is null
-     */
     @Override
     public void validateForDelete(MenuCategory menuCategory) throws ValidationException {
         if(menuCategory == null) {
@@ -51,11 +37,6 @@ public class MenuCategoryValidator implements Validator<MenuCategory> {
         validateIdentity(menuCategory);
     }
 
-    /**
-     * validates if the identity parameter is set
-     * @param menuCategory object to validate
-     * @throws ValidationException if the identity of the object is not set
-     */
     @Override
     public void validateIdentity(MenuCategory menuCategory) throws ValidationException {
         if(menuCategory == null) {
