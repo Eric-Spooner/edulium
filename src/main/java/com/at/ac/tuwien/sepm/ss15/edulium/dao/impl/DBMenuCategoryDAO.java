@@ -16,14 +16,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 /**
  * H2 Database Implementation of the MenuCategoryDAO interface
  */
-class MenuCategoryDAOImpl implements DAO<MenuCategory> {
-    private static final Logger LOGGER = LogManager.getLogger(MenuCategoryDAOImpl.class);
+class DBMenuCategoryDAO implements DAO<MenuCategory> {
+    private static final Logger LOGGER = LogManager.getLogger(DBMenuCategoryDAO.class);
 
     @Autowired
     private DataSource dataSource;
@@ -32,12 +31,6 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
     @Autowired
     private Validator<MenuCategory> validator;
 
-    /**
-     * writes the object into the database and sets the identity parameter of
-     * menuCategory
-     * @param menuCategory object to store
-     * @throws DAOException if an error accessing the database occurred
-     */
     @Override
     public void create(MenuCategory menuCategory) throws DAOException, ValidationException {
         LOGGER.debug("entering create with parameters " + menuCategory);
@@ -62,12 +55,6 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
         generateHistory(menuCategory);
     }
 
-    /**
-     * updates the object in the database
-     * @param menuCategory object to update
-     * @throws DAOException if an error accessing the database ocurred or if the
-     *         dataset was not found in the database
-     */
     @Override
     public void update(MenuCategory menuCategory) throws DAOException, ValidationException {
         LOGGER.debug("entering update with parameters " + menuCategory);
@@ -91,12 +78,6 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
         generateHistory(menuCategory);
     }
 
-    /**
-     * removes the object from the database
-     * @param menuCategory object to remove
-     * @throws DAOException if an error accessing the database occurred or if
-     *         the dataset was not found in the database
-     */
     @Override
     public void delete(MenuCategory menuCategory) throws DAOException, ValidationException {
         LOGGER.debug("entering delete with parameters " + menuCategory);
@@ -119,14 +100,6 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
         generateHistory(menuCategory);
     }
 
-    /**
-     * returns all objects from the database which parameters match the
-     * parameters of the object menuCategory
-     * all parameters with value NULL will not be used for matching
-     * @param menuCategory object used for matching
-     * @return returns a list of objects from the database which match the criteria
-     * @throws DAOException if an error accessing the database occurred
-     */
     @Override
     public List<MenuCategory> find(MenuCategory menuCategory) throws DAOException {
         LOGGER.debug("entering find with parameters " + menuCategory);
@@ -156,10 +129,6 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
         return objects;
     }
 
-    /**
-     * @return returns all objects in the database
-     * @throws DAOException if an error accessing the database occurred
-     */
     @Override
     public List<MenuCategory> getAll() throws DAOException {
         LOGGER.debug("entering getAll");
@@ -180,13 +149,6 @@ class MenuCategoryDAOImpl implements DAO<MenuCategory> {
         return objects;
     }
 
-    /**
-     * @param menuCategory object to get the history for
-     * @return returns the history of changes for the menuCategory object
-     * @throws DAOException if the data couldn't be retrieved
-     * @throws ValidationException if the menuCategory object parameters are
-     *         not valid for this action
-     */
     @Override
     public List<History<MenuCategory>> getHistory(MenuCategory menuCategory) throws DAOException, ValidationException {
         LOGGER.debug("entering getHistory with parameters " + menuCategory);
