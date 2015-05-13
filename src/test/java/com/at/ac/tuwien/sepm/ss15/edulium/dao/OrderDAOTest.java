@@ -25,15 +25,20 @@ import static org.junit.Assert.*;
  */
 public class OrderDAOTest extends AbstractDAOTest {
     @Autowired
-    private DBOrderDAO orderDAO;
+    private DAO<Order> orderDAO;
     @Autowired
-    private DBMenuEntryDAO menuEntryDAO;
+    private DAO<MenuEntry> menuEntryDAO;
     @Autowired
-    private TableDAO tableDAO;
+    private DAO<Table> tableDAO;
     @Autowired
     private DAO<MenuCategory> menuCategoryDAO;
     @Autowired
     private DAO<TaxRate> taxRateDAO;
+    @Autowired
+    private DAO<User> userDAO;
+    @Autowired
+    private DAO<Section> sectionDAO;
+
 
     private MenuEntry createMenuEntry(String name, String desc, String cat,
                                       double price, double tax, boolean available) throws ValidationException, DAOException {
@@ -57,21 +62,32 @@ public class OrderDAOTest extends AbstractDAOTest {
         return entry;
     }
 
-    private Table createTable(Long sectionID, Long userID, Integer seats,
-                              Integer column, Integer row) throws ValidationException, DAOException{
+    private Order createOrder(Double brutto, String info,
+                              Double tax,  Timestamp time) throws ValidationException, DAOException {
+        MenuCategory menuCategory = new MenuCategory();
+        menuCategory.setName("cat");
+        TaxRate taxRate = new TaxRate();
+        taxRate.setValue(BigDecimal.valueOf(20));
+        menuCategoryDAO.create(menuCategory);
+        taxRateDAO.create(taxRate);
+        User user = new User();
+        user.setName("Test User");
+        user.setRole("Role");
+        userDAO.create(user);
+        Section section = new Section();
+        section.setName("Garden");
+        sectionDAO.create(section);
         Table table = new Table();
-        table.setSection_id(sectionID);
-        table.setUser_id(userID);
-        table.setSeats(seats);
-        table.setColumn(column);
-        table.setRow(row);
-        return table;
-    }
+        table.setColumn(4);
+        table.setRow(3);
+        table.setSeats(5);
+        table.setNumber((long)1);
+        table.setSection_id(section.getIdentity());
+        table.setUser_id(user.getIdentity());
 
-    private Order createOrder(Double brutto, Boolean canceled, String info,
-                                  Double tax, Table table, MenuEntry entry, Timestamp time) throws ValidationException, DAOException {
-        tableDAO.create(table);
-        menuEntryDAO.create(entry);
+
+        MenuEntry entry = new MenuEntry();
+
 
         Order order = new Order();
         order.setTable(table);

@@ -7,7 +7,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import javax.xml.bind.ValidationEvent;
 
 /**
- * Created by - on 13.05.2015.
+ * validator implementation for the Order domain object
  */
 public class OrderValidator implements Validator<Order> {
     @Override
