@@ -10,4 +10,6 @@
     <context:annotation-config />
     <context:component-scan base-package="com.at.ac.tuwien.sepm.ss15.edulium" />
 
+    <import resource="Spring-Security.xml" />
+
 </beans>

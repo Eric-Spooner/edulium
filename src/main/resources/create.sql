@@ -6,14 +6,14 @@ CREATE TABLE IF NOT EXISTS RestaurantUser (
 );
 
 CREATE TABLE IF NOT EXISTS RestaurantUserHistory (
-    user_ID VARCHAR(25) REFERENCES RestaurantUser(ID),
+    ID VARCHAR(25) REFERENCES RestaurantUser(ID),
     name VARCHAR(100),
     userRole VARCHAR(100),
     deleted BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(user_ID, changeNr)
+    PRIMARY KEY(ID, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS Invoice (
@@ -26,13 +26,16 @@ CREATE TABLE IF NOT EXISTS Invoice (
 );
 
 CREATE TABLE IF NOT EXISTS InvoiceHistory (
-    invoice_ID BIGINT REFERENCES Invoice(ID),
+    ID BIGINT REFERENCES Invoice(ID),
+    invoiceTime TIMESTAMP,
+    brutto DECIMAL(20, 2),
     paid DECIMAL(20, 2),
+    user_ID VARCHAR(25) REFERENCES RestaurantUser(ID),
     canceled BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(invoice_ID, changeNr)
+    PRIMARY KEY(ID, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS Instalment (
@@ -52,13 +55,13 @@ CREATE TABLE IF NOT EXISTS RestaurantSection (
 );
 
 CREATE TABLE IF NOT EXISTS RestaurantSectionHistory (
-    section_ID BIGINT REFERENCES RestaurantSection(ID),
+    ID BIGINT REFERENCES RestaurantSection(ID),
     name VARCHAR(100),
     deleted BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(section_ID, changeNr)
+    PRIMARY KEY(ID, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS RestaurantTable (
@@ -74,7 +77,7 @@ CREATE TABLE IF NOT EXISTS RestaurantTable (
 
 CREATE TABLE IF NOT EXISTS TableHistory (
     section_ID BIGINT REFERENCES RestaurantSection(ID),
-    table_number BIGINT REFERENCES RestaurantTable(number),
+    number BIGINT REFERENCES RestaurantTable(number),
     seats INT,
     tableRow INT,
     tableColumn INT,
@@ -83,7 +86,7 @@ CREATE TABLE IF NOT EXISTS TableHistory (
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(section_ID, table_number, changeNr)
+    PRIMARY KEY(section_ID, number, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS Reservation (
@@ -96,7 +99,7 @@ CREATE TABLE IF NOT EXISTS Reservation (
 );
 
 CREATE TABLE IF NOT EXISTS ReservationHistory (
-    reservation_ID BIGINT REFERENCES Reservation(ID),
+    ID BIGINT REFERENCES Reservation(ID),
     reservationTime TIMESTAMP,
     name VARCHAR(100),
     quantity INT,
@@ -105,7 +108,7 @@ CREATE TABLE IF NOT EXISTS ReservationHistory (
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(reservation_ID, changeNr)
+    PRIMARY KEY(ID, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS ReservationAssoc (
@@ -132,29 +135,29 @@ CREATE TABLE IF NOT EXISTS MenuCategory (
 );
 
 CREATE TABLE IF NOT EXISTS MenuCategoryHistory (
-    category_ID BIGINT REFERENCES MenuCategory(ID),
+    ID BIGINT REFERENCES MenuCategory(ID),
     name VARCHAR(100),
     deleted BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
-    changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(category_ID, changeNr)
+    changeNr BIGINT,
+    PRIMARY KEY(ID, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS TaxRate (
     ID IDENTITY,
-    taxRateValue DECIMAL(3, 2),
+    taxRateValue DECIMAL(5, 4),
     deleted BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS TaxRateHistory (
-    taxRate_ID BIGINT REFERENCES TaxRate(ID),
-    taxRateValue DECIMAL(3, 2),
+    ID BIGINT REFERENCES TaxRate(ID),
+    taxRateValue DECIMAL(5, 4),
     deleted BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(taxRate_ID, changeNr)
+    PRIMARY KEY(ID, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS MenuEntry (
@@ -169,7 +172,7 @@ CREATE TABLE IF NOT EXISTS MenuEntry (
 );
 
 CREATE TABLE IF NOT EXISTS MenuEntryHistory (
-    menuEntry_ID BIGINT REFERENCES MenuEntry(ID),
+    ID BIGINT REFERENCES MenuEntry(ID),
     name VARCHAR(100),
     price DECIMAL(20, 2),
     available BOOLEAN,
@@ -180,7 +183,7 @@ CREATE TABLE IF NOT EXISTS MenuEntryHistory (
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(menuEntry_ID, changeNr)
+    PRIMARY KEY(ID, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS Sale (
@@ -190,13 +193,13 @@ CREATE TABLE IF NOT EXISTS Sale (
 );
 
 CREATE TABLE IF NOT EXISTS SaleHistory (
-    sale_ID BIGINT REFERENCES Sale(ID),
+    ID BIGINT REFERENCES Sale(ID),
     name VARCHAR(100),
     deleted BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(sale_ID, changeNr)
+    PRIMARY KEY(ID, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS SaleAssoc (
@@ -273,13 +276,13 @@ CREATE TABLE IF NOT EXISTS Menu (
 );
 
 CREATE TABLE IF NOT EXISTS MenuHistory (
-    menu_ID BIGINT REFERENCES Menu(ID),
+    ID BIGINT REFERENCES Menu(ID),
     name VARCHAR(100),
     deleted BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(menu_ID, changeNr)
+    PRIMARY KEY(ID, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS MenuAssoc (
@@ -314,13 +317,17 @@ CREATE TABLE IF NOT EXISTS RestaurantOrder (
 );
 
 CREATE TABLE IF NOT EXISTS RestaurantOrderHistory (
-    restaurantOrder_ID BIGINT REFERENCES RestaurantOrder(ID),
+    ID BIGINT REFERENCES RestaurantOrder(ID),
     invoice_ID BIGINT REFERENCES Invoice(ID),
     table_number BIGINT REFERENCES RestaurantTable(number),
-    canceled BOOLEAN,
+    menuEntry_ID BIGINT REFERENCES MenuEntry(ID),
+    orderTime TIMESTAMP,
+    brutto DECIMAL(20, 2),
+    tax DECIMAL(3, 2),
     info TEXT,
+    canceled BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(restaurantOrder_ID, changeNr)
+    PRIMARY KEY(ID, changeNr)
 );

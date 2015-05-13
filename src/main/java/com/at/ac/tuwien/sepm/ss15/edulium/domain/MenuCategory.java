@@ -8,6 +8,17 @@ public class MenuCategory {
     private String name = null;
 
     /**
+     * Creates a new category object and assigns the given identity to it.
+     * @param identity the identity of the category
+     * @return MenuCategory object with the given identity
+     */
+    public static MenuCategory withIdentity(long identity) {
+        MenuCategory menuCategory = new MenuCategory();
+        menuCategory.setIdentity(identity);
+        return menuCategory;
+    }
+
+    /**
      * @return  returns the category name
      *          can be null (if this instance does not represent
      *          a persistent dataset)

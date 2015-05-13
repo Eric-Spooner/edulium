@@ -16,6 +16,7 @@
 
     <jdbc:initialize-database data-source="dataSource">
         <jdbc:script location="classpath:create.sql" />
+        <jdbc:script location="classpath:testdata.sql" />
     </jdbc:initialize-database>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
