@@ -18,7 +18,7 @@ public class TestTaxRateValidator extends AbstractDomainTest {
     public void testValidateForCreate_shouldAcceptTaxRate() throws ValidationException {
         // GIVEN
         TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(20.25));
+        taxRate.setValue(BigDecimal.valueOf(0.2025));
 
         // WHEN
         taxRateValidator.validateForCreate(taxRate);
@@ -46,7 +46,7 @@ public class TestTaxRateValidator extends AbstractDomainTest {
     public void testValidateForCreate_taxRateWithNegativeValueShouldThrow() throws ValidationException {
         // GIVEN
         TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(-1.0));
+        taxRate.setValue(BigDecimal.valueOf(-0.01));
 
         // WHEN
         taxRateValidator.validateForCreate(taxRate);
@@ -56,7 +56,7 @@ public class TestTaxRateValidator extends AbstractDomainTest {
     public void testValidateForCreate_taxRateWithValueLargerThan100ShouldThrow() throws ValidationException {
         // GIVEN
         TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(101.0));
+        taxRate.setValue(BigDecimal.valueOf(1.01));
 
         // WHEN
         taxRateValidator.validateForCreate(taxRate);
@@ -67,7 +67,7 @@ public class TestTaxRateValidator extends AbstractDomainTest {
         // GIVEN
         TaxRate taxRate = new TaxRate();
         taxRate.setIdentity(0L);
-        taxRate.setValue(BigDecimal.valueOf(20.25));
+        taxRate.setValue(BigDecimal.valueOf(0.2025));
 
         // WHEN
         taxRateValidator.validateForUpdate(taxRate);
@@ -77,7 +77,7 @@ public class TestTaxRateValidator extends AbstractDomainTest {
     public void testValidateForUpdate_taxRateWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
         TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(20.25));
+        taxRate.setValue(BigDecimal.valueOf(0.2025));
 
         // WHEN
         taxRateValidator.validateForUpdate(taxRate);
@@ -107,7 +107,7 @@ public class TestTaxRateValidator extends AbstractDomainTest {
         // GIVEN
         TaxRate taxRate = new TaxRate();
         taxRate.setIdentity(0L);
-        taxRate.setValue(BigDecimal.valueOf(-1.0));
+        taxRate.setValue(BigDecimal.valueOf(-0.01));
 
         // WHEN
         taxRateValidator.validateForUpdate(taxRate);
@@ -118,7 +118,7 @@ public class TestTaxRateValidator extends AbstractDomainTest {
         // GIVEN
         TaxRate taxRate = new TaxRate();
         taxRate.setIdentity(0L);
-        taxRate.setValue(BigDecimal.valueOf(101.0));
+        taxRate.setValue(BigDecimal.valueOf(1.01));
 
         // WHEN
         taxRateValidator.validateForUpdate(taxRate);
@@ -153,7 +153,7 @@ public class TestTaxRateValidator extends AbstractDomainTest {
     }
 
     @Test
-    public void testValidateForIdentity_shouldAcceptTaxRate() throws ValidationException {
+    public void testValidateIdentity_shouldAcceptTaxRate() throws ValidationException {
         // GIVEN
         TaxRate taxRate = new TaxRate();
         taxRate.setIdentity(0L);
@@ -163,7 +163,7 @@ public class TestTaxRateValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForIdentity_taxRateWithoutIdentityShouldThrow() throws ValidationException {
+    public void testValidateIdentity_taxRateWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
         TaxRate taxRate = new TaxRate();
 
@@ -172,7 +172,7 @@ public class TestTaxRateValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForIdentity_nullObjectShouldThrow() throws ValidationException {
+    public void testValidateIdentity_nullObjectShouldThrow() throws ValidationException {
         // GIVEN
         TaxRate taxRate = null;
 
