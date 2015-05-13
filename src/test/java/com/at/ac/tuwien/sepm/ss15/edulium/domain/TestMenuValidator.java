@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.util.LinkedList;
 
 /**
  * Unit Test for the TaxRate validator
@@ -17,9 +18,11 @@ public class TestMenuValidator extends AbstractDomainTest {
     @Test
     public void testValidateForCreate_shouldAcceptMenu() throws ValidationException {
         // GIVEN
+        LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
+        list.add(new MenuEntry());
         Menu menu = new Menu();
         menu.setName("Menu");
-        //TODO add MenuEntry
+        menu.setEntries(list);
 
         // WHEN
         menuValidator.validateForCreate(menu);
@@ -45,10 +48,31 @@ public class TestMenuValidator extends AbstractDomainTest {
 
 
     @Test(expected = ValidationException.class)
-    public void testValidateForCreate_MenuWithoutNameShouldThrow() throws ValidationException {
+         public void testValidateForCreate_MenuWithoutNameShouldThrow() throws ValidationException {
         // GIVEN
         Menu menu = new Menu();
         menu.setName("");
+
+        // WHEN
+        menuValidator.validateForCreate(menu);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_MenuWithoutListMenuEntriesShouldThrow() throws ValidationException {
+        // GIVEN
+        Menu menu = new Menu();
+        menu.setName("Menu");
+
+        // WHEN
+        menuValidator.validateForCreate(menu);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_MenuWithEmptyListMenuEntriesShouldThrow() throws ValidationException {
+        // GIVEN
+        Menu menu = new Menu();
+        menu.setName("Menu");
+        menu.setEntries(new LinkedList<MenuEntry>());
 
         // WHEN
         menuValidator.validateForCreate(menu);
@@ -60,6 +84,9 @@ public class TestMenuValidator extends AbstractDomainTest {
         Menu menu = new Menu();
         menu.setIdentity(0L);
         menu.setName("Menu");
+        LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
+        list.add(new MenuEntry());
+        menu.setEntries(list);
 
         // WHEN
         menuValidator.validateForUpdate(menu);
