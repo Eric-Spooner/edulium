@@ -1,16 +1,19 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Unit Test for the TaxRate DAO
@@ -23,7 +26,7 @@ public class TestTaxRateDAO extends AbstractDAOTest {
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
         // GIVEN
         TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(20.25));
+        taxRate.setValue(BigDecimal.valueOf(0.2025));
 
         // WHEN
         taxRateDAO.create(taxRate);
@@ -57,7 +60,7 @@ public class TestTaxRateDAO extends AbstractDAOTest {
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // PREPARE
         TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(19.0));
+        taxRate.setValue(BigDecimal.valueOf(0.19));
 
         // check if tax rate is stored
         taxRateDAO.create(taxRate);
@@ -66,7 +69,7 @@ public class TestTaxRateDAO extends AbstractDAOTest {
         // GIVEN
         TaxRate updatedTaxRate = new TaxRate();
         updatedTaxRate.setIdentity(taxRate.getIdentity());
-        updatedTaxRate.setValue(BigDecimal.valueOf(10.0));
+        updatedTaxRate.setValue(BigDecimal.valueOf(0.1));
 
         // WHEN
         taxRateDAO.update(updatedTaxRate);
@@ -82,7 +85,7 @@ public class TestTaxRateDAO extends AbstractDAOTest {
     public void testUpdate_updatingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
         // GIVEN
         TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(15.0));
+        taxRate.setValue(BigDecimal.valueOf(0.15));
 
         // WHEN
         taxRateDAO.update(taxRate);
@@ -121,7 +124,7 @@ public class TestTaxRateDAO extends AbstractDAOTest {
             fail("DAOException should not occur while searching for a non-existing tax rate identity");
         }
 
-        taxRate.setValue(BigDecimal.valueOf(25.0));
+        taxRate.setValue(BigDecimal.valueOf(0.25));
 
         // WHEN
         taxRateDAO.update(taxRate);
@@ -133,7 +136,7 @@ public class TestTaxRateDAO extends AbstractDAOTest {
         final int numberOfTaxRatesBefore = taxRateDAO.getAll().size();
 
         TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(30.0));
+        taxRate.setValue(BigDecimal.valueOf(0.3));
 
         // check if taxRate is stored
         taxRateDAO.create(taxRate);
@@ -195,21 +198,21 @@ public class TestTaxRateDAO extends AbstractDAOTest {
         // PREPARE
         // tax rate 1
         TaxRate taxRate1 = new TaxRate();
-        taxRate1.setValue(BigDecimal.valueOf(11.11));
+        taxRate1.setValue(BigDecimal.valueOf(0.1111));
 
         taxRateDAO.create(taxRate1);
         assertEquals(1, taxRateDAO.find(taxRate1).size());
 
         // tax rate 2
         TaxRate taxRate2 = new TaxRate();
-        taxRate2.setValue(BigDecimal.valueOf(22.22));
+        taxRate2.setValue(BigDecimal.valueOf(0.2222));
 
         taxRateDAO.create(taxRate2);
         assertEquals(1, taxRateDAO.find(taxRate2).size());
 
         // tax rate 3
         TaxRate taxRate3 = new TaxRate();
-        taxRate3.setValue(BigDecimal.valueOf(22.22));
+        taxRate3.setValue(BigDecimal.valueOf(0.2222));
 
         taxRateDAO.create(taxRate3);
         assertEquals(1, taxRateDAO.find(taxRate3).size());
@@ -240,31 +243,31 @@ public class TestTaxRateDAO extends AbstractDAOTest {
         // PREPARE
         // tax rate 1
         TaxRate taxRate1 = new TaxRate();
-        taxRate1.setValue(BigDecimal.valueOf(11.11));
+        taxRate1.setValue(BigDecimal.valueOf(0.1111));
 
         taxRateDAO.create(taxRate1);
         assertEquals(1, taxRateDAO.find(taxRate1).size());
 
         // tax rate 2
         TaxRate taxRate2 = new TaxRate();
-        taxRate2.setValue(BigDecimal.valueOf(22.22));
+        taxRate2.setValue(BigDecimal.valueOf(0.2222));
 
         taxRateDAO.create(taxRate2);
         assertEquals(1, taxRateDAO.find(taxRate2).size());
 
         // tax rate 3
         TaxRate taxRate3 = new TaxRate();
-        taxRate3.setValue(BigDecimal.valueOf(22.22));
+        taxRate3.setValue(BigDecimal.valueOf(0.2222));
 
         taxRateDAO.create(taxRate3);
         assertEquals(1, taxRateDAO.find(taxRate3).size());
 
         // GIVEN
         TaxRate matcher1 = new TaxRate(); // for tax rate 1
-        matcher1.setValue(BigDecimal.valueOf(11.11));
+        matcher1.setValue(BigDecimal.valueOf(0.1111));
 
         TaxRate matcher2 = new TaxRate(); // for tax rate 2 and tax rate 3
-        matcher2.setValue(BigDecimal.valueOf(22.22));
+        matcher2.setValue(BigDecimal.valueOf(0.2222));
 
         // WHEN
         List<TaxRate> result1 = taxRateDAO.find(matcher1);
@@ -308,21 +311,21 @@ public class TestTaxRateDAO extends AbstractDAOTest {
 
         // tax rate 1
         TaxRate taxRate1 = new TaxRate();
-        taxRate1.setValue(BigDecimal.valueOf(11.11));
+        taxRate1.setValue(BigDecimal.valueOf(0.1111));
 
         taxRateDAO.create(taxRate1);
         assertEquals(1, taxRateDAO.find(taxRate1).size());
 
         // tax rate 2
         TaxRate taxRate2 = new TaxRate();
-        taxRate2.setValue(BigDecimal.valueOf(22.22));
+        taxRate2.setValue(BigDecimal.valueOf(0.2222));
 
         taxRateDAO.create(taxRate2);
         assertEquals(1, taxRateDAO.find(taxRate2).size());
 
         // tax rate 3
         TaxRate taxRate3 = new TaxRate();
-        taxRate3.setValue(BigDecimal.valueOf(22.22));
+        taxRate3.setValue(BigDecimal.valueOf(0.2222));
 
         taxRateDAO.create(taxRate3);
         assertEquals(1, taxRateDAO.find(taxRate3).size());
@@ -335,5 +338,100 @@ public class TestTaxRateDAO extends AbstractDAOTest {
         assertTrue(result.contains(taxRate1));
         assertTrue(result.contains(taxRate2));
         assertTrue(result.contains(taxRate3));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_withoutObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        TaxRate taxRate = null;
+
+        // WHEN
+        taxRateDAO.getHistory(taxRate);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_withoutIdentityShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        TaxRate taxRate = new TaxRate();
+
+        // WHEN
+        taxRateDAO.getHistory(taxRate);
+    }
+
+    @Test
+    public void testGetHistory_notPersistentDataShouldReturnEmptyList() throws DAOException, ValidationException {
+        // GIVEN
+        TaxRate taxRate = new TaxRate();
+
+        // search for a non-existing tax rate identity
+        try {
+            taxRate.setIdentity(0L);
+            while (!taxRateDAO.find(taxRate).isEmpty()) {
+                taxRate.setIdentity(taxRate.getIdentity() + 1L);
+            }
+        } catch (DAOException e) {
+            fail("DAOException should not occur while searching for a non-existing tax rate identity");
+        }
+
+        // WHEN
+        List<TaxRate> result = taxRateDAO.find(taxRate);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // get test user
+        User testUser = getCurrentUser();
+
+        // GIVEN
+        // create data
+        TaxRate taxRate1 = new TaxRate();
+        taxRate1.setValue(BigDecimal.valueOf(0.5));
+        LocalDateTime createTime = LocalDateTime.now();
+        taxRateDAO.create(taxRate1);
+
+        // update data
+        TaxRate taxRate2 = new TaxRate();
+        taxRate2.setIdentity(taxRate1.getIdentity());
+        taxRate2.setValue(BigDecimal.valueOf(0.4));
+        LocalDateTime updateTime = LocalDateTime.now();
+        taxRateDAO.update(taxRate2);
+
+        // delete data
+        LocalDateTime deleteTime = LocalDateTime.now();
+        taxRateDAO.delete(taxRate2);
+
+        // WHEN
+        List<History<TaxRate>> history = taxRateDAO.getHistory(taxRate1);
+
+        // THEN
+        assertEquals(3, history.size());
+
+        // check create history
+        History<TaxRate> entry = history.get(0);
+        assertEquals(Long.valueOf(1), entry.getChangeNumber());
+        assertEquals(taxRate1, entry.getData());
+        assertEquals(testUser, entry.getUser());
+        assertTrue(Duration.between(createTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(entry.isDeleted());
+
+        // check update history
+        entry = history.get(1);
+        assertEquals(Long.valueOf(2), entry.getChangeNumber());
+        assertEquals(taxRate2, entry.getData());
+        assertEquals(testUser, entry.getUser());
+        assertTrue(Duration.between(updateTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(entry.isDeleted());
+
+        // check delete history
+        entry = history.get(2);
+        assertEquals(Long.valueOf(3), entry.getChangeNumber());
+        assertEquals(taxRate2, entry.getData());
+        assertEquals(testUser, entry.getUser());
+        assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertTrue(entry.isDeleted());
     }
 }
