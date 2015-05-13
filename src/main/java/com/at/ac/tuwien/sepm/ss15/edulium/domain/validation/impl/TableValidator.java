@@ -81,6 +81,14 @@ public class TableValidator implements Validator<Table> {
         if(table == null) {
             throw new ValidationException("object must not be null");
         }
+
+        if(table.getNumber() == null) {
+            throw new ValidationException("number must not be null");
+        }
+
+        if(table.getNumber() < 0) {
+            throw new ValidationException("number must not be < 0");
+        }
     }
 
     private void checkForRequiredDataAttributesForCreateAndUpdate(Table table) throws ValidationException {
@@ -94,6 +102,10 @@ public class TableValidator implements Validator<Table> {
 
         if(table.getNumber() == null) {
             throw new ValidationException("number must not be null");
+        }
+
+        if(table.getNumber() < 0) {
+            throw new ValidationException("number must not be < 0");
         }
 
         if(table.getRow() == null) {

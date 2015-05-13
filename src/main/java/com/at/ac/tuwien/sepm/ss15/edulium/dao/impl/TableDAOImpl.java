@@ -8,6 +8,8 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
@@ -21,6 +23,8 @@ import java.util.List;
  * H2 Database Implementation of the MenuCategoryDAO interface
  */
 public class TableDAOImpl implements DAO<Table> {
+    private static final Logger LOGGER = LogManager.getLogger(MenuCategoryDAOImpl.class);
+
     @Autowired
     private DataSource dataSource;
     @Autowired
@@ -38,6 +42,7 @@ public class TableDAOImpl implements DAO<Table> {
      */
     @Override
     public void create(Table table) throws DAOException, ValidationException {
+        LOGGER.debug("entering create with parameters " + table);
         assert(table != null);
 
         validator.validateForCreate(table);
@@ -56,10 +61,11 @@ public class TableDAOImpl implements DAO<Table> {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
+            LOGGER.error("inserting table into database failed", e);
             throw new DAOException(e);
         }
 
-        //generateHistory(table.getNumber()); TODO
+        generateHistory(table);
     }
 
     /**
@@ -70,6 +76,7 @@ public class TableDAOImpl implements DAO<Table> {
      */
     @Override
     public void update(Table table) throws DAOException, ValidationException {
+        LOGGER.debug("entering update with parameters " + table);
         assert(table != null);
 
         validator.validateForUpdate(table);
@@ -90,10 +97,11 @@ public class TableDAOImpl implements DAO<Table> {
             }
 
         } catch (SQLException e) {
+            LOGGER.error("updating table in database failed", e);
             throw new DAOException(e);
         }
 
-        //generateHistory(table.getNumber()); TODO
+        generateHistory(table);
     }
 
     /**
@@ -104,6 +112,7 @@ public class TableDAOImpl implements DAO<Table> {
      */
     @Override
     public void delete(Table table) throws DAOException, ValidationException {
+        LOGGER.debug("entering delete with parameters " + table);
         assert(table != null);
 
         validator.validateForDelete(table);
@@ -117,10 +126,11 @@ public class TableDAOImpl implements DAO<Table> {
             }
 
         } catch (SQLException e) {
+            LOGGER.error("deleting table failed", e);
             throw new DAOException(e);
         }
 
-        //generateHistory(table.getNumber()); TODO
+        generateHistory(table);
     }
 
     /**
@@ -133,6 +143,7 @@ public class TableDAOImpl implements DAO<Table> {
      */
     @Override
     public List<Table> find(Table table) throws DAOException {
+        LOGGER.debug("entering find with parameters " + table);
         assert(table != null);
         String query = "SELECT * FROM RestaurantTable WHERE number = ISNULL(?, number) " +
                 "AND seats = ISNULL(?, seats) AND section_ID = ISNULL(?, section_ID)" +
@@ -175,6 +186,7 @@ public class TableDAOImpl implements DAO<Table> {
             }
 
         } catch (SQLException e) {
+            LOGGER.error("searching for table failed", e);
             throw new DAOException(e);
         }
 
@@ -187,6 +199,7 @@ public class TableDAOImpl implements DAO<Table> {
      */
     @Override
     public List<Table> getAll() throws DAOException {
+        LOGGER.debug("entering getAll");
         final String query = "SELECT * FROM RestaurantTable WHERE disabled = false";
         final List<Table> objects = new ArrayList<>();
 
@@ -200,6 +213,7 @@ public class TableDAOImpl implements DAO<Table> {
             }
 
         } catch (SQLException e) {
+            LOGGER.error("searching for all tables failed", e);
             throw new DAOException(e);
         }
 
@@ -215,7 +229,9 @@ public class TableDAOImpl implements DAO<Table> {
      */
     @Override
     public List<History<Table>> getHistory(Table table) throws DAOException, ValidationException {
+        LOGGER.debug("entering getHistory with parameters " + table);
         validator.validateIdentity(table);
+
         List<History<Table>> history = new ArrayList<>();
         final String query = "SELECT * FROM TableHistory WHERE number = ? ORDER BY changeNr";
 
@@ -226,6 +242,7 @@ public class TableDAOImpl implements DAO<Table> {
                 history.add(parseHistoryEntry(result));
             }
         } catch (SQLException e) {
+            LOGGER.error("retrieving history failed", e);
             throw new DAOException("retrieving history failed", e);
         }
 
@@ -240,10 +257,12 @@ public class TableDAOImpl implements DAO<Table> {
      * @throws DAOException if an error accessing the database occurred
      */
     private void generateHistory(Table table) throws DAOException {
+        LOGGER.debug("entering generateHistory with parameters " + table);
+
         final String query = "INSERT INTO TableHistory " +
                 "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
                 "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM TableHistory WHERE number = ?) " +
-                "FROM TableHistory WHERE number = ?)";
+                "FROM RestaurantTable WHERE number = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
@@ -252,6 +271,7 @@ public class TableDAOImpl implements DAO<Table> {
 
             stmt.executeUpdate();
         } catch (SQLException e) {
+            LOGGER.error("generating history failed", e);
             throw new DAOException("generating history failed", e);
         }
     }

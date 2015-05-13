@@ -16,6 +16,17 @@ public class Table {
     }
 
     /**
+     * Creates a new table object and assigns the given number to it.
+     * @param number the identity of the category
+     * @return table object with the given number
+     */
+    public static Table withNumber(long number) {
+        Table table = new Table();
+        table.setNumber(number);
+        return table;
+    }
+
+    /**
      * @return the number of seats on this table
      */
     public Integer getSeats() {
