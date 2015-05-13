@@ -13,9 +13,22 @@ public class Order {
     private Double brutto = null;
     private Double tax = null;
     private String info = null;
+    private Table table = null;
+    private MenuEntry menueEntry = null;
+
 
     /**
      *
+     * @param identity
+     * @return Order with the given identity
+     */
+    public static Order withIdentity(long identity){
+        Order order = new Order();
+        order.setIdentity(identity);
+        return order;
+    }
+
+    /**
      * @return the identity of the Order
      */
     public Long getIdentity() {
@@ -24,6 +37,7 @@ public class Order {
 
     /**
      * sets the identity of the order
+     *
      * @param identity
      */
     public void setIdentity(Long identity) {
@@ -31,7 +45,23 @@ public class Order {
     }
 
     /**
+     * @return the table, the order is for
+     */
+    public Table getTable() {
+        return table;
+    }
+
+    /**
+     * sets the table, the order belongs to
      *
+     * @param table
+     */
+    public void setTable(Table table) {
+        this.table = table;
+    }
+
+
+    /**
      * @return the time, the order has been placed
      */
     public Timestamp getTime() {
@@ -40,6 +70,7 @@ public class Order {
 
     /**
      * sets the time, the order has been placed
+     *
      * @param time
      */
     public void setTime(Timestamp time) {
@@ -47,7 +78,6 @@ public class Order {
     }
 
     /**
-     *
      * @return the condition, if the order has been canceled
      */
     public boolean isCanceled() {
@@ -56,6 +86,7 @@ public class Order {
 
     /**
      * sets the canceled condition of the order
+     *
      * @param canceled
      */
     public void setCanceled(boolean canceled) {
@@ -63,7 +94,6 @@ public class Order {
     }
 
     /**
-     *
      * @return the brutto amount of the order
      */
     public double getBrutto() {
@@ -72,6 +102,7 @@ public class Order {
 
     /**
      * sets the brutto amount of the order
+     *
      * @param brutto
      */
     public void setBrutto(double brutto) {
@@ -79,7 +110,6 @@ public class Order {
     }
 
     /**
-     *
      * @return the tax amount of the order
      */
     public double getTax() {
@@ -88,6 +118,7 @@ public class Order {
 
     /**
      * sets the tax amount of the order
+     *
      * @param tax
      */
     public void setTax(double tax) {
@@ -95,7 +126,6 @@ public class Order {
     }
 
     /**
-     *
      * @return the info of the order
      */
     public String getInfo() {
@@ -104,10 +134,27 @@ public class Order {
 
     /**
      * sets the info of the order
+     *
      * @param info
      */
     public void setInfo(String info) {
         this.info = info;
+    }
+
+    /**
+     *
+     * @return the menu entry of the order
+     */
+    public MenuEntry getMenueEntry() {
+        return menueEntry;
+    }
+
+    /**
+     * sets the menu Entry of the order
+     * @param menueEntry
+     */
+    public void setMenueEntry(MenuEntry menueEntry) {
+        this.menueEntry = menueEntry;
     }
 
     @Override
@@ -130,12 +177,14 @@ public class Order {
     @Override
     public String toString() {
         return "Order{" +
-                "identity='" + identity + '\'' +
+                "identity=" + identity +
                 ", time=" + time +
                 ", canceled=" + canceled +
                 ", brutto=" + brutto +
                 ", tax=" + tax +
                 ", info='" + info + '\'' +
+                ", table=" + table +
+                ", menueEntry=" + menueEntry +
                 '}';
     }
 }
