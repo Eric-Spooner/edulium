@@ -4,7 +4,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="menuCategoryDAO" class="com.at.ac.tuwien.sepm.ss15.edulium.dao.impl.MenuCategoryDAOImpl">
-    </bean>
+    <bean id="menuCategoryDAO" class="com.at.ac.tuwien.sepm.ss15.edulium.dao.impl.MenuCategoryDAOImpl"/>
 
 </beans>
