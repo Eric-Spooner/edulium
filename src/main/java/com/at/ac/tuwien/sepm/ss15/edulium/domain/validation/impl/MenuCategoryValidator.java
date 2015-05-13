@@ -8,7 +8,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
  * validator implementation for the MenuCategory domain object
  */
 public class MenuCategoryValidator implements Validator<MenuCategory> {
-    private final int NAME_MAX_LENGTH = 100;
 
     @Override
     public void validateForCreate(MenuCategory menuCategory) throws ValidationException {
@@ -53,9 +52,6 @@ public class MenuCategoryValidator implements Validator<MenuCategory> {
         }
         if(menuCategory.getName().isEmpty()) {
             throw new ValidationException("name must not be empty");
-        }
-        if (menuCategory.getName().length() > NAME_MAX_LENGTH) {
-            throw new ValidationException("name must not be longer than " + NAME_MAX_LENGTH + " characters");
         }
     }
 }
