@@ -77,27 +77,6 @@ public class TestUserDAO extends AbstractDAOTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithEmptyIdentityShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-        user.setIdentity("");
-        user.setName("Breezy Badger");
-        user.setRole("tester");
-
-        // WHEN
-        userDAO.create(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testCreate_addingEmptyObjectShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-
-        // WHEN
-        userDAO.create(user);
-    }
-
-    @Test(expected = ValidationException.class)
     public void testCreate_addingNullObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         User user = null;
@@ -140,15 +119,6 @@ public class TestUserDAO extends AbstractDAOTest {
         User user = new User();
         user.setName("Oneiric Ocelot");
         user.setRole("thrower");
-
-        // WHEN
-        userDAO.update(user);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testUpdate_updatingEmptyObjectShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
 
         // WHEN
         userDAO.update(user);
@@ -210,15 +180,6 @@ public class TestUserDAO extends AbstractDAOTest {
         // check if user was removed
         assertEquals(0, userDAO.find(user).size());
         assertEquals(numberOfUsersBefore, userDAO.getAll().size());
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        User user = new User();
-
-        // WHEN
-        userDAO.delete(user);
     }
 
     @Test(expected = ValidationException.class)
