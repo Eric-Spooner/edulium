@@ -12,5 +12,6 @@
     <import resource="dao/Spring-UserDAO.xml" />
     <import resource="dao/Spring-TaxRateDAO.xml" />
     <import resource="dao/Spring-MenuDAO.xml" />
+    <import resource="dao/Spring-OrderDAO.xml" />
 
 </beans>
