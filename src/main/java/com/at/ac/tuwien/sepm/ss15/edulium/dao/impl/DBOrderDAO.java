@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * H2 Database Implementation of the Order DAO interface
  */
-public class DBOrderDAO implements DAO<Order> {
+class DBOrderDAO implements DAO<Order> {
     @Override
     public void create(Order object) throws DAOException, ValidationException {
 

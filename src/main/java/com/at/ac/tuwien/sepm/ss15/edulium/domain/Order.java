@@ -1,6 +1,9 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.stream.LongStream;
 
 /**
@@ -8,17 +11,16 @@ import java.util.stream.LongStream;
  */
 public class Order {
     private Long identity = null;
-    private Timestamp time = null;
-    private Boolean canceled = null;
-    private Double brutto = null;
-    private Double tax = null;
-    private String info = null;
+    private LocalDateTime time = null;
+    private BigDecimal brutto = null;
+    private BigDecimal tax = null;
+    private String additionalInformation = null;
     private Table table = null;
     private MenuEntry menueEntry = null;
 
 
     /**
-     *
+     * The method is used to generate an Order with the given identity
      * @param identity
      * @return Order with the given identity
      */
@@ -29,7 +31,7 @@ public class Order {
     }
 
     /**
-     * @return the identity of the Order
+     * @return the identity of the Order (can be null)
      */
     public Long getIdentity() {
         return identity;
@@ -45,14 +47,14 @@ public class Order {
     }
 
     /**
-     * @return the table, the order is for
+     * @return the table, the order is for (can be null)
      */
     public Table getTable() {
         return table;
     }
 
     /**
-     * sets the table, the order belongs to
+     * sets the table, the order belongs to (can be null)
      *
      * @param table
      */
@@ -64,7 +66,7 @@ public class Order {
     /**
      * @return the time, the order has been placed
      */
-    public Timestamp getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 
@@ -73,30 +75,14 @@ public class Order {
      *
      * @param time
      */
-    public void setTime(Timestamp time) {
+    public void setTime(LocalDateTime time) {
         this.time = time;
     }
 
     /**
-     * @return the condition, if the order has been canceled
+     * @return the brutto amount of the order (can be null)
      */
-    public boolean isCanceled() {
-        return canceled;
-    }
-
-    /**
-     * sets the canceled condition of the order
-     *
-     * @param canceled
-     */
-    public void setCanceled(boolean canceled) {
-        this.canceled = canceled;
-    }
-
-    /**
-     * @return the brutto amount of the order
-     */
-    public double getBrutto() {
+    public BigDecimal getBrutto() {
         return brutto;
     }
 
@@ -105,14 +91,14 @@ public class Order {
      *
      * @param brutto
      */
-    public void setBrutto(double brutto) {
+    public void setBrutto(BigDecimal brutto) {
         this.brutto = brutto;
     }
 
     /**
      * @return the tax amount of the order
      */
-    public double getTax() {
+    public BigDecimal getTax() {
         return tax;
     }
 
@@ -121,29 +107,29 @@ public class Order {
      *
      * @param tax
      */
-    public void setTax(double tax) {
+    public void setTax(BigDecimal tax) {
         this.tax = tax;
     }
 
     /**
-     * @return the info of the order
+     * @return the additional Information of the order (can be null)
      */
-    public String getInfo() {
-        return info;
+    public String getAdditionalInformation() {
+        return additionalInformation;
     }
 
     /**
      * sets the info of the order
      *
-     * @param info
+     * @param additionalInformation
      */
-    public void setInfo(String info) {
-        this.info = info;
+    public void setAdditionalInformation(String additionalInformation) {
+        this.additionalInformation = additionalInformation;
     }
 
     /**
      *
-     * @return the menu entry of the order
+     * @return the menu entry of the order (can be null)
      */
     public MenuEntry getMenueEntry() {
         return menueEntry;
@@ -157,6 +143,7 @@ public class Order {
         this.menueEntry = menueEntry;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -164,12 +151,14 @@ public class Order {
 
         Order order = (Order) o;
 
-        if (Double.compare(order.brutto, brutto) != 0) return false;
-        if (canceled != order.canceled) return false;
-        if (Double.compare(order.tax, tax) != 0) return false;
-        if (!identity.equals(order.identity)) return false;
-        if (!info.equals(order.info)) return false;
-        if (!time.equals(order.time)) return false;
+        if (additionalInformation != null ? !additionalInformation.equals(order.additionalInformation) : order.additionalInformation != null)
+            return false;
+        if (brutto != null ? !brutto.equals(order.brutto) : order.brutto != null) return false;
+        if (identity != null ? !identity.equals(order.identity) : order.identity != null) return false;
+        if (menueEntry != null ? !menueEntry.equals(order.menueEntry) : order.menueEntry != null) return false;
+        if (table != null ? !table.equals(order.table) : order.table != null) return false;
+        if (tax != null ? !tax.equals(order.tax) : order.tax != null) return false;
+        if (time != null ? !time.equals(order.time) : order.time != null) return false;
 
         return true;
     }
@@ -179,10 +168,9 @@ public class Order {
         return "Order{" +
                 "identity=" + identity +
                 ", time=" + time +
-                ", canceled=" + canceled +
                 ", brutto=" + brutto +
                 ", tax=" + tax +
-                ", info='" + info + '\'' +
+                ", additionalInformation='" + additionalInformation + '\'' +
                 ", table=" + table +
                 ", menueEntry=" + menueEntry +
                 '}';
