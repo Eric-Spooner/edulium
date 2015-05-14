@@ -9,5 +9,9 @@
 
     <!-- DAO beans -->
     <import resource="dao/Spring-MenuCategoryDAO.xml" />
-
+    <import resource="dao/Spring-SectionDAO.xml" />
+    <import resource="dao/Spring-TableDAO.xml" />
+    <import resource="dao/Spring-UserDAO.xml" />
+    <import resource="dao/Spring-OrderDAO.xml" />
+    <import resource="dao/Spring-MenuDAO.xml" />
 </beans>
