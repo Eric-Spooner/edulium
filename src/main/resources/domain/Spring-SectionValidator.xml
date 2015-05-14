@@ -4,13 +4,8 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="Spring-Context.xml" />
-    <import resource="Spring-DataSource.xml" />
-
-    <!-- DAO beans -->
-    <import resource="dao/Spring-MenuCategoryDAO.xml" />
-    <import resource="dao/Spring-SectionDAO.xml" />
-    <import resource="dao/Spring-TableDAO.xml" />
-    <import resource="dao/Spring-UserDAO.xml" />
+    <bean id="sectionValidator" class="com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl.SectionValidator">
+    </bean>
 
 </beans>
+
