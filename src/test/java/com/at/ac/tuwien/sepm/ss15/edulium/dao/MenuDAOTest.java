@@ -93,55 +93,6 @@ public class MenuDAOTest extends AbstractDAOTest {
         }
     }
 
-    @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithEmptyNameShouldFail() throws DAOException, ValidationException {
-        //Given
-        Menu men = new Menu();
-        men.setName("");
-        LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
-        list.add(createMenuEntry("entry", "desc", "cat", 20, 0.2, true));
-        men.setEntries(list);
-
-        //When
-        try {
-            menuDAO.create(men);
-        } finally {
-            assertNull(men.getIdentity());
-        }
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testCreate_addingMenuWithEmptyListShouldFail() throws DAOException, ValidationException {
-        //Given
-        Menu men = new Menu();
-        men.setName("");
-        LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
-        men.setEntries(list);
-
-        //When
-        try {
-            menuDAO.create(men);
-        } finally {
-            assertNull(men.getIdentity());
-        }
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testCreate_addingMenuWithListNullShouldFail() throws DAOException, ValidationException {
-        //Given
-        Menu men = new Menu();
-        men.setName("");
-        LinkedList<MenuEntry> list = null;
-        men.setEntries(list);
-
-        //When
-        try {
-            menuDAO.create(men);
-        } finally {
-            assertNull(men.getIdentity());
-        }
-    }
-
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         //  GIVEN

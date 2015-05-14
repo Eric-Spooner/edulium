@@ -46,8 +46,8 @@ public class Menu{
     public void addEntry(MenuEntry entry){
         if(this.entries == null){
             this.entries = new LinkedList<MenuEntry>();
+            this.entries.add(entry);
         }
-        this.entries.add(entry);
     }
 
     /**
