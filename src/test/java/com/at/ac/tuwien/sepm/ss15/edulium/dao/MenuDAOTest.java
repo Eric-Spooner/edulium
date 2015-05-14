@@ -27,15 +27,14 @@ public class MenuDAOTest extends AbstractDAOTest {
     @Autowired
     private DAO<TaxRate> taxRateDAO;
 
-    private MenuEntry createMenuEntry(String name, String desc, String cat,
-                                      double price, double tax, boolean available) throws ValidationException, DAOException {
+    private MenuEntry createMenuEntry(String name, String desc, String cat, double price, double tax, boolean available)
+            throws ValidationException, DAOException {
         MenuCategory menuCategory = new MenuCategory();
         menuCategory.setName(cat);
+        menuCategoryDAO.create(menuCategory);
 
         TaxRate taxRate = new TaxRate();
         taxRate.setValue(BigDecimal.valueOf(tax));
-
-        menuCategoryDAO.create(menuCategory);
         taxRateDAO.create(taxRate);
 
         MenuEntry entry = new MenuEntry();
@@ -112,7 +111,7 @@ public class MenuDAOTest extends AbstractDAOTest {
         menuDAO.update(men);
 
         // THEN
-        // check if entry was updatedupdatedMenu
+        // check if entry was updated
         List<Menu> storedObjects = menuDAO.find(Menu.withIdentity(updatedMenu.getIdentity()));
         assertEquals(1, storedObjects.size());
         assertEquals(updatedMenu, storedObjects.get(0));
@@ -133,10 +132,7 @@ public class MenuDAOTest extends AbstractDAOTest {
     public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Long identity = (long) 1;
-        LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
-        list.add(createMenuEntry("entry", "desc", "cat", 20, 0.2, true));
-        Menu men = createMenu("Menu", list);
-        men.setIdentity(identity);
+        Menu men = new Menu();
 
         // generate identity which is not used by any persistent object
         try {
@@ -146,8 +142,14 @@ public class MenuDAOTest extends AbstractDAOTest {
             }
         } catch (DAOException e) {
             // exception should not occur here
+            //The Test shoudln't fail while searching
             fail();
         }
+
+        LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
+        list.add(createMenuEntry("entry", "desc", "cat", 20, 0.2, true));
+        Menu men2 = createMenu("Menu", list);
+        men2.setIdentity(men.getIdentity());
 
         // WHEN
         menuDAO.update(men);
@@ -199,6 +201,7 @@ public class MenuDAOTest extends AbstractDAOTest {
             }
         } catch (DAOException e) {
             // exception should not occur here
+            // The test shouldn't fail while searching
             fail();
         }
 
@@ -302,39 +305,6 @@ public class MenuDAOTest extends AbstractDAOTest {
         assertTrue(storedObjects.isEmpty());
     }
 
-    @Test
-    public void testGetAll_shouldReturnEmptyList() throws DAOException {
-        // WHEN / THEN
-        assertTrue(menuDAO.getAll().isEmpty());
-    }
-
-    @Test
-    public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
-        // GIVEN
-        LinkedList<MenuEntry> list1 = new LinkedList<MenuEntry>();
-        list1.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
-        Menu men1 = createMenu("Menu1", list1);
-        menuDAO.create(men1);
-
-        LinkedList<MenuEntry> list2 = new LinkedList<MenuEntry>();
-        list2.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
-        Menu men2 = createMenu("Menu2", list2);
-        menuDAO.create(men2);
-
-        LinkedList<MenuEntry> list3 = new LinkedList<MenuEntry>();
-        list3.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
-        Menu men3 = createMenu("Menu3", list3);
-        menuDAO.create(men3);
-
-        // WHEN
-        List<Menu> objects = menuDAO.getAll();
-
-        // THEN
-        assertEquals(3, objects.size());
-        assertTrue(objects.contains(men1));
-        assertTrue(objects.contains(men2));
-        assertTrue(objects.contains(men3));
-    }
 
     @Test(expected = ValidationException.class)
     public void testGetHistory_withoutObjectShouldFail() throws DAOException, ValidationException {

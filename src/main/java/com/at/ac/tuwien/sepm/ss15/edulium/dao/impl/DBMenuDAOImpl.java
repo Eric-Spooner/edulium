@@ -9,7 +9,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import java.util.List;
 
 /**
- * Created by - on 11.05.2015.
+ * H2 Database Implementation of the MenuEntry DAO interface
  */
 public class DBMenuDAOImpl implements DAO<Menu> {
     @Override
