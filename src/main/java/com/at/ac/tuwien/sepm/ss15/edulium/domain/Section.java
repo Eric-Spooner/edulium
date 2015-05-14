@@ -14,6 +14,17 @@ public class Section {
     }
 
     /**
+     * Creates a new section object and assigns the given identity to it.
+     * @param identity the identity of the section
+     * @return section object with the given identity
+     */
+    public static Section withIdentity(long identity) {
+        Section section = new Section();
+        section.setIdentity(identity);
+        return section;
+    }
+
+    /**
      * @return the unique identity of the section
      */
     public Long getIdentity() {

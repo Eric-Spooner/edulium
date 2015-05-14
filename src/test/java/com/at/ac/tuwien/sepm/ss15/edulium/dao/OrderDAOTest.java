@@ -51,8 +51,8 @@ public class OrderDAOTest extends AbstractDAOTest {
         table.setRow(3);
         table.setSeats(5);
         table.setNumber(1L);
-        table.setSection_id(section.getIdentity());
-        table.setUser_id(Long.valueOf(user.getIdentity()));
+        table.setSection(section);
+        table.setUser(user);
         return table;
     }
 
@@ -81,8 +81,8 @@ public class OrderDAOTest extends AbstractDAOTest {
         table.setRow(3);
         table.setSeats(5);
         table.setNumber(1L);
-        table.setSection_id(section.getIdentity());
-        table.setUser_id(Long.valueOf(user.getIdentity()));
+        table.setSection(section);
+        table.setUser(user);
         tableDAO.create(table);
 
         MenuEntry entry = new MenuEntry();

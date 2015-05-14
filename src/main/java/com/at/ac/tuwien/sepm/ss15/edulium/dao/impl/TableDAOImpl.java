@@ -1,30 +1,38 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.TableDAO;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.TableValidator;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * H2 Database Implementation of the MenuCategoryDAO interface
  */
-@Repository
-class TableDAOImpl implements TableDAO {
+public class TableDAOImpl implements DAO<Table> {
+    private static final Logger LOGGER = LogManager.getLogger(TableDAOImpl.class);
+
     @Autowired
     private DataSource dataSource;
     @Autowired
-    private TableValidator validator;
+    private DAO<User> userDAO;
+    @Autowired
+    private DAO<Section> sectionDAO;
+    @Autowired
+    private Validator<Table> validator;
 
     /**
      * writes the object into the database and sets the identity parameter of
@@ -34,33 +42,30 @@ class TableDAOImpl implements TableDAO {
      */
     @Override
     public void create(Table table) throws DAOException, ValidationException {
+        LOGGER.debug("entering create with parameters " + table);
         assert(table != null);
 
         validator.validateForCreate(table);
 
-        final String query = "INSERT INTO RestaurantTable (section_ID, seats, row, column, user_id) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        final String query = "INSERT INTO RestaurantTable (section_ID, seats, tableRow, tableColumn, user_ID, number) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query,
-                Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
 
-            stmt.setLong(1, table.getSection_id());
+            stmt.setLong(1, table.getSection().getIdentity());
             stmt.setInt(2, table.getSeats());
             stmt.setInt(3, table.getRow());
             stmt.setInt(4, table.getColumn());
-            stmt.setLong(5, table.getUser_id());
+            stmt.setString(5, table.getUser().getIdentity());
+            stmt.setLong(6, table.getNumber());
             stmt.executeUpdate();
 
-            try (ResultSet key = stmt.getGeneratedKeys()) {
-                key.next();
-                table.setNumber(key.getLong(1));
-            }
-
         } catch (SQLException e) {
+            LOGGER.error("inserting table into database failed", e);
             throw new DAOException(e);
         }
 
-        //generateHistory(table.getNumber()); TODO
+        generateHistory(table);
     }
 
     /**
@@ -71,6 +76,7 @@ class TableDAOImpl implements TableDAO {
      */
     @Override
     public void update(Table table) throws DAOException, ValidationException {
+        LOGGER.debug("entering update with parameters " + table);
         assert(table != null);
 
         validator.validateForUpdate(table);
@@ -79,11 +85,11 @@ class TableDAOImpl implements TableDAO {
                 "section_ID = ?, seats = ?, tableRow = ?, tableColumn = ?, user_ID = ? WHERE number = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, table.getSection_id());
+            stmt.setLong(1, table.getSection().getIdentity());
             stmt.setInt(2, table.getSeats());
             stmt.setInt(3, table.getRow());
             stmt.setInt(4, table.getColumn());
-            stmt.setLong(5, table.getUser_id());
+            stmt.setString(5, table.getUser().getIdentity());
             stmt.setLong(6, table.getNumber());
 
             if (stmt.executeUpdate() == 0) {
@@ -91,10 +97,11 @@ class TableDAOImpl implements TableDAO {
             }
 
         } catch (SQLException e) {
+            LOGGER.error("updating table in database failed", e);
             throw new DAOException(e);
         }
 
-        //generateHistory(table.getNumber()); TODO
+        generateHistory(table);
     }
 
     /**
@@ -105,11 +112,12 @@ class TableDAOImpl implements TableDAO {
      */
     @Override
     public void delete(Table table) throws DAOException, ValidationException {
+        LOGGER.debug("entering delete with parameters " + table);
         assert(table != null);
 
         validator.validateForDelete(table);
 
-        final String query = "UPDATE RestaurantTable SET deleted = true WHERE number = ?";
+        final String query = "UPDATE RestaurantTable SET disabled = true WHERE number = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, table.getNumber());
@@ -118,10 +126,11 @@ class TableDAOImpl implements TableDAO {
             }
 
         } catch (SQLException e) {
+            LOGGER.error("deleting table failed", e);
             throw new DAOException(e);
         }
 
-        //generateHistory(table.getNumber()); TODO
+        generateHistory(table);
     }
 
     /**
@@ -134,21 +143,40 @@ class TableDAOImpl implements TableDAO {
      */
     @Override
     public List<Table> find(Table table) throws DAOException {
+        LOGGER.debug("entering find with parameters " + table);
         assert(table != null);
         String query = "SELECT * FROM RestaurantTable WHERE number = ISNULL(?, number) " +
                 "AND seats = ISNULL(?, seats) AND section_ID = ISNULL(?, section_ID)" +
                 "AND tableRow = ISNULL(?, tableRow) AND tableColumn = ISNULL(?, tableColumn)" +
-                "AND user_ID = ISNULL(?, user_ID) AND deleted = false";
+                "AND user_ID = ISNULL(?, user_ID) AND disabled = false";
 
         final List<Table> objects = new ArrayList<>();
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, table.getNumber());
-            stmt.setInt(2, table.getSeats());
-            stmt.setLong(3, table.getSection_id());
-            stmt.setInt(4, table.getRow());
-            stmt.setInt(5, table.getColumn());
-            stmt.setLong(6, table.getUser_id());
+            if(table.getNumber() == null)
+                stmt.setNull(1, Types.VARCHAR);
+            else
+                stmt.setLong(1, table.getNumber());
+            if(table.getSeats() == null)
+                stmt.setNull(2, Types.VARCHAR);
+            else
+                stmt.setInt(2, table.getSeats());
+            if(table.getSection() == null)
+                stmt.setNull(3, Types.VARCHAR);
+            else
+                stmt.setLong(3, table.getSection().getIdentity());
+            if(table.getRow() == null)
+                stmt.setNull(4, Types.VARCHAR);
+            else
+                stmt.setInt(4, table.getRow());
+            if(table.getColumn() == null)
+                stmt.setNull(5, Types.VARCHAR);
+            else
+                stmt.setInt(5, table.getColumn());
+            if(table.getUser() == null)
+                stmt.setNull(6, Types.VARCHAR);
+            else
+                stmt.setString(6, table.getUser().getIdentity());
             stmt.execute();
 
             try (ResultSet result = stmt.getResultSet()) {
@@ -158,6 +186,7 @@ class TableDAOImpl implements TableDAO {
             }
 
         } catch (SQLException e) {
+            LOGGER.error("searching for table failed", e);
             throw new DAOException(e);
         }
 
@@ -170,7 +199,8 @@ class TableDAOImpl implements TableDAO {
      */
     @Override
     public List<Table> getAll() throws DAOException {
-        final String query = "SELECT * FROM RestaurantTable WHERE deleted = false";
+        LOGGER.debug("entering getAll");
+        final String query = "SELECT * FROM RestaurantTable WHERE disabled = false";
         final List<Table> objects = new ArrayList<>();
 
         try (Statement stmt = dataSource.getConnection().createStatement()) {
@@ -183,10 +213,67 @@ class TableDAOImpl implements TableDAO {
             }
 
         } catch (SQLException e) {
+            LOGGER.error("searching for all tables failed", e);
             throw new DAOException(e);
         }
 
         return objects;
+    }
+
+    /**
+     * @param table object to get the history for
+     * @return returns the history of changes for the table object
+     * @throws DAOException if the data couldn't be retrieved
+     * @throws ValidationException if the table object parameters are
+     *         not valid for this action
+     */
+    @Override
+    public List<History<Table>> getHistory(Table table) throws DAOException, ValidationException {
+        LOGGER.debug("entering getHistory with parameters " + table);
+        validator.validateIdentity(table);
+
+        List<History<Table>> history = new ArrayList<>();
+        final String query = "SELECT * FROM TableHistory WHERE number = ? ORDER BY changeNr";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, table.getNumber());
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                history.add(parseHistoryEntry(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("retrieving history failed", e);
+            throw new DAOException("retrieving history failed", e);
+        }
+
+        return history;
+    }
+
+    /**
+     * writes the changes of the dataset into the database
+     * stores the time; number of the change and the user which executed
+     * the changes
+     * @param table updated dataset
+     * @throws DAOException if an error accessing the database occurred
+     */
+    private void generateHistory(Table table) throws DAOException {
+        LOGGER.debug("entering generateHistory with parameters " + table);
+
+        final String query = "INSERT INTO TableHistory " +
+                "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
+                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM TableHistory WHERE number = ?) " +
+                "FROM RestaurantTable WHERE number = ?)";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+            stmt.setLong(2, table.getNumber());          // dataset id
+            stmt.setLong(3, table.getNumber());          // dataset id
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("generating history failed", e);
+            throw new DAOException("generating history failed", e);
+        }
     }
 
     /**
@@ -195,14 +282,43 @@ class TableDAOImpl implements TableDAO {
      * @return Table object with the data of the resultSet set
      * @throws SQLException if an error accessing the database occurred
      */
-    private Table parseResult(ResultSet result) throws SQLException {
+    private Table parseResult(ResultSet result) throws SQLException, DAOException {
+        Section matcherSection = new Section();
+        matcherSection.setIdentity(result.getLong(1));
+        User matcherUser = new User();
+        matcherUser.setIdentity(result.getString(6));
         Table table = new Table();
-        table.setSection_id(result.getLong(1));
+        table.setSection((Section) sectionDAO.find(matcherSection).get(0));
         table.setNumber(result.getLong(2));
         table.setSeats(result.getInt(3));
         table.setRow(result.getInt(4));
         table.setColumn(result.getInt(5));
-        table.setUser_id(result.getLong(6));
+        table.setUser((User)userDAO.find(matcherUser).get(0));
         return table;
+    }
+
+    /**
+     * converts the database query output into a history entry object
+     * @param result database output
+     * @return History object with the data of the resultSet set
+     * @throws SQLException if an error accessing the database occurred
+     * @throws DAOException if an error retrieving the user ocurred
+     */
+    private History<Table> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
+        // get user
+        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        if (storedUsers.size() != 1) {
+            throw new DAOException("user not found");
+        }
+
+        // create history entry
+        History<Table> historyEntry = new History<>();
+        historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
+        historyEntry.setChangeNumber(result.getLong("changeNr"));
+        historyEntry.setDeleted(result.getBoolean("disabled"));
+        historyEntry.setUser(storedUsers.get(0));
+        historyEntry.setData(parseResult(result));
+
+        return historyEntry;
     }
 }

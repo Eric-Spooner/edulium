@@ -4,21 +4,32 @@ package com.at.ac.tuwien.sepm.ss15.edulium.domain;
  * domain object which represents a table in the restaurant
  */
 public class Table {
-    private int seats;
+    private Integer seats;
     private Long number;
-    private Long section_id;
-    private Long user_id;
-    private int row;
-    private int column;
+    private Section section;
+    private User user;
+    private Integer row;
+    private Integer column;
 
     public Table() {
 
     }
 
     /**
+     * Creates a new table object and assigns the given number to it.
+     * @param number the identity of the category
+     * @return table object with the given number
+     */
+    public static Table withNumber(long number) {
+        Table table = new Table();
+        table.setNumber(number);
+        return table;
+    }
+
+    /**
      * @return the number of seats on this table
      */
-    public int getSeats() {
+    public Integer getSeats() {
         return seats;
     }
 
@@ -46,7 +57,7 @@ public class Table {
     /**
      * @return the row of this table
      */
-    public int getRow() {
+    public Integer getRow() {
         return row;
     }
 
@@ -60,7 +71,7 @@ public class Table {
     /**
      * @return the column of this table
      */
-    public int getColumn() {
+    public Integer getColumn() {
         return column;
     }
 
@@ -74,29 +85,29 @@ public class Table {
     /**
      * @return the id of the section the table is located
      */
-    public Long getSection_id() {
-        return section_id;
+    public Section getSection() {
+        return section;
     }
 
     /**
-     * @param section_id sets the id of the section the table is located
+     * @param section sets the id of the section the table is located
      */
-    public void setSection_id(Long section_id) {
-        this.section_id = section_id;
+    public void setSection(Section section) {
+        this.section = section;
     }
 
     /**
      * @return the id of the user responsible for the table
      */
-    public Long getUser_id() {
-        return user_id;
+    public User getUser() {
+        return user;
     }
 
     /**
-     * @param user_id sets the id of the user responsible for the table
+     * @param user sets the id of the user responsible for the table
      */
-    public void setUser_id(Long user_id) {
-        this.user_id = user_id;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
@@ -104,8 +115,8 @@ public class Table {
         return "Table{" +
                 "seats=" + seats +
                 ", number=" + number +
-                ", section_id=" + section_id +
-                ", user_id=" + user_id +
+                ", section=" + section +
+                ", user=" + user +
                 ", row=" + row +
                 ", column=" + column +
                 '}';
@@ -118,12 +129,12 @@ public class Table {
 
         Table table = (Table) o;
 
-        if (column != table.column) return false;
-        if (row != table.row) return false;
-        if (seats != table.seats) return false;
+        if (column != null ? !column.equals(table.column) : table.column != null) return false;
         if (number != null ? !number.equals(table.number) : table.number != null) return false;
-        if (section_id != null ? !section_id.equals(table.section_id) : table.section_id != null) return false;
-        if (user_id != null ? !user_id.equals(table.user_id) : table.user_id != null) return false;
+        if (row != null ? !row.equals(table.row) : table.row != null) return false;
+        if (seats != null ? !seats.equals(table.seats) : table.seats != null) return false;
+        if (section != null ? !section.equals(table.section) : table.section != null) return false;
+        if (user != null ? !user.equals(table.user) : table.user != null) return false;
 
         return true;
     }
