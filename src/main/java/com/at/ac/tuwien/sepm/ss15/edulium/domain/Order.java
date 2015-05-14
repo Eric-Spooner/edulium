@@ -1,10 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.stream.LongStream;
 
 /**
  * domain object, which represents orders
@@ -24,7 +21,7 @@ public class Order {
      * @param identity
      * @return Order with the given identity
      */
-    public static Order withIdentity(long identity){
+    public static Order withIdentity(long identity) {
         Order order = new Order();
         order.setIdentity(identity);
         return order;
@@ -131,7 +128,7 @@ public class Order {
      *
      * @return the menu entry of the order (can be null)
      */
-    public MenuEntry getMenueEntry() {
+    public MenuEntry getMenuEntry() {
         return menueEntry;
     }
 
@@ -139,7 +136,7 @@ public class Order {
      * sets the menu Entry of the order
      * @param menueEntry
      */
-    public void setMenueEntry(MenuEntry menueEntry) {
+    public void setMenuEntry(MenuEntry menueEntry) {
         this.menueEntry = menueEntry;
     }
 
@@ -153,11 +150,11 @@ public class Order {
 
         if (additionalInformation != null ? !additionalInformation.equals(order.additionalInformation) : order.additionalInformation != null)
             return false;
-        if (brutto != null ? !brutto.equals(order.brutto) : order.brutto != null) return false;
+        if (brutto != null ? (brutto.compareTo(order.brutto)!=0) : order.brutto != null) return false;
         if (identity != null ? !identity.equals(order.identity) : order.identity != null) return false;
         if (menueEntry != null ? !menueEntry.equals(order.menueEntry) : order.menueEntry != null) return false;
         if (table != null ? !table.equals(order.table) : order.table != null) return false;
-        if (tax != null ? !tax.equals(order.tax) : order.tax != null) return false;
+        if (tax != null ? (tax.compareTo(order.tax)!=0) : order.tax != null) return false;
         if (time != null ? !time.equals(order.time) : order.time != null) return false;
 
         return true;

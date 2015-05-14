@@ -22,7 +22,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         // GIVEN
         Order order = new Order();
         order.setTable(new Table());
-        order.setMenueEntry(new MenuEntry());
+        order.setMenuEntry(MenuEntry.withIdentity(4));
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(BigDecimal.valueOf(0));
         order.setTime(LocalDateTime.now());
@@ -36,6 +36,7 @@ public class TestOrderValidator extends AbstractDomainTest {
     public void testValidateForCreate_OrderWithoutValueShouldThrow() throws ValidationException {
         // GIVEN
         Order order = new Order();
+
         // WHEN
         orderValidator.validateForCreate(order);
     }
@@ -49,23 +50,8 @@ public class TestOrderValidator extends AbstractDomainTest {
         orderValidator.validateForCreate(order);
     }
 
-
     @Test(expected = ValidationException.class)
-         public void testValidateForCreate_OrderWithoutAdditionalInfoShouldThrow() throws ValidationException {
-        // GIVEN
-        Order order = new Order();
-        order.setTable(new Table());
-        order.setMenueEntry(new MenuEntry());
-        order.setBrutto(BigDecimal.valueOf(0));
-        order.setTax(BigDecimal.valueOf(0));
-        order.setTime(LocalDateTime.now());
-
-        // WHEN
-        orderValidator.validateForCreate(order);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForCreate_OrderWithoutOrderEntriesShouldThrow() throws ValidationException {
+    public void testValidateForCreate_OrderWithoutMenuEntryShouldThrow() throws ValidationException {
         // GIVEN
         Order order = new Order();
         order.setTable(new Table());
@@ -81,7 +67,7 @@ public class TestOrderValidator extends AbstractDomainTest {
     public void testValidateForCreate_OrderWithoutTableShouldThrow() throws ValidationException {
         // GIVEN
         Order order = new Order();
-        order.setMenueEntry(new MenuEntry());
+        order.setMenuEntry(MenuEntry.withIdentity(5));
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(BigDecimal.valueOf(0));
         order.setTime(LocalDateTime.now());
@@ -96,7 +82,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         // GIVEN
         Order order = new Order();
         order.setTable(new Table());
-        order.setMenueEntry(new MenuEntry());
+        order.setMenuEntry(MenuEntry.withIdentity(5));
         order.setTax(BigDecimal.valueOf(0));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
@@ -110,7 +96,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         // GIVEN
         Order order = new Order();
         order.setTable(new Table());
-        order.setMenueEntry(new MenuEntry());
+        order.setMenuEntry(MenuEntry.withIdentity(5));
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
@@ -124,10 +110,11 @@ public class TestOrderValidator extends AbstractDomainTest {
         // GIVEN
         Order order = new Order();
         order.setTable(new Table());
-        order.setMenueEntry(new MenuEntry());
+        order.setMenuEntry(MenuEntry.withIdentity(5));
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(BigDecimal.valueOf(0));
         order.setAdditionalInformation("Info");
+
         // WHEN
         orderValidator.validateForCreate(order);
     }
@@ -138,13 +125,11 @@ public class TestOrderValidator extends AbstractDomainTest {
         Order order = new Order();
         order.setIdentity((long) 1);
         order.setTable(new Table());
-        order.setMenueEntry(new MenuEntry());
+        order.setMenuEntry(MenuEntry.withIdentity(5));
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(BigDecimal.valueOf(0));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
-
-
 
         // WHEN
         orderValidator.validateForUpdate(order);
@@ -155,12 +140,11 @@ public class TestOrderValidator extends AbstractDomainTest {
         // GIVEN
         Order order = new Order();
         order.setTable(new Table());
-        order.setMenueEntry(new MenuEntry());
+        order.setMenuEntry(MenuEntry.withIdentity(5));
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(BigDecimal.valueOf(0));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
-
 
         // WHEN
         orderValidator.validateForUpdate(order);
@@ -179,7 +163,7 @@ public class TestOrderValidator extends AbstractDomainTest {
     public void testValidateForDelete_shouldAcceptOrder() throws ValidationException {
         // GIVEN
         Order order = new Order();
-        order.setIdentity((long)1);
+        order.setIdentity(1L);
 
         // WHEN
         orderValidator.validateForUpdate(order);

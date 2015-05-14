@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import javafx.scene.control.Tab;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,34 +33,70 @@ public class OrderDAOTest extends AbstractDAOTest {
     @Autowired
     private DAO<Section> sectionDAO;
 
+    public Section createSection(String name){
+        Section section = new Section();
+        section.setName(name);
+        return section;
+    }
 
-    private Order createOrder(BigDecimal brutto, String info,
-                              BigDecimal tax,  LocalDateTime time) throws ValidationException, DAOException {
-        MenuCategory menuCategory = new MenuCategory();
-        menuCategory.setName("cat");
-        TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(20));
-        menuCategoryDAO.create(menuCategory);
-        taxRateDAO.create(taxRate);
+    public Table createTable(Integer tableCol, Integer tableRow,
+                             Long tableNumber, Section section) throws ValidationException, DAOException {
         User user = new User();
         user.setName("Test User");
         user.setRole("Role");
         userDAO.create(user);
-        Section section = new Section();
-        section.setName("Garden");
-        sectionDAO.create(section);
+
         Table table = new Table();
         table.setColumn(4);
         table.setRow(3);
         table.setSeats(5);
-        table.setNumber((long) 1);
+        table.setNumber(1L);
+        table.setSection_id(section.getIdentity());
+        table.setUser_id(Long.valueOf(user.getIdentity()));
+        return table;
+    }
+
+    private Order createOrder(BigDecimal brutto, String info, BigDecimal tax,  LocalDateTime time)
+            throws ValidationException, DAOException {
+
+        MenuCategory menuCategory = new MenuCategory();
+        menuCategory.setName("cat");
+        menuCategoryDAO.create(menuCategory);
+
+        TaxRate taxRate = new TaxRate();
+        taxRate.setValue(BigDecimal.valueOf(20));
+        taxRateDAO.create(taxRate);
+
+        User user = new User();
+        user.setName("Test User");
+        user.setRole("Role");
+        userDAO.create(user);
+
+        Section section = new Section();
+        section.setName("Garden");
+        sectionDAO.create(section);
+
+        Table table = new Table();
+        table.setColumn(4);
+        table.setRow(3);
+        table.setSeats(5);
+        table.setNumber(1L);
         table.setSection_id(section.getIdentity());
         table.setUser_id(Long.valueOf(user.getIdentity()));
         tableDAO.create(table);
+
         MenuEntry entry = new MenuEntry();
+        entry.setAvailable(true);
+        entry.setName("Entry");
+        entry.setDescription("Desc");
+        entry.setPrice(BigDecimal.valueOf(50.0));
+        entry.setCategory(menuCategory);
+        entry.setTaxRate(taxRate);
+        menuEntryDAO.create(entry);
+
         Order order = new Order();
         order.setTable(table);
-        order.setMenueEntry(entry);
+        order.setMenuEntry(entry);
         order.setBrutto(brutto);
         order.setTax(tax);
         order.setAdditionalInformation(info);
@@ -72,13 +109,13 @@ public class OrderDAOTest extends AbstractDAOTest {
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
         // GIVEN
-        Order order = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(50), LocalDateTime.now());
+        Order order = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(50),
+                LocalDateTime.now());
         // WHEN
         orderDAO.create(order);
 
         // THEN
         // try to find the user and compare it
-        Order matcher = new Order();
         List<Order> storedObjects = orderDAO.find(Order.withIdentity(order.getIdentity()));
         assertEquals(1, storedObjects.size());
         assertEquals(order, storedObjects.get(0));
@@ -105,14 +142,16 @@ public class OrderDAOTest extends AbstractDAOTest {
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         //  GIVEN
-        Order order= createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(50), LocalDateTime.now());
+        Order order= createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(50),
+                LocalDateTime.now());
         orderDAO.create(order);
 
         // check if entry is stored
         assertEquals(1, orderDAO.find(Order.withIdentity(order.getIdentity())).size());
 
         // WHEN
-        Order order2 = order = createOrder(BigDecimal.valueOf(1000),"Order Information 2", BigDecimal.valueOf(100), LocalDateTime.now());
+        Order order2 = order = createOrder(BigDecimal.valueOf(1000),"Order Information 2",
+                BigDecimal.valueOf(100), LocalDateTime.now());
         order2.setIdentity(order.getIdentity());
         orderDAO.update(order);
 
@@ -124,16 +163,19 @@ public class OrderDAOTest extends AbstractDAOTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testUpdate_updatingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
-        //Given
-        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(50), LocalDateTime.now());
+    public void testUpdate_updatingObjectWithIdentityNullShouldFail()
+            throws DAOException, ValidationException {
+        // Given
+        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information",
+                BigDecimal.valueOf(50), LocalDateTime.now());
 
-        //When
+        // When
         orderDAO.update(order);
     }
 
     @Test(expected = DAOException.class)
-    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
+    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException,
+            ValidationException {
         // GIVEN
         Long identity = (long) 1;
         Order order = new Order();
@@ -151,30 +193,70 @@ public class OrderDAOTest extends AbstractDAOTest {
             fail();
         }
 
-        order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(50), LocalDateTime.now());
-
+        order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(50),
+                LocalDateTime.now());
 
         // WHEN
         orderDAO.update(order);
     }
 
+    public void testUpdate_updatingTableShouldWork() throws DAOException,
+            ValidationException {
+        // GIVEN
+        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(50),
+                LocalDateTime.now());
+
+        // WHEN
+        orderDAO.create(order);
+
+        Order order2  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(50),
+                LocalDateTime.now());
+        Section section = createSection("Hauptraum");
+        Table table = createTable(5,6,5L,section);
+        tableDAO.create(table);
+        order2.setTable(table);
+        order2.setIdentity(order.getIdentity());
+        orderDAO.update(order2);
+
+        // THEN
+        assertEquals(order2, orderDAO.find(Order.withIdentity(order2.getIdentity())).get(0));
+    }
+
+    public void testUpdate_updatingTimeShouldWork() throws DAOException,
+            ValidationException {
+        // GIVEN
+        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(50),
+                LocalDateTime.now());
+
+        // WHEN
+        orderDAO.create(order);
+
+        Order order2  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(50),
+                LocalDateTime.now());
+
+        // THEN
+        assertEquals(order2, orderDAO.find(Order.withIdentity(order2.getIdentity())).get(0));
+    }
+
     @Test
     public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // GIVEN
-        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(50), LocalDateTime.now());
+        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(50),
+                LocalDateTime.now());
 
         orderDAO.create(order);
-        assertEquals(1, orderDAO.getAll().size());
+        assertEquals(1, orderDAO.find(Order.withIdentity(order.getIdentity())).size());
 
         // WHEN
         orderDAO.delete(order);
 
-        //Then
-        assertTrue(orderDAO.getAll().isEmpty());
+        // Then
+        assertEquals(0, orderDAO.find(Order.withIdentity(order.getIdentity())).size());
     }
 
     @Test(expected = ValidationException.class)
-    public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
+    public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException,
+            ValidationException {
         // GIVEN
         Order order = new Order();
 
@@ -183,7 +265,8 @@ public class OrderDAOTest extends AbstractDAOTest {
     }
 
     @Test(expected = DAOException.class)
-    public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
+    public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException,
+            ValidationException {
         // GIVEN
         Long identity = (long) 1;
         Order order = new Order();
@@ -208,27 +291,33 @@ public class OrderDAOTest extends AbstractDAOTest {
     @Test
     public void testFind_byIdentityShouldReturnObject() throws DAOException, ValidationException {
         // GIVEN
-        Order order1 = createOrder(BigDecimal.valueOf(500),"Order Information1", BigDecimal.valueOf(50), LocalDateTime.now());
+        Order order1 = createOrder(BigDecimal.valueOf(500),"Order Information1",
+                BigDecimal.valueOf(50), LocalDateTime.now());
         orderDAO.create(order1);
-        Order order2  = createOrder(BigDecimal.valueOf(500),"Order Information2", BigDecimal.valueOf(50), LocalDateTime.now());
+        Order order2  = createOrder(BigDecimal.valueOf(500),"Order Information2",
+                BigDecimal.valueOf(50), LocalDateTime.now());
         orderDAO.create(order2);
-        Order order3  = createOrder(BigDecimal.valueOf(500),"Order Information3", BigDecimal.valueOf(50), LocalDateTime.now());
+        Order order3  = createOrder(BigDecimal.valueOf(500),"Order Information3",
+                BigDecimal.valueOf(50), LocalDateTime.now());
         orderDAO.create(order3);
 
         // WHEN
         List<Order> objects = orderDAO.find(Order.withIdentity(order1.getIdentity()));
+
         // THEN
         assertEquals(1, objects.size());
         assertEquals(order1, objects.get(0));
 
         // WHEN
         List<Order> objects2 = orderDAO.find(Order.withIdentity(order2.getIdentity()));
+
         // THEN
         assertEquals(1, objects.size());
         assertEquals(order1, objects.get(0));
 
         // WHEN
         List<Order> objects3 = orderDAO.find(Order.withIdentity(order3.getIdentity()));
+
         // THEN
         assertEquals(1, objects.size());
         assertEquals(order1, objects.get(0));
@@ -238,11 +327,14 @@ public class OrderDAOTest extends AbstractDAOTest {
     public void testFind_byInfoShouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         Order matcher = new Order();
-        Order order1  = createOrder(BigDecimal.valueOf(500),"Order Information1", BigDecimal.valueOf(50), LocalDateTime.now());
+        Order order1  = createOrder(BigDecimal.valueOf(500),"Order Information1",
+                BigDecimal.valueOf(50), LocalDateTime.now());
         orderDAO.create(order1);
-        Order order2  = createOrder(BigDecimal.valueOf(1000),"Order Information2", BigDecimal.valueOf(50), LocalDateTime.now());
+        Order order2  = createOrder(BigDecimal.valueOf(1000),"Order Information2",
+                BigDecimal.valueOf(50), LocalDateTime.now());
         orderDAO.create(order2);
-        Order order3 = createOrder(BigDecimal.valueOf(500), "Order Information3", BigDecimal.valueOf(50), LocalDateTime.now());
+        Order order3 = createOrder(BigDecimal.valueOf(500), "Order Information3",
+                BigDecimal.valueOf(50), LocalDateTime.now());
         orderDAO.create(order3);
 
 
@@ -285,28 +377,8 @@ public class OrderDAOTest extends AbstractDAOTest {
     }
 
     @Test
-    public void testGetAll_shouldReturnEmptyList() throws DAOException {
-        // WHEN / THEN
-        assertTrue(orderDAO.getAll().isEmpty());
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testGetHistory_withoutObjectShouldFail() throws DAOException, ValidationException {
-        //WHEN THEN
-        orderDAO.getHistory(null);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testGetHistory_withoutIdentityShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        Order entry = new Order();
-
-        // WHEN
-        orderDAO.getHistory(entry);
-    }
-
-    @Test
-    public void testGetHistory_notPersistentDataShouldReturnEmptyList() throws DAOException, ValidationException {
+    public void testGetHistory_notPersistentDataShouldReturnEmptyList()
+            throws DAOException, ValidationException {
         // GIVEN
         Long identity = (long) 1;
         Order matcher = new Order();
@@ -318,7 +390,7 @@ public class OrderDAOTest extends AbstractDAOTest {
             matcher.setIdentity(identity);
         }
 
-        //WHEN THEN
+        // WHEN THEN
         assertTrue(orderDAO.getHistory(matcher).isEmpty());
     }
 
@@ -329,15 +401,19 @@ public class OrderDAOTest extends AbstractDAOTest {
         User user = getCurrentUser();
 
         // GIVEN
+
         // create data
-        Order order1  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(50), LocalDateTime.now());
+        Order order1  = createOrder(BigDecimal.valueOf(500),"Order Information",
+                BigDecimal.valueOf(50), LocalDateTime.now());
         LocalDateTime createTime = LocalDateTime.now();
         orderDAO.create(order1);
 
-        Order order2  = createOrder(BigDecimal.valueOf(600),"Order Information2", BigDecimal.valueOf(60), LocalDateTime.now());
+        Order order2  = createOrder(BigDecimal.valueOf(600),"Order Information2",
+                BigDecimal.valueOf(60), LocalDateTime.now());
         order2.setIdentity(order1.getIdentity());
         LocalDateTime updateTime = LocalDateTime.now();
         orderDAO.update(order2);
+
         // delete data
         LocalDateTime deleteTime = LocalDateTime.now();
         orderDAO.delete(order2);
@@ -346,6 +422,8 @@ public class OrderDAOTest extends AbstractDAOTest {
         List<History<Order>> history = orderDAO.getHistory(order2);
 
         // THEN
+        //check sive of history
+        assertEquals(3, history.size());
 
         // check create history
         History<Order> historyEntry = history.get(0);
