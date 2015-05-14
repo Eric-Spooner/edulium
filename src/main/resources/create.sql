@@ -146,13 +146,13 @@ CREATE TABLE IF NOT EXISTS MenuCategoryHistory (
 
 CREATE TABLE IF NOT EXISTS TaxRate (
     ID IDENTITY,
-    taxRateValue DECIMAL(3, 2),
+    taxRateValue DECIMAL(5, 4),
     deleted BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS TaxRateHistory (
     ID BIGINT REFERENCES TaxRate(ID),
-    taxRateValue DECIMAL(3, 2),
+    taxRateValue DECIMAL(5, 4),
     deleted BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),

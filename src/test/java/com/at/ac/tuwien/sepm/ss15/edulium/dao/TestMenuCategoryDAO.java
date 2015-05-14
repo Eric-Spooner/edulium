@@ -40,23 +40,9 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithoutNameShouldFail() throws DAOException, ValidationException {
+    public void testCreate_addingInvalidObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         MenuCategory category = new MenuCategory();
-
-        // WHEN
-        try {
-            menuCategoryDAO.create(category);
-        } finally {
-            assertNull(category.getIdentity());
-        }
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithEmptyNameShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        MenuCategory category = new MenuCategory();
-        category.setName("");
 
         // WHEN
         try {

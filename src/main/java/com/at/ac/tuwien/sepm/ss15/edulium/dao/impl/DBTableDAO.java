@@ -12,7 +12,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -22,8 +21,8 @@ import java.util.List;
 /**
  * H2 Database Implementation of the MenuCategoryDAO interface
  */
-public class TableDAOImpl implements DAO<Table> {
-    private static final Logger LOGGER = LogManager.getLogger(MenuCategoryDAOImpl.class);
+public class DBTableDAO implements DAO<Table> {
+    private static final Logger LOGGER = LogManager.getLogger(DBTableDAO.class);
 
     @Autowired
     private DataSource dataSource;
