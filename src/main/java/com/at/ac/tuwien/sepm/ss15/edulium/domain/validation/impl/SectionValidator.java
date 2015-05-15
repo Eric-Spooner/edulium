@@ -16,8 +16,14 @@ public class SectionValidator implements Validator<Section> {
      */
     @Override
     public void validateForCreate(Section section) throws ValidationException {
+        if(section == null) {
+            throw new ValidationException("section must not be null");
+        }
         if(section.getName() == null) {
             throw new ValidationException("name must not be null");
+        }
+        if(section.getName().compareTo("") == 0) {
+            throw new ValidationException("name must not be empty");
         }
         if(section.getName().isEmpty()) {
             throw new ValidationException("name must not be empty");
@@ -31,6 +37,15 @@ public class SectionValidator implements Validator<Section> {
      */
     @Override
     public void validateForUpdate(Section section) throws ValidationException {
+        if(section == null) {
+            throw new ValidationException("section must not be null");
+        }
+        if(section.getName() == null) {
+            throw new ValidationException("name must not be null");
+        }
+        if(section.getName().compareTo("") == 0) {
+            throw new ValidationException("name must not be empty");
+        }
         if(section.getIdentity() == null) {
             throw new ValidationException("identity must not be null");
         }
@@ -43,6 +58,9 @@ public class SectionValidator implements Validator<Section> {
      */
     @Override
     public void validateForDelete(Section section) throws ValidationException {
+        if(section == null) {
+            throw new ValidationException("section must not be null");
+        }
         if(section.getIdentity() == null) {
             throw new ValidationException("identity must not be null");
         }

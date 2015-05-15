@@ -20,9 +20,10 @@ public class Table {
      * @param number the identity of the category
      * @return table object with the given number
      */
-    public static Table withNumber(long number) {
+    public static Table withIdentity(Section section, long number) {
         Table table = new Table();
         table.setNumber(number);
+        table.setSection(section);
         return table;
     }
 

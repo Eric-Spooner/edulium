@@ -1,6 +1,11 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.impl.DBTableDAO;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * domain object which represents a section in the restaurant
@@ -8,10 +13,6 @@ import java.util.ArrayList;
 public class Section {
     private Long identity;
     private String name;
-
-    public Section() {
-
-    }
 
     /**
      * Creates a new section object and assigns the given identity to it.
@@ -53,11 +54,40 @@ public class Section {
     }
 
     /**
+     * @return a list of tables in this section
+     */
+    public List getTables() throws DAOException {
+        DAO<Table> tableDAO = new DBTableDAO();
+        Table matcher = new Table();
+        matcher.setSection(this);
+        List tableList;
+
+        try {
+            tableList = tableDAO.find(matcher);
+        }
+        catch(DAOException e) {
+            throw new DAOException("cannot find table", e);
+        }
+
+        return tableList;
+    }
+
+    /**
+     * @param table adds one table to this section,
+     *               already existing tables are not changed
+     */
+    public void setTable(Table table) {
+        table.setSection(this);
+    }
+
+    /**
      * @param tables adds multiple tables to this section,
      *               already existing tables are not changed
      */
-    public void addTables(ArrayList<Table> tables) {
-        tables.addAll(tables);
+    public void setTables(ArrayList<Table> tables) {
+        for(Table table : tables) {
+            table.setSection(this);
+        }
     }
 
     @Override

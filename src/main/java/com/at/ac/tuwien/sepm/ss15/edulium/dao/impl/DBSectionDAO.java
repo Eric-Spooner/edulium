@@ -15,7 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -25,8 +24,8 @@ import java.util.List;
 /**
  * H2 Database Implementation of the section interface
  */
-public class SectionDAOImpl implements DAO<Section> {
-    private static final Logger LOGGER = LogManager.getLogger(SectionDAOImpl.class);
+public class DBSectionDAO implements DAO<Section> {
+    private static final Logger LOGGER = LogManager.getLogger(DBSectionDAO.class);
 
     @Autowired
     private DataSource dataSource;
