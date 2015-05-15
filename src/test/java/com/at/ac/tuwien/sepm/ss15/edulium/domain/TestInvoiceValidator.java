@@ -38,23 +38,6 @@ public class TestInvoiceValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForCreate_shouldFailWithProvidedInstallments() throws ValidationException {
-        Invoice invoice = new Invoice();
-        invoice.setTime(LocalDateTime.now());
-        invoice.setGross(new BigDecimal("23"));
-        invoice.setCreator(new User());
-
-        Installment in1 = new Installment();
-        Installment in2 = new Installment();
-        List<Installment> inList = new ArrayList<>();
-        inList.add(in1);
-        inList.add(in2);
-        invoice.setInstallments(inList);
-
-        invoiceValidator.validateForCreate(invoice);
-    }
-
-    @Test(expected = ValidationException.class)
     public void testValidateForCreate_shouldFailWithNullInvoice() throws ValidationException {
         Invoice invoice = null;
 
@@ -97,16 +80,6 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         Installment in1 = new Installment();
         List<Installment> inList = new ArrayList<>();
         inList.add(in1);
-        invoice.setInstallments(inList);
-
-        invoiceValidator.validateForUpdate(invoice);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForUpdate_shouldFailWhenInstallmentsAreMissing() throws ValidationException {
-        Invoice invoice = new Invoice();
-        invoice.setIdentity(1L);
-        invoice.addPaid(new BigDecimal("12"));
 
         invoiceValidator.validateForUpdate(invoice);
     }
