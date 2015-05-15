@@ -82,7 +82,7 @@ public class MenuDAOTest extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testCreate_addingEmptyObjectShouldFail() throws DAOException, ValidationException {
         //Given
-        Menu men = null;
+        Menu men = new Menu();
 
         //When
         try {
