@@ -1,6 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 
@@ -53,6 +54,12 @@ public class MenuValidator implements Validator<Menu> {
             throw new ValidationException("Menu entries not be null");
         }else if(object.getEntries().size() == 0){
             throw new ValidationException("There should be at least one menu entry");
+        }else{
+            for(MenuEntry entry:object.getEntries()){
+                if(entry.getIdentity() == null) {
+                    throw new ValidationException("Every MenuEntry must have an Identity");
+                }
+            }
         }
     }
 }
