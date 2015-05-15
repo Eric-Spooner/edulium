@@ -23,8 +23,8 @@ public class TestOrderValidator extends AbstractDomainTest {
         Order order = new Order();
         order.setTable(Table.withIdentity(Section.withIdentity(4), 3));
         order.setMenuEntry(MenuEntry.withIdentity(4));
-        order.setBrutto(BigDecimal.valueOf(0));
-        order.setTax(BigDecimal.valueOf(0));
+        order.setBrutto(BigDecimal.valueOf(1));
+        order.setTax(BigDecimal.valueOf(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("");
 
@@ -159,8 +159,8 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setIdentity((long) 1);
         order.setTable(Table.withIdentity(Section.withIdentity(4), 3));
         order.setMenuEntry(MenuEntry.withIdentity(5));
-        order.setBrutto(BigDecimal.valueOf(0));
-        order.setTax(BigDecimal.valueOf(0));
+        order.setBrutto(BigDecimal.valueOf(1));
+        order.setTax(BigDecimal.valueOf(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
 
@@ -231,7 +231,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setIdentity(1L);
 
         // WHEN
-        orderValidator.validateForUpdate(order);
+        orderValidator.validateForDelete(order);
     }
 
     @Test(expected = ValidationException.class)
