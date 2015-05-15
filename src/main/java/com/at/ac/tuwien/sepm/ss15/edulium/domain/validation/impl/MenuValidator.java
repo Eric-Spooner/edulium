@@ -5,7 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 
 /**
- * Created by - on 11.05.2015.
+ * validator implementation for the Menu domain object
  */
 public class MenuValidator implements Validator<Menu> {
     @Override
