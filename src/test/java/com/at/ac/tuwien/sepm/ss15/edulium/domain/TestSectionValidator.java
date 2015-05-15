@@ -6,154 +6,154 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Unit Test for the MenuCategory validator
+ * Unit Test for the Section validator
  */
 public class TestSectionValidator extends AbstractDomainTest {
     @Autowired
-    private Validator<MenuCategory> menuCategoryValidator;
+    private Validator<Section> sectionValidator;
 
     @Test
-    public void testValidateForCreate_shouldAcceptMenuCategory() throws ValidationException {
+    public void testValidateForCreate_shouldAcceptSection() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = new MenuCategory();
-        menuCategory.setName("cat");
+        Section section = new Section();
+        section.setName("section");
 
         // WHEN
-        menuCategoryValidator.validateForCreate(menuCategory);
+        sectionValidator.validateForCreate(section);
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForCreate_menuCategoryWithoutNameShouldThrow() throws ValidationException {
+    public void testValidateForCreate_sectionWithoutNameShouldThrow() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = new MenuCategory();
+        Section section = new Section();
 
         // WHEN
-        menuCategoryValidator.validateForCreate(menuCategory);
+        sectionValidator.validateForCreate(section);
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForCreate_menuCategoryWithEmptyNameShouldThrow() throws ValidationException {
+    public void testValidateForCreate_sectionWithEmptyNameShouldThrow() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = new MenuCategory();
-        menuCategory.setName("");
+        Section section = new Section();
+        section.setName("");
 
         // WHEN
-        menuCategoryValidator.validateForCreate(menuCategory);
+        sectionValidator.validateForCreate(section);
     }
 
     @Test(expected = ValidationException.class)
     public void testValidateForCreate_nullObjectShouldThrow() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = null;
+        Section section = null;
 
         // WHEN
-        menuCategoryValidator.validateForCreate(menuCategory);
+        sectionValidator.validateForCreate(section);
     }
 
     @Test
-    public void testValidateForUpdate_shouldAcceptMenuCategory() throws ValidationException {
+    public void testValidateForUpdate_shouldAcceptSection() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = new MenuCategory();
-        menuCategory.setIdentity(0L);
-        menuCategory.setName("cat");
+        Section section = new Section();
+        section.setIdentity(0L);
+        section.setName("section");
 
         // WHEN
-        menuCategoryValidator.validateForUpdate(menuCategory);
+        sectionValidator.validateForUpdate(section);
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForUpdate_menuCategoryWithoutIdentityShouldThrow() throws ValidationException {
+    public void testValidateForUpdate_sectionWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = new MenuCategory();
-        menuCategory.setName("cat");
+        Section section = new Section();
+        section.setName("section");
 
         // WHEN
-        menuCategoryValidator.validateForUpdate(menuCategory);
+        sectionValidator.validateForUpdate(section);
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForUpdate_menuCategoryWithoutNameShouldThrow() throws ValidationException {
+    public void testValidateForUpdate_sectionWithoutNameShouldThrow() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = new MenuCategory();
-        menuCategory.setIdentity(0L);
+        Section section = new Section();
+        section.setIdentity(0L);
 
         // WHEN
-        menuCategoryValidator.validateForUpdate(menuCategory);
+        sectionValidator.validateForUpdate(section);
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForUpdate_menuCategoryWithEmptyNameShouldThrow() throws ValidationException {
+    public void testValidateForUpdate_sectionWithEmptyNameShouldThrow() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = new MenuCategory();
-        menuCategory.setIdentity(0L);
-        menuCategory.setName("");
+        Section section = new Section();
+        section.setIdentity(0L);
+        section.setName("");
 
         // WHEN
-        menuCategoryValidator.validateForUpdate(menuCategory);
+        sectionValidator.validateForUpdate(section);
     }
 
     @Test(expected = ValidationException.class)
     public void testValidateForUpdate_nullObjectShouldThrow() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = null;
+        Section section = null;
 
         // WHEN
-        menuCategoryValidator.validateForUpdate(menuCategory);
+        sectionValidator.validateForUpdate(section);
     }
 
     @Test
-    public void testValidateForDelete_shouldAcceptMenuCategory() throws ValidationException {
+    public void testValidateForDelete_shouldAcceptSection() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = new MenuCategory();
-        menuCategory.setIdentity(0L);
+        Section section = new Section();
+        section.setIdentity(0L);
 
         // WHEN
-        menuCategoryValidator.validateForDelete(menuCategory);
+        sectionValidator.validateForDelete(section);
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForDelete_menuCategoryWithoutIdentityShouldThrow() throws ValidationException {
+    public void testValidateForDelete_sectionWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = new MenuCategory();
+        Section section = new Section();
 
         // WHEN
-        menuCategoryValidator.validateForDelete(menuCategory);
+        sectionValidator.validateForDelete(section);
     }
 
     @Test(expected = ValidationException.class)
     public void testValidateForDelete_nullObjectShouldThrow() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = null;
+        Section section = null;
 
         // WHEN
-        menuCategoryValidator.validateForDelete(menuCategory);
+        sectionValidator.validateForDelete(section);
     }
 
     @Test
-    public void testValidateIdentity_shouldAcceptMenuCategory() throws ValidationException {
+    public void testValidateIdentity_shouldAcceptSection() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = new MenuCategory();
-        menuCategory.setIdentity(0L);
+        Section section = new Section();
+        section.setIdentity(0L);
 
         // WHEN
-        menuCategoryValidator.validateIdentity(menuCategory);
+        sectionValidator.validateIdentity(section);
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateIdentity_menuCategoryWithoutIdentityShouldThrow() throws ValidationException {
+    public void testValidateIdentity_sectionWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = new MenuCategory();
+        Section section = new Section();
 
         // WHEN
-        menuCategoryValidator.validateIdentity(menuCategory);
+        sectionValidator.validateIdentity(section);
     }
 
     @Test(expected = ValidationException.class)
     public void testValidateIdentity_nullObjectShouldThrow() throws ValidationException {
         // GIVEN
-        MenuCategory menuCategory = null;
+        Section section = null;
 
         // WHEN
-        menuCategoryValidator.validateIdentity(menuCategory);
+        sectionValidator.validateIdentity(section);
     }
 }

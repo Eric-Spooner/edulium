@@ -4,7 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="tableDAO" class="com.at.ac.tuwien.sepm.ss15.edulium.dao.impl.TableDAOImpl">
+    <bean id="tableDAO" class="com.at.ac.tuwien.sepm.ss15.edulium.dao.impl.DBTableDAO">
     </bean>
 
 </beans>

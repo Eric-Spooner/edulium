@@ -29,11 +29,11 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestTableDAO extends AbstractDAOTest {
     @Autowired
-    private DAO tableDAO;
+    private DAO<Table> tableDAO;
     @Autowired
-    private DAO userDAO;
+    private DAO<User> userDAO;
     @Autowired
-    private DAO sectionDAO;
+    private DAO<Section> sectionDAO;
     private User user1;
     private User user2;
     private User user3;
