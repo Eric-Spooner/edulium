@@ -62,7 +62,7 @@ public class DBMenuDAO implements DAO<Menu> {
         for(MenuEntry entry:menu.getEntries()) {
             try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setLong(1, menu.getIdentity());
-                stmt.setLong(2,entry.getIdentity());
+                stmt.setLong(2, entry.getIdentity());
                 stmt.setBigDecimal(3,entry.getPrice());
                 stmt.executeUpdate();
             } catch (SQLException e) {
@@ -104,6 +104,7 @@ public class DBMenuDAO implements DAO<Menu> {
      * @param menu updated dataset
      * @throws DAOException if an error accessing the database occurred
      */
+    /*
     private void generateHistory(Menu menu) throws DAOException {
         LOGGER.debug("entering generateHistory with parameters " + menu);
 
@@ -114,13 +115,13 @@ public class DBMenuDAO implements DAO<Menu> {
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
-            stmt.setLong(2, menuCategory.getIdentity());          // dataset id
-            stmt.setLong(3, menuCategory.getIdentity());          // dataset id
-
+            stmt.setLong(2, menu.getIdentity());          // dataset id
+            stmt.setLong(3, menu.getIdentity());          // dataset id
             stmt.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error("generating history failed", e);
             throw new DAOException("generating history failed", e);
         }
     }
+    */
 }
