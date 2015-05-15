@@ -281,7 +281,7 @@ public class TestTableDAO extends AbstractDAOTest {
         tableDAO.create(table);
 
         // check if table created
-        List<Table> objects = tableDAO.find(Table.withNumber(table.getNumber()));
+        List<Table> objects = tableDAO.find(Table.withIdentity(section1, table.getNumber()));
         assertEquals(objects.size(), 1);
         assertEquals(objects.get(0), table);
 
@@ -565,12 +565,11 @@ public class TestTableDAO extends AbstractDAOTest {
         tableDAO.create(table1);
 
         // update data
-        Table table2 = Table.withNumber(table1.getNumber());
+        Table table2 = Table.withIdentity(section2, table1.getNumber());
         table2.setSeats(13);
         table2.setColumn(14);
         table2.setRow(15);
         table2.setUser(user2);
-        table2.setSection(section2);
         LocalDateTime updateTime = LocalDateTime.now();
         tableDAO.update(table2);
 
