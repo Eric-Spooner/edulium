@@ -30,6 +30,10 @@ public class TableValidator implements Validator<Table> {
      */
     @Override
     public void validateForUpdate(Table table) throws ValidationException {
+        if(table == null) {
+            throw new ValidationException("table must not be null");
+        }
+
         if(table.getNumber() == null) {
             throw new ValidationException("number must not be null");
         }
@@ -54,6 +58,10 @@ public class TableValidator implements Validator<Table> {
      */
     @Override
     public void validateForDelete(Table table) throws ValidationException {
+        if(table == null) {
+            throw new ValidationException("table must not be null");
+        }
+
         if(table.getNumber() == null) {
             throw new ValidationException("number must not be null");
         }
