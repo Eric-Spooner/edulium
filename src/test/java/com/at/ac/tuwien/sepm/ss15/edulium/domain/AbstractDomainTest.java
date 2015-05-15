@@ -17,6 +17,6 @@ import static org.junit.Assert.fail;
  * Base class for all Domain Tests which loads the domain context configuration.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:Spring-DAO.xml")
+@ContextConfiguration("classpath:Spring-Domain.xml")
 public abstract class AbstractDomainTest {
 }

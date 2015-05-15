@@ -29,8 +29,6 @@ public class DBMenuDAO implements DAO<Menu> {
     @Autowired
     private DataSource dataSource;
     @Autowired
-    private DAO<MenuEntry> menuEntryDAO;
-    @Autowired
     private Validator<Menu> validator;
     @Override
     public void create(Menu menu) throws DAOException, ValidationException {
