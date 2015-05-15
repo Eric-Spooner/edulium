@@ -80,6 +80,68 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
         }
     }
 
+    @Test(expected = DAOException.class)
+    public void testCreate_addingObjectWithoutPersistentCategoryShouldFail() throws DAOException, ValidationException {
+        // PREPARE
+        Long identity = 0L;
+        MenuCategory cat = new MenuCategory();
+        cat.setIdentity(identity);
+
+        // generate identity for the category which is not used by any persistent category
+        try {
+            while (!menuCategoryDAO.find(cat).isEmpty()) {
+                identity++;
+                cat.setIdentity(identity);
+            }
+        } catch (DAOException e) {
+            // exception should not occur here
+            fail();
+        }
+
+        // GIVEN
+        MenuEntry entry = createMenuEntry("entry", "desc", "cat", 20, 0.2, true);
+        // set category which has a identity, but is not persistent
+        entry.setCategory(cat);
+
+        // WHEN
+        try {
+            menuEntryDAO.create(entry);
+        } finally {
+            assertNull(entry.getIdentity());
+        }
+    }
+
+    @Test(expected = DAOException.class)
+    public void testCreate_addingObjectWithoutPersistentTaxRateShouldFail() throws DAOException, ValidationException {
+        // PREPARE
+        Long identity = 0L;
+        TaxRate tax = new TaxRate();
+        tax.setIdentity(identity);
+
+        // generate identity for the taxRate which is not used by any persistent taxRate
+        try {
+            while (!taxRateDAO.find(tax).isEmpty()) {
+                identity++;
+                tax.setIdentity(identity);
+            }
+        } catch (DAOException e) {
+            // exception should not occur here
+            fail();
+        }
+
+        // GIVEN
+        MenuEntry entry = createMenuEntry("entry", "desc", "cat", 20, 0.2, true);
+        // set taxRate which has a identity, but is not persistent
+        entry.setTaxRate(tax);
+
+        // WHEN
+        try {
+            menuEntryDAO.create(entry);
+        } finally {
+            assertNull(entry.getIdentity());
+        }
+    }
+
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         //  GIVEN
