@@ -3,26 +3,17 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.impl.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.sun.xml.internal.ws.developer.MemberSubmissionAddressing;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Unit Test for the TableDAO
@@ -270,7 +261,6 @@ public class TestTableDAO extends AbstractDAOTest {
         // GIVEN
         before();
         Table table = new Table();
-        User user = new User();
         table.setNumber((long)2);
         table.setSeats(3);
         table.setColumn(4);
@@ -478,7 +468,6 @@ public class TestTableDAO extends AbstractDAOTest {
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         before();
-        Table matcher = new Table();
         Table table1 = new Table();
         Table table2 = new Table();
         Table table3 = new Table();
