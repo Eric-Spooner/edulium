@@ -1,4 +1,4 @@
-package com.at.ac.tuwien.sepm.ss15.edulium.dao;
+package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Installment;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
@@ -19,9 +19,7 @@ import java.util.List;
 /**
  * Test cases for the invoice validator
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:Spring-Domain.xml")
-public class TestInvoiceValidator {
+public class TestInvoiceValidator extends AbstractDomainTest {
 
     @Autowired
     Validator<Invoice> invoiceValidator;

@@ -20,8 +20,8 @@ import java.util.List;
 /**
  * H2 Database Implementation of the UserDAO interface
  */
-class UserDAOImpl implements DAO<User> {
-    private static final Logger LOGGER = LogManager.getLogger(UserDAOImpl.class);
+class DBUserDAO implements DAO<User> {
+    private static final Logger LOGGER = LogManager.getLogger(DBUserDAO.class);
 
     @Autowired
     private DataSource dataSource;
@@ -36,7 +36,7 @@ class UserDAOImpl implements DAO<User> {
 
         final String query = "INSERT INTO RestaurantUser (ID, name, userRole) VALUES (?, ?, ?)";
 
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, user.getIdentity());
             stmt.setString(2, user.getName());
             stmt.setString(3, user.getRole());
@@ -151,14 +151,17 @@ class UserDAOImpl implements DAO<User> {
 
     @Override
     public List<History<User>> getHistory(User user) throws DAOException, ValidationException {
-        LOGGER.debug("entering getHistory with parameters " + user);
+        LOGGER.debug("Entering getHistory with parameters: " + user);
 
         validator.validateIdentity(user);
-        List<History<User>> history = new ArrayList<>();
+
         final String query = "SELECT * FROM RestaurantUserHistory WHERE ID = ? ORDER BY changeNr";
+
+        List<History<User>> history = new ArrayList<>();
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, user.getIdentity());
+
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 history.add(historyFromResultSet(result));
@@ -171,8 +174,14 @@ class UserDAOImpl implements DAO<User> {
         return history;
     }
 
+    /**
+     * writes the changes of the dataset into the database
+     * stores the time; number of the change and the user which executed the changes
+     * @param user updated dataset
+     * @throws DAOException if an error accessing the database occurred
+     */
     private void generateHistory(User user) throws DAOException {
-        LOGGER.debug("entering generateHistory with parameters " + user);
+        LOGGER.debug("Entering generateHistory with parameters: " + user);
 
         final String query = "INSERT INTO RestaurantUserHistory " +
                 "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
