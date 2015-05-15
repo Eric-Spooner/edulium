@@ -34,6 +34,7 @@ public class TestTableDAO extends AbstractDAOTest {
     private DAO<User> userDAO;
     @Autowired
     private DAO<Section> sectionDAO;
+
     private User user1;
     private User user2;
     private User user3;
@@ -41,6 +42,7 @@ public class TestTableDAO extends AbstractDAOTest {
     private Section section2;
     private Section section3;
 
+    @Before
     public void before() throws ValidationException, DAOException {
         user1 = new User();
         user2 = new User();
@@ -76,7 +78,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table table = new Table();
         table.setNumber((long)1);
         table.setSection(section1);
@@ -103,7 +104,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testCreate_addingObjectWithoutNumberShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table table = new Table();
         table.setSection(section1);
         table.setUser(user1);
@@ -118,7 +118,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testCreate_addingObjectWithoutSectionShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table table = new Table();
         table.setNumber((long) 1);
         table.setUser(user1);
@@ -133,7 +132,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testCreate_addingObjectWithoutUserShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table table = new Table();
         table.setNumber((long) 1);
         table.setSection(section1);
@@ -148,7 +146,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testCreate_addingObjectWithoutSeatsShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table table = new Table();
         table.setNumber((long) 1);
         table.setSection(section1);
@@ -163,7 +160,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testCreate_addingObjectWithoutColumnShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table table = new Table();
         table.setNumber((long) 1);
         table.setSection(section1);
@@ -178,7 +174,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testCreate_addingObjectWithoutRowShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table table = new Table();
         table.setNumber((long) 1);
         table.setSection(section1);
@@ -193,7 +188,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table table = new Table();
         table.setNumber((long)1);
         table.setSection(section1);
@@ -225,7 +219,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testUpdate_updatingObjectWithNumberNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table table = new Table();
         table.setSeats(3);
         table.setColumn(4);
@@ -240,7 +233,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test(expected = DAOException.class)
     public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table table = new Table();
         table.setSeats(3);
         table.setColumn(4);
@@ -268,7 +260,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test
     public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table table = new Table();
         User user = new User();
         table.setNumber((long)2);
@@ -299,7 +290,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testDelete_deletingObjectWithNumberNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table table = new Table();
         table.setSection(section1);
         table.setUser(user1);
@@ -314,7 +304,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test(expected = DAOException.class)
     public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table table = new Table();
         Long number = (long) 1;
         table.setNumber(number);
@@ -342,7 +331,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test
     public void testFind_byNumberShouldReturnObject() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table matcher = new Table();
         Table table1 = new Table();
         Table table2 = new Table();
@@ -394,7 +382,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test
     public void testFind_bySeatsAndRowAndColumnShouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table table1 = new Table();
         Table table2 = new Table();
         Table table3 = new Table();
@@ -477,7 +464,6 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
-        before();
         Table matcher = new Table();
         Table table1 = new Table();
         Table table2 = new Table();
@@ -547,7 +533,6 @@ public class TestTableDAO extends AbstractDAOTest {
 
     @Test
     public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
-        before();
         // PREPARE
         // get test user
         User user = getCurrentUser();
