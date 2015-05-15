@@ -49,12 +49,15 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
                 "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            TaxRate taxRate = menuEntry.getTaxRate();
+            MenuCategory category = menuEntry.getCategory();
+
             stmt.setString(1, menuEntry.getName());
             stmt.setBigDecimal(2, menuEntry.getPrice());
             stmt.setBoolean(3, menuEntry.getAvailable());
             stmt.setString(4, menuEntry.getDescription());
-            stmt.setLong(5, menuEntry.getTaxRate().getIdentity());
-            stmt.setLong(6, menuEntry.getCategory().getIdentity());
+            stmt.setObject(5, taxRate == null ? null : taxRate.getIdentity());
+            stmt.setObject(6, category == null ? null : category.getIdentity());
             stmt.executeUpdate();
 
             ResultSet key = stmt.getGeneratedKeys();
@@ -79,12 +82,15 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
                 "description = ?, taxRate_ID = ?, category_ID = ? WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            TaxRate taxRate = menuEntry.getTaxRate();
+            MenuCategory category = menuEntry.getCategory();
+
             stmt.setString(1, menuEntry.getName());
             stmt.setBigDecimal(2, menuEntry.getPrice());
             stmt.setBoolean(3, menuEntry.getAvailable());
             stmt.setString(4, menuEntry.getDescription());
-            stmt.setLong(5, menuEntry.getTaxRate().getIdentity());
-            stmt.setLong(6, menuEntry.getCategory().getIdentity());
+            stmt.setObject(5, taxRate == null ? null : taxRate.getIdentity());
+            stmt.setObject(6, category == null ? null : category.getIdentity());
             stmt.setLong(7, menuEntry.getIdentity());
 
             if (stmt.executeUpdate() == 0) {
@@ -142,13 +148,16 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
         final List<MenuEntry> objects = new ArrayList<>();
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            TaxRate taxRate = menuEntry.getTaxRate();
+            MenuCategory category = menuEntry.getCategory();
+
             stmt.setObject(1, menuEntry.getIdentity());
             stmt.setObject(2, menuEntry.getName());
             stmt.setObject(3, menuEntry.getPrice());
             stmt.setObject(4, menuEntry.getAvailable());
             stmt.setObject(5, menuEntry.getDescription());
-            stmt.setObject(6, menuEntry.getTaxRate().getIdentity());
-            stmt.setObject(7, menuEntry.getCategory().getIdentity());
+            stmt.setObject(6, taxRate == null ? null : taxRate.getIdentity());
+            stmt.setObject(7, category == null ? null : category.getIdentity());
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {

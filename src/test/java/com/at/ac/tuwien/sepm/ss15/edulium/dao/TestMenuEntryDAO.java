@@ -156,7 +156,7 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
         // WHEN
         MenuEntry updatedEntry = createMenuEntry("newEntry", "newDesc", "newCat", 19.99, 0.5, false);
         updatedEntry.setIdentity(entry.getIdentity());
-        menuEntryDAO.update(entry);
+        menuEntryDAO.update(updatedEntry);
 
         // THEN
         // check if entry was updated
@@ -202,12 +202,12 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
     @Test
     public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // GIVEN
-        int initialSize = menuCategoryDAO.getAll().size();
+        int initialSize = menuEntryDAO.getAll().size();
         MenuEntry entry = createMenuEntry("entry", "desc", "cat", 20.0, 0.2, true);
         menuEntryDAO.create(entry);
 
         // check if entry created
-        assertEquals(initialSize + 1, menuCategoryDAO.getAll().size());
+        assertEquals(initialSize + 1, menuEntryDAO.getAll().size());
 
         // WHEN
         menuEntryDAO.delete(entry);
@@ -215,7 +215,7 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
         // THEN
         // check if entry was removed
         assertTrue(menuEntryDAO.find(MenuEntry.withIdentity(entry.getIdentity())).isEmpty());
-        assertEquals(initialSize, menuCategoryDAO.getAll().size());
+        assertEquals(initialSize, menuEntryDAO.getAll().size());
     }
 
     @Test(expected = ValidationException.class)
@@ -442,7 +442,7 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
         TaxRate tax1 = new TaxRate();
         tax1.setValue(BigDecimal.valueOf(0.1));
         TaxRate tax2 = new TaxRate();
-        tax1.setValue(BigDecimal.valueOf(0.2));
+        tax2.setValue(BigDecimal.valueOf(0.2));
 
         taxRateDAO.create(tax1);
         taxRateDAO.create(tax2);
