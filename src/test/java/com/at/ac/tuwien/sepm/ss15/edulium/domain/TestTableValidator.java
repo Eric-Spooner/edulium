@@ -78,6 +78,21 @@ public class TestTableValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void testValidateForCreate_tableWithInvalidSectionShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber(1L);
+        table.setSection(new Section());
+        table.setUser(User.withIdentity("A"));
+        table.setSeats(2);
+        table.setColumn(3);
+        table.setRow(4);
+
+        // WHEN
+        tableValidator.validateForCreate(table);
+    }
+
+    @Test(expected = ValidationException.class)
     public void testValidateForCreate_tableWithoutUserShouldThrow() throws ValidationException, DAOException {
         // GIVEN
         Table table = new Table();
@@ -86,6 +101,21 @@ public class TestTableValidator extends AbstractDomainTest {
         section.setName("Section");
         table.setNumber((long) 1);
         table.setSection(section);
+        table.setSeats(2);
+        table.setColumn(3);
+        table.setRow(4);
+
+        // WHEN
+        tableValidator.validateForCreate(table);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_tableWithInvalidUserShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber(1L);
+        table.setSection(Section.withIdentity(1L));
+        table.setUser(new User());
         table.setSeats(2);
         table.setColumn(3);
         table.setRow(4);
@@ -276,6 +306,134 @@ public class TestTableValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_tableWithoutSectionShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        Table table = new Table();
+        User user = new User();
+        user.setIdentity("A");
+        user.setName("User");
+        user.setRole("Role");
+        table.setNumber((long) 1);
+        table.setUser(user);
+        table.setSeats(2);
+        table.setColumn(3);
+        table.setRow(4);
+
+        // WHEN
+        tableValidator.validateForUpdate(table);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_tableWithInvalidSectionShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber(1L);
+        table.setSection(new Section());
+        table.setUser(User.withIdentity("A"));
+        table.setSeats(2);
+        table.setColumn(3);
+        table.setRow(4);
+
+        // WHEN
+        tableValidator.validateForUpdate(table);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_tableWithoutUserShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        Table table = new Table();
+        Section section = new Section();
+        section.setIdentity((long) 1);
+        section.setName("Section");
+        table.setNumber((long) 1);
+        table.setSection(section);
+        table.setSeats(2);
+        table.setColumn(3);
+        table.setRow(4);
+
+        // WHEN
+        tableValidator.validateForUpdate(table);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_tableWithInvalidUserShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber(1L);
+        table.setSection(Section.withIdentity(1L));
+        table.setUser(new User());
+        table.setSeats(2);
+        table.setColumn(3);
+        table.setRow(4);
+
+        // WHEN
+        tableValidator.validateForUpdate(table);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_tableWithoutSeatsShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        Table table = new Table();
+        User user = new User();
+        user.setIdentity("A");
+        user.setName("User");
+        user.setRole("Role");
+        Section section = new Section();
+        section.setIdentity((long) 1);
+        section.setName("Section");
+        table.setNumber((long) 1);
+        table.setSection(section);
+        table.setUser(user);
+        table.setColumn(3);
+        table.setRow(4);
+
+        // WHEN
+        tableValidator.validateForUpdate(table);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_tableWithoutColumnShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        Table table = new Table();
+        User user = new User();
+        user.setIdentity("A");
+        user.setName("User");
+        user.setRole("Role");
+        Section section = new Section();
+        section.setIdentity((long) 1);
+        section.setName("Section");
+        table.setNumber((long) 1);
+        table.setSection(section);
+        table.setUser(user);
+        table.setSeats(2);
+        table.setRow(4);
+
+        // WHEN
+        tableValidator.validateForUpdate(table);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_tableWithoutRowShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        Table table = new Table();
+        User user = new User();
+        user.setIdentity("A");
+        user.setName("User");
+        user.setRole("Role");
+        Section section = new Section();
+        section.setIdentity((long) 1);
+        section.setName("Section");
+        table.setNumber((long) 1);
+        table.setSection(section);
+        table.setUser(user);
+        table.setSeats(2);
+        table.setColumn(3);
+
+        // WHEN
+        tableValidator.validateForUpdate(table);
+    }
+
+    @Test(expected = ValidationException.class)
     public void testValidateForUpdate_tableWithNegativeSeatsShouldThrow() throws ValidationException, DAOException {
         // GIVEN
         Table table = new Table();
@@ -352,10 +510,43 @@ public class TestTableValidator extends AbstractDomainTest {
         tableValidator.validateForUpdate(table);
     }
 
+    @Test
+    public void testValidateForDelete_shouldAcceptTable() throws ValidationException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber(0L);
+        table.setSection(Section.withIdentity(1L));
+
+        // WHEN
+        tableValidator.validateForDelete(table);
+    }
+
     @Test(expected = ValidationException.class)
     public void testValidateForDelete_tableWithoutNumberShouldThrow() throws ValidationException {
         // GIVEN
         Table table = new Table();
+        table.setSection(Section.withIdentity(1L));
+
+        // WHEN
+        tableValidator.validateForDelete(table);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForDelete_tableWithoutSectionShouldThrow() throws ValidationException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber(1L);
+
+        // WHEN
+        tableValidator.validateForDelete(table);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForDelete_tableWithInvalidSectionShouldThrow() throws ValidationException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber(1L);
+        table.setSection(new Section());
 
         // WHEN
         tableValidator.validateForDelete(table);
@@ -375,6 +566,7 @@ public class TestTableValidator extends AbstractDomainTest {
         // GIVEN
         Table table = new Table();
         table.setNumber(0L);
+        table.setSection(Section.withIdentity(1L));
 
         // WHEN
         tableValidator.validateIdentity(table);
@@ -384,6 +576,28 @@ public class TestTableValidator extends AbstractDomainTest {
     public void testValidateIdentity_tableWithoutNumberShouldThrow() throws ValidationException {
         // GIVEN
         Table table = new Table();
+        table.setSection(Section.withIdentity(1L));
+
+        // WHEN
+        tableValidator.validateIdentity(table);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateIdentity_tableWithoutSectionShouldThrow() throws ValidationException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber(0L);
+
+        // WHEN
+        tableValidator.validateIdentity(table);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateIdentity_tableWithInvalidSectionShouldThrow() throws ValidationException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber(0L);
+        table.setSection(new Section());
 
         // WHEN
         tableValidator.validateIdentity(table);
