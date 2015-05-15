@@ -41,7 +41,6 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         assertEquals(invoice, invoiceList.get(0));
     }
 
-    // TODO: Test the add functionality of the paid amount in Invoice
     @Test
     public void testUpdate_shouldUpdateObject() throws ValidationException, DAOException {
         // GIVEN
@@ -52,7 +51,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoiceDAO.create(invoice);
 
         // WHEN
-        invoice.setPaid(new BigDecimal("28.0"));
+        invoice.addPaid(new BigDecimal("28.0"));
         Installment in1 = new Installment();
         Installment in2 = new Installment();
         List<Installment> inList = new ArrayList<>();

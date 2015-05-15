@@ -11,7 +11,7 @@ public class Invoice {
     private Long identity;
     private LocalDateTime time;
     private BigDecimal gross;
-    private BigDecimal paid; // TODO: instead of setters, make an add method (The paid amount will be calculated here)
+    private BigDecimal paid = BigDecimal.ZERO;
     private User creator;
     private List<Installment> installments;
 
@@ -69,17 +69,21 @@ public class Invoice {
     }
 
     /**
-     * @return Returns the paid amount (can be null)
+     * @return Returns the total amount that has been paid so far (can be null)
      */
     public BigDecimal getPaid() {
         return paid;
     }
 
     /**
-     * @param paid Returns the paid amount
+     * Adds an amount that got paid to the total paid amount
+     * @param paid The amount that is going to be added to the
+     *             total paid amount
+     * @return Returns the total paid amount after the new amount
+     *             was added
      */
-    public void setPaid(BigDecimal paid) {
-        this.paid = paid;
+    public BigDecimal addPaid(BigDecimal paid) {
+        return this.paid.add(paid);
     }
 
     /**

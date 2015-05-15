@@ -1,15 +1,9 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Installment;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -89,7 +83,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15"));
-        invoice.setPaid(new BigDecimal("16"));
+        invoice.addPaid(new BigDecimal("16"));
 
         invoiceValidator.validateForCreate(invoice);
     }
@@ -98,7 +92,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
     public void testValidateForUpdate_shouldAcceptInvoice() throws ValidationException {
         Invoice invoice = new Invoice();
         invoice.setIdentity(1L);
-        invoice.setPaid(new BigDecimal("12"));
+        invoice.addPaid(new BigDecimal("12"));
 
         Installment in1 = new Installment();
         List<Installment> inList = new ArrayList<>();
@@ -112,7 +106,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
     public void testValidateForUpdate_shouldFailWhenInstallmentsAreMissing() throws ValidationException {
         Invoice invoice = new Invoice();
         invoice.setIdentity(1L);
-        invoice.setPaid(new BigDecimal("12"));
+        invoice.addPaid(new BigDecimal("12"));
 
         invoiceValidator.validateForUpdate(invoice);
     }
@@ -135,7 +129,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
     public void testValidateForUpdate_shouldFailWithNegativePaidAmount() throws ValidationException {
         Invoice invoice = new Invoice();
         invoice.setIdentity(1L);
-        invoice.setPaid(new BigDecimal("-19"));
+        invoice.addPaid(new BigDecimal("-19"));
 
         invoiceValidator.validateForUpdate(invoice);
     }
