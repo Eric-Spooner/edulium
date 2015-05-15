@@ -14,5 +14,7 @@
     <import resource="domain/Spring-TaxRateValidator.xml" />
     <import resource="domain/Spring-MenuValidator.xml" />
     <import resource="domain/Spring-OrderValidator.xml" />
+    <import resource="domain/Spring-MenuEntryValidator.xml" />
+>>>>>>> paris/menuEntry
 
 </beans>

@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 /**
  * Unit Test for the MenuEntryDAO
  */
-public class MenuEntryDAOTest extends AbstractDAOTest {
+public class TestMenuEntryDAO extends AbstractDAOTest {
     @Autowired
     private DAO<MenuEntry> menuEntryDAO;
     @Autowired
@@ -80,6 +80,68 @@ public class MenuEntryDAOTest extends AbstractDAOTest {
         }
     }
 
+    @Test(expected = DAOException.class)
+    public void testCreate_addingObjectWithoutPersistentCategoryShouldFail() throws DAOException, ValidationException {
+        // PREPARE
+        Long identity = 0L;
+        MenuCategory cat = new MenuCategory();
+        cat.setIdentity(identity);
+
+        // generate identity for the category which is not used by any persistent category
+        try {
+            while (!menuCategoryDAO.find(cat).isEmpty()) {
+                identity++;
+                cat.setIdentity(identity);
+            }
+        } catch (DAOException e) {
+            // exception should not occur here
+            fail();
+        }
+
+        // GIVEN
+        MenuEntry entry = createMenuEntry("entry", "desc", "cat", 20, 0.2, true);
+        // set category which has a identity, but is not persistent
+        entry.setCategory(cat);
+
+        // WHEN
+        try {
+            menuEntryDAO.create(entry);
+        } finally {
+            assertNull(entry.getIdentity());
+        }
+    }
+
+    @Test(expected = DAOException.class)
+    public void testCreate_addingObjectWithoutPersistentTaxRateShouldFail() throws DAOException, ValidationException {
+        // PREPARE
+        Long identity = 0L;
+        TaxRate tax = new TaxRate();
+        tax.setIdentity(identity);
+
+        // generate identity for the taxRate which is not used by any persistent taxRate
+        try {
+            while (!taxRateDAO.find(tax).isEmpty()) {
+                identity++;
+                tax.setIdentity(identity);
+            }
+        } catch (DAOException e) {
+            // exception should not occur here
+            fail();
+        }
+
+        // GIVEN
+        MenuEntry entry = createMenuEntry("entry", "desc", "cat", 20, 0.2, true);
+        // set taxRate which has a identity, but is not persistent
+        entry.setTaxRate(tax);
+
+        // WHEN
+        try {
+            menuEntryDAO.create(entry);
+        } finally {
+            assertNull(entry.getIdentity());
+        }
+    }
+
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         //  GIVEN
@@ -87,16 +149,18 @@ public class MenuEntryDAOTest extends AbstractDAOTest {
         menuEntryDAO.create(entry);
 
         // check if entry is stored
-        assertEquals(entry, menuEntryDAO.find(MenuEntry.withIdentity(entry.getIdentity())).get(0));
+        List<MenuEntry> storedObjects = menuEntryDAO.find(MenuEntry.withIdentity(entry.getIdentity()));
+        assertEquals(1, storedObjects.size());
+        assertEquals(entry, storedObjects.get(0));
 
         // WHEN
         MenuEntry updatedEntry = createMenuEntry("newEntry", "newDesc", "newCat", 19.99, 0.5, false);
         updatedEntry.setIdentity(entry.getIdentity());
-        menuEntryDAO.update(entry);
+        menuEntryDAO.update(updatedEntry);
 
         // THEN
         // check if entry was updated
-        List<MenuEntry> storedObjects = menuEntryDAO.find(MenuEntry.withIdentity(updatedEntry.getIdentity()));
+        storedObjects = menuEntryDAO.find(MenuEntry.withIdentity(updatedEntry.getIdentity()));
         assertEquals(1, storedObjects.size());
         assertEquals(updatedEntry, storedObjects.get(0));
     }
@@ -112,21 +176,24 @@ public class MenuEntryDAOTest extends AbstractDAOTest {
 
     @Test(expected = DAOException.class)
     public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
-        // GIVEN
+        // PREPARE
         Long identity = (long) 1;
-        MenuEntry entry = createMenuEntry("entry", "desc", "cat", 20.0, 0.2, true);
-        entry.setIdentity(identity);
-
+        MenuEntry matcher = new MenuEntry();
+        matcher.setIdentity(identity);
         // generate identity which is not used by any persistent object
         try {
-            while (!menuEntryDAO.find(entry).isEmpty()) {
+            while (!menuEntryDAO.find(matcher).isEmpty()) {
                 identity++;
-                entry.setIdentity(identity);
+                matcher.setIdentity(identity);
             }
         } catch (DAOException e) {
             // exception should not occur here
             fail();
         }
+
+        // GIVEN
+        MenuEntry entry = createMenuEntry("entry", "desc", "cat", 20.0, 0.2, true);
+        entry.setIdentity(identity);
 
         // WHEN
         menuEntryDAO.update(entry);
@@ -135,13 +202,12 @@ public class MenuEntryDAOTest extends AbstractDAOTest {
     @Test
     public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // GIVEN
+        int initialSize = menuEntryDAO.getAll().size();
         MenuEntry entry = createMenuEntry("entry", "desc", "cat", 20.0, 0.2, true);
         menuEntryDAO.create(entry);
 
         // check if entry created
-        List<MenuEntry> objects = menuEntryDAO.find(MenuEntry.withIdentity(entry.getIdentity()));
-        assertEquals(1, objects.size());
-        assertEquals(entry, objects.get(0));
+        assertEquals(initialSize + 1, menuEntryDAO.getAll().size());
 
         // WHEN
         menuEntryDAO.delete(entry);
@@ -149,7 +215,7 @@ public class MenuEntryDAOTest extends AbstractDAOTest {
         // THEN
         // check if entry was removed
         assertTrue(menuEntryDAO.find(MenuEntry.withIdentity(entry.getIdentity())).isEmpty());
-        assertTrue(menuEntryDAO.getAll().isEmpty());
+        assertEquals(initialSize, menuEntryDAO.getAll().size());
     }
 
     @Test(expected = ValidationException.class)
@@ -247,6 +313,184 @@ public class MenuEntryDAOTest extends AbstractDAOTest {
     }
 
     @Test
+    public void testFind_byAvailabilityShouldReturnObjects() throws DAOException, ValidationException {
+        // GIVEN
+        MenuEntry matcher = new MenuEntry();
+
+        MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);
+        menuEntryDAO.create(entry1);
+
+        MenuEntry entry2 = createMenuEntry("entry1", "desc2", "cat2", 20.0, 0.2, true);
+        menuEntryDAO.create(entry2);
+
+        MenuEntry entry3 = createMenuEntry("entry2", "desc3", "cat3", 30.0, 0.3, false);
+        menuEntryDAO.create(entry3);
+
+        // WHEN
+        matcher.setAvailable(true);
+        List<MenuEntry> objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(2, objects.size());
+        assertTrue(objects.contains(entry1));
+        assertTrue(objects.contains(entry2));
+
+        // WHEN
+        matcher.setAvailable(false);
+        objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(1, objects.size());
+        assertEquals(entry3, objects.get(0));
+    }
+
+    @Test
+    public void testFind_byPriceShouldReturnObjects() throws DAOException, ValidationException {
+        // GIVEN
+        MenuEntry matcher = new MenuEntry();
+
+        MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);
+        menuEntryDAO.create(entry1);
+
+        MenuEntry entry2 = createMenuEntry("entry1", "desc2", "cat2", 10.0, 0.2, true);
+        menuEntryDAO.create(entry2);
+
+        MenuEntry entry3 = createMenuEntry("entry2", "desc3", "cat3", 20.0, 0.3, true);
+        menuEntryDAO.create(entry3);
+
+        // WHEN
+        matcher.setPrice(BigDecimal.valueOf(10.00));
+        List<MenuEntry> objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(2, objects.size());
+        assertTrue(objects.contains(entry1));
+        assertTrue(objects.contains(entry2));
+
+        // WHEN
+        matcher.setPrice(BigDecimal.valueOf(20.000));
+        objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(1, objects.size());
+        assertEquals(entry3, objects.get(0));
+    }
+
+    @Test
+    public void testFind_byCategoryShouldReturnObjects() throws DAOException, ValidationException {
+        // PREPARE
+        MenuEntry matcher = new MenuEntry();
+
+        // create categories
+        MenuCategory cat1 = new MenuCategory();
+        cat1.setName("cat1");
+        MenuCategory cat2 = new MenuCategory();
+        cat2.setName("cat2");
+
+        menuCategoryDAO.create(cat1);
+        menuCategoryDAO.create(cat2);
+
+        // check if categories created
+        List<MenuCategory> entries = menuCategoryDAO.find(cat1);
+        assertEquals(1, entries.size());
+        assertEquals(cat1, entries.get(0));
+
+        entries = menuCategoryDAO.find(cat2);
+        assertEquals(1, entries.size());
+        assertEquals(cat2, entries.get(0));
+
+        // GIVEN
+        MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);
+        // override category from createMenuEntry()
+        entry1.setCategory(cat1);
+        menuEntryDAO.create(entry1);
+
+        MenuEntry entry2 = createMenuEntry("entry1", "desc2", "cat2", 20.0, 0.2, true);
+        // override category from createMenuEntry()
+        entry2.setCategory(cat1);
+        menuEntryDAO.create(entry2);
+
+        MenuEntry entry3 = createMenuEntry("entry2", "desc3", "cat3", 30.0, 0.3, true);
+        // override category from createMenuEntry()
+        entry3.setCategory(cat2);
+        menuEntryDAO.create(entry3);
+
+        // WHEN
+        matcher.setCategory(cat1);
+        List<MenuEntry> objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(2, objects.size());
+        assertTrue(objects.contains(entry1));
+        assertTrue(objects.contains(entry2));
+
+        // WHEN
+        matcher.setCategory(cat2);
+        objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(1, objects.size());
+        assertEquals(entry3, objects.get(0));
+    }
+
+    @Test
+    public void testFind_byTaxRateShouldReturnObjects() throws DAOException, ValidationException {
+        // PREPARE
+        MenuEntry matcher = new MenuEntry();
+
+        // create tax rates
+        TaxRate tax1 = new TaxRate();
+        tax1.setValue(BigDecimal.valueOf(0.1));
+        TaxRate tax2 = new TaxRate();
+        tax2.setValue(BigDecimal.valueOf(0.2));
+
+        taxRateDAO.create(tax1);
+        taxRateDAO.create(tax2);
+
+        // check if tax rates created
+        List<TaxRate> storedObjects = taxRateDAO.find(tax1);
+        assertEquals(1, storedObjects.size());
+        assertEquals(tax1, storedObjects.get(0));
+
+        storedObjects = taxRateDAO.find(tax2);
+        assertEquals(1, storedObjects.size());
+        assertEquals(tax2, storedObjects.get(0));
+
+        // GIVEN
+        MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);
+        // override taxRate from createMenuEntry()
+        entry1.setTaxRate(tax1);
+        menuEntryDAO.create(entry1);
+
+        MenuEntry entry2 = createMenuEntry("entry1", "desc2", "cat2", 20.0, 0.2, true);
+        // override taxRate from createMenuEntry()
+        entry2.setTaxRate(tax1);
+        menuEntryDAO.create(entry2);
+
+        MenuEntry entry3 = createMenuEntry("entry2", "desc3", "cat3", 30.0, 0.3, true);
+        // override taxRate from createMenuEntry()
+        entry3.setTaxRate(tax2);
+        menuEntryDAO.create(entry3);
+
+        // WHEN
+        matcher.setTaxRate(tax1);
+        List<MenuEntry> objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(2, objects.size());
+        assertTrue(objects.contains(entry1));
+        assertTrue(objects.contains(entry2));
+
+        // WHEN
+        matcher.setTaxRate(tax2);
+        objects = menuEntryDAO.find(matcher);
+
+        // THEN
+        assertEquals(1, objects.size());
+        assertEquals(entry3, objects.get(0));
+    }
+
+    @Test
     public void testFind_shouldReturnEmptyList() throws DAOException {
         // GIVEN
         Long identity = (long) 1;
@@ -267,12 +511,6 @@ public class MenuEntryDAOTest extends AbstractDAOTest {
     }
 
     @Test
-    public void testGetAll_shouldReturnEmptyList() throws DAOException {
-        // WHEN / THEN
-        assertTrue(menuEntryDAO.getAll().isEmpty());
-    }
-
-    @Test
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);
@@ -288,7 +526,6 @@ public class MenuEntryDAOTest extends AbstractDAOTest {
         List<MenuEntry> objects = menuEntryDAO.getAll();
 
         // THEN
-        assertEquals(3, objects.size());
         assertTrue(objects.contains(entry1));
         assertTrue(objects.contains(entry2));
         assertTrue(objects.contains(entry3));
