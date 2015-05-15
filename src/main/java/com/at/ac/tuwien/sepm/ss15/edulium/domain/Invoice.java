@@ -119,9 +119,8 @@ public class Invoice {
 
         if (identity != null ? !identity.equals(invoice.identity) : invoice.identity != null) return false;
         if (time != null ? !time.equals(invoice.time) : invoice.time != null) return false;
-        if (gross != null ? !gross.equals(invoice.gross) : invoice.gross != null) return false;
-        if (paid != null ? !paid.equals(invoice.paid) : invoice.paid != null) return false;
+        if (gross != null ? gross.compareTo(invoice.gross) != 0 : invoice.gross != null) return false;
+        if (paid != null ? paid.compareTo(invoice.paid) != 0 : invoice.paid != null) return false;
         return !(creator != null ? !creator.equals(invoice.creator) : invoice.creator != null);
-
     }
 }
