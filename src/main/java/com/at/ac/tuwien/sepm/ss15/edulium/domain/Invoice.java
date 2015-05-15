@@ -78,8 +78,6 @@ public class Invoice {
      * Adds an amount that got paid to the total paid amount
      * @param paid The amount that is going to be added to the
      *             total paid amount
-     * @return Returns the total paid amount after the new amount
-     *             was added
      */
     public void addPaid(BigDecimal paid) {
         this.paid = this.paid.add(paid);
