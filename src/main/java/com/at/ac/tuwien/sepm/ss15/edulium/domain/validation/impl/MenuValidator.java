@@ -30,7 +30,6 @@ public class MenuValidator implements Validator<Menu> {
         if (object == null) {
             throw new ValidationException("Menu must not be null");
         }
-
         validateIdentity(object);
     }
 
