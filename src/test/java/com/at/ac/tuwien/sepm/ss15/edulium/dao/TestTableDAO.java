@@ -91,6 +91,31 @@ public class TestTableDAO extends AbstractDAOTest {
         Assert.assertEquals(table, storedObjects.get(0));
     }
 
+    /* user is optional */
+    @Test
+    public void testCreate_shouldAddObjectWithoutUser() throws DAOException, ValidationException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber((long) 1);
+        table.setSection(section1);
+        table.setUser(null);
+        table.setSeats(3);
+        table.setColumn(4);
+        table.setRow(5);
+
+        // WHEN
+        tableDAO.create(table);
+
+        // THEN
+        // check if identity is set
+        Assert.assertNotNull(table.getNumber());
+
+        // check retrieving object
+        List<Table> storedObjects = tableDAO.find(Table.withIdentity(section1, 1L));
+        Assert.assertEquals(1, storedObjects.size());
+        Assert.assertEquals(table, storedObjects.get(0));
+    }
+
     @Test(expected = DAOException.class)
     public void testCreate_addingTwoObjectsWithSameIdentityShouldFail() throws DAOException, ValidationException {
         // PREPARE
@@ -192,6 +217,40 @@ public class TestTableDAO extends AbstractDAOTest {
         table.setSeats(6);
         table.setColumn(7);
         table.setRow(8);
+        table.setUser(user2);
+
+        // WHEN
+        tableDAO.update(table);
+
+        // THEN
+        // check if category name was updated
+        List<Table> storedObjects = tableDAO.find(Table.withIdentity(section1, 1L));
+        Assert.assertEquals(1, storedObjects.size());
+        Assert.assertEquals(table, storedObjects.get(0));
+    }
+
+    /* user is optional */
+    @Test
+    public void testUpdate_shouldUpdateObjectWithoutUser() throws DAOException, ValidationException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber((long) 1);
+        table.setSection(section1);
+        table.setUser(user1);
+        table.setSeats(3);
+        table.setColumn(4);
+        table.setRow(5);
+
+        tableDAO.create(table);
+
+        // check if cat is stored
+        assertEquals(1, tableDAO.find(table).size());
+
+        // GIVEN
+        table.setSeats(6);
+        table.setColumn(7);
+        table.setRow(8);
+        table.setUser(null);
 
         // WHEN
         tableDAO.update(table);

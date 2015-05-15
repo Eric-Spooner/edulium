@@ -92,8 +92,9 @@ public class TestTableValidator extends AbstractDomainTest {
         tableValidator.validateForCreate(table);
     }
 
-    @Test(expected = ValidationException.class)
-    public void testValidateForCreate_tableWithoutUserShouldThrow() throws ValidationException, DAOException {
+    /* user is optional */
+    @Test
+    public void testValidateForCreate_tableWithoutUserShouldAccept() throws ValidationException, DAOException {
         // GIVEN
         Table table = new Table();
         Section section = new Section();
@@ -338,8 +339,9 @@ public class TestTableValidator extends AbstractDomainTest {
         tableValidator.validateForUpdate(table);
     }
 
-    @Test(expected = ValidationException.class)
-    public void testValidateForUpdate_tableWithoutUserShouldThrow() throws ValidationException, DAOException {
+    /* user is optional */
+    @Test
+    public void testValidateForUpdate_tableWithoutUserShouldAccept() throws ValidationException, DAOException {
         // GIVEN
         Table table = new Table();
         Section section = new Section();

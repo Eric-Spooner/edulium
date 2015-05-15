@@ -7,7 +7,7 @@ public class Table {
     private Integer seats;
     private Long number;
     private Section section;
-    private User user;
+    private User user; // optional
     private Integer row;
     private Integer column;
 
@@ -105,7 +105,7 @@ public class Table {
     }
 
     /**
-     * @param user sets the id of the user responsible for the table
+     * @param user sets the id of the user responsible for the table (optional)
      */
     public void setUser(User user) {
         this.user = user;
