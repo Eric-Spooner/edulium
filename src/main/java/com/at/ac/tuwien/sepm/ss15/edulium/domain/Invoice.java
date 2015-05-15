@@ -13,7 +13,6 @@ public class Invoice {
     private BigDecimal gross;
     private BigDecimal paid = BigDecimal.ZERO;
     private User creator;
-    private List<Installment> installments;
 
     /**
      * Creates a new invoice object and assigns the given identity to it
@@ -100,21 +99,6 @@ public class Invoice {
         this.creator = creator;
     }
 
-    /**
-     * @return The list of installments (can be null)
-     */
-    public List<Installment> getInstallments() {
-        return installments;
-    }
-
-    /**
-     * @param installments The list of installments we want to assign to
-     *                     the invoice
-     */
-    public void setInstallments(List<Installment> installments) {
-        this.installments = installments;
-    }
-
     @Override
     public String toString() {
         return "Invoice{" +
@@ -123,7 +107,6 @@ public class Invoice {
                 ", gross=" + gross +
                 ", paid=" + paid +
                 ", creator=" + creator +
-                ", installments=" + installments + "" +
                 "}";
     }
 
@@ -136,9 +119,9 @@ public class Invoice {
 
         if (identity != null ? !identity.equals(invoice.identity) : invoice.identity != null) return false;
         if (time != null ? !time.equals(invoice.time) : invoice.time != null) return false;
-        if (gross != null ? gross.compareTo(invoice.gross) != 0 : invoice.gross != null) return false;
-        if (paid != null ? paid.compareTo(invoice.paid) != 0 : invoice.paid != null) return false;
-        return !(installments != null ? !installments.equals(invoice.installments) : invoice.installments != null);
+        if (gross != null ? !gross.equals(invoice.gross) : invoice.gross != null) return false;
+        if (paid != null ? !paid.equals(invoice.paid) : invoice.paid != null) return false;
+        return !(creator != null ? !creator.equals(invoice.creator) : invoice.creator != null);
 
     }
 }

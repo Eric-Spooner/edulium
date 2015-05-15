@@ -36,11 +36,6 @@ public class InvoiceValidatorImpl implements Validator<Invoice> {
             throw new ValidationException("Upon creation, the creator of the invoice " +
                     "must be provided");
         }
-
-        if (invoice.getInstallments() != null && invoice.getInstallments().size() != 0) {
-            throw new ValidationException("Installments where a payment occurred cannot " +
-                    "be provided upon creation");
-        }
     }
 
     /**
@@ -56,13 +51,6 @@ public class InvoiceValidatorImpl implements Validator<Invoice> {
 
         if (invoice.getPaid() != null && invoice.getPaid().compareTo(BigDecimal.ZERO) < 0) {
             throw new ValidationException("The amount that was already paid cannot be negative");
-        }
-
-        // If a payment is going to be updated but not the installment where it took place
-        if (invoice.getPaid() != null && invoice.getInstallments() == null ||
-                (invoice.getInstallments() != null && invoice.getInstallments().size() == 0)) {
-            throw new ValidationException("When updating the payed amount, you have to provide " +
-                    "the installment(s) where the payment took place");
         }
 
         validateIdentity(invoice);

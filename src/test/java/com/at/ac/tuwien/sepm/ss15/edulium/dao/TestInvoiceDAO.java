@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Installment;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,19 +50,12 @@ public class TestInvoiceDAO extends AbstractDAOTest {
 
         // WHEN
         invoice.addPaid(new BigDecimal("28.0"));
-        Installment in1 = new Installment();
-        Installment in2 = new Installment();
-        List<Installment> inList = new ArrayList<>();
-        inList.add(in1);
-        inList.add(in2);
-        invoice.setInstallments(inList);
         invoiceDAO.update(invoice);
 
         // THEN
         List<Invoice> invoiceList = invoiceDAO.find(invoice);
         assertEquals(1, invoiceList.size());
         assertEquals(invoice, invoiceList.get(0));
-        assertEquals(2, invoiceList.get(0).getInstallments().size());
     }
 
     @Test
