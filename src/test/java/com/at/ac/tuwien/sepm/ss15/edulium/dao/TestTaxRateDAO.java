@@ -304,6 +304,16 @@ public class TestTaxRateDAO extends AbstractDAOTest {
     }
 
     @Test
+    public void testFind_nullObjectShouldReturnEmptyList() throws DAOException {
+        // WHEN
+        List<TaxRate> result = taxRateDAO.find(null);
+
+        // THEN
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
         final int numberOfTaxRatesBefore = taxRateDAO.getAll().size();

@@ -382,6 +382,16 @@ public class TestUserDAO extends AbstractDAOTest {
     }
 
     @Test
+    public void testFind_nullObjectShouldReturnEmptyList() throws DAOException {
+        // WHEN
+        List<User> result = userDAO.find(null);
+
+        // THEN
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
         final int numberOfUsersBefore = userDAO.getAll().size();

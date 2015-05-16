@@ -12,5 +12,6 @@
     <import resource="domain/Spring-SectionValidator.xml" />
     <import resource="domain/Spring-UserValidator.xml" />
     <import resource="domain/Spring-TaxRateValidator.xml" />
+    <import resource="domain/Spring-MenuEntryValidator.xml" />
 
 </beans>
