@@ -359,6 +359,34 @@ public class TestTableValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_tableWithoutColumnShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber(1L);
+        table.setSection(Section.withIdentity(1L));
+        table.setUser(User.withIdentity("A"));
+        table.setSeats(2);
+        table.setRow(4);
+
+        // WHEN
+        tableValidator.validateForUpdate(table);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_tableWithoutRowShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber(1L);
+        table.setSection(Section.withIdentity(1L));
+        table.setUser(User.withIdentity("A"));
+        table.setSeats(2);
+        table.setColumn(3);
+
+        // WHEN
+        tableValidator.validateForUpdate(table);
+    }
+
+    @Test(expected = ValidationException.class)
     public void testValidateForUpdate_nullObjectShouldThrow() throws ValidationException {
         // GIVEN
         Table table = null;
