@@ -42,7 +42,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         assertEquals(invoice, invoiceList.get(0));
     }
 
-    @Test
+    @Test(expected = ValidationException.class)
     public void testCreate_addingNullObjectShouldFail() throws ValidationException, DAOException {
         // WHEN/THEN
         invoiceDAO.create(null);
