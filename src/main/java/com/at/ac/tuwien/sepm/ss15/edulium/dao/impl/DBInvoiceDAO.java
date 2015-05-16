@@ -119,8 +119,36 @@ class DBInvoiceDAO implements DAO<Invoice> {
      */
     @Override
     public List<Invoice> find(Invoice invoice) throws DAOException {
-        // TODO: Implement after writing the tests
-        return null;
+        LOGGER.debug("Entering find with parameters: " + invoice);
+
+        if (invoice == null) {
+            return new ArrayList<>();
+        }
+
+        final List<Invoice> results = new ArrayList<>();
+
+        final String query = "SELECT * FROM Invoice WHERE " +
+                "ID = ISNULL(?, ID) AND " +
+                "invoiceTime = ISNULL(?, invoiceTime) AND " +
+                "brutto = ISNULL(?, brutto) AND " +
+                "user_ID = ISNULL(?, user_ID) AND " +
+                "canceled = FALSE;";
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, invoice.getIdentity());
+            stmt.setObject(2, invoice.getTime());
+            stmt.setBigDecimal(3, invoice.getGross());
+            stmt.setString(4, invoice.getCreator().getIdentity());
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                results.add(parseResult(rs));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Failed to retrieve data from the database", e);
+            throw new DAOException("Failed to retrieve data from the database", e);
+        }
+
+        return results;
     }
 
     /**
