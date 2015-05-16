@@ -45,6 +45,7 @@ class DBTableDAO implements DAO<Table> {
 
         validator.validateForCreate(table);
 
+        // Update existing tables or insert table if not existing
         // Check if table is already in database with attribute disabled=true
         String query = "SELECT * FROM RestaurantTable WHERE number = ? " +
                 "AND section_ID = ? AND disabled = true";
@@ -67,6 +68,9 @@ class DBTableDAO implements DAO<Table> {
                 if (stmtReadd.executeUpdate() == 0) {
                     throw new DAOException("readd table failed: dataset not found");
                 }
+
+                generateHistory(table);
+
                 return;
             }
 
@@ -111,13 +115,16 @@ class DBTableDAO implements DAO<Table> {
         validator.validateForUpdate(table);
 
         final String query = "UPDATE RestaurantTable SET " +
-                "seats = ?, tableRow = ?, tableColumn = ?, user_ID = ? WHERE number = ? AND section_ID = ?";
+                "seats = ?, tableRow = ?, tableColumn = ?, user_ID = ISNULL(?, user_ID) WHERE number = ? AND section_ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setInt(1, table.getSeats());
             stmt.setInt(2, table.getRow());
             stmt.setInt(3, table.getColumn());
-            stmt.setString(4, table.getUser().getIdentity());
+            if(table.getUser() == null)
+                stmt.setNull(4, Types.VARCHAR);
+            else
+                stmt.setString(4, table.getUser().getIdentity());
             stmt.setLong(5, table.getNumber());
             stmt.setLong(6, table.getSection().getIdentity());
 
@@ -181,7 +188,7 @@ class DBTableDAO implements DAO<Table> {
         String query = "SELECT * FROM RestaurantTable WHERE number = ISNULL(?, number) " +
                 "AND seats = ISNULL(?, seats) AND section_ID = ISNULL(?, section_ID)" +
                 "AND tableRow = ISNULL(?, tableRow) AND tableColumn = ISNULL(?, tableColumn)" +
-                "AND user_ID = ISNULL(?, user_ID) AND disabled = false";
+                "AND CASE WHEN (? IS NULL) THEN TRUE ELSE user_ID = ? END AND disabled = false";
 
         final List<Table> objects = new ArrayList<>();
 
@@ -194,10 +201,15 @@ class DBTableDAO implements DAO<Table> {
                 stmt.setObject(3, table.getSection().getIdentity());
             stmt.setObject(4, table.getRow());
             stmt.setObject(5, table.getColumn());
-            if(table.getUser() == null)
+            if(table.getUser() == null) {
                 stmt.setNull(6, Types.VARCHAR);
-            else
+                stmt.setNull(7, Types.VARCHAR);
+            }
+            else {
                 stmt.setObject(6, table.getUser().getIdentity());
+                stmt.setObject(7, table.getUser().getIdentity());
+            }
+
             stmt.execute();
 
             ResultSet result = stmt.getResultSet();

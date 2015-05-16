@@ -38,8 +38,16 @@ public class TableValidator implements Validator<Table> {
             throw new ValidationException("number must not be null");
         }
 
+        if(table.getColumn() == null) {
+            throw new ValidationException("column must not be null");
+        }
+
         if(table.getColumn() < 0) {
             throw new ValidationException("column must not be < 0");
+        }
+
+        if(table.getRow() == null) {
+            throw new ValidationException("row must not be null");
         }
 
         if(table.getRow() < 0) {
