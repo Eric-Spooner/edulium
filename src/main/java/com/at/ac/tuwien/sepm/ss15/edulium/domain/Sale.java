@@ -1,7 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
 /**
- * Created by constantin on 16.05.15.
+ * Domain object representing a Sale
  */
 public class Sale {
     private Long identity = null;
@@ -65,6 +65,6 @@ public class Sale {
 
         if (identity != null ? !identity.equals(sale.identity) : sale.identity != null) return false;
         return !(name != null ? !name.equals(sale.name) : sale.name != null);
-        
+
     }
 }
