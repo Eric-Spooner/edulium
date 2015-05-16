@@ -200,12 +200,8 @@ public class TestInvoiceDAO extends AbstractDAOTest {
 
     @Test
     public void testFind_shouldReturnEmptyListWhenNoObjectIsStored() throws DAOException {
-        // GIVEN
-        Invoice invoice = new Invoice();
-        invoice.setIdentity(1L); // Arbitrary identity
-
         // WHEN
-        List results = invoiceDAO.find(invoice);
+        List results = invoiceDAO.find(Invoice.withIdentity(1L));
 
         // THEN
         assertTrue(results.isEmpty());

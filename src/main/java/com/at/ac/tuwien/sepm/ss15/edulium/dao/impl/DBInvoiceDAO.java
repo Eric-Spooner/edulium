@@ -10,6 +10,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
@@ -62,6 +63,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
             LOGGER.error("Failed to insert invoice entry into database", e);
             throw new DAOException("Failed to insert invoice entry into database", e);
         }
+
+        generateHistory(invoice);
     }
 
     /**
@@ -88,6 +91,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
             LOGGER.error("Failed to update invoice entry in database", e);
             throw new DAOException("Failed to update invoice entry in database", e);
         }
+
+        generateHistory(invoice);
     }
 
     /**
@@ -111,6 +116,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
             LOGGER.error("Failed to delete invoice entry from database", e);
             throw new DAOException("Failed to delete invoice entry from database", e);
         }
+
+        generateHistory(invoice);
     }
 
     /**
@@ -143,6 +150,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
             while (rs.next()) {
                 results.add(parseResult(rs));
             }
+            rs.close();
         } catch (SQLException e) {
             LOGGER.error("Failed to retrieve data from the database", e);
             throw new DAOException("Failed to retrieve data from the database", e);
@@ -166,12 +174,64 @@ class DBInvoiceDAO implements DAO<Invoice> {
             while (rs.next()) {
                 results.add(parseResult(rs));
             }
+            rs.close();
         } catch (SQLException e) {
             LOGGER.error("Failed to retreive all invoice entries from the database", e);
             throw new DAOException("Failed to retreive all invoice entries from the database", e);
         }
 
         return results;
+    }
+
+    /**
+     * Gets the history of changes for the invoice object from
+     * the database
+     */
+    @Override
+    public List<History<Invoice>> getHistory(Invoice invoice) throws DAOException, ValidationException {
+        LOGGER.debug("entering getHistory with parameters " + invoice);
+
+        List<History<Invoice>> history = new ArrayList<>();
+
+        final String query = "SELECT * FROM InvoiceHistory WHERE ID = ? ORDER BY changeNr";
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, invoice.getIdentity());
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                history.add(parseHistoryResult(rs));
+            }
+            rs.close();
+        } catch (SQLException e) {
+            LOGGER.error("Failed to retrieve history", e);
+            throw new DAOException("Failed to retrieve history", e);
+        }
+
+        return history;
+    }
+
+    /**
+     * TODO
+     * @param invoice
+     * @throws DAOException
+     */
+    private void generateHistory(Invoice invoice) throws DAOException {
+        LOGGER.debug("Entering generateHistory with parameters: " + invoice);
+
+        final String query = "INSERT INTO InvoiceHistory " +
+                "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
+                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM InvoiceHistory WHERE ID = ?) " +
+                "FROM Invoice WHERE ID = ?);";
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName());
+            stmt.setLong(2, invoice.getIdentity());
+            stmt.setLong(3, invoice.getIdentity());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("Generating history failed", e);
+            throw new DAOException("Generating history failed", e);
+        }
     }
 
     /**
@@ -197,14 +257,27 @@ class DBInvoiceDAO implements DAO<Invoice> {
         return invoice;
     }
 
-
     /**
-     * Gets the history of changes for the invoice object from
-     * the database
+     * TODO
+     * @param rs
+     * @return
+     * @throws DAOException
+     * @throws SQLException
      */
-    @Override
-    public List<History<Invoice>> getHistory(Invoice object) throws DAOException, ValidationException {
-        // TODO: Implement after writing the tests
-        return null;
+    private History<Invoice> parseHistoryResult(ResultSet rs) throws DAOException, SQLException {
+        List<User> user = userDAO.find(User.withIdentity(rs.getString("changeUser")));
+        if (user.size() != 1) {
+            LOGGER.error("User not found");
+            throw new DAOException("User not found");
+        }
+
+        History<Invoice> event = new History<>();
+        event.setTimeOfChange(rs.getTimestamp("changeTime").toLocalDateTime());
+        event.setChangeNumber(rs.getLong("changeNr"));
+        event.setDeleted(rs.getBoolean("canceled"));
+        event.setUser(user.get(0));
+        event.setData(parseResult(rs));
+
+        return event;
     }
 }
