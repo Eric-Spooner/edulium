@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS RestaurantTable (
     tableColumn INT,
     user_ID VARCHAR(25) REFERENCES RestaurantUser(ID),
     disabled BOOLEAN DEFAULT FALSE,
-    PRIMARY KEY(number, section_ID)
+    PRIMARY KEY(section_ID, number)
 );
 
 CREATE TABLE IF NOT EXISTS TableHistory (
