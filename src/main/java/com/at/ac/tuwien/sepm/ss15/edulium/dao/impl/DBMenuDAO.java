@@ -2,10 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
@@ -35,6 +32,8 @@ public class DBMenuDAO implements DAO<Menu> {
     private Validator<Menu> validator;
     @Autowired
     private DAO<MenuEntry> menuEntryDAO;
+    @Autowired
+    private DAO<User> userDAO;
 
     @Override
     public void create(Menu menu) throws DAOException, ValidationException {
@@ -74,7 +73,7 @@ public class DBMenuDAO implements DAO<Menu> {
                 throw new DAOException("inserting menu association to menuEntry into database failed", e);
             }
         }
-        //generateHistory(menuCategory);
+        generateHistory(menu);
     }
 
     @Override
@@ -178,7 +177,7 @@ public class DBMenuDAO implements DAO<Menu> {
 
         final String query = "INSERT INTO MenuHistory " +
                 "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
-                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM MenuCategoryHistory Menu ID = ?) " +
+                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM MenuHistory WHERE ID = ?) " +
                 "FROM Menu WHERE ID = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
@@ -187,8 +186,55 @@ public class DBMenuDAO implements DAO<Menu> {
             stmt.setLong(3, menu.getIdentity());          // dataset id
             stmt.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.error("generating history failed", e);
-            throw new DAOException("generating history failed", e);
+            LOGGER.error("generating Menu history failed", e);
+            throw new DAOException("generating Menu history failed", e);
         }
+
+        /**
+         * MenuAssoc History for each MenuEntry of the menu
+         */
+        for(MenuEntry entry:menu.getEntries()){
+            final String query2 = "INSERT INTO MenuAssocHistory " +
+                    "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
+                    "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM MenuAssocHistory WHERE menu_ID = ? AND menuEntry_ID = ?) " +
+                    "FROM MenuAssoc WHERE menu_ID = ? AND menuEntry_ID = ?)";
+
+            try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+                stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+                stmt.setLong(2, menu.getIdentity());          // dataset id
+                stmt.setLong(3, entry.getIdentity());          // dataset id
+                stmt.setLong(4, menu.getIdentity());          // dataset id
+                stmt.setLong(5, entry.getIdentity());          // dataset id
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                LOGGER.error("generating MenuAssoc history failed", e);
+                throw new DAOException("generating MenuAssoc history failed", e);
+            }
+        }
+    }
+
+    /**
+     * converts the database query output into a history entry object
+     * @param result database output
+     * @return History object with the data of the resultSet set
+     * @throws SQLException if an error accessing the database occurred
+     * @throws DAOException if an error retrieving the user ocurred
+     */
+    private History<Menu> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
+        // get user
+        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        if (storedUsers.size() != 1) {
+            LOGGER.error("user not found");
+            throw new DAOException("user not found");
+        }
+        // create history entry
+        History<Menu> historyEntry = new History<Menu>();
+        historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
+        historyEntry.setChangeNumber(result.getLong("changeNr"));
+        historyEntry.setDeleted(result.getBoolean("deleted"));
+        historyEntry.setUser(storedUsers.get(0));
+        historyEntry.setData(parseResult(result));
+
+        return historyEntry;
     }
 }
