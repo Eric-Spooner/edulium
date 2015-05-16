@@ -173,11 +173,10 @@ public class DBMenuDAO implements DAO<Menu> {
      * @param menu updated dataset
      * @throws DAOException if an error accessing the database occurred
      */
-    /*
     private void generateHistory(Menu menu) throws DAOException {
         LOGGER.debug("entering generateHistory with parameters " + menu);
 
-        final String query = "INSERT INTO MenuCategoryHistory " +
+        final String query = "INSERT INTO MenuHistory " +
                 "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
                 "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM MenuCategoryHistory Menu ID = ?) " +
                 "FROM Menu WHERE ID = ?)";
@@ -192,5 +191,4 @@ public class DBMenuDAO implements DAO<Menu> {
             throw new DAOException("generating history failed", e);
         }
     }
-    */
 }
