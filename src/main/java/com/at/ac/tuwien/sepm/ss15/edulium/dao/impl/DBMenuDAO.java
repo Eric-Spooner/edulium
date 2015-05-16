@@ -115,7 +115,7 @@ public class DBMenuDAO implements DAO<Menu> {
                     updateMenuAssoc(menu, entry, entry.getPrice());
                 }else{
                     //The Entry is not in the list, so it should be deleted
-                   deleteMenuAssoc(menu, entry, entry.getPrice());
+                   deleteMenuAssoc(menu, entry);
                 }
                 generateHistoryMenuAssoc(menu, entry, changeNr);
             }
@@ -151,8 +151,12 @@ public class DBMenuDAO implements DAO<Menu> {
             LOGGER.error("deleting menu failed", e);
             throw new DAOException("deleting menu failed", e);
         }
+        Long changeNr = generateHistoryMenu(menu);
 
-        generateHistoryMenu(menu);
+        for(MenuEntry entry:menu.getEntries()){
+            deleteMenuAssoc(menu, entry);
+            generateHistoryMenuAssoc(menu, entry, changeNr);
+        }
     }
 
     @Override
@@ -452,9 +456,8 @@ public class DBMenuDAO implements DAO<Menu> {
      * if the Menu Assoc is enabled, than disable it.
      * @param menu
      * @param entry
-     * @param price
      */
-    private void deleteMenuAssoc(Menu menu, MenuEntry entry, BigDecimal price) throws DAOException{
+    private void deleteMenuAssoc(Menu menu, MenuEntry entry) throws DAOException{
         //The Entry is not in the list, so it should be disabled
         final String query = "UPDATE MenuAssoc SET disabled = true WHERE menu_ID = ? AND menuEntry_ID = ?";
 
