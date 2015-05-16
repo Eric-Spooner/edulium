@@ -157,6 +157,8 @@ public class DBMenuDAO implements DAO<Menu> {
             deleteMenuAssoc(menu, entry);
             generateHistoryMenuAssoc(menu, entry, changeNr);
         }
+
+        menu.setEntries(new LinkedList<MenuEntry>());
     }
 
     @Override
@@ -374,8 +376,7 @@ public class DBMenuDAO implements DAO<Menu> {
         /*Get the MenuEntries over MenuAssocHistory*/
         List<MenuEntry> menuEntries = new LinkedList<MenuEntry>();
         String query = "SELECT * FROM MenuAssocHistory WHERE " +
-                "menu_ID = ? AND changeNr = ? AND " +
-                "disabled = false";
+                "menu_ID = ? AND changeNr = ? AND disabled = false";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setObject(1, result.getLong("ID"));
             stmt.setLong(2, changeNr);

@@ -354,21 +354,19 @@ public class MenuDAOTest extends AbstractDAOTest {
         menuDAO.create(men1);
 
         LinkedList<MenuEntry> list2 = new LinkedList<MenuEntry>();
-        list2.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
+        list2.add(createMenuEntry("entry2", "desc", "cat", 20, 0.2, true));
         Menu men2 = createMenu("Menu2", list2);
         men2.setIdentity(men1.getIdentity());
         LocalDateTime updateTime = LocalDateTime.now();
         menuDAO.update(men2);
 
-        // delete data
-        LocalDateTime deleteTime = LocalDateTime.now();
-        menuDAO.delete(men2);
+
 
         // WHEN
         List<History<Menu>> history = menuDAO.getHistory(men2);
 
         // THEN
-        assertEquals(3, history.size());
+        assertEquals(2, history.size());
 
         // check create history
         History<Menu> historyEntry = history.get(0);
@@ -385,6 +383,16 @@ public class MenuDAOTest extends AbstractDAOTest {
         assertEquals(user, historyEntry.getUser());
         assertTrue(Duration.between(updateTime, historyEntry.getTimeOfChange()).getSeconds() < 1);
         assertFalse(historyEntry.isDeleted());
+
+        // delete data
+        LocalDateTime deleteTime = LocalDateTime.now();
+        menuDAO.delete(men2);
+
+        // WHEN
+        history = menuDAO.getHistory(men2);
+
+        // THEN
+        assertEquals(3, history.size());
 
         // check delete history
         historyEntry = history.get(2);
