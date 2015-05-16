@@ -2,7 +2,6 @@ package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * Domain object representing an invoice
@@ -11,7 +10,7 @@ public class Invoice {
     private Long identity;
     private LocalDateTime time;
     private BigDecimal gross;
-    private BigDecimal paid = BigDecimal.ZERO;
+    private Boolean paid;
     private User creator;
 
     /**
@@ -68,19 +67,18 @@ public class Invoice {
     }
 
     /**
-     * @return Returns the total amount that has been paid so far (can be null)
+     * @return Returns true if the invoice was paid and false otherwise (can be null)
      */
-    public BigDecimal getPaid() {
+    public Boolean getPaid() {
         return paid;
     }
 
     /**
-     * Adds an amount that got paid to the total paid amount
-     * @param paid The amount that is going to be added to the
-     *             total paid amount
+     * Sets whether or not the invoice was paid
+     * @param paid Set to true if the invoice was paid and false otherwise
      */
-    public void addPaid(BigDecimal paid) {
-        this.paid = this.paid.add(paid);
+    public void setPaid(Boolean paid) {
+        this.paid = paid;
     }
 
     /**
@@ -118,7 +116,7 @@ public class Invoice {
         if (identity != null ? !identity.equals(invoice.identity) : invoice.identity != null) return false;
         if (time != null ? !time.equals(invoice.time) : invoice.time != null) return false;
         if (gross != null ? gross.compareTo(invoice.gross) != 0 : invoice.gross != null) return false;
-        if (paid != null ? paid.compareTo(invoice.paid) != 0 : invoice.paid != null) return false;
+        if (paid != null ? !paid.equals(invoice.paid) : invoice.paid != null) return false;
         return !(creator != null ? !creator.equals(invoice.creator) : invoice.creator != null);
     }
 }

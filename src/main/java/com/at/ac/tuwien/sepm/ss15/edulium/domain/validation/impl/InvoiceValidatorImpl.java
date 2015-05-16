@@ -6,7 +6,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 
 import java.math.BigDecimal;
 
-public class InvoiceValidatorImpl implements Validator<Invoice> {
+class InvoiceValidatorImpl implements Validator<Invoice> {
 
     /**
      * Validates the invoice object for the create action
@@ -27,12 +27,13 @@ public class InvoiceValidatorImpl implements Validator<Invoice> {
             throw new ValidationException("The total gross amount cannot be negative");
         }
 
-        if (invoice.getPaid() != null && invoice.getPaid().compareTo(BigDecimal.ZERO) != 0) {
-            throw new ValidationException("The amount that was already paid can only " +
-                    "be 0 upon creation");
+        if (invoice.getPaid() != null && invoice.getPaid().equals(Boolean.TRUE)) {
+            throw new ValidationException("The invoice cannot be paid upon creation");
         }
 
-        if (invoice.getCreator() == null) {
+        if (invoice.getCreator() == null ||
+                invoice.getCreator().getIdentity() == null ||
+                invoice.getCreator().getIdentity().equals("")) {
             throw new ValidationException("Upon creation, the creator of the invoice " +
                     "must be provided");
         }
@@ -49,8 +50,23 @@ public class InvoiceValidatorImpl implements Validator<Invoice> {
             throw new ValidationException("Object must not be null");
         }
 
-        if (invoice.getPaid() != null && invoice.getPaid().compareTo(BigDecimal.ZERO) < 0) {
-            throw new ValidationException("The amount that was already paid cannot be negative");
+        if (invoice.getTime() == null || invoice.getGross() == null) {
+            throw  new ValidationException("Time and gross must not be null");
+        }
+
+        if (invoice.getGross().compareTo(BigDecimal.ZERO) < 0) {
+            throw new ValidationException("The total gross amount cannot be negative");
+        }
+
+        if (invoice.getPaid() == null) {
+            throw new ValidationException("Paid must be either true of false");
+        }
+
+        if (invoice.getCreator() == null ||
+                invoice.getCreator().getIdentity() == null ||
+                invoice.getCreator().getIdentity().equals("")) {
+            throw new ValidationException("Upon creation, the creator of the invoice " +
+                    "must be provided");
         }
 
         validateIdentity(invoice);

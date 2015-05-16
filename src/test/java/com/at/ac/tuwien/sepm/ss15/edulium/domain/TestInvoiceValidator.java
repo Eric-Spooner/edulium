@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Test cases for the invoice validator
@@ -23,7 +21,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("23"));
-        invoice.setCreator(new User());
+        invoice.setCreator(User.withIdentity("TestUser"));
 
         invoiceValidator.validateForCreate(invoice);
     }
@@ -38,8 +36,27 @@ public class TestInvoiceValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void testValidateForCreate_shouldFailWithMissingCreatorIdentity() throws ValidationException {
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("23"));
+        invoice.setCreator(new User());
+
+        invoiceValidator.validateForCreate(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
     public void testValidateForCreate_shouldFailWithNullInvoice() throws ValidationException {
         Invoice invoice = null;
+
+        invoiceValidator.validateForCreate(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_shouldFailWithNullTime() throws ValidationException {
+        Invoice invoice = new Invoice();
+        invoice.setGross(new BigDecimal("23"));
+        invoice.setCreator(User.withIdentity("TestUser"));
 
         invoiceValidator.validateForCreate(invoice);
     }
@@ -48,6 +65,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
     public void testValidateForCreate_shouldFailWithNullGrossAmount() throws ValidationException {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
+        invoice.setCreator(User.withIdentity("TestUser"));
 
         invoiceValidator.validateForCreate(invoice);
     }
@@ -57,16 +75,17 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("-22"));
+        invoice.setCreator(User.withIdentity("TestUser"));
 
         invoiceValidator.validateForCreate(invoice);
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForCreate_shouldFailWithPaidAmount() throws ValidationException {
+    public void testValidateForCreate_shouldFailWithPaidSetToTrue() throws ValidationException {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15"));
-        invoice.addPaid(new BigDecimal("16"));
+        invoice.setPaid(Boolean.TRUE);
 
         invoiceValidator.validateForCreate(invoice);
     }
@@ -75,11 +94,20 @@ public class TestInvoiceValidator extends AbstractDomainTest {
     public void testValidateForUpdate_shouldAcceptInvoice() throws ValidationException {
         Invoice invoice = new Invoice();
         invoice.setIdentity(1L);
-        invoice.addPaid(new BigDecimal("12"));
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15"));
+        invoice.setPaid(Boolean.TRUE);
+        invoice.setCreator(User.withIdentity("TestUser"));
 
-        Installment in1 = new Installment();
-        List<Installment> inList = new ArrayList<>();
-        inList.add(in1);
+        invoiceValidator.validateForUpdate(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_shouldFailWithMissingUserIdentity() throws ValidationException {
+        Invoice invoice = new Invoice();
+        invoice.setIdentity(1L);
+        invoice.setGross(new BigDecimal("19"));
+        invoice.setCreator(new User());
 
         invoiceValidator.validateForUpdate(invoice);
     }
@@ -94,15 +122,6 @@ public class TestInvoiceValidator extends AbstractDomainTest {
     @Test(expected = ValidationException.class)
     public void testValidateForUpdate_shouldFailWithNullIdentity() throws ValidationException {
         Invoice invoice = new Invoice();
-
-        invoiceValidator.validateForUpdate(invoice);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForUpdate_shouldFailWithNegativePaidAmount() throws ValidationException {
-        Invoice invoice = new Invoice();
-        invoice.setIdentity(1L);
-        invoice.addPaid(new BigDecimal("-19"));
 
         invoiceValidator.validateForUpdate(invoice);
     }

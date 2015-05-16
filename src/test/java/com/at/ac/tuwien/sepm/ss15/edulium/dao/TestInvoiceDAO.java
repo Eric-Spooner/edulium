@@ -24,7 +24,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
-        invoice.setCreator(new User());
+        invoice.setCreator(User.withIdentity("TestUser"));
 
         // WHEN
         invoiceDAO.create(invoice);
@@ -45,11 +45,12 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("26.7"));
-        invoice.setCreator(new User());
+        invoice.setCreator(User.withIdentity("TestUser"));
         invoiceDAO.create(invoice);
 
         // WHEN
-        invoice.addPaid(new BigDecimal("28.0"));
+        assertEquals(1, invoiceDAO.find(invoice).size());
+        invoice.setPaid(Boolean.TRUE);
         invoiceDAO.update(invoice);
 
         // THEN
@@ -64,10 +65,11 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("22.0"));
-        invoice.setCreator(new User());
+        invoice.setCreator(User.withIdentity("TestUser"));
         invoiceDAO.create(invoice);
 
         // WHEN
+        assertEquals(1, invoiceDAO.find(invoice).size());
         invoiceDAO.delete(invoice);
 
         // THEN
@@ -76,49 +78,44 @@ public class TestInvoiceDAO extends AbstractDAOTest {
     }
 
     @Test
-    public void testFind_shouldFindObject() throws ValidationException, DAOException {
+    public void testFind_shouldFindObjectsByIdentity() throws ValidationException, DAOException {
         // GIVEN
         Invoice inv1 = new Invoice();
         Invoice inv2 = new Invoice();
         Invoice inv3 = new Invoice();
-        Invoice matcher = new Invoice();
         List<Invoice> invoiceList;
 
         LocalDateTime now = LocalDateTime.now();
         inv1.setTime(now);
         inv1.setGross(new BigDecimal("11.0"));
-        inv1.setCreator(new User());
+        inv1.setCreator(User.withIdentity("TestUser1"));
         inv2.setTime(now);
         inv2.setGross(new BigDecimal("12.0"));
-        inv2.setCreator(new User());
+        inv2.setCreator(User.withIdentity("TestUser2"));
         inv3.setTime(now);
         inv3.setGross(new BigDecimal("13.0"));
-        inv3.setCreator(new User());
+        inv3.setCreator(User.withIdentity("TestUser3"));
 
         invoiceDAO.create(inv1);
         invoiceDAO.create(inv2);
         invoiceDAO.create(inv3);
 
         // WHEN
-        matcher.setIdentity(inv1.getIdentity());
-        invoiceList = invoiceDAO.find(matcher);
-        assertNotNull(invoiceList);
+        invoiceList = invoiceDAO.find(Invoice.withIdentity(inv1.getIdentity()));
 
         // THEN
         assertEquals(1, invoiceList.size());
         assertEquals(inv1, invoiceList.get(0));
 
         // WHEN
-        matcher.setIdentity(inv2.getIdentity());
-        invoiceList = invoiceDAO.find(matcher);
+        invoiceList = invoiceDAO.find(Invoice.withIdentity(inv2.getIdentity()));
 
         // THEN
         assertEquals(1, invoiceList.size());
         assertEquals(inv2, invoiceList.get(0));
 
         // WHEN
-        matcher.setIdentity(inv3.getIdentity());
-        invoiceList = invoiceDAO.find(matcher);
+        invoiceList = invoiceDAO.find(Invoice.withIdentity(inv3.getIdentity()));
 
         // THEN
         assertEquals(1, invoiceList.size());
@@ -129,25 +126,19 @@ public class TestInvoiceDAO extends AbstractDAOTest {
     public void testFind_shouldReturnEmptyListWhenNoObjectIsStored() throws DAOException {
         // GIVEN
         Invoice invoice = new Invoice();
-        invoice.setIdentity(1l); // Arbitrary identity
+        invoice.setIdentity(1L); // Arbitrary identity
 
         // WHEN
-        List<Invoice> allInvoices = invoiceDAO.getAll();
-        assertNotNull(allInvoices);
-        assertTrue(allInvoices.isEmpty());
+        List results = invoiceDAO.find(invoice);
 
         // THEN
-        List<Invoice> results = invoiceDAO.find(invoice);
         assertTrue(results.isEmpty());
     }
 
     @Test
     public void testFind_shouldFindObjectsWhenSearchingByCreator() throws ValidationException, DAOException {
         // GIVEN
-        User creator = new User();
-        creator.setIdentity("user");
-        creator.setName("Bill");
-        creator.setRole("waiter");
+        User creator = User.withIdentity("User");
 
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
@@ -174,13 +165,13 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         LocalDateTime now = LocalDateTime.now();
         inv1.setTime(now);
         inv1.setGross(new BigDecimal("11.0"));
-        inv1.setCreator(new User());
+        inv1.setCreator(User.withIdentity("TestUser1"));
         inv2.setTime(now);
         inv2.setGross(new BigDecimal("12.0"));
-        inv2.setCreator(new User());
+        inv2.setCreator(User.withIdentity("TestUser2"));
         inv3.setTime(now);
         inv3.setGross(new BigDecimal("13.0"));
-        inv3.setCreator(new User());
+        inv3.setCreator(User.withIdentity("TestUser3"));
 
         invoiceDAO.create(inv1);
         invoiceDAO.create(inv2);
@@ -195,13 +186,5 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         assertTrue(all.contains(inv1));
         assertTrue(all.contains(inv2));
         assertTrue(all.contains(inv3));
-    }
-
-    @Test
-    public void testGetAll_shouldReturnEmptyList() throws DAOException {
-        // WHEN / THEN
-        List<Invoice> all = invoiceDAO.getAll();
-        assertNotNull(all);
-        assertTrue(all.isEmpty());
     }
 }
