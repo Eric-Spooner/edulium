@@ -7,6 +7,9 @@ branches:
   only:
     - master
 
+after_success:
+  - mvn jacoco:report coveralls:jacoco
+
 notifications:
   email:
     recipients:
