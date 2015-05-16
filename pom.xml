@@ -17,6 +17,8 @@
         <java.version>1.8</java.version>
         <spring-context.version>4.1.6.RELEASE</spring-context.version>
         <spring-security.version>4.0.1.RELEASE</spring-security.version>
+        <maven-coveralls-plugin.version>3.1.0</maven-coveralls-plugin.version>
+        <maven-cobertura-plugin.version>2.1.1</maven-cobertura-plugin.version>
     </properties>
 
     <build>
@@ -95,4 +97,37 @@
             <version>${spring-security.version}</version>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>travis</id>
+            <activation>
+                <property>
+                    <name>env.TRAVIS</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>net.sourceforge.cobertura</groupId>
+                        <artifactId>cobertura</artifactId>
+                        <version>${maven-cobertura-plugin.version}</version>
+                        <configuration>
+                            <format>xml</format>
+                            <maxmem>256m</maxmem>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.eluder.coveralls</groupId>
+                        <artifactId>coveralls-maven-plugin</artifactId>
+                        <version>${maven-coveralls-plugin.version}</version>
+                        <configuration>
+                            <repoToken>Es2AtAqCWbvai9c0pLcy2nWxuLzkiBKQ6</repoToken>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
