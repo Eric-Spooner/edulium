@@ -20,11 +20,6 @@ class InvoiceValidatorImpl implements Validator<Invoice> {
      */
     @Override
     public void validateForCreate(Invoice invoice) throws ValidationException {
-        if (invoice == null) {
-            throw new ValidationException("Object must not be null");
-        }
-
-        userValidator.validateForCreate(invoice.getCreator());
         checkForRequiredAttributesForCreateAndUpdate(invoice);
     }
 
@@ -35,11 +30,6 @@ class InvoiceValidatorImpl implements Validator<Invoice> {
      */
     @Override
     public void validateForUpdate(Invoice invoice) throws ValidationException {
-        if (invoice == null) {
-            throw new ValidationException("Object must not be null");
-        }
-
-        userValidator.validateForUpdate(invoice.getCreator());
         checkForRequiredAttributesForCreateAndUpdate(invoice);
         validateIdentity(invoice);
     }
@@ -72,6 +62,10 @@ class InvoiceValidatorImpl implements Validator<Invoice> {
     }
 
     private void checkForRequiredAttributesForCreateAndUpdate(Invoice invoice) throws ValidationException {
+        if (invoice == null) {
+            throw new ValidationException("Object must not be null");
+        }
+
         if (invoice.getTime() == null) {
             throw  new ValidationException("Time cannot be null");
         }
@@ -83,5 +77,7 @@ class InvoiceValidatorImpl implements Validator<Invoice> {
         if (invoice.getGross().compareTo(BigDecimal.ZERO) < 0) {
             throw new ValidationException("The total gross amount cannot be negative");
         }
+
+        userValidator.validateIdentity(invoice.getCreator());
     }
 }

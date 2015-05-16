@@ -18,10 +18,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
 
     @Test
     public void testValidateForCreate_shouldAcceptInvoice() throws ValidationException {
-        User creator = new User();
-        creator.setName("TestName");
-        creator.setRole("waiter");
-        creator.setIdentity("tn");
+        User creator = User.withIdentity("testUser");
 
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
@@ -85,10 +82,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
 
     @Test
     public void testValidateForUpdate_shouldAcceptInvoice() throws ValidationException {
-        User creator = new User();
-        creator.setName("TestName");
-        creator.setRole("waiter");
-        creator.setIdentity("tn");
+        User creator = User.withIdentity("TestUser");
 
         Invoice invoice = new Invoice();
         invoice.setIdentity(1L);
@@ -114,10 +108,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
     @Test(expected = ValidationException.class)
     public void testValidateForUpdate_shouldFailWithNullTime() throws ValidationException {
 
-        User creator = new User();
-        creator.setName("TestName");
-        creator.setRole("waiter");
-        creator.setIdentity("tn");
+        User creator = User.withIdentity("TestUser");
         Invoice invoice = new Invoice();
         invoice.setGross(new BigDecimal("20"));
         invoice.setIdentity(1L);
@@ -129,10 +120,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
 
     @Test(expected = ValidationException.class)
     public void testValidateForUpdate_shouldFailWithNullGrossAmount() throws ValidationException {
-        User creator = new User();
-        creator.setName("TestName");
-        creator.setRole("waiter");
-        creator.setIdentity("tn");
+        User creator = User.withIdentity("TestUser");
 
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
@@ -145,10 +133,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
 
     @Test(expected = ValidationException.class)
     public void testValidateForUpdate_shouldFailWithNegativeGrossAmount() throws ValidationException {
-        User creator = new User();
-        creator.setName("TestName");
-        creator.setRole("waiter");
-        creator.setIdentity("tn");
+        User creator = User.withIdentity("TestUser");
 
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
