@@ -45,19 +45,17 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
         LOGGER.debug("entering create with parameters " + menuEntry);
 
         validator.validateForCreate(menuEntry);
+
         final String query = "INSERT INTO MenuEntry (name, price, available, description, taxRate_ID, category_ID) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            TaxRate taxRate = menuEntry.getTaxRate();
-            MenuCategory category = menuEntry.getCategory();
-
             stmt.setString(1, menuEntry.getName());
             stmt.setBigDecimal(2, menuEntry.getPrice());
             stmt.setBoolean(3, menuEntry.getAvailable());
             stmt.setString(4, menuEntry.getDescription());
-            stmt.setObject(5, taxRate == null ? null : taxRate.getIdentity());
-            stmt.setObject(6, category == null ? null : category.getIdentity());
+            stmt.setObject(5, menuEntry.getTaxRate().getIdentity());
+            stmt.setObject(6, menuEntry.getCategory().getIdentity());
             stmt.executeUpdate();
 
             ResultSet key = stmt.getGeneratedKeys();
@@ -78,19 +76,17 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
         LOGGER.debug("entering update with parameters " + menuEntry);
 
         validator.validateForUpdate(menuEntry);
+
         final String query = "UPDATE MenuEntry SET name = ?, price = ?, available = ?, " +
                 "description = ?, taxRate_ID = ?, category_ID = ? WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            TaxRate taxRate = menuEntry.getTaxRate();
-            MenuCategory category = menuEntry.getCategory();
-
             stmt.setString(1, menuEntry.getName());
             stmt.setBigDecimal(2, menuEntry.getPrice());
             stmt.setBoolean(3, menuEntry.getAvailable());
             stmt.setString(4, menuEntry.getDescription());
-            stmt.setObject(5, taxRate == null ? null : taxRate.getIdentity());
-            stmt.setObject(6, category == null ? null : category.getIdentity());
+            stmt.setObject(5, menuEntry.getTaxRate().getIdentity());
+            stmt.setObject(6, menuEntry.getCategory().getIdentity());
             stmt.setLong(7, menuEntry.getIdentity());
 
             if (stmt.executeUpdate() == 0) {
@@ -110,6 +106,7 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
         LOGGER.debug("entering delete with parameters " + menuEntry);
 
         validator.validateForDelete(menuEntry);
+
         final String query = "UPDATE MenuEntry SET deleted = true WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
@@ -135,15 +132,15 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
             return new ArrayList<>();
         }
 
-        String query = "SELECT * FROM MenuEntry WHERE " +
-                "ID = ISNULL(?, ID) AND " +
-                "name = ISNULL(?, name) AND " +
-                "price = ISNULL(?, price) AND " +
-                "available = ISNULL(?, available) AND " +
-                "description = ISNULL(?, description) AND " +
-                "taxRate_ID = ISNULL(?, taxRate_ID) AND " +
-                "category_ID = ISNULL(?, category_ID) AND " +
-                "deleted = false";
+        final String query = "SELECT * FROM MenuEntry WHERE " +
+                    "ID = ISNULL(?, ID) AND " +
+                    "name = ISNULL(?, name) AND " +
+                    "price = ISNULL(?, price) AND " +
+                    "available = ISNULL(?, available) AND " +
+                    "description = ISNULL(?, description) AND " +
+                    "taxRate_ID = ISNULL(?, taxRate_ID) AND " +
+                    "category_ID = ISNULL(?, category_ID) AND " +
+                    "deleted = false";
 
         final List<MenuEntry> objects = new ArrayList<>();
 
@@ -176,6 +173,7 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
         LOGGER.debug("entering getAll");
 
         final String query = "SELECT * FROM MenuEntry WHERE deleted = false";
+
         final List<MenuEntry> objects = new ArrayList<>();
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
@@ -196,8 +194,10 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
         LOGGER.debug("entering getHistory with parameters " + menuEntry);
 
         validator.validateIdentity(menuEntry);
-        List<History<MenuEntry>> history = new ArrayList<>();
+
         final String query = "SELECT * FROM MenuEntryHistory WHERE ID = ? ORDER BY changeNr";
+
+        List<History<MenuEntry>> history = new ArrayList<>();
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, menuEntry.getIdentity());
@@ -242,13 +242,13 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
      */
     private MenuEntry parseResult(ResultSet result) throws DAOException, SQLException {
         List<TaxRate> taxRates = taxRateDAO.find(TaxRate.withIdentity(result.getLong("taxRate_ID")));
-        if(taxRates.size() != 1) {
+        if (taxRates.size() != 1) {
             LOGGER.error("retrieving taxRate failed");
             throw new DAOException("retrieving taxRate failed");
         }
 
         List<MenuCategory> categories = menuCategoryDAO.find(MenuCategory.withIdentity(result.getLong("category_ID")));
-        if(categories.size() != 1) {
+        if (categories.size() != 1) {
             LOGGER.error("retrieving category failed");
             throw new DAOException("retrieving category failed");
         }

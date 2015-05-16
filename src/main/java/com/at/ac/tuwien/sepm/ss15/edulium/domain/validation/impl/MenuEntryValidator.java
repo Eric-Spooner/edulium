@@ -1,8 +1,11 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 
@@ -10,6 +13,11 @@ import java.math.BigDecimal;
  * validator implementation for the MenuEntry domain object
  */
 class MenuEntryValidator implements Validator<MenuEntry> {
+    @Autowired
+    private Validator<MenuCategory> menuCategoryValidator;
+    @Autowired
+    private Validator<TaxRate> taxRateValidator;
+
     @Override
     public void validateForCreate(MenuEntry menuEntry) throws ValidationException {
         if (menuEntry == null) {
@@ -61,23 +69,14 @@ class MenuEntryValidator implements Validator<MenuEntry> {
         if (menuEntry.getDescription() == null) {
             throw new ValidationException("description must not be null");
         }
-        if (menuEntry.getTaxRate() == null) {
-            throw new ValidationException("taxRate must not be null");
-        }
-        if (menuEntry.getTaxRate().getIdentity() == null) {
-            throw new ValidationException("taxRate identity must not be null");
-        }
-        if (menuEntry.getCategory() == null) {
-            throw new ValidationException("category must not be null");
-        }
-        if (menuEntry.getCategory().getIdentity() == null) {
-            throw new ValidationException("category identity must not be null");
-        }
-        if(menuEntry.getName().isEmpty()) {
+        if (menuEntry.getName().isEmpty()) {
             throw new ValidationException("name must not be empty");
         }
         if (menuEntry.getPrice().compareTo(BigDecimal.ZERO) < 0) {
             throw new ValidationException("value must be equal or greater than 0.0");
         }
+
+        menuCategoryValidator.validateIdentity(menuEntry.getCategory());
+        taxRateValidator.validateIdentity(menuEntry.getTaxRate());
     }
 }
