@@ -17,6 +17,8 @@
         <java.version>1.8</java.version>
         <spring-context.version>4.1.6.RELEASE</spring-context.version>
         <spring-security.version>4.0.1.RELEASE</spring-security.version>
+        <maven-coveralls-plugin.version>3.1.0</maven-coveralls-plugin.version>
+        <maven-jacoco-plugin.version>0.7.4.201502262128</maven-jacoco-plugin.version>
     </properties>
 
     <build>
@@ -95,4 +97,30 @@
             <version>${spring-security.version}</version>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>travis</id>
+            <activation>
+                <property>
+                    <name>env.TRAVIS</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>${maven-jacoco-plugin.version}</version>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.eluder.coveralls</groupId>
+                        <artifactId>coveralls-maven-plugin</artifactId>
+                        <version>${maven-coveralls-plugin.version}</version>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
