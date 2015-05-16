@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 /**
  * Unit Test for MenuDAO
  */
-public class TestOrderDAO extends AbstractDAOTest {
+public class TestMenuDAO extends AbstractDAOTest {
     @Autowired
     private DAO<MenuEntry> menuEntryDAO;
     @Autowired
@@ -435,5 +435,43 @@ public class TestOrderDAO extends AbstractDAOTest {
         assertTrue(objects.contains(men1));
         assertTrue(objects.contains(men2));
         assertTrue(objects.contains(men3));
+    }
+
+    @Test
+    public void testUpdate_DeleteMenuEntryAndAddSameEntryAgain() throws DAOException, ValidationException {
+        //  GIVEN
+        LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
+        list.add(createMenuEntry("entry1", "desc1", "cat", 20, 0.2, true));
+        list.add(createMenuEntry("entry2", "desc2", "cat", 20, 0.2, true));
+        Menu men = createMenu("Menu", list);
+        menuDAO.create(men);
+
+        MenuEntry entryTwo = men.getEntries().get(1);
+
+        // check if entry is stored
+        assertEquals(men, menuDAO.find(Menu.withIdentity(men.getIdentity())).get(0));
+
+        // WHEN
+        List<MenuEntry> listNew = men.getEntries();
+        listNew.remove(1);
+        menuDAO.update(men);
+
+        // THEN
+        // check if entry was updated
+        List<Menu> storedObjects = menuDAO.find(Menu.withIdentity(men.getIdentity()));
+        assertEquals(1, storedObjects.size());
+        assertEquals(men, storedObjects.get(0));
+
+        // WHEN
+        listNew = men.getEntries();
+        listNew.add(entryTwo);
+        men.setEntries(listNew);
+        menuDAO.update(men);
+
+        // THEN
+        // check if entry was updated
+        storedObjects = menuDAO.find(Menu.withIdentity(men.getIdentity()));
+        assertEquals(1, storedObjects.size());
+        assertEquals(men, storedObjects.get(0));
     }
 }
