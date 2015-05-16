@@ -37,15 +37,13 @@ public class TestSectionDAO extends AbstractDAOTest {
         Assert.assertNotNull(section.getIdentity());
 
         // check retrieving object
-        Section matcher = new Section();
-        matcher.setIdentity(section.getIdentity());
-        List<Section> storedObjects = sectionDAO.find(matcher);
-        Assert.assertEquals(storedObjects.size(), 1);
-        Assert.assertEquals(storedObjects.get(0), section);
+        List<Section> storedObjects = sectionDAO.find(Section.withIdentity(section.getIdentity()));
+        Assert.assertEquals(1, storedObjects.size());
+        Assert.assertEquals(section, storedObjects.get(0));
     }
 
     @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithoutNameShouldFail() throws DAOException, ValidationException {
+    public void testCreate_addingInvalidObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Section section = new Section();
 
@@ -58,40 +56,35 @@ public class TestSectionDAO extends AbstractDAOTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testCreate_addingObjectWithEmptyNameShouldFail() throws DAOException, ValidationException {
+    public void testCreate_addingNullObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        Section section = new Section();
-        section.setName("");
+        Section section = null;
 
         // WHEN
-        try {
-            sectionDAO.create(section);
-        } finally {
-            Assert.assertNull(section.getIdentity());
-        }
+        sectionDAO.create(section);
     }
 
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
-        // GIVEN
+        // PREPARE
         Section section = new Section();
         section.setName("section");
         sectionDAO.create(section);
 
         // check if section is stored
-        Section matcher = new Section();
-        matcher.setIdentity(section.getIdentity());
-        Assert.assertEquals(sectionDAO.find(matcher).get(0), section);
+        Assert.assertEquals(1, sectionDAO.find(section).size());
+
+        // GIVEN
+        section.setName("newSection");
 
         // WHEN
-        section.setName("newSection");
         sectionDAO.update(section);
 
         // THEN
         // check if section name was updated
-        List<Section> storedObjects = sectionDAO.find(matcher);
-        Assert.assertEquals(storedObjects.size(), 1);
-        Assert.assertEquals(storedObjects.get(0), section);
+        List<Section> storedObjects = sectionDAO.find(Section.withIdentity(section.getIdentity()));
+        Assert.assertEquals(1, storedObjects.size());
+        Assert.assertEquals(section, storedObjects.get(0));
     }
 
     @Test(expected = ValidationException.class)
@@ -104,24 +97,45 @@ public class TestSectionDAO extends AbstractDAOTest {
         sectionDAO.update(section);
     }
 
+    @Test(expected = ValidationException.class)
+    public void testUpdate_updatingInvalidObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        Section section = new Section();
+
+        // WHEN
+        sectionDAO.update(section);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdate_updatingNullObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        Section section = null;
+
+        // WHEN
+        sectionDAO.update(section);
+    }
+
     @Test(expected = DAOException.class)
     public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        Section section = new Section();
+        Section notPersitentSection = new Section();
         Long identity = (long) 1;
-        section.setIdentity(identity);
-        section.setName("section");
+        notPersitentSection.setIdentity(identity);
 
         // check if no item with the id IDENTITY exists
         try {
-            while (!sectionDAO.find(section).isEmpty()) {
+            while (!sectionDAO.find(notPersitentSection).isEmpty()) {
                 identity++;
-                section.setIdentity(identity);
+                notPersitentSection.setIdentity(identity);
             }
         } catch (DAOException e) {
             // exception should not occur here
             Assert.fail();
         }
+
+        Section section = new Section();
+        section.setIdentity(notPersitentSection.getIdentity());
+        section.setName("section");
 
         // WHEN
         sectionDAO.update(section);
@@ -129,31 +143,35 @@ public class TestSectionDAO extends AbstractDAOTest {
 
     @Test
     public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
-        // GIVEN
+        // PREPARE
         Section section = new Section();
         section.setName("section");
         sectionDAO.create(section);
         
         // check if section created
-        Section matcher = new Section();
-        matcher.setIdentity(section.getIdentity());
-        List<Section> objects = sectionDAO.find(matcher);
-        Assert.assertEquals(objects.size(), 1);
-        Assert.assertEquals(objects.get(0), section);
+        Assert.assertEquals(1, sectionDAO.find(section).size());
 
         // WHEN
         sectionDAO.delete(section);
 
-        // check if section was removed
         // THEN
-        Assert.assertEquals(sectionDAO.find(matcher).size(), 0);
-        Assert.assertEquals(sectionDAO.getAll().size(), 0);
+        // check if section was removed
+        Assert.assertEquals(0, sectionDAO.find(section).size());
     }
 
     @Test(expected = ValidationException.class)
     public void testDelete_deletingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Section section = new Section();
+
+        // WHEN
+        sectionDAO.delete(section);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testDelete_deletingNullObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        Section section = null;
 
         // WHEN
         sectionDAO.delete(section);
@@ -199,22 +217,22 @@ public class TestSectionDAO extends AbstractDAOTest {
         matcher.setIdentity(section1.getIdentity());
         List<Section> objects = sectionDAO.find(matcher);
         // THEN
-        Assert.assertEquals(objects.size(), 1);
-        Assert.assertEquals(objects.get(0), section1);
+        Assert.assertEquals(1, objects.size());
+        Assert.assertEquals(section1, objects.get(0));
 
         // WHEN
         matcher.setIdentity(section2.getIdentity());
         objects = sectionDAO.find(matcher);
         // THEN
-        Assert.assertEquals(objects.size(), 1);
-        Assert.assertEquals(objects.get(0), section2);
+        Assert.assertEquals(1, objects.size());
+        Assert.assertEquals(section2, objects.get(0));
 
         // WHEN
         matcher.setIdentity(section3.getIdentity());
         objects = sectionDAO.find(matcher);
         // THEN
-        Assert.assertEquals(objects.size(), 1);
-        Assert.assertEquals(objects.get(0), section3);
+        Assert.assertEquals(1, objects.size());
+        Assert.assertEquals(section3, objects.get(0));
     }
 
     @Test
@@ -236,7 +254,7 @@ public class TestSectionDAO extends AbstractDAOTest {
         List<Section> objects = sectionDAO.find(matcher);
 
         // THEN
-        Assert.assertEquals(objects.size(), 2);
+        Assert.assertEquals(2, objects.size());
         Assert.assertTrue(objects.contains(section1));
         Assert.assertTrue(objects.contains(section2));
 
@@ -245,7 +263,7 @@ public class TestSectionDAO extends AbstractDAOTest {
         objects = sectionDAO.find(matcher);
 
         // THEN
-        Assert.assertEquals(objects.size(), 1);
+        Assert.assertEquals(1, objects.size());
         Assert.assertEquals(objects.get(0), section3);
     }
 
@@ -266,13 +284,7 @@ public class TestSectionDAO extends AbstractDAOTest {
         List<Section> storedObjects = sectionDAO.find(matcher);
 
         // THEN
-        Assert.assertEquals(storedObjects.size(), 0);
-    }
-
-    @Test
-    public void testGetAll_shouldReturnEmptyList() throws DAOException {
-        // WHEN / THEN
-        Assert.assertEquals(sectionDAO.getAll().size(), 0);
+        Assert.assertTrue(storedObjects.isEmpty());
     }
 
     @Test
@@ -292,7 +304,6 @@ public class TestSectionDAO extends AbstractDAOTest {
         List<Section> objects = sectionDAO.getAll();
 
         // THEN
-        Assert.assertEquals(objects.size(), 3);
         Assert.assertTrue(objects.contains(section1));
         Assert.assertTrue(objects.contains(section2));
         Assert.assertTrue(objects.contains(section3));

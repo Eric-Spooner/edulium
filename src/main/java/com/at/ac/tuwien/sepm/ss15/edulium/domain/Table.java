@@ -7,7 +7,7 @@ public class Table {
     private Integer seats;
     private Long number;
     private Section section;
-    private User user;
+    private User user; // optional
     private Integer row;
     private Integer column;
 
@@ -20,9 +20,10 @@ public class Table {
      * @param number the identity of the category
      * @return table object with the given number
      */
-    public static Table withNumber(long number) {
+    public static Table withIdentity(Section section, long number) {
         Table table = new Table();
         table.setNumber(number);
+        table.setSection(section);
         return table;
     }
 
@@ -104,7 +105,7 @@ public class Table {
     }
 
     /**
-     * @param user sets the id of the user responsible for the table
+     * @param user sets the id of the user responsible for the table (optional)
      */
     public void setUser(User user) {
         this.user = user;
