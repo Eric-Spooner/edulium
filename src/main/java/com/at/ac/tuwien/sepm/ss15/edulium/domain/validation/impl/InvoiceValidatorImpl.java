@@ -1,12 +1,17 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 
 class InvoiceValidatorImpl implements Validator<Invoice> {
+
+    @Autowired
+    private Validator<User> userValidator;
 
     /**
      * Validates the invoice object for the create action
@@ -19,24 +24,8 @@ class InvoiceValidatorImpl implements Validator<Invoice> {
             throw new ValidationException("Object must not be null");
         }
 
-        if (invoice.getTime() == null || invoice.getGross() == null) {
-            throw  new ValidationException("Time and gross must not be null");
-        }
-
-        if (invoice.getGross().compareTo(BigDecimal.ZERO) < 0) {
-            throw new ValidationException("The total gross amount cannot be negative");
-        }
-
-        if (invoice.getPaid() != null && invoice.getPaid().equals(Boolean.TRUE)) {
-            throw new ValidationException("The invoice cannot be paid upon creation");
-        }
-
-        if (invoice.getCreator() == null ||
-                invoice.getCreator().getIdentity() == null ||
-                invoice.getCreator().getIdentity().equals("")) {
-            throw new ValidationException("Upon creation, the creator of the invoice " +
-                    "must be provided");
-        }
+        userValidator.validateForCreate(invoice.getCreator());
+        checkForRequiredAttributesForCreateAndUpdate(invoice);
     }
 
     /**
@@ -50,25 +39,8 @@ class InvoiceValidatorImpl implements Validator<Invoice> {
             throw new ValidationException("Object must not be null");
         }
 
-        if (invoice.getTime() == null || invoice.getGross() == null) {
-            throw  new ValidationException("Time and gross must not be null");
-        }
-
-        if (invoice.getGross().compareTo(BigDecimal.ZERO) < 0) {
-            throw new ValidationException("The total gross amount cannot be negative");
-        }
-
-        if (invoice.getPaid() == null) {
-            throw new ValidationException("Paid must be either true of false");
-        }
-
-        if (invoice.getCreator() == null ||
-                invoice.getCreator().getIdentity() == null ||
-                invoice.getCreator().getIdentity().equals("")) {
-            throw new ValidationException("Upon creation, the creator of the invoice " +
-                    "must be provided");
-        }
-
+        userValidator.validateForUpdate(invoice.getCreator());
+        checkForRequiredAttributesForCreateAndUpdate(invoice);
         validateIdentity(invoice);
     }
 
@@ -96,6 +68,20 @@ class InvoiceValidatorImpl implements Validator<Invoice> {
         if (invoice.getIdentity() == null) {
             throw new ValidationException("The unique identity of the invoice must be " +
                     "present in order to be identified");
+        }
+    }
+
+    private void checkForRequiredAttributesForCreateAndUpdate(Invoice invoice) throws ValidationException {
+        if (invoice.getTime() == null) {
+            throw  new ValidationException("Time cannot be null");
+        }
+
+        if (invoice.getGross() == null) {
+            throw new ValidationException("Gross cannot be null");
+        }
+
+        if (invoice.getGross().compareTo(BigDecimal.ZERO) < 0) {
+            throw new ValidationException("The total gross amount cannot be negative");
         }
     }
 }

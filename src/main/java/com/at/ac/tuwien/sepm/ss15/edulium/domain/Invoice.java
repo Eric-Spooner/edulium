@@ -82,7 +82,7 @@ public class Invoice {
     }
 
     /**
-     * @return Returns the creator of this invoice
+     * @return Returns the creator of this invoice (can be null)
      */
     public User getCreator() {
         return creator;

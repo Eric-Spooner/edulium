@@ -18,10 +18,15 @@ public class TestInvoiceValidator extends AbstractDomainTest {
 
     @Test
     public void testValidateForCreate_shouldAcceptInvoice() throws ValidationException {
+        User creator = new User();
+        creator.setName("TestName");
+        creator.setRole("waiter");
+        creator.setIdentity("tn");
+
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("23"));
-        invoice.setCreator(User.withIdentity("TestUser"));
+        invoice.setCreator(creator);
 
         invoiceValidator.validateForCreate(invoice);
     }
@@ -47,9 +52,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
 
     @Test(expected = ValidationException.class)
     public void testValidateForCreate_shouldFailWithNullInvoice() throws ValidationException {
-        Invoice invoice = null;
-
-        invoiceValidator.validateForCreate(invoice);
+        invoiceValidator.validateForCreate(null);
     }
 
     @Test(expected = ValidationException.class)
@@ -80,24 +83,79 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         invoiceValidator.validateForCreate(invoice);
     }
 
-    @Test(expected = ValidationException.class)
-    public void testValidateForCreate_shouldFailWithPaidSetToTrue() throws ValidationException {
-        Invoice invoice = new Invoice();
-        invoice.setTime(LocalDateTime.now());
-        invoice.setGross(new BigDecimal("15"));
-        invoice.setPaid(Boolean.TRUE);
-
-        invoiceValidator.validateForCreate(invoice);
-    }
-
     @Test
     public void testValidateForUpdate_shouldAcceptInvoice() throws ValidationException {
+        User creator = new User();
+        creator.setName("TestName");
+        creator.setRole("waiter");
+        creator.setIdentity("tn");
+
         Invoice invoice = new Invoice();
         invoice.setIdentity(1L);
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15"));
         invoice.setPaid(Boolean.TRUE);
-        invoice.setCreator(User.withIdentity("TestUser"));
+        invoice.setCreator(creator);
+
+        invoiceValidator.validateForUpdate(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_shouldFailWithNullCreator() throws ValidationException {
+        Invoice invoice = new Invoice();
+        invoice.setGross(new BigDecimal("20"));
+        invoice.setTime(LocalDateTime.now());
+        invoice.setIdentity(1L);
+        invoice.setPaid(Boolean.TRUE);
+
+        invoiceValidator.validateForUpdate(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_shouldFailWithNullTime() throws ValidationException {
+
+        User creator = new User();
+        creator.setName("TestName");
+        creator.setRole("waiter");
+        creator.setIdentity("tn");
+        Invoice invoice = new Invoice();
+        invoice.setGross(new BigDecimal("20"));
+        invoice.setIdentity(1L);
+        invoice.setPaid(Boolean.TRUE);
+        invoice.setCreator(creator);
+
+        invoiceValidator.validateForUpdate(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_shouldFailWithNullGrossAmount() throws ValidationException {
+        User creator = new User();
+        creator.setName("TestName");
+        creator.setRole("waiter");
+        creator.setIdentity("tn");
+
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setIdentity(1L);
+        invoice.setPaid(Boolean.TRUE);
+        invoice.setCreator(creator);
+
+        invoiceValidator.validateForUpdate(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_shouldFailWithNegativeGrossAmount() throws ValidationException {
+        User creator = new User();
+        creator.setName("TestName");
+        creator.setRole("waiter");
+        creator.setIdentity("tn");
+
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("-20"));
+        invoice.setIdentity(1L);
+        invoice.setPaid(Boolean.TRUE);
+        invoice.setCreator(creator);
 
         invoiceValidator.validateForUpdate(invoice);
     }
@@ -114,9 +172,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
 
     @Test(expected = ValidationException.class)
     public void testValidateForUpdate_shouldFailWithNoInvoice() throws ValidationException {
-        Invoice invoice = null;
-
-        invoiceValidator.validateForUpdate(invoice);
+        invoiceValidator.validateForUpdate(null);
     }
 
     @Test(expected = ValidationException.class)
@@ -136,9 +192,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
 
     @Test(expected = ValidationException.class)
     public void testValidateForDelete_shouldFailWithNullInvoice() throws ValidationException {
-        Invoice invoice = null;
-
-        invoiceValidator.validateForDelete(invoice);
+        invoiceValidator.validateForDelete(null);
     }
 
     @Test(expected = ValidationException.class)
