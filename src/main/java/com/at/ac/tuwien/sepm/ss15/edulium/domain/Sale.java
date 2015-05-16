@@ -65,5 +65,6 @@ public class Sale {
 
         if (identity != null ? !identity.equals(sale.identity) : sale.identity != null) return false;
         return !(name != null ? !name.equals(sale.name) : sale.name != null);
+        
     }
 }
