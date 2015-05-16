@@ -370,7 +370,7 @@ public class DBMenuDAO implements DAO<Menu> {
         /*Get the MenuEntries over MenuAssocHistory*/
         List<MenuEntry> menuEntries = new LinkedList<MenuEntry>();
         String query = "SELECT * FROM MenuAssocHistory WHERE " +
-                "menu_ID = ? AND changeNr = ?" +
+                "menu_ID = ? AND changeNr = ? AND " +
                 "disabled = false";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setObject(1, result.getLong("ID"));
@@ -385,13 +385,7 @@ public class DBMenuDAO implements DAO<Menu> {
             LOGGER.error("searching for menu entries failed", e);
             throw new DAOException("searching for menu entries failed", e);
         }
-
-        if(menuEntries.size()>0){
-            menu.setEntries(menuEntries);
-        }else{
-            throw new DAOException("there is no menu Entry for the searched menu");
-        }
-
+        menu.setEntries(menuEntries);
         return  menu;
     }
 

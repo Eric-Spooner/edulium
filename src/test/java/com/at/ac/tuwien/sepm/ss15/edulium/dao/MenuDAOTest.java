@@ -395,7 +395,6 @@ public class MenuDAOTest extends AbstractDAOTest {
         assertTrue(historyEntry.isDeleted());
     }
 
-
     @Test
     public void testGetAll_shouldReturnEmptyList() throws DAOException {
         // WHEN / THEN
