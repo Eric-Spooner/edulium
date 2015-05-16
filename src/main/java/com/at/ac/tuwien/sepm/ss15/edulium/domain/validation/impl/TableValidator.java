@@ -46,8 +46,24 @@ public class TableValidator implements Validator<Table> {
             throw new ValidationException("row must not be < 0");
         }
 
+        if(table.getSeats() == null) {
+            throw new ValidationException("seats must not be null");
+        }
+
         if(table.getSeats() < 0) {
             throw new ValidationException("seats must not be < 0");
+        }
+
+        if(table.getSection() == null) {
+            throw new ValidationException("section must not be null");
+        }
+
+        if(table.getSection().getIdentity() == null) {
+            throw new ValidationException("section identity must not be null");
+        }
+
+        if(table.getUser() != null && table.getUser().getIdentity() == null) {
+            throw new ValidationException("user identity must not be null");
         }
     }
 
@@ -66,15 +82,23 @@ public class TableValidator implements Validator<Table> {
             throw new ValidationException("number must not be null");
         }
 
-        if(table.getColumn() < 0) {
+        if(table.getSection() == null) {
+            throw new ValidationException("section must not be null");
+        }
+
+        if(table.getSection().getIdentity() == null) {
+            throw new ValidationException("section identity must not be null");
+        }
+
+        if(table.getColumn() != null && table.getColumn() < 0) {
             throw new ValidationException("column must not be < 0");
         }
 
-        if(table.getRow() < 0) {
+        if(table.getRow() != null && table.getRow() < 0) {
             throw new ValidationException("row must not be < 0");
         }
 
-        if(table.getSeats() < 0) {
+        if(table.getSeats() != null && table.getSeats() < 0) {
             throw new ValidationException("seats must not be < 0");
         }
     }
@@ -96,6 +120,14 @@ public class TableValidator implements Validator<Table> {
 
         if(table.getNumber() < 0) {
             throw new ValidationException("number must not be < 0");
+        }
+
+        if(table.getSection() == null) {
+            throw new ValidationException("section must not be null");
+        }
+
+        if(table.getSection().getIdentity() == null) {
+            throw new ValidationException("section identity must not be null");
         }
     }
 
@@ -136,8 +168,12 @@ public class TableValidator implements Validator<Table> {
             throw new ValidationException("section must not be null");
         }
 
-        if(table.getUser() == null) {
-            throw new ValidationException("user must not be null");
+        if(table.getSection().getIdentity() == null) {
+            throw new ValidationException("section identity must not be null");
+        }
+
+        if(table.getUser() != null && table.getUser().getIdentity() == null) {
+            throw new ValidationException("user identity must not be null");
         }
     }
 }

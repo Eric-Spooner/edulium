@@ -2,7 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.impl.DBTableDAO;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,8 @@ import java.util.List;
 public class Section {
     private Long identity;
     private String name;
+    @Autowired
+    private DAO<Table> tableDAO;
 
     /**
      * Creates a new section object and assigns the given identity to it.
@@ -27,6 +29,8 @@ public class Section {
 
     /**
      * @return the unique identity of the section
+     *         can be null (if this instance does not represent
+     *         a persistent dataset)
      */
     public Long getIdentity() {
         return identity;
@@ -41,6 +45,7 @@ public class Section {
 
     /**
      * @return the name of the section
+     *         can be null
      */
     public String getName() {
         return name;
@@ -55,9 +60,9 @@ public class Section {
 
     /**
      * @return a list of tables in this section
+     *         can be empty if there are no tables in this section
      */
     public List getTables() throws DAOException {
-        DAO<Table> tableDAO = new DBTableDAO();
         Table matcher = new Table();
         matcher.setSection(this);
         List tableList;

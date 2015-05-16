@@ -147,9 +147,9 @@ class DBSectionDAO implements DAO<Section> {
             stmt.setString(2, section.getName());
             stmt.execute();
 
-            ResultSet key = stmt.getGeneratedKeys();
-            if (key.next()) {
-                section.setIdentity(key.getLong(1));
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                objects.add(parseResult(result));
             }
 
         } catch (SQLException e) {

@@ -66,13 +66,13 @@ CREATE TABLE IF NOT EXISTS RestaurantSectionHistory (
 
 CREATE TABLE IF NOT EXISTS RestaurantTable (
     section_ID BIGINT REFERENCES RestaurantSection(ID),
-    number BIGINT AUTO_INCREMENT,
+    number BIGINT,
     seats INT,
     tableRow INT,
     tableColumn INT,
     user_ID VARCHAR(25) REFERENCES RestaurantUser(ID),
     disabled BOOLEAN DEFAULT FALSE,
-    PRIMARY KEY(section_ID, number)
+    PRIMARY KEY(number, section_ID)
 );
 
 CREATE TABLE IF NOT EXISTS TableHistory (

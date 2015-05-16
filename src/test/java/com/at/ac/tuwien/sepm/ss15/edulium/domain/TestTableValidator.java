@@ -314,48 +314,6 @@ public class TestTableValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForUpdate_tableWithoutColumnShouldThrow() throws ValidationException, DAOException {
-        // GIVEN
-        Table table = new Table();
-        User user = new User();
-        user.setIdentity("A");
-        user.setName("User");
-        user.setRole("Role");
-        Section section = new Section();
-        section.setIdentity((long) 1);
-        section.setName("Section");
-        table.setNumber((long) 1);
-        table.setSection(section);
-        table.setUser(user);
-        table.setSeats(2);
-        table.setRow(4);
-
-        // WHEN
-        tableValidator.validateForUpdate(table);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForUpdate_tableWithoutRowShouldThrow() throws ValidationException, DAOException {
-        // GIVEN
-        Table table = new Table();
-        User user = new User();
-        user.setIdentity("A");
-        user.setName("User");
-        user.setRole("Role");
-        Section section = new Section();
-        section.setIdentity((long) 1);
-        section.setName("Section");
-        table.setNumber((long) 1);
-        table.setSection(section);
-        table.setUser(user);
-        table.setSeats(2);
-        table.setColumn(3);
-
-        // WHEN
-        tableValidator.validateForUpdate(table);
-    }
-
-    @Test(expected = ValidationException.class)
     public void testValidateForUpdate_tableWithNegativeSeatsShouldThrow() throws ValidationException, DAOException {
         // GIVEN
         Table table = new Table();
