@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
@@ -15,6 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +31,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
     private DataSource dataSource;
     @Autowired
     private Validator<Invoice> invoiceValidator;
+    @Autowired
+    private DAO<User> userDAO;
 
     /**
      * Writes the invoice object into the database and sets the identity
@@ -69,7 +74,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
         invoiceValidator.validateForUpdate(invoice);
 
         final String query = "UPDATE Invoice SET invoiceTime = ?, brutto = ?, user_ID = ? " +
-                "WHERE id = ?";
+                "WHERE id = ?;";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setObject(1, invoice.getTime());
             stmt.setBigDecimal(2, invoice.getGross());
@@ -90,7 +95,22 @@ class DBInvoiceDAO implements DAO<Invoice> {
      */
     @Override
     public void delete(Invoice invoice) throws DAOException, ValidationException {
-        // TODO: Implement after writing the tests
+        LOGGER.debug("Entering delete with parameters: " + invoice);
+
+        invoiceValidator.validateForDelete(invoice);
+
+        final String query = "UPDATE Invoice SET canceled = TRUE WHERE ID = ?;";
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, invoice.getIdentity());
+
+            if (stmt.executeUpdate() == 0) {
+                LOGGER.error("Failed to delete invoice entry from database, dataset not found");
+                throw new DAOException("Failed to delete invoice entry from database, dataset not found");
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Failed to delete invoice entry from database", e);
+            throw new DAOException("Failed to delete invoice entry from database", e);
+        }
     }
 
     /**
@@ -108,8 +128,45 @@ class DBInvoiceDAO implements DAO<Invoice> {
      */
     @Override
     public List<Invoice> getAll() throws DAOException {
-        // TODO: Implement after writing the tests
-        return null;
+        LOGGER.debug("Entering getAll");
+
+        final List<Invoice> results = new ArrayList<>();
+
+        final String query = "SELECT * FROM Invoice WHERE canceled = FALSE";
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                results.add(parseResult(rs));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Failed to retreive all invoice entries from the database", e);
+            throw new DAOException("Failed to retreive all invoice entries from the database", e);
+        }
+
+        return results;
+    }
+
+    /**
+     * Parses a result set in an object of type invoice
+     * @param rs The database output
+     * @return The parsed object of type invoice
+     * @throws DAOException If an error, while retrieving the invoice data, occurs
+     * @throws SQLException If an error, while accessing database results, occurs
+     */
+    private Invoice parseResult(ResultSet rs) throws DAOException, SQLException {
+        List<User> creator = userDAO.find(User.withIdentity(rs.getString("user_ID")));
+        if (creator.size() != 1) {
+            LOGGER.error("Retrieving creator failed");
+            throw new DAOException("Retrieving creator failed");
+        }
+
+        Invoice invoice = new Invoice();
+        invoice.setCreator(creator.get(0));
+        invoice.setIdentity(rs.getLong("ID"));
+        invoice.setTime((LocalDateTime) rs.getObject("invoiceTime"));
+        invoice.setGross(rs.getBigDecimal("brutto"));
+
+        return invoice;
     }
 
 
