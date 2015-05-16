@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 /**
  * Unit Test for MenuDAO
  */
-public class MenuDAOTest extends AbstractDAOTest {
+public class TestOrderDAO extends AbstractDAOTest {
     @Autowired
     private DAO<MenuEntry> menuEntryDAO;
     @Autowired
