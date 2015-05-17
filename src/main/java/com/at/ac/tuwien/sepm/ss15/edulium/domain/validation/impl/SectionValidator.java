@@ -22,9 +22,6 @@ public class SectionValidator implements Validator<Section> {
         if(section.getName() == null) {
             throw new ValidationException("name must not be null");
         }
-        if(section.getName().compareTo("") == 0) {
-            throw new ValidationException("name must not be empty");
-        }
         if(section.getName().isEmpty()) {
             throw new ValidationException("name must not be empty");
         }
@@ -42,7 +39,7 @@ public class SectionValidator implements Validator<Section> {
         if(section.getName() == null) {
             throw new ValidationException("name must not be null");
         }
-        if(section.getName().compareTo("") == 0) {
+        if(section.getName().isEmpty()) {
             throw new ValidationException("name must not be empty");
         }
     }

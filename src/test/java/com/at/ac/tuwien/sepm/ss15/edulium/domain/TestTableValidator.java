@@ -42,6 +42,15 @@ public class TestTableValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void testValidateForCreate_tableWithInvalidNumberShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        table.setNumber((long)-1);
+
+        // WHEN
+        tableValidator.validateForCreate(table);
+    }
+
+    @Test(expected = ValidationException.class)
     public void testValidateForCreate_tableWithoutSectionShouldThrow() throws ValidationException, DAOException {
         // GIVEN
         table.setSection(null);
@@ -151,6 +160,15 @@ public class TestTableValidator extends AbstractDomainTest {
     public void testValidateForUpdate_tableWithoutNumberShouldThrow() throws ValidationException, DAOException {
         // GIVEN
         table.setNumber(null);
+
+        // WHEN
+        tableValidator.validateForUpdate(table);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_tableWithInvalidNumberShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        table.setNumber((long)-1);
 
         // WHEN
         tableValidator.validateForUpdate(table);
@@ -272,6 +290,15 @@ public class TestTableValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void testValidateForDelete_tableWithInvalidNumberShouldThrow() throws ValidationException {
+        // GIVEN
+        table.setNumber((long)-1);
+
+        // WHEN
+        tableValidator.validateForDelete(table);
+    }
+
+    @Test(expected = ValidationException.class)
     public void testValidateForDelete_tableWithoutSectionShouldThrow() throws ValidationException {
         // GIVEN
         table.setSection(null);
@@ -308,6 +335,15 @@ public class TestTableValidator extends AbstractDomainTest {
     public void testValidateIdentity_tableWithoutNumberShouldThrow() throws ValidationException {
         // GIVEN
         table.setNumber(null);
+
+        // WHEN
+        tableValidator.validateIdentity(table);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateIdentity_tableWithInvalidNumberShouldThrow() throws ValidationException {
+        // GIVEN
+        table.setNumber((long)-1);
 
         // WHEN
         tableValidator.validateIdentity(table);

@@ -780,6 +780,15 @@ public class TestTableDAO extends AbstractDAOTest {
     }
 
     @Test
+    public void testFindNull_shouldReturnEmptyList() throws DAOException {
+        // WHEN
+        List<Table> storedObjects = tableDAO.find(null);
+
+        // THEN
+        Assert.assertTrue(storedObjects.isEmpty());
+    }
+
+    @Test
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         Table matcher = new Table();

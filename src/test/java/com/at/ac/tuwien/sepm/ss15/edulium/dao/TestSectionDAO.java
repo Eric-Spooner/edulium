@@ -18,8 +18,6 @@ import java.util.List;
  * Unit Test for the SectionDAO
  */
 public class TestSectionDAO extends AbstractDAOTest {
-    private static final Logger LOGGER = LogManager.getLogger(TestSectionDAO.class);
-
     @Autowired
     private DAO<Section> sectionDAO;
 
@@ -282,6 +280,15 @@ public class TestSectionDAO extends AbstractDAOTest {
 
         // WHEN
         List<Section> storedObjects = sectionDAO.find(matcher);
+
+        // THEN
+        Assert.assertTrue(storedObjects.isEmpty());
+    }
+
+    @Test
+    public void testFindNull_shouldReturnEmptyList() throws DAOException {
+        // WHEN
+        List<Section> storedObjects = sectionDAO.find(null);
 
         // THEN
         Assert.assertTrue(storedObjects.isEmpty());

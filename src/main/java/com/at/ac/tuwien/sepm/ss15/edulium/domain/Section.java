@@ -13,8 +13,6 @@ import java.util.List;
 public class Section {
     private Long identity;
     private String name;
-    @Autowired
-    private DAO<Table> tableDAO;
 
     /**
      * Creates a new section object and assigns the given identity to it.
@@ -56,43 +54,6 @@ public class Section {
      */
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-     * @return a list of tables in this section
-     *         can be empty if there are no tables in this section
-     */
-    public List getTables() throws DAOException {
-        Table matcher = new Table();
-        matcher.setSection(this);
-        List tableList;
-
-        try {
-            tableList = tableDAO.find(matcher);
-        }
-        catch(DAOException e) {
-            throw new DAOException("cannot find table", e);
-        }
-
-        return tableList;
-    }
-
-    /**
-     * @param table adds one table to this section,
-     *               already existing tables are not changed
-     */
-    public void setTable(Table table) {
-        table.setSection(this);
-    }
-
-    /**
-     * @param tables adds multiple tables to this section,
-     *               already existing tables are not changed
-     */
-    public void setTables(ArrayList<Table> tables) {
-        for(Table table : tables) {
-            table.setSection(this);
-        }
     }
 
     @Override

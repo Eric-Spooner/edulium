@@ -90,10 +90,7 @@ class DBTableDAO implements DAO<Table> {
             stmt.setInt(1, table.getSeats());
             stmt.setInt(2, table.getRow());
             stmt.setInt(3, table.getColumn());
-            if(table.getUser() == null)
-                stmt.setNull(4, Types.VARCHAR);
-            else
-                stmt.setString(4, table.getUser().getIdentity());
+            stmt.setString(4, table.getUser() != null ? table.getUser().getIdentity() : null); // optional
             stmt.setLong(5, table.getNumber());
             stmt.setLong(6, table.getSection().getIdentity());
 

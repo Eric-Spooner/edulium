@@ -44,6 +44,10 @@ public class TableValidator implements Validator<Table> {
             throw new ValidationException("number must not be null");
         }
 
+        if(table.getNumber() < 0) {
+            throw new ValidationException("number must not be < 0");
+        }
+
         if(table.getSection() == null) {
             throw new ValidationException("section must not be null");
         }
