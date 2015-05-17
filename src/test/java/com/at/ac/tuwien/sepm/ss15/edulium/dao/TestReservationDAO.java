@@ -310,6 +310,15 @@ public class TestReservationDAO extends AbstractDAOTest {
     }
 
     @Test
+    public void testFind_nullObjectShouldReturnEmptyList() throws DAOException, ValidationException {
+        // WHEN
+        List<Reservation> result = reservationDAO.find(null);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     public void testFind_byIdentityShouldReturnObject() throws DAOException, ValidationException {
         // PREPARE
         // reservation 1
