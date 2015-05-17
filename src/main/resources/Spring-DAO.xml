@@ -12,6 +12,7 @@
     <import resource="dao/Spring-SectionDAO.xml" />
     <import resource="dao/Spring-TableDAO.xml" />
     <import resource="dao/Spring-UserDAO.xml" />
+    <import resource="dao/Spring-InvoiceDAO.xml"/>
     <import resource="dao/Spring-TaxRateDAO.xml" />
     <import resource="dao/Spring-MenuEntryDAO.xml" />
     <import resource="dao/Spring-ReservationDAO.xml" />
