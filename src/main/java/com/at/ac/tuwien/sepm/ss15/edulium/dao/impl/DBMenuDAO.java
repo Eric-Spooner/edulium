@@ -2,8 +2,6 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
@@ -19,14 +17,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * H2 Database Implementation of the MenuEntry DAO interface
  */
-class DBMenuDAO implements DAO<Menu> {
+public class DBMenuDAO implements DAO<Menu> {
     private static final Logger LOGGER = LogManager.getLogger(DBMenuDAO.class);
 
     @Autowired
@@ -37,6 +35,7 @@ class DBMenuDAO implements DAO<Menu> {
     private DAO<MenuEntry> menuEntryDAO;
     @Autowired
     private DAO<User> userDAO;
+
     @Override
     public void create(Menu menu) throws DAOException, ValidationException {
         LOGGER.debug("entering create with parameters " + menu);
@@ -48,14 +47,12 @@ class DBMenuDAO implements DAO<Menu> {
                      dataSource.getConnection().prepareStatement(queryMenu, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, menu.getName());
             stmt.executeUpdate();
+
             ResultSet key = stmt.getGeneratedKeys();
             if (key.next()) {
                 menu.setIdentity(key.getLong(1));
             }
             key.close();
-            stmt.setLong(1,menu.getIdentity());
-            stmt.setString(2, menu.getName());
-            stmt.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error("inserting menu into database failed", e);
             throw new DAOException("inserting menu into database failed", e);
@@ -106,18 +103,18 @@ class DBMenuDAO implements DAO<Menu> {
                 //Contains is not appropiate, because the entries only have the same ID
                 Boolean found = false;
                 for(MenuEntry entry1 : menuEntries){
-                   if(entry1.getIdentity() == entry.getIdentity()) {
-                       found = true;
-                       //Delete the entry, in order to be able to check at the end, if new MenuAssoc have to be made
-                       menuEntries.remove(entry1);
-                   }
+                    if(entry1.getIdentity().equals(entry.getIdentity())) {
+                        found = true;
+                        //Delete the entry, in order to be able to check at the end, if new MenuAssoc have to be made
+                        menuEntries.remove(entry1);
+                    }
                 }
                 if(found){
                     //The Entry is in the list, so update the price
                     updateMenuAssoc(menu, entry, entry.getPrice());
                 }else{
                     //The Entry is not in the list, so it should be deleted
-                   deleteMenuAssoc(menu, entry);
+                    deleteMenuAssoc(menu, entry);
                 }
                 generateHistoryMenuAssoc(menu, entry, changeNr);
             }
@@ -129,8 +126,8 @@ class DBMenuDAO implements DAO<Menu> {
         //Check if there are Entries left
         if(menuEntries.size() >0){
             for(MenuEntry entry : menuEntries){
-               createMenuAssoc(menu, entry, entry.getPrice());
-               generateHistoryMenuAssoc(menu, entry, changeNr);
+                createMenuAssoc(menu, entry, entry.getPrice());
+                generateHistoryMenuAssoc(menu, entry, changeNr);
             }
         }
     }
@@ -294,8 +291,8 @@ class DBMenuDAO implements DAO<Menu> {
             stmt.setLong(3, menu.getIdentity());          // dataset id
             stmt.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.error("generating history failed", e);
-            throw new DAOException("generating history failed", e);
+            LOGGER.error("generating Menu history failed", e);
+            throw new DAOException("generating Menu history failed", e);
         }
         //get the change Nr, for Menu Assoc
         final String queryGetChangeNr = "SELECT MAX(changeNr) FROM MenuHistory WHERE ID = ?";
@@ -322,8 +319,8 @@ class DBMenuDAO implements DAO<Menu> {
     private void generateHistoryMenuAssoc(Menu menu, MenuEntry entry, Long changeNr) throws DAOException {
         LOGGER.debug("entering generateHistory with parameters " + menu);
         final String query2 = "INSERT INTO MenuAssocHistory " +
-                   "(SELECT *, CURRENT_TIMESTAMP(), ?, ? " +
-                   "FROM MenuAssoc WHERE menu_ID = ? AND menuEntry_ID = ?)";
+                "(SELECT *, CURRENT_TIMESTAMP(), ?, ? " +
+                "FROM MenuAssoc WHERE menu_ID = ? AND menuEntry_ID = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query2)) {
             stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
@@ -401,9 +398,9 @@ class DBMenuDAO implements DAO<Menu> {
      * This function is used, to update Menu Assoc Entries
      * if the Menu Assoc is disabled, then enable it again
      * the parameters are used, to identify the Menu Assoc and to set the values
-     * @param menu
-     * @param entry
-     * @param price
+     * @param menu Menu Is used to identify the MenuAssoc
+     * @param entry Entry is used to identify the Menu Assoc
+     * @param price the value
      */
     private void updateMenuAssoc(Menu menu, MenuEntry entry, BigDecimal price) throws DAOException{
         //At first, look if the
@@ -413,7 +410,7 @@ class DBMenuDAO implements DAO<Menu> {
                 "UPDATE MenuAssoc SET menuPrice = ? WHERE menu_ID = ? AND menuEntry_ID = ? AND disabled = false";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryUpdateMenuAssoc)) {
-            stmt.setBigDecimal(1, entry.getPrice());
+            stmt.setBigDecimal(1, price);
             stmt.setLong(2, menu.getIdentity());
             stmt.setLong(3,entry.getIdentity());
 
@@ -430,9 +427,9 @@ class DBMenuDAO implements DAO<Menu> {
      * This function is used, to insert Menu Assoc Entries
      * if the Menu Assoc is disabled, then enable it again
      * the parameters are used, to identify the Menu Assoc and to set the values
-     * @param menu
-     * @param entry
-     * @param price
+     * @param menu Menu Is used to identify the MenuAssoc
+     * @param entry Entry is used to identify the Menu Assoc
+     * @param price the value
      */
     private void createMenuAssoc(Menu menu, MenuEntry entry, BigDecimal price) throws  DAOException{
         if(findAndEnableMenuAssoc(menu, entry)) {
@@ -446,7 +443,7 @@ class DBMenuDAO implements DAO<Menu> {
                          dataSource.getConnection().prepareStatement(queryInsertIntoMenuAssoc, Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setLong(1, menu.getIdentity());
                 stmt.setLong(2, entry.getIdentity());
-                stmt.setBigDecimal(3,entry.getPrice());
+                stmt.setBigDecimal(3,price);
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 LOGGER.error("inserting menu association to menuEntry into database failed", e);
@@ -457,8 +454,8 @@ class DBMenuDAO implements DAO<Menu> {
     /**
      * This function is used, to delete Menu Assoc Entries
      * if the Menu Assoc is enabled, than disable it.
-     * @param menu
-     * @param entry
+     * @param menu Menu Is used to identify the MenuAssoc
+     * @param entry Entry is used to identify the Menu Assoc
      */
     private void deleteMenuAssoc(Menu menu, MenuEntry entry) throws DAOException{
         //The Entry is not in the list, so it should be disabled
@@ -480,8 +477,8 @@ class DBMenuDAO implements DAO<Menu> {
 
     /**
      * This function is used to search MenuAssocs and to enable it again, if they are disabled
-     * @param menu
-     * @param entry
+     * @param menu Menu Is used to identify the MenuAssoc
+     * @param entry Entry is used to identify the Menu Assoc
      * @return true, if the MenuAssoc is already there
      */
     private boolean findAndEnableMenuAssoc(Menu menu, MenuEntry entry) throws DAOException{
