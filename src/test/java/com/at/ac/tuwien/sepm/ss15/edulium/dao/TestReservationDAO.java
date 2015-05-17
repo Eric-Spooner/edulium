@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -701,5 +703,110 @@ public class TestReservationDAO extends AbstractDAOTest {
         assertTrue(result.contains(reservation1));
         assertTrue(result.contains(reservation2));
         assertTrue(result.contains(reservation3));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_withoutObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        Reservation reservation = null;
+
+        // WHEN
+        reservationDAO.getHistory(reservation);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_withoutIdentityShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        Reservation reservation = new Reservation();
+
+        // WHEN
+        reservationDAO.getHistory(reservation);
+    }
+
+    @Test
+    public void testGetHistory_notPersistentDataShouldReturnEmptyList() throws DAOException, ValidationException {
+        // GIVEN
+        Reservation reservation = new Reservation();
+
+        // search for a non-existing tax rate identity
+        try {
+            reservation.setIdentity(0L);
+            while (!reservationDAO.find(reservation).isEmpty()) {
+                reservation.setIdentity(reservation.getIdentity() + 1L);
+            }
+        } catch (DAOException e) {
+            fail("DAOException should not occur while searching for a non-existing reservation identity");
+        }
+
+        // WHEN
+        List<Reservation> result = reservationDAO.find(reservation);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // get test user
+        User testUser = getCurrentUser();
+
+        // GIVEN
+        // create data
+        Reservation reservation1 = new Reservation();
+        reservation1.setName("Karmic Koala");
+        reservation1.setTime(LocalDateTime.now());
+        reservation1.setDuration(Duration.ofMinutes(200));
+        reservation1.setQuantity(21);
+        reservation1.setTables(Arrays.asList(table1, table2, table3));
+
+        LocalDateTime createTime = LocalDateTime.now();
+        reservationDAO.create(reservation1);
+
+        // update data
+        Reservation reservation2 = new Reservation();
+        reservation2.setIdentity(reservation1.getIdentity());
+        reservation1.setName("Maverick Meerkat");
+        reservation1.setTime(LocalDateTime.now());
+        reservation1.setDuration(Duration.ofMinutes(250));
+        reservation1.setQuantity(10);
+        reservation1.setTables(Arrays.asList(table1, table2));
+
+        LocalDateTime updateTime = LocalDateTime.now();
+        reservationDAO.update(reservation2);
+
+        // delete data
+        LocalDateTime deleteTime = LocalDateTime.now();
+        reservationDAO.delete(reservation2);
+
+        // WHEN
+        List<History<Reservation>> history = reservationDAO.getHistory(reservation1);
+
+        // THEN
+        assertEquals(3, history.size());
+
+        // check create history
+        History<Reservation> entry = history.get(0);
+        assertEquals(Long.valueOf(1), entry.getChangeNumber());
+        assertEquals(reservation1, entry.getData());
+        assertEquals(testUser, entry.getUser());
+        assertTrue(Duration.between(createTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(entry.isDeleted());
+
+        // check update history
+        entry = history.get(1);
+        assertEquals(Long.valueOf(2), entry.getChangeNumber());
+        assertEquals(reservation2, entry.getData());
+        assertEquals(testUser, entry.getUser());
+        assertTrue(Duration.between(updateTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(entry.isDeleted());
+
+        // check delete history
+        entry = history.get(2);
+        assertEquals(Long.valueOf(3), entry.getChangeNumber());
+        assertEquals(reservation2, entry.getData());
+        assertEquals(testUser, entry.getUser());
+        assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertTrue(entry.isDeleted());
     }
 }
