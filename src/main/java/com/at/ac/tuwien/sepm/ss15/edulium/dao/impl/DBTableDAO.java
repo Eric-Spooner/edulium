@@ -45,55 +45,24 @@ class DBTableDAO implements DAO<Table> {
 
         validator.validateForCreate(table);
 
-        // Update existing tables or insert table if not existing
-        // Check if table is already in database with attribute disabled=true
-        String query = "SELECT * FROM RestaurantTable WHERE number = ? " +
-                "AND section_ID = ? AND disabled = true";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setObject(1, table.getNumber());
-            stmt.setObject(2, table.getSection().getIdentity());
-
-            stmt.execute();
-
-            ResultSet result = stmt.getResultSet();
-            if(result.next()) {
-                LOGGER.debug("readd disabled table");
-                query = "UPDATE RestaurantTable SET " +
-                        "disabled = FALSE WHERE number = ? AND section_ID = ?";
-                PreparedStatement stmtReadd = dataSource.getConnection().prepareStatement(query);
-
-                stmtReadd.setLong(1, table.getNumber());
-                stmtReadd.setLong(2, table.getSection().getIdentity());
-                if (stmtReadd.executeUpdate() == 0) {
-                    throw new DAOException("readd table failed: dataset not found");
-                }
-
-                generateHistory(table);
-
-                return;
-            }
-
-        } catch (SQLException e) {
-            LOGGER.error("searching for table failed", e);
-            throw new DAOException("searching for table failed", e);
+        if (!find(Table.withIdentity(table.getSection(), table.getNumber())).isEmpty()) {
+            LOGGER.error("inserting table into database failed, table exists already");
+            throw new DAOException("inserting table into database failed, table exists already");
         }
 
-        query = "INSERT INTO RestaurantTable (section_ID, seats, tableRow, tableColumn, user_ID, number) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        final String query = "MERGE INTO RestaurantTable (section_ID, number, seats, tableRow, tableColumn, user_ID, disabled) " +
+                             "KEY (section_ID, number) " +
+                             "VALUES (?, ?, ?, ?, ?, ?, false)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, table.getSection().getIdentity());
-            stmt.setInt(2, table.getSeats());
-            stmt.setInt(3, table.getRow());
-            stmt.setInt(4, table.getColumn());
-            if(table.getUser() == null)
-                stmt.setNull(5, Types.VARCHAR);
-            else
-                stmt.setString(5, table.getUser().getIdentity());
-            stmt.setLong(6, table.getNumber());
-            stmt.executeUpdate();
+            stmt.setLong(2, table.getNumber());
+            stmt.setInt(3, table.getSeats());
+            stmt.setInt(4, table.getRow());
+            stmt.setInt(5, table.getColumn());
+            stmt.setString(6, table.getUser() != null ? table.getUser().getIdentity() : null); // optional
 
+            stmt.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error("inserting table into database failed", e);
             throw new DAOException("inserting table into database failed", e);
