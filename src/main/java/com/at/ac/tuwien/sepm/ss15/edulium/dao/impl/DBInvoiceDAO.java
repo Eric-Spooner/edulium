@@ -17,7 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +49,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
                 "VALUES (?, ?, ?);";
         try (PreparedStatement stmt = dataSource.getConnection()
                 .prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setObject(1, invoice.getTime());
+            stmt.setTimestamp(1, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
             stmt.setBigDecimal(2, invoice.getGross());
             stmt.setString(3, invoice.getCreator().getIdentity());
             stmt.executeUpdate();
@@ -79,9 +79,10 @@ class DBInvoiceDAO implements DAO<Invoice> {
         final String query = "UPDATE Invoice SET invoiceTime = ?, brutto = ?, user_ID = ? " +
                 "WHERE id = ?;";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setObject(1, invoice.getTime());
+            stmt.setTimestamp(1, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
             stmt.setBigDecimal(2, invoice.getGross());
             stmt.setString(3, invoice.getCreator().getIdentity());
+            stmt.setLong(4, invoice.getIdentity());
 
             if (stmt.executeUpdate() == 0) {
                 LOGGER.error("Failed to update invoice entry in database, dataset not found");
@@ -142,9 +143,9 @@ class DBInvoiceDAO implements DAO<Invoice> {
                 "canceled = FALSE;";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, invoice.getIdentity());
-            stmt.setObject(2, invoice.getTime());
+            stmt.setTimestamp(2, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
             stmt.setBigDecimal(3, invoice.getGross());
-            stmt.setString(4, invoice.getCreator().getIdentity());
+            stmt.setString(4, invoice.getCreator() == null ? null : invoice.getCreator().getIdentity());
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -190,6 +191,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
     @Override
     public List<History<Invoice>> getHistory(Invoice invoice) throws DAOException, ValidationException {
         LOGGER.debug("entering getHistory with parameters " + invoice);
+
+        invoiceValidator.validateIdentity(invoice);
 
         List<History<Invoice>> history = new ArrayList<>();
 
@@ -251,7 +254,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
         Invoice invoice = new Invoice();
         invoice.setCreator(creator.get(0));
         invoice.setIdentity(rs.getLong("ID"));
-        invoice.setTime((LocalDateTime) rs.getObject("invoiceTime"));
+        invoice.setTime(rs.getTimestamp("invoiceTime").toLocalDateTime());
         invoice.setGross(rs.getBigDecimal("brutto"));
 
         return invoice;
