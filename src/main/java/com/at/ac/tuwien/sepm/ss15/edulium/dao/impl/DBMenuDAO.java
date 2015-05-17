@@ -298,7 +298,7 @@ public class DBMenuDAO implements DAO<Menu> {
             throw new DAOException("generating history failed", e);
         }
 
-        return -1;
+        return -1L;
     }
 
     private void generateHistoryMenuAssoc(Menu menu, MenuEntry entry, Long changeNr) throws DAOException {
