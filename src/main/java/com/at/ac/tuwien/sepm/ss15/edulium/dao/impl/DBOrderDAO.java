@@ -37,9 +37,6 @@ class DBOrderDAO implements DAO<Order> {
     @Autowired
     private DAO<MenuEntry> menuEntryDAO;
 
-
-
-
     @Override
     public void create(Order order) throws DAOException, ValidationException {
         LOGGER.debug("entering create with parameters " + order);
@@ -150,20 +147,16 @@ class DBOrderDAO implements DAO<Order> {
         final List<Order> objects = new ArrayList<>();
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            MenuEntry menuEntry = order.getMenuEntry();
-            Table table = order.getTable();
-            Invoice invoice = order.getInvoice();
-            LocalDateTime time = order.getTime();
-
             stmt.setObject(1, order.getIdentity());
             stmt.setObject(2, order.getTax());
             stmt.setObject(3, order.getBrutto());
             stmt.setObject(4, order.getAdditionalInformation());
-            stmt.setObject(5, time == null ? null : Timestamp.valueOf(time));
-            stmt.setObject(6, invoice == null ? null : invoice.getIdentity());
-            stmt.setObject(7, table == null ? null : table.getSection() == null ? null : table.getSection().getIdentity());
-            stmt.setObject(8, table == null ? null : table.getNumber());
-            stmt.setObject(9, menuEntry == null ? null : menuEntry.getIdentity());
+            stmt.setObject(5, order.getTime() == null ? null : Timestamp.valueOf(order.getTime()));
+            stmt.setObject(6, order.getInvoice() == null ? null : order.getInvoice().getIdentity());
+            stmt.setObject(7, order.getTable() == null ? null : order.getTable().getSection() == null ?
+                    null : order.getTable().getSection().getIdentity());
+            stmt.setObject(8, order.getTable() == null ? null : order.getTable().getNumber());
+            stmt.setObject(9, order.getMenuEntry() == null ? null : order.getMenuEntry().getIdentity());
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
@@ -279,7 +272,7 @@ class DBOrderDAO implements DAO<Order> {
         order.setTax(result.getBigDecimal("tax"));
         order.setTime(result.getTimestamp("orderTime").toLocalDateTime());
         order.setTable(tables.get(0));
-        order.setInvoice(invoices.get(0));
+        if(invoices.size()>0) order.setInvoice(invoices.get(0));
         order.setMenuEntry(menuEntries.get(0));
         return order;
     }

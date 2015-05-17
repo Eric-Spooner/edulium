@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -41,9 +42,14 @@ public class TestOrderDAO extends AbstractDAOTest {
 
     public Table createTable(Integer tableCol, Integer tableRow,
                              Long tableNumber, Section section) throws ValidationException, DAOException {
-        User user = new User();
-        user.setName("Test User");
-        user.setRole("Role");
+        User user = User.withIdentity("username");
+        int i = 0;
+        while(userDAO.find(user).size()>0){
+            user = User.withIdentity("username" + i);
+            i++;
+        }
+        user.setRole("role");
+        user.setName("name");
         userDAO.create(user);
 
         Table table = new Table();
@@ -67,10 +73,14 @@ public class TestOrderDAO extends AbstractDAOTest {
         taxRate.setValue(BigDecimal.valueOf(0.5));
         taxRateDAO.create(taxRate);
 
-        User user = new User();
-        user.setIdentity("username");
-        user.setName("Test User");
-        user.setRole("Role");
+        User user = User.withIdentity("username");
+        int i = 0;
+        while(userDAO.find(user).size()>0){
+            user = User.withIdentity("username" + i);
+            i++;
+        }
+        user.setRole("role");
+        user.setName("name");
         userDAO.create(user);
 
         Section section = new Section();
@@ -314,14 +324,14 @@ public class TestOrderDAO extends AbstractDAOTest {
 
         // THEN
         assertEquals(1, objects.size());
-        assertEquals(order1, objects.get(0));
+        assertEquals(order2, objects2.get(0));
 
         // WHEN
         List<Order> objects3 = orderDAO.find(Order.withIdentity(order3.getIdentity()));
 
         // THEN
         assertEquals(1, objects.size());
-        assertEquals(order1, objects.get(0));
+        assertEquals(order3, objects3.get(0));
     }
 
     @Test
@@ -393,6 +403,35 @@ public class TestOrderDAO extends AbstractDAOTest {
 
         // WHEN THEN
         assertTrue(orderDAO.getHistory(matcher).isEmpty());
+    }
+
+    @Test
+    public void testGetAll_shouldReturnEmptyList() throws DAOException {
+        // WHEN / THEN
+        assertTrue(orderDAO.getAll().isEmpty());
+    }
+
+    @Test
+    public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
+        // GIVEN
+        Order order1  = createOrder(BigDecimal.valueOf(500),"Order Information1",
+                BigDecimal.valueOf(0.2), LocalDateTime.now());
+        orderDAO.create(order1);
+        Order order2  = createOrder(BigDecimal.valueOf(1000),"Order Information2",
+                BigDecimal.valueOf(0.2), LocalDateTime.now());
+        orderDAO.create(order2);
+        Order order3 = createOrder(BigDecimal.valueOf(500), "Order Information3",
+                BigDecimal.valueOf(0.2), LocalDateTime.now());
+        orderDAO.create(order3);
+
+        // WHEN
+        List<Order> objects = orderDAO.getAll();
+
+        // THEN
+        assertEquals(3, objects.size());
+        assertTrue(objects.contains(order1));
+        assertTrue(objects.contains(order2));
+        assertTrue(objects.contains(order3));
     }
 
     @Test
