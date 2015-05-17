@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 /**
  * Unit Test for the OrderDAO
  */
-public class OrderDAOTest extends AbstractDAOTest {
+public class TestOrderDAO extends AbstractDAOTest {
     @Autowired
     private DAO<Order> orderDAO;
     @Autowired
