@@ -3,8 +3,10 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import static org.junit.Assert.*;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,14 +21,25 @@ public class TestReservationDAO extends AbstractDAOTest {
     @Autowired
     private DAO<Reservation> reservationDAO;
     @Autowired
-    private TableDAO tableDAO; // only to create test tables
+    private DAO<Table> tableDAO; // only to create test tables
+    @Autowired
+    private DAO<Section> sectionDAO; // only to create test sections
 
-    @Test
-    public void testCreate_shouldAddValidObject() throws DAOException, ValidationException {
-        // PREPARE
-        List<Table> tables = new ArrayList<>();
+    private Table table1;
+    private Table table2;
+    private Table table3;
 
-        Table table1 = new Table();
+    @Before
+    public void before() throws ValidationException, DAOException {
+        Section section = new Section();
+        section.setIdentity(1L);
+        section.setName("Section");
+
+        sectionDAO.create(section);
+        assertEquals(1, sectionDAO.find(section).size());
+
+        table1 = new Table();
+        table1.setSection(section);
         table1.setNumber(1L);
         table1.setColumn(1);
         table1.setRow(1);
@@ -34,9 +47,9 @@ public class TestReservationDAO extends AbstractDAOTest {
 
         tableDAO.create(table1);
         assertEquals(1, tableDAO.find(table1).size());
-        tables.add(table1);
 
-        Table table2 = new Table();
+        table2 = new Table();
+        table2.setSection(section);
         table2.setNumber(2L);
         table2.setColumn(2);
         table2.setRow(2);
@@ -44,15 +57,26 @@ public class TestReservationDAO extends AbstractDAOTest {
 
         tableDAO.create(table2);
         assertEquals(1, tableDAO.find(table2).size());
-        tables.add(table2);
 
+        table3 = new Table();
+        table3.setNumber(3L);
+        table3.setColumn(3);
+        table3.setRow(3);
+        table3.setSeats(6);
+
+        tableDAO.create(table3);
+        assertEquals(1, tableDAO.find(table3).size());
+    }
+
+    @Test
+    public void testCreate_shouldAddValidObject() throws DAOException, ValidationException {
         // GIVEN
         Reservation reservation = new Reservation();
         reservation.setName("Saucy Salamander");
         reservation.setTime(LocalDateTime.now());
         reservation.setDuration(Duration.ofMinutes(140));
         reservation.setQuantity(6);
-        reservation.setTables(tables);
+        reservation.setTables(Arrays.asList(table1, table2));
 
         // WHEN
         reservationDAO.create(reservation);
@@ -88,49 +112,12 @@ public class TestReservationDAO extends AbstractDAOTest {
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // PREPARE
-        List<Table> tablesReservation = new ArrayList<>(); // table 1
-        List<Table> tablesReservationUpdated = new ArrayList<>(); // table 2, table 3
-
-        // table 1
-        Table table1 = new Table();
-        table1.setNumber(1L);
-        table1.setColumn(3);
-        table1.setRow(3);
-        table1.setSeats(4);
-
-        tableDAO.create(table1);
-        assertEquals(1, tableDAO.find(table1).size());
-        tablesReservation.add(table1);
-
-        // table 2
-        Table table2 = new Table();
-        table2.setNumber(2L);
-        table2.setColumn(2);
-        table2.setRow(2);
-        table2.setSeats(6);
-
-        tableDAO.create(table2);
-        assertEquals(1, tableDAO.find(table2).size());
-        tablesReservationUpdated.add(table2);
-
-        // table 3
-        Table table3 = new Table();
-        table3.setNumber(3L);
-        table3.setColumn(3);
-        table3.setRow(3);
-        table3.setSeats(6);
-
-        tableDAO.create(table3);
-        assertEquals(1, tableDAO.find(table3).size());
-        tablesReservationUpdated.add(table3);
-
-        // reservation
         Reservation reservation = new Reservation();
         reservation.setName("Hoary Hedgehog");
         reservation.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
         reservation.setDuration(Duration.ofMinutes(60));
         reservation.setQuantity(4);
-        reservation.setTables(tablesReservation);
+        reservation.setTables(Arrays.asList(table1));
 
         reservationDAO.create(reservation);
         assertEquals(1, reservationDAO.find(reservation).size());
@@ -142,7 +129,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         updatedReservation.setTime(LocalDateTime.of(2016, 06, 17, 12, 00));
         updatedReservation.setDuration(Duration.ofMinutes(120));
         updatedReservation.setQuantity(10);
-        updatedReservation.setTables(tablesReservationUpdated);
+        updatedReservation.setTables(Arrays.asList(table2, table3));
 
         // WHEN
         reservationDAO.update(updatedReservation);
@@ -162,53 +149,12 @@ public class TestReservationDAO extends AbstractDAOTest {
     @Test
     public void testUpdate_shouldUpdateObjectTwoTimes() throws DAOException, ValidationException {
         // PREPARE
-        List<Table> tablesReservation = new ArrayList<>(); // table 1, table 3
-        List<Table> tablesReservationUpdated1 = new ArrayList<>(); // table 2
-        List<Table> tablesReservationUpdated2 = new ArrayList<>(); // table 1, table 2, table 3
-
-        // table 1
-        Table table1 = new Table();
-        table1.setNumber(1L);
-        table1.setColumn(3);
-        table1.setRow(3);
-        table1.setSeats(6);
-
-        tableDAO.create(table1);
-        assertEquals(1, tableDAO.find(table1).size());
-        tablesReservation.add(table1);
-        tablesReservationUpdated2.add(table1);
-
-        // table 2
-        Table table2 = new Table();
-        table2.setNumber(2L);
-        table2.setColumn(2);
-        table2.setRow(2);
-        table2.setSeats(4);
-
-        tableDAO.create(table2);
-        assertEquals(1, tableDAO.find(table2).size());
-        tablesReservationUpdated1.add(table2);
-        tablesReservationUpdated2.add(table2);
-
-        // table 3
-        Table table3 = new Table();
-        table3.setNumber(3L);
-        table3.setColumn(3);
-        table3.setRow(3);
-        table3.setSeats(6);
-
-        tableDAO.create(table3);
-        assertEquals(1, tableDAO.find(table3).size());
-        tablesReservation.add(table3);
-        tablesReservationUpdated2.add(table3);
-
-        // reservation
         Reservation reservation = new Reservation();
         reservation.setName("Oneiric Ocelot");
         reservation.setTime(LocalDateTime.now());
         reservation.setDuration(Duration.ofMinutes(60));
         reservation.setQuantity(10);
-        reservation.setTables(tablesReservation);
+        reservation.setTables(Arrays.asList(table1, table3));
 
         reservationDAO.create(reservation);
         assertEquals(1, reservationDAO.find(reservation).size());
@@ -220,7 +166,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         updatedReservation1.setTime(LocalDateTime.now());
         updatedReservation1.setDuration(Duration.ofMinutes(60));
         updatedReservation1.setQuantity(4);
-        updatedReservation1.setTables(tablesReservationUpdated1);
+        updatedReservation1.setTables(Arrays.asList(table2));
 
         // WHEN
         reservationDAO.update(updatedReservation1);
@@ -238,7 +184,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         updatedReservation2.setTime(LocalDateTime.now());
         updatedReservation2.setDuration(Duration.ofMinutes(60));
         updatedReservation2.setQuantity(16);
-        updatedReservation2.setTables(tablesReservationUpdated2);
+        updatedReservation2.setTables(Arrays.asList(table1, table2, table3));
 
         // WHEN
         reservationDAO.update(updatedReservation2);
@@ -301,34 +247,12 @@ public class TestReservationDAO extends AbstractDAOTest {
         // PREPARE
         final int numberOfReservationsBefore = reservationDAO.getAll().size();
 
-        List<Table> tables = new ArrayList<>();
-
-        Table table1 = new Table();
-        table1.setNumber(1L);
-        table1.setColumn(1);
-        table1.setRow(1);
-        table1.setSeats(4);
-
-        tableDAO.create(table1);
-        assertEquals(1, tableDAO.find(table1).size());
-        tables.add(table1);
-
-        Table table2 = new Table();
-        table2.setNumber(2L);
-        table2.setColumn(2);
-        table2.setRow(2);
-        table2.setSeats(2);
-
-        tableDAO.create(table2);
-        assertEquals(1, tableDAO.find(table2).size());
-        tables.add(table2);
-
         Reservation reservation = new Reservation();
         reservation.setName("Edgy Eft");
         reservation.setTime(LocalDateTime.now());
         reservation.setDuration(Duration.ofMinutes(130));
         reservation.setQuantity(12);
-        reservation.setTables(tables);
+        reservation.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation);
 
@@ -648,37 +572,13 @@ public class TestReservationDAO extends AbstractDAOTest {
     @Test
     public void testFind_byTablesShouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
-        List<Table> tablesReservation1 = new ArrayList<>(); // table 1
-        List<Table> tablesReservation2 = new ArrayList<>(); // table 1, table 2
-
-        Table table1 = new Table();
-        table1.setNumber(1L);
-        table1.setColumn(1);
-        table1.setRow(1);
-        table1.setSeats(4);
-
-        tableDAO.create(table1);
-        assertEquals(1, tableDAO.find(table1).size());
-        tablesReservation1.add(table1);
-        tablesReservation2.add(table1);
-
-        Table table2 = new Table();
-        table2.setNumber(2L);
-        table2.setColumn(2);
-        table2.setRow(2);
-        table2.setSeats(2);
-
-        tableDAO.create(table2);
-        assertEquals(1, tableDAO.find(table2).size());
-        tablesReservation2.add(table2);
-
         // reservation 1
         Reservation reservation1 = new Reservation();
         reservation1.setName("Hardy Heron");
         reservation1.setTime(LocalDateTime.now());
         reservation1.setDuration(Duration.ofMinutes(200));
         reservation1.setQuantity(21);
-        reservation1.setTables(tablesReservation1);
+        reservation1.setTables(Arrays.asList(table1));
 
         reservationDAO.create(reservation1);
         assertEquals(1, reservationDAO.find(reservation1).size());
@@ -689,7 +589,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation2.setTime(LocalDateTime.now());
         reservation2.setDuration(Duration.ofMinutes(200));
         reservation2.setQuantity(30);
-        reservation2.setTables(tablesReservation2);
+        reservation2.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation2);
         assertEquals(1, reservationDAO.find(reservation2).size());
@@ -700,17 +600,17 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation3.setTime(LocalDateTime.now());
         reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
-        reservation3.setTables(tablesReservation2);
+        reservation3.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation3);
         assertEquals(1, reservationDAO.find(reservation3).size());
 
         // GIVEN
         Reservation matcher1 = new Reservation(); // for reservation 1, reservation 2 and reservation 3
-        matcher1.setTables(tablesReservation1);
+        matcher1.setTables(Arrays.asList(table1));
 
         Reservation matcher2 = new Reservation(); // for reservation 2 and reservation 3
-        matcher2.setTables(tablesReservation2);
+        matcher2.setTables(Arrays.asList(table1, table2));
 
         // WHEN
         List<Reservation> result1 = reservationDAO.find(matcher1);
