@@ -297,8 +297,26 @@ public class DBMenuDAO implements DAO<Menu> {
             LOGGER.error("generating history failed", e);
             throw new DAOException("generating history failed", e);
         }
+        //get the change Nr, for Menu Assoc
+        final String queryGetChangeNr = "SELECT MAX(changeNr) FROM MenuHistory WHERE ID = ?";
 
-        return -1L;
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryGetChangeNr)) {
+            stmt.setLong(1,menu.getIdentity());          // dataset id
+            ResultSet result = stmt.executeQuery();
+            Long resultNr = -1L;
+            while(result.next()){
+                resultNr = result.getLong(1);
+            }
+            if(resultNr == -1){
+                LOGGER.error("getting changeNr failed");
+                throw new DAOException("getting changeNr failed");
+            }else{
+                return resultNr;
+            }
+        } catch (SQLException e) {
+            LOGGER.error("getting changeNr failed", e);
+            throw new DAOException("getting changeNr failed", e);
+        }
     }
 
     private void generateHistoryMenuAssoc(Menu menu, MenuEntry entry, Long changeNr) throws DAOException {
