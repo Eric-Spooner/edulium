@@ -61,6 +61,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         assertEquals(1, tableDAO.find(table2).size());
 
         table3 = new Table();
+        table3.setSection(section);
         table3.setNumber(3L);
         table3.setColumn(3);
         table3.setRow(3);
