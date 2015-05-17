@@ -206,6 +206,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation.setTime(LocalDateTime.now());
         reservation.setDuration(Duration.ofMinutes(90));
         reservation.setQuantity(8);
+        reservation.setTables(Arrays.asList(table1, table2));
 
         // WHEN
         reservationDAO.update(reservation);
@@ -239,6 +240,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation.setTime(LocalDateTime.now());
         reservation.setDuration(Duration.ofMinutes(160));
         reservation.setQuantity(14);
+        reservation.setTables(Arrays.asList(table1, table2));
 
         // WHEN
         reservationDAO.update(reservation);
@@ -329,6 +331,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation1.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
         reservation1.setDuration(Duration.ofMinutes(200));
         reservation1.setQuantity(21);
+        reservation1.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation1);
         assertEquals(1, reservationDAO.find(reservation1).size());
@@ -339,6 +342,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation2.setTime(LocalDateTime.of(2015, 05, 18, 17, 30));
         reservation2.setDuration(Duration.ofMinutes(200));
         reservation2.setQuantity(30);
+        reservation2.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation2);
         assertEquals(1, reservationDAO.find(reservation2).size());
@@ -349,6 +353,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation3.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
         reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
+        reservation3.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation3);
         assertEquals(1, reservationDAO.find(reservation3).size());
@@ -383,6 +388,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation1.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
         reservation1.setDuration(Duration.ofMinutes(200));
         reservation1.setQuantity(21);
+        reservation1.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation1);
         assertEquals(1, reservationDAO.find(reservation1).size());
@@ -393,6 +399,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation2.setTime(LocalDateTime.of(2015, 05, 18, 17, 30));
         reservation2.setDuration(Duration.ofMinutes(200));
         reservation2.setQuantity(30);
+        reservation2.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation2);
         assertEquals(1, reservationDAO.find(reservation2).size());
@@ -403,6 +410,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation3.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
         reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
+        reservation3.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation3);
         assertEquals(1, reservationDAO.find(reservation3).size());
@@ -436,6 +444,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation1.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
         reservation1.setDuration(Duration.ofMinutes(200));
         reservation1.setQuantity(21);
+        reservation1.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation1);
         assertEquals(1, reservationDAO.find(reservation1).size());
@@ -446,6 +455,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation2.setTime(LocalDateTime.of(2015, 05, 18, 17, 30));
         reservation2.setDuration(Duration.ofMinutes(200));
         reservation2.setQuantity(30);
+        reservation2.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation2);
         assertEquals(1, reservationDAO.find(reservation2).size());
@@ -456,6 +466,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation3.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
         reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
+        reservation3.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation3);
         assertEquals(1, reservationDAO.find(reservation3).size());
@@ -489,6 +500,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation1.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
         reservation1.setDuration(Duration.ofMinutes(200));
         reservation1.setQuantity(21);
+        reservation1.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation1);
         assertEquals(1, reservationDAO.find(reservation1).size());
@@ -499,6 +511,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation2.setTime(LocalDateTime.of(2015, 05, 18, 17, 30));
         reservation2.setDuration(Duration.ofMinutes(200));
         reservation2.setQuantity(30);
+        reservation2.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation2);
         assertEquals(1, reservationDAO.find(reservation2).size());
@@ -509,6 +522,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation3.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
         reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
+        reservation3.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation3);
         assertEquals(1, reservationDAO.find(reservation3).size());
@@ -542,6 +556,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation1.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
         reservation1.setDuration(Duration.ofMinutes(200));
         reservation1.setQuantity(21);
+        reservation1.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation1);
         assertEquals(1, reservationDAO.find(reservation1).size());
@@ -552,6 +567,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation2.setTime(LocalDateTime.of(2015, 05, 18, 17, 30));
         reservation2.setDuration(Duration.ofMinutes(200));
         reservation2.setQuantity(30);
+        reservation2.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation2);
         assertEquals(1, reservationDAO.find(reservation2).size());
@@ -562,6 +578,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation3.setTime(LocalDateTime.of(2015, 05, 15, 18, 30));
         reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
+        reservation3.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation3);
         assertEquals(1, reservationDAO.find(reservation3).size());
@@ -667,30 +684,33 @@ public class TestReservationDAO extends AbstractDAOTest {
 
         // reservation 1
         Reservation reservation1 = new Reservation();
-        reservation1.setName("Karmic Koala");
+        reservation1.setName("Hardy Heron");
         reservation1.setTime(LocalDateTime.now());
         reservation1.setDuration(Duration.ofMinutes(200));
         reservation1.setQuantity(21);
+        reservation1.setTables(Arrays.asList(table1));
 
         reservationDAO.create(reservation1);
         assertEquals(1, reservationDAO.find(reservation1).size());
 
         // reservation 2
         Reservation reservation2 = new Reservation();
-        reservation2.setName("Lucid Lynx");
+        reservation2.setName("Hardy Heron");
         reservation2.setTime(LocalDateTime.now());
         reservation2.setDuration(Duration.ofMinutes(200));
         reservation2.setQuantity(30);
+        reservation2.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation2);
         assertEquals(1, reservationDAO.find(reservation2).size());
 
         // reservation 3
         Reservation reservation3 = new Reservation();
-        reservation3.setName("Maverick Meerkat");
+        reservation3.setName("Jaunty Jackalope");
         reservation3.setTime(LocalDateTime.now());
         reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
+        reservation3.setTables(Arrays.asList(table1, table2));
 
         reservationDAO.create(reservation3);
         assertEquals(1, reservationDAO.find(reservation3).size());
