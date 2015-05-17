@@ -16,7 +16,7 @@ public class IntermittentSale {
     private Boolean sunday = null;
     private LocalDateTime fromDayTime = null;
     private Integer duration = null;
-    private Boolean enabled = true; //default: true
+    private Boolean enabled = null;
 
     /**
      * Creates a new intermittentSale object and assigns the given identity to it.
