@@ -44,10 +44,11 @@ class DBOrderDAO implements DAO<Order> {
     public void create(Order order) throws DAOException, ValidationException {
         LOGGER.debug("entering create with parameters " + order);
         validator.validateForCreate(order);
-        final String query = "INSERT INTO Order (invoice_ID, table_section, table_number, menuEntry_ID, " +
+        final String query = "INSERT INTO RestaurantOrder (invoice_ID, table_section, table_number, menuEntry_ID, " +
                 "orderTime, brutto, tax, info) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setLong(1, order.getInvoice().getIdentity());
+            Invoice invoice = order.getInvoice();
+            stmt.setObject(1, invoice == null ? null : invoice.getIdentity());
             stmt.setLong(2, order.getTable().getSection().getIdentity());
             stmt.setLong(3, order.getTable().getNumber());
             stmt.setLong(4, order.getMenuEntry().getIdentity());
@@ -75,7 +76,7 @@ class DBOrderDAO implements DAO<Order> {
 
         validator.validateForUpdate(order);
 
-        final String query = "UPDATE Order SET invoice_ID = ?, table_section = ?, table_number = ?," +
+        final String query = "UPDATE RestaurantOrder SET invoice_ID = ?, table_section = ?, table_number = ?," +
                 " menuEntry_ID = ?, orderTime = ?, brutto = ?, tax = ?, info = ? WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
@@ -109,7 +110,7 @@ class DBOrderDAO implements DAO<Order> {
 
         validator.validateForDelete(order);
 
-        final String query = "UPDATE Order SET deleted = true WHERE ID = ?";
+        final String query = "UPDATE RestaurantOrder SET canceled = true WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, order.getIdentity());
@@ -134,17 +135,17 @@ class DBOrderDAO implements DAO<Order> {
             return new ArrayList<>();
         }
 
-        final String query = "SELECT * FROM Order WHERE " +
+        final String query = "SELECT * FROM RestaurantOrder WHERE " +
                 "ID = ISNULL(?, ID) AND " +
                 "tax = ISNULL(?, tax) AND " +
                 "brutto = ISNULL(?, brutto) AND " +
                 "info = ISNULL(?, info) AND " +
                 "orderTime = ISNULL(?, orderTime) AND " +
-                "invoice_ID = ISNULL(?, taxRate_ID) AND " +
-                "table_section = ISNULL(?, category_ID) AND " +
-                "table_number = ISNULL(?, category_ID) AND " +
-                "menuEntry_ID = ISNULL(?, category_ID) AND " +
-                "deleted = false";
+                "invoice_ID = ISNULL(?, invoice_ID) AND " +
+                "table_section = ISNULL(?, table_section) AND " +
+                "table_number = ISNULL(?, table_number) AND " +
+                "menuEntry_ID = ISNULL(?, menuEntry_ID) AND " +
+                "canceled = false";
 
         final List<Order> objects = new ArrayList<>();
 
@@ -180,7 +181,7 @@ class DBOrderDAO implements DAO<Order> {
     public List<Order> getAll() throws DAOException {
         LOGGER.debug("entering getAll");
 
-        final String query = "SELECT * FROM Order WHERE deleted = false";
+        final String query = "SELECT * FROM RestaurantOrder WHERE canceled = false";
 
         final List<Order> objects = new ArrayList<>();
 
@@ -203,7 +204,7 @@ class DBOrderDAO implements DAO<Order> {
 
         validator.validateIdentity(order);
 
-        final String query = "SELECT * FROM Order WHERE ID = ? ORDER BY changeNr";
+        final String query = "SELECT * FROM RestaurantOrder WHERE ID = ? ORDER BY changeNr";
 
         List<History<Order>> history = new ArrayList<>();
 
@@ -302,7 +303,7 @@ class DBOrderDAO implements DAO<Order> {
         History<Order> historyEntry = new History<>();
         historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
         historyEntry.setChangeNumber(result.getLong("changeNr"));
-        historyEntry.setDeleted(result.getBoolean("deleted"));
+        historyEntry.setDeleted(result.getBoolean("canceled"));
         historyEntry.setUser(storedUsers.get(0));
         historyEntry.setData(parseResult(result));
 
