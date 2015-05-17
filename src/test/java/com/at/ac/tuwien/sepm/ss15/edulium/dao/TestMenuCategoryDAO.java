@@ -4,14 +4,14 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * Unit Test for the MenuCategoryDAO
@@ -300,6 +300,16 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
 
         // WHEN / THEN
         assertTrue(menuCategoryDAO.getHistory(cat).isEmpty());
+    }
+
+    @Test
+    public void testFind_nullObjectShouldReturnEmptyList() throws DAOException {
+        // WHEN
+        List<MenuCategory> result = menuCategoryDAO.find(null);
+
+        // THEN
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
     }
 
     @Test

@@ -4,33 +4,45 @@ package com.at.ac.tuwien.sepm.ss15.edulium.domain;
  * domain object which represents a table in the restaurant
  */
 public class Table {
-    private int seats;
+    private Integer seats;
     private Long number;
-    private Long section_id;
-    private Long user_id;
-    private int row;
-    private int column;
+    private Section section;
+    private User user; // optional
+    private Integer row;
+    private Integer column;
 
-    public Table() {
-
+    /**
+     * Creates a new table object and assigns the given number and section to it.
+     * @param section section the table is located
+     * @param number number of the table
+     * @return table with assigned identity parameters
+     */
+    public static Table withIdentity(Section section, long number) {
+        Table table = new Table();
+        table.setNumber(number);
+        table.setSection(section);
+        return table;
     }
 
     /**
      * @return the number of seats on this table
+     *         can be null
      */
-    public int getSeats() {
+    public Integer getSeats() {
         return seats;
     }
 
     /**
      * @param seats sets the number of seats on this table
      */
-    public void setSeats(int seats) {
+    public void setSeats(Integer seats) {
         this.seats = seats;
     }
 
     /**
      * @return the unique number of this table
+     *         can be null (if this instance does not represent
+     *         a persistent dataset)
      */
     public Long getNumber() {
         return number;
@@ -45,58 +57,63 @@ public class Table {
 
     /**
      * @return the row of this table
+     *         can be null
      */
-    public int getRow() {
+    public Integer getRow() {
         return row;
     }
 
     /**
      * @param row sets the row of this table
      */
-    public void setRow(int row) {
+    public void setRow(Integer row) {
         this.row = row;
     }
 
     /**
      * @return the column of this table
+     *         can be null
      */
-    public int getColumn() {
+    public Integer getColumn() {
         return column;
     }
 
     /**
      * @param column sets the column of this table
      */
-    public void setColumn(int column) {
+    public void setColumn(Integer column) {
         this.column = column;
     }
 
     /**
      * @return the id of the section the table is located
+     *         can be null (if this instance does not represent
+     *         a persistent dataset)
      */
-    public Long getSection_id() {
-        return section_id;
+    public Section getSection() {
+        return section;
     }
 
     /**
-     * @param section_id sets the id of the section the table is located
+     * @param section sets the unique id of the section the table is located
      */
-    public void setSection_id(Long section_id) {
-        this.section_id = section_id;
+    public void setSection(Section section) {
+        this.section = section;
     }
 
     /**
      * @return the id of the user responsible for the table
+     *         can be null
      */
-    public Long getUser_id() {
-        return user_id;
+    public User getUser() {
+        return user;
     }
 
     /**
-     * @param user_id sets the id of the user responsible for the table
+     * @param user sets the id of the user responsible for the table (optional)
      */
-    public void setUser_id(Long user_id) {
-        this.user_id = user_id;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override
@@ -104,8 +121,8 @@ public class Table {
         return "Table{" +
                 "seats=" + seats +
                 ", number=" + number +
-                ", section_id=" + section_id +
-                ", user_id=" + user_id +
+                ", section=" + section +
+                ", user=" + user +
                 ", row=" + row +
                 ", column=" + column +
                 '}';
@@ -118,12 +135,11 @@ public class Table {
 
         Table table = (Table) o;
 
-        if (column != table.column) return false;
-        if (row != table.row) return false;
-        if (seats != table.seats) return false;
+        if (column != null ? !column.equals(table.column) : table.column != null) return false;
         if (number != null ? !number.equals(table.number) : table.number != null) return false;
-        if (section_id != null ? !section_id.equals(table.section_id) : table.section_id != null) return false;
-        if (user_id != null ? !user_id.equals(table.user_id) : table.user_id != null) return false;
+        if (row != null ? !row.equals(table.row) : table.row != null) return false;
+        if (seats != null ? !seats.equals(table.seats) : table.seats != null) return false;
+        if (section != null ? !section.equals(table.section) : table.section != null) return false;
 
         return true;
     }

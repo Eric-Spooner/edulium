@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertFalse;
 
 /**
  * Unit Test for the TaxRate DAO
@@ -301,6 +300,16 @@ public class TestTaxRateDAO extends AbstractDAOTest {
         List<TaxRate> result = taxRateDAO.find(matcher);
 
         // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testFind_nullObjectShouldReturnEmptyList() throws DAOException {
+        // WHEN
+        List<TaxRate> result = taxRateDAO.find(null);
+
+        // THEN
+        assertNotNull(result);
         assertTrue(result.isEmpty());
     }
 
