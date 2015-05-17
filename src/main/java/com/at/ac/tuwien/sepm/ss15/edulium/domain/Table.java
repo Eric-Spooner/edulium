@@ -11,14 +11,11 @@ public class Table {
     private Integer row;
     private Integer column;
 
-    public Table() {
-
-    }
-
     /**
-     * Creates a new table object and assigns the given number to it.
-     * @param number the identity of the category
-     * @return table object with the given number
+     * Creates a new table object and assigns the given number and section to it.
+     * @param section section the table is located
+     * @param number number of the table
+     * @return table with assigned identity parameters
      */
     public static Table withIdentity(Section section, long number) {
         Table table = new Table();
@@ -38,7 +35,7 @@ public class Table {
     /**
      * @param seats sets the number of seats on this table
      */
-    public void setSeats(int seats) {
+    public void setSeats(Integer seats) {
         this.seats = seats;
     }
 
@@ -69,7 +66,7 @@ public class Table {
     /**
      * @param row sets the row of this table
      */
-    public void setRow(int row) {
+    public void setRow(Integer row) {
         this.row = row;
     }
 
@@ -84,20 +81,21 @@ public class Table {
     /**
      * @param column sets the column of this table
      */
-    public void setColumn(int column) {
+    public void setColumn(Integer column) {
         this.column = column;
     }
 
     /**
      * @return the id of the section the table is located
-     *         can be null
+     *         can be null (if this instance does not represent
+     *         a persistent dataset)
      */
     public Section getSection() {
         return section;
     }
 
     /**
-     * @param section sets the id of the section the table is located
+     * @param section sets the unique id of the section the table is located
      */
     public void setSection(Section section) {
         this.section = section;
