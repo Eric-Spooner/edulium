@@ -55,8 +55,8 @@ class OrderValidator implements Validator<Order> {
         }
         if(order.getTax() == null) {
             throw new ValidationException("Tax must not be null");
-        }else if(order.getTax().equals(BigDecimal.valueOf(0))) {
-            throw new ValidationException("Tax must not be null");
+        }else if(order.getTax().compareTo(BigDecimal.valueOf(0)) == -1 || order.getTax().compareTo(BigDecimal.valueOf(1)) == 1) {
+            throw new ValidationException("Tax must be between 0 (included) and 1 (included)");
         }
         if(order.getMenuEntry() == null) {
             throw new ValidationException("Menu Entry must not be null");

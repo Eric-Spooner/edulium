@@ -77,7 +77,11 @@ class DBOrderDAO implements DAO<Order> {
                 " menuEntry_ID = ?, orderTime = ?, brutto = ?, tax = ?, info = ? WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, order.getInvoice().getIdentity());
+            if(order.getInvoice() == null){
+                stmt.setNull(1, Types.VARCHAR);
+            }else {
+                stmt.setLong(1, order.getInvoice().getIdentity());
+            }
             stmt.setLong(2, order.getTable().getSection().getIdentity());
             stmt.setLong(3, order.getTable().getNumber());
             stmt.setLong(4, order.getMenuEntry().getIdentity());
@@ -138,7 +142,7 @@ class DBOrderDAO implements DAO<Order> {
                 "brutto = ISNULL(?, brutto) AND " +
                 "info = ISNULL(?, info) AND " +
                 "orderTime = ISNULL(?, orderTime) AND " +
-                "invoice_ID = ISNULL(?, invoice_ID) AND " +
+                "CASE WHEN (? IS NULL) THEN TRUE ELSE invoice_ID = ? END AND " +
                 "table_section = ISNULL(?, table_section) AND " +
                 "table_number = ISNULL(?, table_number) AND " +
                 "menuEntry_ID = ISNULL(?, menuEntry_ID) AND " +
@@ -152,11 +156,18 @@ class DBOrderDAO implements DAO<Order> {
             stmt.setObject(3, order.getBrutto());
             stmt.setObject(4, order.getAdditionalInformation());
             stmt.setObject(5, order.getTime() == null ? null : Timestamp.valueOf(order.getTime()));
-            stmt.setObject(6, order.getInvoice() == null ? null : order.getInvoice().getIdentity());
-            stmt.setObject(7, order.getTable() == null ? null : order.getTable().getSection() == null ?
+            if(order.getInvoice() == null) {
+                stmt.setNull(6, Types.VARCHAR);
+                stmt.setNull(7, Types.VARCHAR);
+            }
+            else {
+                stmt.setObject(6, order.getInvoice().getIdentity());
+                stmt.setObject(7, order.getInvoice().getIdentity());
+            }
+            stmt.setObject(8, order.getTable() == null ? null : order.getTable().getSection() == null ?
                     null : order.getTable().getSection().getIdentity());
-            stmt.setObject(8, order.getTable() == null ? null : order.getTable().getNumber());
-            stmt.setObject(9, order.getMenuEntry() == null ? null : order.getMenuEntry().getIdentity());
+            stmt.setObject(9, order.getTable() == null ? null : order.getTable().getNumber());
+            stmt.setObject(10, order.getMenuEntry() == null ? null : order.getMenuEntry().getIdentity());
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
@@ -197,7 +208,7 @@ class DBOrderDAO implements DAO<Order> {
 
         validator.validateIdentity(order);
 
-        final String query = "SELECT * FROM RestaurantOrder WHERE ID = ? ORDER BY changeNr";
+        final String query = "SELECT * FROM RestaurantOrderHistory WHERE ID = ? ORDER BY changeNr";
 
         List<History<Order>> history = new ArrayList<>();
 
