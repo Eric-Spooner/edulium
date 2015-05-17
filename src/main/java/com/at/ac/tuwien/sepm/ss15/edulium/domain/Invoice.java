@@ -10,7 +10,6 @@ public class Invoice {
     private Long identity;
     private LocalDateTime time;
     private BigDecimal gross;
-    private Boolean paid;
     private User creator;
 
     /**
@@ -67,21 +66,6 @@ public class Invoice {
     }
 
     /**
-     * @return Returns true if the invoice was paid and false otherwise (can be null)
-     */
-    public Boolean getPaid() {
-        return paid;
-    }
-
-    /**
-     * Sets whether or not the invoice was paid
-     * @param paid Set to true if the invoice was paid and false otherwise
-     */
-    public void setPaid(Boolean paid) {
-        this.paid = paid;
-    }
-
-    /**
      * @return Returns the creator of this invoice (can be null)
      */
     public User getCreator() {
@@ -101,7 +85,6 @@ public class Invoice {
                 "identity=" + identity +
                 ", time=" + time +
                 ", gross=" + gross +
-                ", paid=" + paid +
                 ", creator=" + creator +
                 "}";
     }
@@ -116,7 +99,6 @@ public class Invoice {
         if (identity != null ? !identity.equals(invoice.identity) : invoice.identity != null) return false;
         if (time != null ? !time.equals(invoice.time) : invoice.time != null) return false;
         if (gross != null ? gross.compareTo(invoice.gross) != 0 : invoice.gross != null) return false;
-        if (paid != null ? !paid.equals(invoice.paid) : invoice.paid != null) return false;
         return !(creator != null ? !creator.equals(invoice.creator) : invoice.creator != null);
     }
 }

@@ -99,7 +99,6 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice.setGross(new BigDecimal("2"));
         invoice.setTime(LocalDateTime.now());
         invoice.setCreator(getCurrentUser());
-        invoice.setPaid(Boolean.TRUE);
         invoiceDAO.update(invoice);
     }
 
@@ -109,7 +108,6 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         Invoice invoice = new Invoice();
         invoice.setGross(new BigDecimal("20"));
         invoice.setTime(LocalDateTime.now());
-        invoice.setPaid(Boolean.TRUE);
         invoice.setCreator(getCurrentUser());
 
         // WHEN/THEN
