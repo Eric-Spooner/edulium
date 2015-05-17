@@ -49,7 +49,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
                 "VALUES (?, ?, ?);";
         try (PreparedStatement stmt = dataSource.getConnection()
                 .prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setTimestamp(1, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
+            stmt.setTimestamp(1, Timestamp.valueOf(invoice.getTime()));
             stmt.setBigDecimal(2, invoice.getGross());
             stmt.setString(3, invoice.getCreator().getIdentity());
             stmt.executeUpdate();
@@ -79,7 +79,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
         final String query = "UPDATE Invoice SET invoiceTime = ?, brutto = ?, user_ID = ? " +
                 "WHERE id = ?;";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setTimestamp(1, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
+            stmt.setTimestamp(1, Timestamp.valueOf(invoice.getTime()));
             stmt.setBigDecimal(2, invoice.getGross());
             stmt.setString(3, invoice.getCreator().getIdentity());
             stmt.setLong(4, invoice.getIdentity());
