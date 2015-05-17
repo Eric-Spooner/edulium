@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,7 +44,7 @@ class DBOrderDAO implements DAO<Order> {
     public void create(Order order) throws DAOException, ValidationException {
         LOGGER.debug("entering create with parameters " + order);
         validator.validateForCreate(order);
-        final String query = "INSERT INTO MenuEntry (invoice_ID, table_section, table_number, menuEntry_ID, " +
+        final String query = "INSERT INTO Order (invoice_ID, table_section, table_number, menuEntry_ID, " +
                 "orderTime, brutto, tax, info) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setLong(1, order.getInvoice().getIdentity());
@@ -69,28 +70,155 @@ class DBOrderDAO implements DAO<Order> {
     }
 
     @Override
-    public void update(Order object) throws DAOException, ValidationException {
+    public void update(Order order) throws DAOException, ValidationException {
+        LOGGER.debug("entering update with parameters " + order);
 
+        validator.validateForUpdate(order);
+
+        final String query = "UPDATE Order SET invoice_ID = ?, table_section = ?, table_number = ?," +
+                " menuEntry_ID = ?, orderTime = ?, brutto = ?, tax = ?, info = ? WHERE ID = ?";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, order.getInvoice().getIdentity());
+            stmt.setLong(2, order.getTable().getSection().getIdentity());
+            stmt.setLong(3, order.getTable().getNumber());
+            stmt.setLong(4, order.getMenuEntry().getIdentity());
+            stmt.setTimestamp(5, Timestamp.valueOf(order.getTime()));
+            stmt.setBigDecimal(6, order.getBrutto());
+            stmt.setBigDecimal(7, order.getTax());
+            stmt.setString(8, order.getAdditionalInformation());
+            stmt.setLong(9, order.getIdentity());
+            stmt.executeUpdate();
+
+
+            if (stmt.executeUpdate() == 0) {
+                LOGGER.error("updating menuEntry in database failed, dataset not found");
+                throw new DAOException("updating menuEntry in database failed, dataset not found");
+            }
+        } catch (SQLException e) {
+            LOGGER.error("updating menuEntry in database failed", e);
+            throw new DAOException("updating menuEntry in database failed", e);
+        }
+
+        generateHistory(order);
     }
 
     @Override
-    public void delete(Order object) throws DAOException, ValidationException {
+    public void delete(Order order) throws DAOException, ValidationException {
+        LOGGER.debug("entering delete with parameters " + order);
 
+        validator.validateForDelete(order);
+
+        final String query = "UPDATE Order SET deleted = true WHERE ID = ?";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, order.getIdentity());
+
+            if (stmt.executeUpdate() == 0) {
+                LOGGER.error("deleting order failed, dataset not found");
+                throw new DAOException("deleting order failed, dataset not found");
+            }
+        } catch (SQLException e) {
+            LOGGER.error("deleting order failed", e);
+            throw new DAOException("deleting order failed", e);
+        }
+
+        generateHistory(order);
     }
 
     @Override
-    public List<Order> find(Order object) throws DAOException {
-        return null;
+    public List<Order> find(Order order) throws DAOException {
+        LOGGER.debug("entering find with parameters " + order);
+
+        if (order == null) {
+            return new ArrayList<>();
+        }
+
+        final String query = "SELECT * FROM Order WHERE " +
+                "ID = ISNULL(?, ID) AND " +
+                "tax = ISNULL(?, tax) AND " +
+                "brutto = ISNULL(?, brutto) AND " +
+                "info = ISNULL(?, info) AND " +
+                "orderTime = ISNULL(?, orderTime) AND " +
+                "invoice_ID = ISNULL(?, taxRate_ID) AND " +
+                "table_section = ISNULL(?, category_ID) AND " +
+                "table_number = ISNULL(?, category_ID) AND " +
+                "menuEntry_ID = ISNULL(?, category_ID) AND " +
+                "deleted = false";
+
+        final List<Order> objects = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            MenuEntry menuEntry = order.getMenuEntry();
+            Table table = order.getTable();
+            Invoice invoice = order.getInvoice();
+            LocalDateTime time = order.getTime();
+
+            stmt.setObject(1, order.getIdentity());
+            stmt.setObject(2, order.getTax());
+            stmt.setObject(3, order.getBrutto());
+            stmt.setObject(4, order.getAdditionalInformation());
+            stmt.setObject(5, time == null ? null : Timestamp.valueOf(time));
+            stmt.setObject(6, invoice == null ? null : invoice.getIdentity());
+            stmt.setObject(7, table == null ? null : table.getSection() == null ? null : table.getSection().getIdentity());
+            stmt.setObject(8, table == null ? null : table.getNumber());
+            stmt.setObject(9, menuEntry == null ? null : menuEntry.getIdentity());
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                objects.add(parseResult(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("searching for menu entries failed", e);
+            throw new DAOException("searching for menu entries failed", e);
+        }
+
+        return objects;
     }
 
     @Override
     public List<Order> getAll() throws DAOException {
-        return null;
+        LOGGER.debug("entering getAll");
+
+        final String query = "SELECT * FROM Order WHERE deleted = false";
+
+        final List<Order> objects = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                objects.add(parseResult(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("searching for all entries failed", e);
+            throw new DAOException("searching for all entries failed", e);
+        }
+
+        return objects;
     }
 
     @Override
-    public List<History<Order>> getHistory(Order object) throws DAOException, ValidationException {
-        return null;
+    public List<History<Order>> getHistory(Order order) throws DAOException, ValidationException {
+        LOGGER.debug("entering getHistory with parameters " + order);
+
+        validator.validateIdentity(order);
+
+        final String query = "SELECT * FROM Order WHERE ID = ? ORDER BY changeNr";
+
+        List<History<Order>> history = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, order.getIdentity());
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                history.add(parseHistoryEntry(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("retrieving history failed", e);
+            throw new DAOException("retrieving history failed", e);
+        }
+
+        return history;
     }
 
 
