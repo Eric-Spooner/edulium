@@ -5,7 +5,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.math.BigDecimal;
 import java.util.LinkedList;
 
 /**
@@ -19,7 +18,7 @@ public class TestMenuValidator extends AbstractDomainTest {
     public void testValidateForCreate_shouldAcceptMenu() throws ValidationException {
         // GIVEN
         LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
-        list.add(new MenuEntry());
+        list.add(MenuEntry.withIdentity(5));
         Menu menu = new Menu();
         menu.setName("Menu");
         menu.setEntries(list);
@@ -78,6 +77,18 @@ public class TestMenuValidator extends AbstractDomainTest {
         menuValidator.validateForCreate(menu);
     }
 
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_MenuWithListMenuEntriesWithoutIdentificationShouldThrow() throws ValidationException {
+        // GIVEN
+        Menu menu = new Menu();
+        menu.setName("Menu");
+        LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
+        list.add(new MenuEntry());
+        menu.setEntries(list);
+        // WHEN
+        menuValidator.validateForCreate(menu);
+    }
+
     @Test
     public void testValidateForUpdate_shouldAcceptMenu() throws ValidationException {
         // GIVEN
@@ -85,7 +96,7 @@ public class TestMenuValidator extends AbstractDomainTest {
         menu.setIdentity(0L);
         menu.setName("Menu");
         LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
-        list.add(new MenuEntry());
+        list.add(MenuEntry.withIdentity(5));
         menu.setEntries(list);
 
         // WHEN
