@@ -155,8 +155,7 @@ public class MenuEntry {
         if (name != null ? !name.equals(menuEntry.name) : menuEntry.name != null) return false;
         if (price != null ? price.compareTo(menuEntry.price) != 0 : menuEntry.price != null) return false;
         if (available != null ? !available.equals(menuEntry.available) : menuEntry.available != null) return false;
-        if (description != null ? !description.equals(menuEntry.description) : menuEntry.description != null)
-            return false;
+        if (description != null ? !description.equals(menuEntry.description) : menuEntry.description != null) return false;
         if (taxRate != null ? !taxRate.equals(menuEntry.taxRate) : menuEntry.taxRate != null) return false;
         return !(category != null ? !category.equals(menuEntry.category) : menuEntry.category != null);
 
