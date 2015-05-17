@@ -250,6 +250,13 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
     }
 
     @Test
+    public void testFind_withoutObjectShouldReturnEmptyList() throws DAOException, ValidationException {
+        MenuEntry matcher = null;
+
+        assertTrue(menuEntryDAO.find(matcher).isEmpty());
+    }
+
+    @Test
     public void testFind_byIdentityShouldReturnObject() throws DAOException, ValidationException {
         // GIVEN
         MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);

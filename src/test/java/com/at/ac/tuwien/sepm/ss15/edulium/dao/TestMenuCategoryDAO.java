@@ -303,6 +303,16 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
     }
 
     @Test
+    public void testFind_nullObjectShouldReturnEmptyList() throws DAOException {
+        // WHEN
+        List<MenuCategory> result = menuCategoryDAO.find(null);
+
+        // THEN
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
         // get test user
