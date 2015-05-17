@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * H2 Database Implementation of the MenuEntry DAO interface
  */
-public class DBMenuDAO implements DAO<Menu> {
+class DBMenuDAO implements DAO<Menu> {
     private static final Logger LOGGER = LogManager.getLogger(DBMenuDAO.class);
 
     @Autowired
