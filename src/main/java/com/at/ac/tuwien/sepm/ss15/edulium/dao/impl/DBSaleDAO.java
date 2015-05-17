@@ -185,7 +185,7 @@ public class DBSaleDAO implements DAO<Sale> {
     private void generateHistory(Sale sale) throws DAOException {
         LOGGER.debug("Entering generateHistory with parameters: " + sale);
 
-        final String query = "INSERT INTO Sale " +
+        final String query = "INSERT INTO SaleHistory " +
                 "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
                 "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM SaleHistory WHERE ID = ?) " +
                 "FROM Sale WHERE ID = ?)";
