@@ -214,9 +214,9 @@ class DBInvoiceDAO implements DAO<Invoice> {
     }
 
     /**
-     * TODO
-     * @param invoice
-     * @throws DAOException
+     * Generates a historic event in the InvoiceHistory table
+     * @param invoice The updated dataset
+     * @throws DAOException Thrown if an error occurs when accessing the database
      */
     private void generateHistory(Invoice invoice) throws DAOException {
         LOGGER.debug("Entering generateHistory with parameters: " + invoice);
@@ -261,11 +261,11 @@ class DBInvoiceDAO implements DAO<Invoice> {
     }
 
     /**
-     * TODO
-     * @param rs
-     * @return
-     * @throws DAOException
-     * @throws SQLException
+     * Parses a result set in an object of type History
+     * @param rs The result set
+     * @return History object containing the result set information
+     * @throws DAOException Thrown in case an error occurs when accessing the database
+     * @throws SQLException Thrown in case an error occurs when accessing the database result
      */
     private History<Invoice> parseHistoryResult(ResultSet rs) throws DAOException, SQLException {
         List<User> user = userDAO.find(User.withIdentity(rs.getString("changeUser")));
