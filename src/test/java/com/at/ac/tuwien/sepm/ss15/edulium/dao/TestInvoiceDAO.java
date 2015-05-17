@@ -197,6 +197,12 @@ public class TestInvoiceDAO extends AbstractDAOTest {
     }
 
     @Test
+    public void testFind_shouldReturnEmptyListWhenSearchingNull() throws DAOException {
+        // WHEN/THEN
+        invoiceDAO.find(null);
+    }
+
+    @Test
     public void testFind_shouldReturnEmptyListWhenNoObjectIsStored() throws DAOException {
         // WHEN
         List results = invoiceDAO.find(Invoice.withIdentity(1L));
