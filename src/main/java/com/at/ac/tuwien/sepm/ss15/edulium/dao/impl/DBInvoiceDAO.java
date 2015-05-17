@@ -17,7 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +49,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
                 "VALUES (?, ?, ?);";
         try (PreparedStatement stmt = dataSource.getConnection()
                 .prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setObject(1, invoice.getTime());
+            stmt.setTimestamp(1, Timestamp.valueOf(invoice.getTime()));
             stmt.setBigDecimal(2, invoice.getGross());
             stmt.setString(3, invoice.getCreator().getIdentity());
             stmt.executeUpdate();
@@ -79,9 +79,10 @@ class DBInvoiceDAO implements DAO<Invoice> {
         final String query = "UPDATE Invoice SET invoiceTime = ?, brutto = ?, user_ID = ? " +
                 "WHERE id = ?;";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setObject(1, invoice.getTime());
+            stmt.setTimestamp(1, Timestamp.valueOf(invoice.getTime()));
             stmt.setBigDecimal(2, invoice.getGross());
             stmt.setString(3, invoice.getCreator().getIdentity());
+            stmt.setLong(4, invoice.getIdentity());
 
             if (stmt.executeUpdate() == 0) {
                 LOGGER.error("Failed to update invoice entry in database, dataset not found");
@@ -142,9 +143,9 @@ class DBInvoiceDAO implements DAO<Invoice> {
                 "canceled = FALSE;";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, invoice.getIdentity());
-            stmt.setObject(2, invoice.getTime());
+            stmt.setTimestamp(2, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
             stmt.setBigDecimal(3, invoice.getGross());
-            stmt.setString(4, invoice.getCreator().getIdentity());
+            stmt.setString(4, invoice.getCreator() == null ? null : invoice.getCreator().getIdentity());
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -191,6 +192,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
     public List<History<Invoice>> getHistory(Invoice invoice) throws DAOException, ValidationException {
         LOGGER.debug("entering getHistory with parameters " + invoice);
 
+        invoiceValidator.validateIdentity(invoice);
+
         List<History<Invoice>> history = new ArrayList<>();
 
         final String query = "SELECT * FROM InvoiceHistory WHERE ID = ? ORDER BY changeNr";
@@ -211,9 +214,9 @@ class DBInvoiceDAO implements DAO<Invoice> {
     }
 
     /**
-     * TODO
-     * @param invoice
-     * @throws DAOException
+     * Generates a historic event in the InvoiceHistory table
+     * @param invoice The updated dataset
+     * @throws DAOException Thrown if an error occurs when accessing the database
      */
     private void generateHistory(Invoice invoice) throws DAOException {
         LOGGER.debug("Entering generateHistory with parameters: " + invoice);
@@ -251,18 +254,18 @@ class DBInvoiceDAO implements DAO<Invoice> {
         Invoice invoice = new Invoice();
         invoice.setCreator(creator.get(0));
         invoice.setIdentity(rs.getLong("ID"));
-        invoice.setTime((LocalDateTime) rs.getObject("invoiceTime"));
+        invoice.setTime(rs.getTimestamp("invoiceTime").toLocalDateTime());
         invoice.setGross(rs.getBigDecimal("brutto"));
 
         return invoice;
     }
 
     /**
-     * TODO
-     * @param rs
-     * @return
-     * @throws DAOException
-     * @throws SQLException
+     * Parses a result set in an object of type History
+     * @param rs The result set
+     * @return History object containing the result set information
+     * @throws DAOException Thrown in case an error occurs when accessing the database
+     * @throws SQLException Thrown in case an error occurs when accessing the database result
      */
     private History<Invoice> parseHistoryResult(ResultSet rs) throws DAOException, SQLException {
         List<User> user = userDAO.find(User.withIdentity(rs.getString("changeUser")));

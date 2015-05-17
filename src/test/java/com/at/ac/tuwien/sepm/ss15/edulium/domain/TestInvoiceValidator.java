@@ -88,7 +88,6 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         invoice.setIdentity(1L);
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15"));
-        invoice.setPaid(Boolean.TRUE);
         invoice.setCreator(creator);
 
         invoiceValidator.validateForUpdate(invoice);
@@ -100,7 +99,6 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         invoice.setGross(new BigDecimal("20"));
         invoice.setTime(LocalDateTime.now());
         invoice.setIdentity(1L);
-        invoice.setPaid(Boolean.TRUE);
 
         invoiceValidator.validateForUpdate(invoice);
     }
@@ -112,7 +110,6 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         Invoice invoice = new Invoice();
         invoice.setGross(new BigDecimal("20"));
         invoice.setIdentity(1L);
-        invoice.setPaid(Boolean.TRUE);
         invoice.setCreator(creator);
 
         invoiceValidator.validateForUpdate(invoice);
@@ -125,7 +122,6 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setIdentity(1L);
-        invoice.setPaid(Boolean.TRUE);
         invoice.setCreator(creator);
 
         invoiceValidator.validateForUpdate(invoice);
@@ -139,7 +135,6 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("-20"));
         invoice.setIdentity(1L);
-        invoice.setPaid(Boolean.TRUE);
         invoice.setCreator(creator);
 
         invoiceValidator.validateForUpdate(invoice);

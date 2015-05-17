@@ -27,7 +27,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
-        invoice.setCreator(User.withIdentity("TestUser"));
+        invoice.setCreator(getCurrentUser());
 
         // WHEN
         invoiceDAO.create(invoice);
@@ -64,12 +64,12 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("26.7"));
-        invoice.setCreator(User.withIdentity("TestUser"));
+        invoice.setCreator(getCurrentUser());
         invoiceDAO.create(invoice);
 
         // WHEN
         assertEquals(1, invoiceDAO.find(invoice).size());
-        invoice.setPaid(Boolean.TRUE);
+        invoice.setGross(new BigDecimal("29"));
         invoiceDAO.update(invoice);
 
         // THEN
@@ -98,8 +98,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice.setIdentity(identity);
         invoice.setGross(new BigDecimal("2"));
         invoice.setTime(LocalDateTime.now());
-        invoice.setCreator(User.withIdentity("TestUser"));
-        invoice.setPaid(Boolean.TRUE);
+        invoice.setCreator(getCurrentUser());
         invoiceDAO.update(invoice);
     }
 
@@ -109,8 +108,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         Invoice invoice = new Invoice();
         invoice.setGross(new BigDecimal("20"));
         invoice.setTime(LocalDateTime.now());
-        invoice.setPaid(Boolean.TRUE);
-        invoice.setCreator(User.withIdentity("TestUser"));
+        invoice.setCreator(getCurrentUser());
 
         // WHEN/THEN
         invoiceDAO.update(invoice);
@@ -122,7 +120,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("22.0"));
-        invoice.setCreator(User.withIdentity("TestUser"));
+        invoice.setCreator(getCurrentUser());
         invoiceDAO.create(invoice);
 
         // WHEN
@@ -164,13 +162,13 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         LocalDateTime now = LocalDateTime.now();
         inv1.setTime(now);
         inv1.setGross(new BigDecimal("11.0"));
-        inv1.setCreator(User.withIdentity("TestUser1"));
+        inv1.setCreator(getCurrentUser());
         inv2.setTime(now);
         inv2.setGross(new BigDecimal("12.0"));
-        inv2.setCreator(User.withIdentity("TestUser2"));
+        inv2.setCreator(getCurrentUser());
         inv3.setTime(now);
         inv3.setGross(new BigDecimal("13.0"));
-        inv3.setCreator(User.withIdentity("TestUser3"));
+        inv3.setCreator(getCurrentUser());
 
         invoiceDAO.create(inv1);
         invoiceDAO.create(inv2);
@@ -210,7 +208,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
     @Test
     public void testFind_shouldFindObjectsWhenSearchingByCreator() throws ValidationException, DAOException {
         // GIVEN
-        User creator = User.withIdentity("User");
+        User creator = getCurrentUser();
 
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
@@ -237,13 +235,13 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         LocalDateTime now = LocalDateTime.now();
         inv1.setTime(now);
         inv1.setGross(new BigDecimal("11.0"));
-        inv1.setCreator(User.withIdentity("TestUser1"));
+        inv1.setCreator(getCurrentUser());
         inv2.setTime(now);
         inv2.setGross(new BigDecimal("12.0"));
-        inv2.setCreator(User.withIdentity("TestUser2"));
+        inv2.setCreator(getCurrentUser());
         inv3.setTime(now);
         inv3.setGross(new BigDecimal("13.0"));
-        inv3.setCreator(User.withIdentity("TestUser3"));
+        inv3.setCreator(getCurrentUser());
 
         invoiceDAO.create(inv1);
         invoiceDAO.create(inv2);
@@ -262,7 +260,6 @@ public class TestInvoiceDAO extends AbstractDAOTest {
 
     @Test
     public void testGetHistory_shouldReturnObject() throws ValidationException, DAOException {
-        User user = getCurrentUser();
 
         // GIVEN
         // Create
@@ -270,13 +267,15 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         LocalDateTime createTime = LocalDateTime.now();
         invoiceA.setGross(new BigDecimal("20.5"));
         invoiceA.setTime(createTime);
-        invoiceA.setCreator(user);
+        invoiceA.setCreator(getCurrentUser());
         invoiceDAO.create(invoiceA);
 
         // Update
         Invoice invoiceB = Invoice.withIdentity(invoiceA.getIdentity());
         LocalDateTime updateTime = LocalDateTime.now();
+        invoiceB.setTime(createTime);
         invoiceB.setGross(new BigDecimal("24"));
+        invoiceB.setCreator(getCurrentUser());
         invoiceDAO.update(invoiceB);
 
         // Delete
@@ -294,7 +293,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         event = history.get(0);
         assertEquals(Long.valueOf(1), event.getChangeNumber());
         assertEquals(invoiceA, event.getData());
-        assertEquals(user, event.getUser());
+        assertEquals(getCurrentUser(), event.getUser());
         assertTrue(Duration.between(createTime, event.getTimeOfChange()).getSeconds() < 1);
         assertFalse(event.isDeleted());
 
@@ -302,15 +301,15 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         event = history.get(1);
         assertEquals(Long.valueOf(2), event.getChangeNumber());
         assertEquals(invoiceB, event.getData());
-        assertEquals(user, event.getUser());
+        assertEquals(getCurrentUser(), event.getUser());
         assertTrue(Duration.between(updateTime, event.getTimeOfChange()).getSeconds() < 1);
         assertFalse(event.isDeleted());
 
         // Delete history inspection
-        event = history.get(3);
+        event = history.get(2);
         assertEquals(Long.valueOf(3), event.getChangeNumber());
         assertEquals(invoiceB, event.getData());
-        assertEquals(user, event.getUser());
+        assertEquals(getCurrentUser(), event.getUser());
         assertTrue(Duration.between(deleteTime, event.getTimeOfChange()).getSeconds() < 1);
         assertTrue(event.isDeleted());
     }

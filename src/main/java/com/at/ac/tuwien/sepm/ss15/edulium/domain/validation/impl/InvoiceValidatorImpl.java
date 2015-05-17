@@ -41,10 +41,6 @@ class InvoiceValidatorImpl implements Validator<Invoice> {
      */
     @Override
     public void validateForDelete(Invoice invoice) throws ValidationException {
-        if (invoice == null) {
-            throw new ValidationException("Object must not be null");
-        }
-
         validateIdentity(invoice);
     }
 
@@ -55,16 +51,21 @@ class InvoiceValidatorImpl implements Validator<Invoice> {
      */
     @Override
     public void validateIdentity(Invoice invoice) throws ValidationException {
+        checkIfNull(invoice);
         if (invoice.getIdentity() == null) {
             throw new ValidationException("The unique identity of the invoice must be " +
                     "present in order to be identified");
         }
     }
 
-    private void checkForRequiredAttributesForCreateAndUpdate(Invoice invoice) throws ValidationException {
+    private void checkIfNull(Invoice invoice) throws ValidationException {
         if (invoice == null) {
             throw new ValidationException("Object must not be null");
         }
+    }
+
+    private void checkForRequiredAttributesForCreateAndUpdate(Invoice invoice) throws ValidationException {
+        checkIfNull(invoice);
 
         if (invoice.getTime() == null) {
             throw  new ValidationException("Time cannot be null");
