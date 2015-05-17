@@ -17,7 +17,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +48,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
                 "VALUES (?, ?, ?);";
         try (PreparedStatement stmt = dataSource.getConnection()
                 .prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setTimestamp(1, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
+            stmt.setObject(1, invoice.getTime());
             stmt.setBigDecimal(2, invoice.getGross());
             stmt.setString(3, invoice.getCreator().getIdentity());
             stmt.executeUpdate();
@@ -79,7 +78,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
         final String query = "UPDATE Invoice SET invoiceTime = ?, brutto = ?, user_ID = ? " +
                 "WHERE id = ?;";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setTimestamp(1, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
+            stmt.setObject(1, invoice.getTime());
             stmt.setBigDecimal(2, invoice.getGross());
             stmt.setString(3, invoice.getCreator().getIdentity());
             stmt.setLong(4, invoice.getIdentity());
@@ -143,7 +142,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
                 "canceled = FALSE;";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, invoice.getIdentity());
-            stmt.setTimestamp(2, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
+            stmt.setObject(2, invoice.getTime());
             stmt.setBigDecimal(3, invoice.getGross());
             stmt.setString(4, invoice.getCreator() == null ? null : invoice.getCreator().getIdentity());
             ResultSet rs = stmt.executeQuery();
