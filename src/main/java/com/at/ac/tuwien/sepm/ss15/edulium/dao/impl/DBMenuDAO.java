@@ -188,6 +188,33 @@ class DBMenuDAO implements DAO<Menu> {
             throw new DAOException("searching for menu entries failed", e);
         }
 
+        //TODO
+        //Check if the user also wants to search for MenuEntries
+        //if the name or the id are != null then check the entries, which have already been found with the entries
+        if(menu.getName() != null || menu.getIdentity() != null){
+            //Search, if the menu has also min. on entry of the MenuEntries
+        }else{
+            //Give back the menus, which have at least one of the given MenuEntries
+            String queryByMenuEntry = "SELECT * FROM (Menu m Join MenuAssoc ma) WHERE " +
+                    "m.deleted = false AND ma.disabled = false AND menuEntry_ID in ?" +
+                    "Group By m.ID";
+
+            objects.clear();
+
+            try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryByMenuEntry)) {
+                stmt.setObject(1, menu.getIdentity());
+                stmt.setObject(2, menu.getName());
+
+                ResultSet result = stmt.executeQuery();
+                while (result.next()) {
+                    objects.add(parseResult(result));
+                }
+            } catch (SQLException e) {
+                LOGGER.error("searching for menu entries failed", e);
+                throw new DAOException("searching for menu entries failed", e);
+            }
+        }
+
         return objects;
     }
 
