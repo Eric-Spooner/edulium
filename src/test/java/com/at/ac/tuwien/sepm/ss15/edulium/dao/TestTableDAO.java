@@ -5,6 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,6 +75,31 @@ public class TestTableDAO extends AbstractDAOTest {
         table.setNumber((long) 1);
         table.setSection(section1);
         table.setUser(user1);
+        table.setSeats(3);
+        table.setColumn(4);
+        table.setRow(5);
+
+        // WHEN
+        tableDAO.create(table);
+
+        // THEN
+        // check if identity is set
+        Assert.assertNotNull(table.getNumber());
+
+        // check retrieving object
+        List<Table> storedObjects = tableDAO.find(Table.withIdentity(section1, 1L));
+        Assert.assertEquals(1, storedObjects.size());
+        Assert.assertEquals(table, storedObjects.get(0));
+    }
+
+    /* user is optional */
+    @Test
+    public void testCreate_shouldAddObjectWithoutUser() throws DAOException, ValidationException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber((long) 1);
+        table.setSection(section1);
+        table.setUser(null);
         table.setSeats(3);
         table.setColumn(4);
         table.setRow(5);
@@ -192,12 +218,46 @@ public class TestTableDAO extends AbstractDAOTest {
         table.setSeats(6);
         table.setColumn(7);
         table.setRow(8);
+        table.setUser(user2);
 
         // WHEN
         tableDAO.update(table);
 
         // THEN
         // check if category name was updated
+        List<Table> storedObjects = tableDAO.find(Table.withIdentity(section1, 1L));
+        Assert.assertEquals(1, storedObjects.size());
+        Assert.assertEquals(table, storedObjects.get(0));
+    }
+
+    /* user is optional */
+    @Test
+    public void testUpdate_shouldUpdateObjectWithoutUser() throws DAOException, ValidationException {
+        // GIVEN
+        Table table = new Table();
+        table.setNumber((long) 1);
+        table.setSection(section1);
+        table.setUser(user1);
+        table.setSeats(3);
+        table.setColumn(4);
+        table.setRow(5);
+
+        tableDAO.create(table);
+
+        // check if table is stored
+        assertEquals(1, tableDAO.find(table).size());
+
+        // GIVEN
+        table.setSeats(6);
+        table.setColumn(7);
+        table.setRow(8);
+        table.setUser(null);
+
+        // WHEN
+        tableDAO.update(table);
+
+        // THEN
+        // check if table was updated
         List<Table> storedObjects = tableDAO.find(Table.withIdentity(section1, 1L));
         Assert.assertEquals(1, storedObjects.size());
         Assert.assertEquals(table, storedObjects.get(0));
@@ -543,7 +603,7 @@ public class TestTableDAO extends AbstractDAOTest {
         Assert.assertTrue(objects.contains(table2));
 
         // WHEN
-        matcher.setSection(section2); // table 3
+        matcher.setUser(user3); // table 3
         objects = tableDAO.find(matcher);
         // THEN
         Assert.assertEquals(1, objects.size());
@@ -591,7 +651,7 @@ public class TestTableDAO extends AbstractDAOTest {
         Assert.assertTrue(objects.contains(table3));
 
         // WHEN
-        matcher.setSection(section2); // table 2
+        matcher.setSeats(13); // table 2
         objects = tableDAO.find(matcher);
         // THEN
         Assert.assertEquals(1, objects.size());
@@ -687,65 +747,11 @@ public class TestTableDAO extends AbstractDAOTest {
         Assert.assertTrue(objects.contains(table2));
 
         // WHEN
-        matcher.setRow(24); // table 3
+        matcher.setColumn(24); // table 3
         objects = tableDAO.find(matcher);
         // THEN
         Assert.assertEquals(1, objects.size());
         Assert.assertTrue(objects.contains(table3));
-    }
-
-    @Test
-    public void testFind_bySeatsAndRowAndColumnShouldReturnObjects() throws DAOException, ValidationException {
-        // PREPARE
-        Table table1 = new Table();
-        table1.setSeats(3);
-        table1.setColumn(4);
-        table1.setRow(5);
-        table1.setNumber((long) 1);
-        table1.setUser(user1);
-        table1.setSection(section1);
-
-        Table table2 = new Table();
-        table2.setSeats(13);
-        table2.setColumn(14);
-        table2.setRow(15);
-        table2.setNumber((long) 1);
-        table2.setUser(user2);
-        table2.setSection(section2);
-
-        Table table3 = new Table();
-        table3.setSeats(23);
-        table3.setColumn(24);
-        table3.setRow(25);
-        table3.setNumber((long) 3);
-        table3.setUser(user3);
-        table3.setSection(section3);
-
-        tableDAO.create(table1);
-        tableDAO.create(table2);
-        tableDAO.create(table3);
-
-        // WHEN
-        Table matcher = new Table();
-        matcher.setSeats(table1.getSeats());
-        matcher.setColumn(table1.getColumn());
-        matcher.setRow(table1.getRow());
-        List<Table> objects = tableDAO.find(matcher);
-
-        // THEN
-        Assert.assertEquals(objects.size(), 2);
-        Assert.assertTrue(objects.contains(table1));
-        Assert.assertTrue(objects.contains(table2));
-
-        // WHEN
-        matcher.setSeats(table3.getSeats());
-        matcher.setColumn(table3.getColumn());
-        matcher.setRow(table3.getRow());
-        objects = tableDAO.find(matcher);
-
-        // THEN
-        Assert.assertEquals(objects.size(), 1);
-        Assert.assertEquals(objects.get(0), table3);
     }
 
     @Test
@@ -873,7 +879,7 @@ public class TestTableDAO extends AbstractDAOTest {
         tableDAO.create(table1);
 
         // update data
-        Table table2 = Table.withIdentity(section2, table1.getNumber());
+        Table table2 = Table.withIdentity(section1, table1.getNumber());
         table2.setSeats(13);
         table2.setColumn(14);
         table2.setRow(15);

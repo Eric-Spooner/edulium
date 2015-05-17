@@ -1,9 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
-/**
- * Created by Administrator on 06.05.2015.
- */
-
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
@@ -24,7 +20,7 @@ import java.util.List;
 /**
  * H2 Database Implementation of the section interface
  */
-public class DBSectionDAO implements DAO<Section> {
+class DBSectionDAO implements DAO<Section> {
     private static final Logger LOGGER = LogManager.getLogger(DBSectionDAO.class);
 
     @Autowired
@@ -43,7 +39,6 @@ public class DBSectionDAO implements DAO<Section> {
     @Override
     public void create(Section section) throws DAOException, ValidationException {
         LOGGER.debug("entering create with parameters " + section);
-        assert(section != null);
 
         validator.validateForCreate(section);
 
@@ -55,14 +50,14 @@ public class DBSectionDAO implements DAO<Section> {
             stmt.setString(1, section.getName());
             stmt.executeUpdate();
 
-            try (ResultSet key = stmt.getGeneratedKeys()) {
-                key.next();
+            ResultSet key = stmt.getGeneratedKeys();
+            if (key.next()) {
                 section.setIdentity(key.getLong(1));
             }
 
         } catch (SQLException e) {
             LOGGER.error("inserting section into database failed", e);
-            throw new DAOException(e);
+            throw new DAOException("inserting section into database failed", e);
         }
 
         generateHistory(section);
@@ -77,7 +72,6 @@ public class DBSectionDAO implements DAO<Section> {
     @Override
     public void update(Section section) throws DAOException, ValidationException {
         LOGGER.debug("entering update with parameters " + section);
-        assert(section != null);
 
         validator.validateForUpdate(section);
 
@@ -88,12 +82,12 @@ public class DBSectionDAO implements DAO<Section> {
             stmt.setLong(2, section.getIdentity());
 
             if (stmt.executeUpdate() == 0) {
-                throw new DAOException("updating failed: dataset not found");
+                throw new DAOException("updating section failed: dataset not found");
             }
 
         } catch (SQLException e) {
             LOGGER.error("updating section in database failed", e);
-            throw new DAOException(e);
+            throw new DAOException("updating section in database failed", e);
         }
 
         generateHistory(section);
@@ -108,7 +102,6 @@ public class DBSectionDAO implements DAO<Section> {
     @Override
     public void delete(Section section) throws DAOException, ValidationException {
         LOGGER.debug("entering delete with parameters " + section);
-        assert(section != null);
 
         validator.validateForDelete(section);
 
@@ -117,12 +110,12 @@ public class DBSectionDAO implements DAO<Section> {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, section.getIdentity());
             if (stmt.executeUpdate() == 0) {
-                throw new DAOException("delete failed: dataset not found");
+                throw new DAOException("delete section failed: dataset not found");
             }
 
         } catch (SQLException e) {
             LOGGER.error("deleting section failed", e);
-            throw new DAOException(e);
+            throw new DAOException("deleting section failed", e);
         }
 
         generateHistory(section);
@@ -139,29 +132,29 @@ public class DBSectionDAO implements DAO<Section> {
     @Override
     public List<Section> find(Section section) throws DAOException {
         LOGGER.debug("entering find with parameters " + section);
-        assert(section != null);
+
+        if (section == null) {
+            return new ArrayList<>();
+        }
+
         String query = "SELECT * FROM RestaurantSection WHERE ID = ISNULL(?, ID) " +
                 "AND name = ISNULL(?, name) AND deleted = false";
 
         final List<Section> objects = new ArrayList<>();
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            if(section.getIdentity() == null)
-                stmt.setNull(1, Types.VARCHAR);
-            else
-                stmt.setLong(1, section.getIdentity());
+            stmt.setObject(1, section.getIdentity());
             stmt.setString(2, section.getName());
             stmt.execute();
 
-            try (ResultSet result = stmt.getResultSet()) {
-                while (result.next()) {
-                    objects.add(parseResult(result));
-                }
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                objects.add(parseResult(result));
             }
 
         } catch (SQLException e) {
             LOGGER.error("searching for section failed", e);
-            throw new DAOException(e);
+            throw new DAOException("searching for section failed", e);
         }
 
         return objects;
@@ -174,21 +167,21 @@ public class DBSectionDAO implements DAO<Section> {
     @Override
     public List<Section> getAll() throws DAOException {
         LOGGER.debug("entering getAll");
+
         final String query = "SELECT * FROM RestaurantSection WHERE deleted = false";
         final List<Section> objects = new ArrayList<>();
 
         try (Statement stmt = dataSource.getConnection().createStatement()) {
             stmt.execute(query);
 
-            try (ResultSet result = stmt.getResultSet()) {
-                while (result.next()) {
-                    objects.add(parseResult(result));
-                }
+            ResultSet result = stmt.getResultSet();
+            while (result.next()) {
+                objects.add(parseResult(result));
             }
 
         } catch (SQLException e) {
             LOGGER.error("searching for all sections failed", e);
-            throw new DAOException(e);
+            throw new DAOException("searching for all sections failed", e);
         }
 
         return objects;
@@ -204,7 +197,9 @@ public class DBSectionDAO implements DAO<Section> {
     @Override
     public List<History<Section>> getHistory(Section section) throws DAOException, ValidationException {
         LOGGER.debug("entering getHistory with parameters " + section);
+
         validator.validateIdentity(section);
+
         List<History<Section>> history = new ArrayList<>();
         final String query = "SELECT * FROM RestaurantSectionHistory WHERE ID = ? ORDER BY changeNr";
 
@@ -232,6 +227,7 @@ public class DBSectionDAO implements DAO<Section> {
      */
     private void generateHistory(Section section) throws DAOException {
         LOGGER.debug("entering generateHistory with parameters " + section);
+
         final String query = "INSERT INTO RestaurantSectionHistory " +
                 "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
                 "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM RestaurantSectionHistory WHERE ID = ?) " +
@@ -257,8 +253,8 @@ public class DBSectionDAO implements DAO<Section> {
      */
     private Section parseResult(ResultSet result) throws SQLException {
         Section section = new Section();
-        section.setIdentity(result.getLong(1));
-        section.setName(result.getString(2));
+        section.setIdentity(result.getLong("ID"));
+        section.setName(result.getString("name"));
         return section;
     }
 

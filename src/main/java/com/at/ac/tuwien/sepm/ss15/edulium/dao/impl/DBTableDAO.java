@@ -19,10 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * H2 Database Implementation of the MenuCategoryDAO interface
+ * H2 Database Implementation of the TableDAO interface
  */
-
-public class DBTableDAO implements DAO<Table> {
+class DBTableDAO implements DAO<Table> {
     private static final Logger LOGGER = LogManager.getLogger(DBTableDAO.class);
 
     @Autowired
@@ -43,26 +42,61 @@ public class DBTableDAO implements DAO<Table> {
     @Override
     public void create(Table table) throws DAOException, ValidationException {
         LOGGER.debug("entering create with parameters " + table);
-        assert(table != null);
 
         validator.validateForCreate(table);
 
-        final String query = "INSERT INTO RestaurantTable (section_ID, seats, tableRow, tableColumn, user_ID, number) " +
+        // Update existing tables or insert table if not existing
+        // Check if table is already in database with attribute disabled=true
+        String query = "SELECT * FROM RestaurantTable WHERE number = ? " +
+                "AND section_ID = ? AND disabled = true";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setObject(1, table.getNumber());
+            stmt.setObject(2, table.getSection().getIdentity());
+
+            stmt.execute();
+
+            ResultSet result = stmt.getResultSet();
+            if(result.next()) {
+                LOGGER.debug("readd disabled table");
+                query = "UPDATE RestaurantTable SET " +
+                        "disabled = FALSE WHERE number = ? AND section_ID = ?";
+                PreparedStatement stmtReadd = dataSource.getConnection().prepareStatement(query);
+
+                stmtReadd.setLong(1, table.getNumber());
+                stmtReadd.setLong(2, table.getSection().getIdentity());
+                if (stmtReadd.executeUpdate() == 0) {
+                    throw new DAOException("readd table failed: dataset not found");
+                }
+
+                generateHistory(table);
+
+                return;
+            }
+
+        } catch (SQLException e) {
+            LOGGER.error("searching for table failed", e);
+            throw new DAOException("searching for table failed", e);
+        }
+
+        query = "INSERT INTO RestaurantTable (section_ID, seats, tableRow, tableColumn, user_ID, number) " +
                 "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-
             stmt.setLong(1, table.getSection().getIdentity());
             stmt.setInt(2, table.getSeats());
             stmt.setInt(3, table.getRow());
             stmt.setInt(4, table.getColumn());
-            stmt.setString(5, table.getUser().getIdentity());
+            if(table.getUser() == null)
+                stmt.setNull(5, Types.VARCHAR);
+            else
+                stmt.setString(5, table.getUser().getIdentity());
             stmt.setLong(6, table.getNumber());
             stmt.executeUpdate();
 
         } catch (SQLException e) {
             LOGGER.error("inserting table into database failed", e);
-            throw new DAOException(e);
+            throw new DAOException("inserting table into database failed", e);
         }
 
         generateHistory(table);
@@ -77,28 +111,30 @@ public class DBTableDAO implements DAO<Table> {
     @Override
     public void update(Table table) throws DAOException, ValidationException {
         LOGGER.debug("entering update with parameters " + table);
-        assert(table != null);
 
         validator.validateForUpdate(table);
 
         final String query = "UPDATE RestaurantTable SET " +
-                "section_ID = ?, seats = ?, tableRow = ?, tableColumn = ?, user_ID = ? WHERE number = ?";
+                "seats = ?, tableRow = ?, tableColumn = ?, user_ID = ISNULL(?, user_ID) WHERE number = ? AND section_ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, table.getSection().getIdentity());
-            stmt.setInt(2, table.getSeats());
-            stmt.setInt(3, table.getRow());
-            stmt.setInt(4, table.getColumn());
-            stmt.setString(5, table.getUser().getIdentity());
-            stmt.setLong(6, table.getNumber());
+            stmt.setInt(1, table.getSeats());
+            stmt.setInt(2, table.getRow());
+            stmt.setInt(3, table.getColumn());
+            if(table.getUser() == null)
+                stmt.setNull(4, Types.VARCHAR);
+            else
+                stmt.setString(4, table.getUser().getIdentity());
+            stmt.setLong(5, table.getNumber());
+            stmt.setLong(6, table.getSection().getIdentity());
 
             if (stmt.executeUpdate() == 0) {
-                throw new DAOException("updating failed: dataset not found");
+                throw new DAOException("updating table failed: dataset not found");
             }
 
         } catch (SQLException e) {
             LOGGER.error("updating table in database failed", e);
-            throw new DAOException(e);
+            throw new DAOException("updating table in database failed", e);
         }
 
         generateHistory(table);
@@ -113,21 +149,21 @@ public class DBTableDAO implements DAO<Table> {
     @Override
     public void delete(Table table) throws DAOException, ValidationException {
         LOGGER.debug("entering delete with parameters " + table);
-        assert(table != null);
 
         validator.validateForDelete(table);
 
-        final String query = "UPDATE RestaurantTable SET disabled = true WHERE number = ?";
+        final String query = "UPDATE RestaurantTable SET disabled = true WHERE number = ? AND section_ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, table.getNumber());
+            stmt.setLong(2, table.getSection().getIdentity());
             if (stmt.executeUpdate() == 0) {
-                throw new DAOException("delete failed: dataset not found");
+                throw new DAOException("delete table failed: dataset not found");
             }
 
         } catch (SQLException e) {
             LOGGER.error("deleting table failed", e);
-            throw new DAOException(e);
+            throw new DAOException("deleting table failed", e);
         }
 
         generateHistory(table);
@@ -144,50 +180,46 @@ public class DBTableDAO implements DAO<Table> {
     @Override
     public List<Table> find(Table table) throws DAOException {
         LOGGER.debug("entering find with parameters " + table);
-        assert(table != null);
+
+        if (table == null) {
+            return new ArrayList<>();
+        }
+
         String query = "SELECT * FROM RestaurantTable WHERE number = ISNULL(?, number) " +
                 "AND seats = ISNULL(?, seats) AND section_ID = ISNULL(?, section_ID)" +
                 "AND tableRow = ISNULL(?, tableRow) AND tableColumn = ISNULL(?, tableColumn)" +
-                "AND user_ID = ISNULL(?, user_ID) AND disabled = false";
+                "AND CASE WHEN (? IS NULL) THEN TRUE ELSE user_ID = ? END AND disabled = false";
 
         final List<Table> objects = new ArrayList<>();
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            if(table.getNumber() == null)
-                stmt.setNull(1, Types.VARCHAR);
-            else
-                stmt.setLong(1, table.getNumber());
-            if(table.getSeats() == null)
-                stmt.setNull(2, Types.VARCHAR);
-            else
-                stmt.setInt(2, table.getSeats());
+            stmt.setObject(1, table.getNumber());
+            stmt.setObject(2, table.getSeats());
             if(table.getSection() == null)
                 stmt.setNull(3, Types.VARCHAR);
             else
-                stmt.setLong(3, table.getSection().getIdentity());
-            if(table.getRow() == null)
-                stmt.setNull(4, Types.VARCHAR);
-            else
-                stmt.setInt(4, table.getRow());
-            if(table.getColumn() == null)
-                stmt.setNull(5, Types.VARCHAR);
-            else
-                stmt.setInt(5, table.getColumn());
-            if(table.getUser() == null)
+                stmt.setObject(3, table.getSection().getIdentity());
+            stmt.setObject(4, table.getRow());
+            stmt.setObject(5, table.getColumn());
+            if(table.getUser() == null) {
                 stmt.setNull(6, Types.VARCHAR);
-            else
-                stmt.setString(6, table.getUser().getIdentity());
+                stmt.setNull(7, Types.VARCHAR);
+            }
+            else {
+                stmt.setObject(6, table.getUser().getIdentity());
+                stmt.setObject(7, table.getUser().getIdentity());
+            }
+
             stmt.execute();
 
-            try (ResultSet result = stmt.getResultSet()) {
-                while (result.next()) {
-                    objects.add(parseResult(result));
-                }
+            ResultSet result = stmt.getResultSet();
+            while (result.next()) {
+                objects.add(parseResult(result));
             }
 
         } catch (SQLException e) {
             LOGGER.error("searching for table failed", e);
-            throw new DAOException(e);
+            throw new DAOException("searching for table failed", e);
         }
 
         return objects;
@@ -200,21 +232,21 @@ public class DBTableDAO implements DAO<Table> {
     @Override
     public List<Table> getAll() throws DAOException {
         LOGGER.debug("entering getAll");
+
         final String query = "SELECT * FROM RestaurantTable WHERE disabled = false";
         final List<Table> objects = new ArrayList<>();
 
         try (Statement stmt = dataSource.getConnection().createStatement()) {
             stmt.execute(query);
 
-            try (ResultSet result = stmt.getResultSet()) {
-                while (result.next()) {
-                    objects.add(parseResult(result));
-                }
+            ResultSet result = stmt.getResultSet();
+            while (result.next()) {
+                objects.add(parseResult(result));
             }
 
         } catch (SQLException e) {
             LOGGER.error("searching for all tables failed", e);
-            throw new DAOException(e);
+            throw new DAOException("searching for all tables failed", e);
         }
 
         return objects;
@@ -230,6 +262,7 @@ public class DBTableDAO implements DAO<Table> {
     @Override
     public List<History<Table>> getHistory(Table table) throws DAOException, ValidationException {
         LOGGER.debug("entering getHistory with parameters " + table);
+
         validator.validateIdentity(table);
 
         List<History<Table>> history = new ArrayList<>();
@@ -284,15 +317,15 @@ public class DBTableDAO implements DAO<Table> {
      */
     private Table parseResult(ResultSet result) throws SQLException, DAOException {
         Section matcherSection = new Section();
-        matcherSection.setIdentity(result.getLong(1));
+        matcherSection.setIdentity(result.getLong("section_ID"));
         User matcherUser = new User();
-        matcherUser.setIdentity(result.getString(6));
+        matcherUser.setIdentity(result.getString("user_ID"));
         Table table = new Table();
         table.setSection((Section) sectionDAO.find(matcherSection).get(0));
-        table.setNumber(result.getLong(2));
-        table.setSeats(result.getInt(3));
-        table.setRow(result.getInt(4));
-        table.setColumn(result.getInt(5));
+        table.setNumber(result.getLong("number"));
+        table.setSeats(result.getInt("seats"));
+        table.setRow(result.getInt("tableRow"));
+        table.setColumn(result.getInt("tableColumn"));
         table.setUser((User)userDAO.find(matcherUser).get(0));
         return table;
     }

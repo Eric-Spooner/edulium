@@ -7,7 +7,7 @@ public class Table {
     private Integer seats;
     private Long number;
     private Section section;
-    private User user;
+    private User user; // optional
     private Integer row;
     private Integer column;
 
@@ -29,6 +29,7 @@ public class Table {
 
     /**
      * @return the number of seats on this table
+     *         can be null
      */
     public Integer getSeats() {
         return seats;
@@ -43,6 +44,8 @@ public class Table {
 
     /**
      * @return the unique number of this table
+     *         can be null (if this instance does not represent
+     *         a persistent dataset)
      */
     public Long getNumber() {
         return number;
@@ -57,6 +60,7 @@ public class Table {
 
     /**
      * @return the row of this table
+     *         can be null
      */
     public Integer getRow() {
         return row;
@@ -71,6 +75,7 @@ public class Table {
 
     /**
      * @return the column of this table
+     *         can be null
      */
     public Integer getColumn() {
         return column;
@@ -85,6 +90,7 @@ public class Table {
 
     /**
      * @return the id of the section the table is located
+     *         can be null
      */
     public Section getSection() {
         return section;
@@ -99,13 +105,14 @@ public class Table {
 
     /**
      * @return the id of the user responsible for the table
+     *         can be null
      */
     public User getUser() {
         return user;
     }
 
     /**
-     * @param user sets the id of the user responsible for the table
+     * @param user sets the id of the user responsible for the table (optional)
      */
     public void setUser(User user) {
         this.user = user;
@@ -135,7 +142,6 @@ public class Table {
         if (row != null ? !row.equals(table.row) : table.row != null) return false;
         if (seats != null ? !seats.equals(table.seats) : table.seats != null) return false;
         if (section != null ? !section.equals(table.section) : table.section != null) return false;
-        if (user != null ? !user.equals(table.user) : table.user != null) return false;
 
         return true;
     }
