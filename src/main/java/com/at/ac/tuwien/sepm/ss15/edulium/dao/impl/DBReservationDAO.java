@@ -158,26 +158,25 @@ class DBReservationDAO implements DAO<Reservation> {
             // sadly we have to provide our own list of pairs - fake it with a list of question marks in the prepared stmt
             final String tablePairs = tables.stream().map(t -> "(?, ?)").collect(Collectors.joining(", "));
 
-            final String query = "SELECT * FROM (Reservation INNER JOIN (SELECT reservation_ID FROM ReservationAssoc " +
-                    "WHERE (table_section, table_number) IN (" + tablePairs + ") AND disabled = false) " +
-                    "ON ID = reservation_ID) WHERE ID = ISNULL(?, ID) AND name = ISNULL(?, name) " +
+            final String query = "SELECT * FROM Reservation WHERE ID = ISNULL(?, ID) AND name = ISNULL(?, name) " +
                     "AND reservationTime = ISNULL(?, reservationTime) AND quantity = ISNULL(?, quantity) " +
-                    "AND duration = ISNULL(?, duration) AND deleted = false GROUP BY ID";
+                    "AND duration = ISNULL(?, duration) AND deleted = false AND EXISTS (SELECT 1 FROM ReservationAssoc " +
+                    "WHERE reservation_ID = ID AND (table_section, table_number) IN (" + tablePairs + ") AND disabled = false)";
 
             try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
                 int index = 1;
-
-                // fill table pairs
-                for (Table table : tables) {
-                    stmt.setLong(index++, table.getSection().getIdentity());
-                    stmt.setLong(index++, table.getNumber());
-                }
 
                 stmt.setObject(index++, reservation.getIdentity());
                 stmt.setObject(index++, reservation.getName());
                 stmt.setObject(index++, reservation.getTime() != null ? Timestamp.valueOf(reservation.getTime()) : null);
                 stmt.setObject(index++, reservation.getQuantity());
                 stmt.setObject(index++, reservation.getDuration() != null ? reservation.getDuration().toMillis() : null);
+
+                // fill table pairs
+                for (Table table : tables) {
+                    stmt.setLong(index++, table.getSection().getIdentity());
+                    stmt.setLong(index++, table.getNumber());
+                }
 
                 ResultSet result = stmt.executeQuery();
                 while (result.next()) {
