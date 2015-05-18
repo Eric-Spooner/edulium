@@ -299,14 +299,38 @@ class DBReservationDAO implements DAO<Reservation> {
      * @return Reservation object with the data of the resultSet set
      * @throws SQLException if an error accessing the database occurred
      */
-    private Reservation reservationFromResultSet(ResultSet result) throws DAOException, SQLException {
+    private Reservation parseResult(ResultSet result) throws DAOException, SQLException {
         Reservation reservation = new Reservation();
         reservation.setIdentity(result.getLong("ID"));
         reservation.setTime(result.getTimestamp("reservationTime").toLocalDateTime());
         reservation.setName(result.getString("name"));
         reservation.setQuantity(result.getInt("quantity"));
         reservation.setDuration(Duration.ofMillis(result.getLong("duration")));
+        return reservation;
+    }
+
+    /**
+     * converts the database query output into a Reservation object and fetches all associated tables
+     * @param result database output
+     * @return Reservation object with the data of the resultSet set with all associated tables
+     * @throws SQLException if an error accessing the database occurred
+     */
+    private Reservation reservationFromResultSet(ResultSet result) throws DAOException, SQLException {
+        Reservation reservation = parseResult(result);
         reservation.setTables(getTablesForReservation(reservation));
+        return reservation;
+    }
+
+    /**
+     * converts the database query output into a Reservation object and fetches all associated tables from history table
+     * with the given change number
+     * @param result database output
+     * @return Reservation object with the data of the resultSet set with all associated tables (with the given change number)
+     * @throws SQLException if an error accessing the database occurred
+     */
+    private Reservation historyReservationFromResultSet(ResultSet result, long changeNumber) throws DAOException, SQLException {
+        Reservation reservation = parseResult(result);
+        reservation.setTables(getTablesForHistoryReservation(reservation, changeNumber));
         return reservation;
     }
 
@@ -325,19 +349,24 @@ class DBReservationDAO implements DAO<Reservation> {
             throw new DAOException("user not found");
         }
 
+        final long changeNumber = result.getLong("changeNr");
+
         // create history entry
         History<Reservation> historyEntry = new History<>();
         historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
-        historyEntry.setChangeNumber(result.getLong("changeNr"));
+        historyEntry.setChangeNumber(changeNumber);
         historyEntry.setDeleted(result.getBoolean("deleted"));
         historyEntry.setUser(storedUsers.get(0));
-        historyEntry.setData(reservationFromResultSet(result));
-
-        historyEntry.getData().setTables(getTablesForHistoryReservation(historyEntry.getData(), historyEntry.getChangeNumber()));
+        historyEntry.setData(historyReservationFromResultSet(result, changeNumber));
 
         return historyEntry;
     }
 
+    /**
+     * adds and/or updates all the reservation-table associations for the given reservation
+     * @param reservation reservation dataset
+     * @throws DAOException if an error accessing the database occurred
+     */
     private void updateReservationAssociations(Reservation reservation) throws DAOException {
         LOGGER.debug("Entering updateReservationAssociations with parameters: " + reservation);
 
@@ -374,6 +403,11 @@ class DBReservationDAO implements DAO<Reservation> {
         }
     }
 
+    /**
+     * searches all tables from the reservation-table associations for the given reservation
+     * @param reservation reservation dataset
+     * @throws DAOException if an error accessing the database occurred
+     */
     private List<Table> getTablesForReservation(Reservation reservation) throws DAOException {
         LOGGER.debug("Entering getTablesForReservation with parameters: " + reservation);
 
@@ -406,7 +440,13 @@ class DBReservationDAO implements DAO<Reservation> {
         return tables;
     }
 
-    private List<Table> getTablesForHistoryReservation(Reservation reservation, long changeNr) throws DAOException {
+    /**
+     * searches all tables from the reservation-table associations for the given reservation history with the given changeNumber
+     * @param reservation reservation history dataset
+     * @param changeNumber reservation history change number
+     * @throws DAOException if an error accessing the database occurred
+     */
+    private List<Table> getTablesForHistoryReservation(Reservation reservation, long changeNumber) throws DAOException {
         LOGGER.debug("Entering getTablesForHistoryReservation with parameters: " + reservation);
 
         final String query = "SELECT table_section, table_number FROM ReservationAssocHistory " +
@@ -416,7 +456,7 @@ class DBReservationDAO implements DAO<Reservation> {
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, reservation.getIdentity());
-            stmt.setLong(2, changeNr);
+            stmt.setLong(2, changeNumber);
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
