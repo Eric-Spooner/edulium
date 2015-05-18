@@ -105,7 +105,7 @@ public class TestReservationDAO extends AbstractDAOTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testCreate_addingInvalidObjecShouldFail() throws DAOException, ValidationException {
+    public void testCreate_addingInvalidObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
         Reservation reservation = new Reservation();
 
