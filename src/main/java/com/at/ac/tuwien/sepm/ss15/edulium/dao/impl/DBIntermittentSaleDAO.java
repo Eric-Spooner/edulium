@@ -15,7 +15,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -38,7 +37,7 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
 
         validator.validateForCreate(intermittentSale);
 
-        final String query = "INSERT INTO IntermittentSale (ID, monday, tuesday, wednesday, thursday, friday, saturday, sunday, fromDayTime, duration, enabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        final String query = "INSERT INTO IntermittentSale (sale_ID, monday, tuesday, wednesday, thursday, friday, saturday, sunday, fromDayTime, duration, enabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, intermittentSale.getIdentity());
@@ -68,7 +67,7 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
 
         validator.validateForUpdate(intermittentSale);
 
-        final String query = "UPDATE IntermittentSale SET monday = ?, tuesday = ?, wednesday = ?, thursday = ?, friday = ?, saturday = ?, sunday = ?, fromDayTime = ?, duration = ?, enabled = ? WHERE ID = ?";
+        final String query = "UPDATE IntermittentSale SET monday = ?, tuesday = ?, wednesday = ?, thursday = ?, friday = ?, saturday = ?, sunday = ?, fromDayTime = ?, duration = ?, enabled = ? WHERE sale_ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setBoolean(1, intermittentSale.getMonday());
@@ -101,7 +100,7 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
 
         validator.validateForDelete(intermittentSale);
 
-        final String query = "UPDATE IntermittentSale SET deleted = true WHERE ID = ?";
+        final String query = "UPDATE IntermittentSale SET deleted = true WHERE sale_ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, intermittentSale.getIdentity());
@@ -126,7 +125,7 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             return new ArrayList<>();
         }
 
-        final String query = "SELECT * FROM Sale WHERE ID = ISNULL(?, ID)" +
+        final String query = "SELECT * FROM IntermittentSale WHERE sale_ID = ISNULL(?, sale_ID)" +
                 " AND monday = ISNULL(?, monday)"+
                 " AND tuesday = ISNULL(?, tuesday)"+
                 " AND wednesday = ISNULL(?, wednesday)"+
@@ -193,7 +192,7 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
 
         validator.validateIdentity(intermittentSale);
 
-        final String query = "SELECT * FROM IntermittentSaleHistory WHERE ID = ? ORDER BY changeNr";
+        final String query = "SELECT * FROM IntermittentSaleHistory WHERE sale_ID = ? ORDER BY changeNr";
 
         List<History<IntermittentSale>> history = new ArrayList<>();
 
@@ -223,8 +222,8 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
 
         final String query = "INSERT INTO IntermittentSaleHistory " +
                 "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
-                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM IntermittentSaleHistory WHERE ID = ?) " +
-                "FROM IntermittentSale WHERE ID = ?)";
+                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM IntermittentSaleHistory WHERE sale_ID = ?) " +
+                "FROM IntermittentSale WHERE sale_ID = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
@@ -246,7 +245,7 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
      */
     private IntermittentSale intermittentSaleFromResultSet(ResultSet result) throws SQLException {
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(result.getLong("ID"));
+        intermittentSale.setIdentity(result.getLong("sale_ID"));
         intermittentSale.setMonday(result.getBoolean("monday"));
         intermittentSale.setTuesday(result.getBoolean("tuesday"));
         intermittentSale.setWednesday(result.getBoolean("wednesday"));
