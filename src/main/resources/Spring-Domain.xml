@@ -13,6 +13,7 @@
     <import resource="domain/Spring-UserValidator.xml" />
     <import resource="domain/Spring-InvoiceValidator.xml"/>
     <import resource="domain/Spring-TaxRateValidator.xml" />
+    <import resource="domain/Spring-ReservationValidator.xml" />
     <import resource="domain/Spring-MenuEntryValidator.xml" />
 
 </beans>
