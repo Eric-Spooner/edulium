@@ -283,8 +283,6 @@ class DBReservationDAO implements DAO<Reservation> {
             throw new DAOException("retrieving the change number failed", e);
         }
 
-        assert changeNr >= 0;
-
         generateReservationAssociationsHistory(reservation, changeNr);
     }
 
