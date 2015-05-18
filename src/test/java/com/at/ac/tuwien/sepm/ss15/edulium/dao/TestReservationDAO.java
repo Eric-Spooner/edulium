@@ -825,11 +825,11 @@ public class TestReservationDAO extends AbstractDAOTest {
         // update data
         Reservation reservation2 = new Reservation();
         reservation2.setIdentity(reservation1.getIdentity());
-        reservation1.setName("Maverick Meerkat");
-        reservation1.setTime(LocalDateTime.now());
-        reservation1.setDuration(Duration.ofMinutes(250));
-        reservation1.setQuantity(10);
-        reservation1.setTables(Arrays.asList(table1, table2));
+        reservation2.setName("Maverick Meerkat");
+        reservation2.setTime(LocalDateTime.now());
+        reservation2.setDuration(Duration.ofMinutes(250));
+        reservation2.setQuantity(10);
+        reservation2.setTables(Arrays.asList(table1, table2));
 
         LocalDateTime updateTime = LocalDateTime.now();
         reservationDAO.update(reservation2);
