@@ -41,9 +41,9 @@ public class DBSaleDAO implements DAO<Sale> {
         final String query = "INSERT INTO Sale (ID, name, deleted) VALUES (?, ?, ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setString(1, sale.getIdentity());
+            stmt.setLong(1, sale.getIdentity());
             stmt.setString(2, sale.getName());
-            stmt.setString(3, false);
+            stmt.setBoolean(3, false);
 
             stmt.executeUpdate();
         } catch (SQLException e) {

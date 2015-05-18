@@ -49,7 +49,7 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             stmt.setBoolean(6, intermittentSale.getFriday());
             stmt.setBoolean(7, intermittentSale.getSaturday());
             stmt.setBoolean(8, intermittentSale.getSunday());
-            stmt.setTime(9, intermittentSale.getFromDayTime());
+            stmt.setTimestamp(9, Timestamp.valueOf(intermittentSale.getFromDayTime()));
             stmt.setInt(10, intermittentSale.getDuration());
             stmt.setBoolean(11, intermittentSale.getEnabled());
 
@@ -78,7 +78,7 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             stmt.setBoolean(5, intermittentSale.getFriday());
             stmt.setBoolean(6, intermittentSale.getSaturday());
             stmt.setBoolean(7, intermittentSale.getSunday());
-            stmt.setTime(8, intermittentSale.getFromDayTime());
+            stmt.setTimestamp(8, Timestamp.valueOf(intermittentSale.getFromDayTime()));
             stmt.setInt(9, intermittentSale.getDuration());
             stmt.setBoolean(10, intermittentSale.getEnabled());
             stmt.setLong(11, intermittentSale.getIdentity());
@@ -156,7 +156,7 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                intermittentSales.add(saleFromResultSet(result));
+                intermittentSales.add(intermittentSaleFromResultSet(result));
             }
         } catch (SQLException e) {
             LOGGER.error("Searching for intermittentSales failed", e);
@@ -254,7 +254,7 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
         intermittentSale.setFriday(result.getBoolean("friday"));
         intermittentSale.setSaturday(result.getBoolean("saturday"));
         intermittentSale.setSunday(result.getBoolean("sunday"));
-        intermittentSale.setFromDayTime(result.getTime("fromDayTime"));
+        intermittentSale.setFromDayTime(result.getTimestamp("fromDayTime").toLocalDateTime());
         intermittentSale.setDuration(result.getInt("duration"));
         intermittentSale.setEnabled(result.getBoolean("enabled"));
         return intermittentSale;
