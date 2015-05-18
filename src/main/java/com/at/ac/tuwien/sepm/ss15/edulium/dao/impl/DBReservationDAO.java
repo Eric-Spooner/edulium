@@ -19,6 +19,7 @@ import java.sql.*;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the ReservationDAO interface
@@ -33,13 +34,15 @@ class DBReservationDAO implements DAO<Reservation> {
     @Autowired
     private DAO<Table> tableDAO;
     @Autowired
-    private Validator<Reservation> validator;
+    private Validator<Reservation> reservationValidator;
+    @Autowired
+    private Validator<Table> tableValidator;
 
     @Override
     public void create(Reservation reservation) throws DAOException, ValidationException {
         LOGGER.debug("Entering create with parameters: " + reservation);
 
-        validator.validateForCreate(reservation);
+        reservationValidator.validateForCreate(reservation);
 
         final String query = "INSERT INTO Reservation (reservationTime, name, quantity, duration) VALUES (?, ?, ?, ?)";
 
@@ -69,7 +72,7 @@ class DBReservationDAO implements DAO<Reservation> {
     public void update(Reservation reservation) throws DAOException, ValidationException {
         LOGGER.debug("Entering update with parameters: " + reservation);
 
-        validator.validateForUpdate(reservation);
+        reservationValidator.validateForUpdate(reservation);
 
         final String query = "UPDATE Reservation SET reservationTime = ?, name = ?, quantity = ?, duration = ? WHERE ID = ?";
 
@@ -98,7 +101,7 @@ class DBReservationDAO implements DAO<Reservation> {
     public void delete(Reservation reservation) throws DAOException, ValidationException {
         LOGGER.debug("Entering delete with parameters: " + reservation);
 
-        validator.validateForDelete(reservation);
+        reservationValidator.validateForDelete(reservation);
 
         final String query = "UPDATE Reservation SET closed = true WHERE ID = ?";
 
@@ -127,26 +130,69 @@ class DBReservationDAO implements DAO<Reservation> {
             return new ArrayList<>();
         }
 
-        final String query = "SELECT * FROM Reservation WHERE ID = ISNULL(?, ID) AND name = ISNULL(?, name) " +
-                "AND reservationTime = ISNULL(?, reservationTime) AND quantity = ISNULL(?, quantity) " +
-                "AND duration = ISNULL(?, duration) AND closed = false";
-
         final List<Reservation> reservations = new ArrayList<>();
 
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setObject(1, reservation.getIdentity());
-            stmt.setObject(2, reservation.getName());
-            stmt.setObject(3, reservation.getTime() != null ? Timestamp.valueOf(reservation.getTime()) : null);
-            stmt.setObject(4, reservation.getQuantity());
-            stmt.setObject(5, reservation.getDuration() != null ? reservation.getDuration().toMillis() : null);
+        if (reservation.getTables() == null) {  // query without tables - no ReservationAssoc join needed :)
+            final String query = "SELECT * FROM Reservation WHERE ID = ISNULL(?, ID) AND name = ISNULL(?, name) " +
+                    "AND reservationTime = ISNULL(?, reservationTime) AND quantity = ISNULL(?, quantity) " +
+                    "AND duration = ISNULL(?, duration) AND closed = false";
 
-            ResultSet result = stmt.executeQuery();
-            while (result.next()) {
-                reservations.add(reservationFromResultSet(result));
+            try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+                stmt.setObject(1, reservation.getIdentity());
+                stmt.setObject(2, reservation.getName());
+                stmt.setObject(3, reservation.getTime() != null ? Timestamp.valueOf(reservation.getTime()) : null);
+                stmt.setObject(4, reservation.getQuantity());
+                stmt.setObject(5, reservation.getDuration() != null ? reservation.getDuration().toMillis() : null);
+
+                ResultSet result = stmt.executeQuery();
+                while (result.next()) {
+                    reservations.add(reservationFromResultSet(result));
+                }
+            } catch (SQLException e) {
+                LOGGER.error("Searching for reservations failed", e);
+                throw new DAOException("Searching for reservations failed", e);
             }
-        } catch (SQLException e) {
-            LOGGER.error("Searching for reservations failed", e);
-            throw new DAOException("Searching for reservations failed", e);
+        } else { // more complex query with table - ReservationAssoc join required
+            // filter out all invalid tables
+            final List<Table> tables = reservation.getTables().stream().filter(table -> {
+                    try {
+                        tableValidator.validateIdentity(table);
+                        return true;
+                    } catch (ValidationException e) {
+                        return false;
+                    }
+                }).collect(Collectors.toList());
+
+            final String tablePairs = tables.stream().map(t -> "(?, ?)").collect(Collectors.joining(", "));
+            final String query = "SELECT * FROM (Reservation INNER JOIN (SELECT reservation_ID FROM ReservationAssoc " +
+                    "WHERE (table_section, table_number) IN (" + tablePairs + ") AND disabled = false) " +
+                    "ON ID = reservation_ID) WHERE ID = ISNULL(?, ID) AND name = ISNULL(?, name) " +
+                    "AND reservationTime = ISNULL(?, reservationTime) AND quantity = ISNULL(?, quantity) " +
+                    "AND duration = ISNULL(?, duration) AND closed = false GROUP BY ID";
+
+            try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+                int index = 1;
+
+                // fill table pairs
+                for (Table table : tables) {
+                    stmt.setLong(index++, table.getSection().getIdentity());
+                    stmt.setLong(index++, table.getNumber());
+                }
+
+                stmt.setObject(index++, reservation.getIdentity());
+                stmt.setObject(index++, reservation.getName());
+                stmt.setObject(index++, reservation.getTime() != null ? Timestamp.valueOf(reservation.getTime()) : null);
+                stmt.setObject(index++, reservation.getQuantity());
+                stmt.setObject(index++, reservation.getDuration() != null ? reservation.getDuration().toMillis() : null);
+
+                ResultSet result = stmt.executeQuery();
+                while (result.next()) {
+                    reservations.add(reservationFromResultSet(result));
+                }
+            } catch (SQLException e) {
+                LOGGER.error("Searching for reservations failed", e);
+                throw new DAOException("Searching for reservations failed", e);
+            }
         }
 
         return reservations;
@@ -177,7 +223,7 @@ class DBReservationDAO implements DAO<Reservation> {
     public List<History<Reservation>> getHistory(Reservation reservation) throws DAOException, ValidationException {
         LOGGER.debug("Entering getHistory with parameters: " + reservation);
 
-        validator.validateIdentity(reservation);
+        reservationValidator.validateIdentity(reservation);
 
         final String query = "SELECT * FROM ReservationHistory WHERE ID = ? ORDER BY changeNr";
 
@@ -317,19 +363,12 @@ class DBReservationDAO implements DAO<Reservation> {
     private void deleteReservationAssociations(Reservation reservation) throws DAOException {
         LOGGER.debug("Entering deleteReservationAssociation with parameters: " + reservation);
 
-        final String query = "UPDATE ReservationAssoc SET disabled = true WHERE reservation_ID = ? AND " +
-                "table_section = ? AND table_number = ?";
+        final String query = "UPDATE ReservationAssoc SET disabled = true WHERE reservation_ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            for (Table table : reservation.getTables()) {
-                stmt.setLong(1, reservation.getIdentity());
-                stmt.setLong(2, table.getSection().getIdentity());
-                stmt.setLong(3, table.getNumber());
+            stmt.setLong(1, reservation.getIdentity());
 
-                stmt.addBatch();
-            }
-
-            stmt.executeBatch();
+            stmt.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error("Deleting reservation-table associations from database failed", e);
             throw new DAOException("Deleting reservation-table associations from database failed", e);

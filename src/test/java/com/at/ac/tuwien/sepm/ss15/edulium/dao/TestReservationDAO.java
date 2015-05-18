@@ -629,31 +629,69 @@ public class TestReservationDAO extends AbstractDAOTest {
         reservation3.setTime(LocalDateTime.now());
         reservation3.setDuration(Duration.ofMinutes(200));
         reservation3.setQuantity(30);
-        reservation3.setTables(Arrays.asList(table1, table2));
+        reservation3.setTables(Arrays.asList(table2, table3));
 
         reservationDAO.create(reservation3);
         assertEquals(1, reservationDAO.find(reservation3).size());
 
         // GIVEN
-        Reservation matcher1 = new Reservation(); // for reservation 1, reservation 2 and reservation 3
+        Reservation matcher1 = new Reservation(); // for reservation 1 and reservation 2
         matcher1.setTables(Arrays.asList(table1));
 
-        Reservation matcher2 = new Reservation(); // for reservation 2 and reservation 3
+        Reservation matcher2 = new Reservation(); // for reservation 1, reservation 2 and reservation 3
         matcher2.setTables(Arrays.asList(table1, table2));
+
+        Reservation matcher3 = new Reservation(); // for reservation 2 and reservation 3
+        matcher3.setTables(Arrays.asList(table2));
+
+        Reservation matcher4 = new Reservation(); // reservation 2 and reservation 3
+        matcher4.setTables(Arrays.asList(table2, table3));
+
+        Reservation matcher5 = new Reservation(); // for reservation 3
+        matcher5.setTables(Arrays.asList(table3));
+
+        Reservation matcher6 = new Reservation(); // for reservation 1, reservation 2 and reservation 3
+        matcher6.setTables(Arrays.asList(table1, table2, table3));
+
+        Reservation matcher7 = new Reservation(); // empty
+        matcher7.setTables(Arrays.asList());
 
         // WHEN
         List<Reservation> result1 = reservationDAO.find(matcher1);
         List<Reservation> result2 = reservationDAO.find(matcher2);
+        List<Reservation> result3 = reservationDAO.find(matcher3);
+        List<Reservation> result4 = reservationDAO.find(matcher4);
+        List<Reservation> result5 = reservationDAO.find(matcher5);
+        List<Reservation> result6 = reservationDAO.find(matcher6);
+        List<Reservation> result7 = reservationDAO.find(matcher7);
 
         // THEN
-        assertEquals(3, result1.size());
+        assertEquals(2, result1.size());
         assertTrue(result1.contains(reservation1));
-        assertTrue(result1.contains(reservation2));
-        assertTrue(result1.contains(reservation3));
+        assertTrue(result1.contains(reservation2));;
 
-        assertEquals(2, result2.size());
+        assertEquals(3, result2.size());
+        assertTrue(result2.contains(reservation1));
         assertTrue(result2.contains(reservation2));
         assertTrue(result2.contains(reservation3));
+
+        assertEquals(2, result3.size());
+        assertTrue(result3.contains(reservation2));
+        assertTrue(result3.contains(reservation3));
+
+        assertEquals(2, result4.size());
+        assertTrue(result4.contains(reservation2));
+        assertTrue(result4.contains(reservation3));
+
+        assertEquals(1, result5.size());
+        assertTrue(result5.contains(reservation3));
+
+        assertEquals(3, result6.size());
+        assertTrue(result6.contains(reservation1));
+        assertTrue(result6.contains(reservation2));
+        assertTrue(result6.contains(reservation3));
+
+        assertEquals(0, result7.size());
     }
 
     @Test
