@@ -314,7 +314,7 @@ class DBReservationDAO implements DAO<Reservation> {
     }
 
     private void createReservationAssociations(Reservation reservation) throws DAOException {
-        LOGGER.debug("Entering createReservationAssociation with parameters: " + reservation);
+        LOGGER.debug("Entering createReservationAssociations with parameters: " + reservation);
 
         final String query = "INSERT INTO ReservationAssoc (reservation_ID, table_section, table_number) VALUES (?, ?, ?)";
 
@@ -337,7 +337,7 @@ class DBReservationDAO implements DAO<Reservation> {
     }
 
     private void updateReservationAssociations(Reservation reservation) throws DAOException {
-        LOGGER.debug("Entering updateReservationAssociation with parameters: " + reservation);
+        LOGGER.debug("Entering updateReservationAssociations with parameters: " + reservation);
 
         final String query = "MERGE INTO ReservationAssoc (reservation_ID, table_section, table_number, disabled) " +
                 "KEY (reservation_ID, table_section, table_number) VALUES (?, ?, ?, false)";
@@ -361,7 +361,7 @@ class DBReservationDAO implements DAO<Reservation> {
     }
 
     private void deleteReservationAssociations(Reservation reservation) throws DAOException {
-        LOGGER.debug("Entering deleteReservationAssociation with parameters: " + reservation);
+        LOGGER.debug("Entering deleteReservationAssociations with parameters: " + reservation);
 
         final String query = "UPDATE ReservationAssoc SET disabled = true WHERE reservation_ID = ?";
 
