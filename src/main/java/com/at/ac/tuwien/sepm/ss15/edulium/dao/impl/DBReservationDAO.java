@@ -275,12 +275,12 @@ class DBReservationDAO implements DAO<Reservation> {
             if (result.next()) {
                 changeNr = result.getLong(1);
             } else {
-                LOGGER.error("retrieving the change number failed");
-                throw new DAOException("retrieving the change number failed");
+                LOGGER.error("retrieving the change number failed, reservation history not found");
+                throw new DAOException("retrieving the change number failed, reservation history not found");
             }
         } catch (SQLException e) {
-            LOGGER.error("generating history for reservation failed", e);
-            throw new DAOException("generating history for reservation failed", e);
+            LOGGER.error("retrieving the change number failed", e);
+            throw new DAOException("retrieving the change number failed", e);
         }
 
         assert changeNr >= 0;
