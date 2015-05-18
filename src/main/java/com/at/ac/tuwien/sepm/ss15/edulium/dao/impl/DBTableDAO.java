@@ -286,16 +286,16 @@ class DBTableDAO implements DAO<Table> {
     private Table parseResult(ResultSet result) throws SQLException, DAOException {
         Table table = new Table();
         // get user
-        List storedUsers = userDAO.find(User.withIdentity(result.getString("user_ID")));
+        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("user_ID")));
         if (storedUsers.size() == 1) {
-            table.setUser((User) storedUsers.get(0));
+            table.setUser(storedUsers.get(0));
         }
         // get section
-        List storedSections = sectionDAO.find(Section.withIdentity(Long.valueOf(result.getString("section_ID"))));
+        List<Section> storedSections = sectionDAO.find(Section.withIdentity(Long.valueOf(result.getString("section_ID"))));
         if (storedSections.size() != 1) {
             throw new DAOException("section must not be null");
         }
-        table.setSection((Section) storedSections.get(0));
+        table.setSection(storedSections.get(0));
         table.setNumber(result.getLong("number"));
         table.setSeats(result.getInt("seats"));
         table.setRow(result.getInt("tableRow"));

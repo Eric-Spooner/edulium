@@ -1,6 +1,8 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class TableValidator implements Validator<Table> {
     @Autowired
-    UserValidator userValidator;
+    Validator<User> userValidator;
     @Autowired
-    SectionValidator sectionValidator;
+    Validator<Section> sectionValidator;
 
     /**
      * validates the object for the create action
@@ -56,7 +58,7 @@ public class TableValidator implements Validator<Table> {
     @Override
     public void validateIdentity(Table table) throws ValidationException {
         if (table == null) {
-            throw new ValidationException("table  must not be null");
+            throw new ValidationException("table must not be null");
         }
 
         if (table.getNumber() == null) {
@@ -73,8 +75,8 @@ public class TableValidator implements Validator<Table> {
     /**
      * validates if the data attribute parameters are set
      *
-     * @param table
-     * @throws ValidationException
+     * @param table object to validate
+     * @throws ValidationException if the parameters of the object are not set correctly
      */
     private void checkForRequiredDataAttributesForCreateAndUpdate(Table table) throws ValidationException {
         validateIdentity(table);
