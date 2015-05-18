@@ -27,21 +27,31 @@ public class TestReservationDAO extends AbstractDAOTest {
     @Autowired
     private DAO<Section> sectionDAO; // only to create test sections
 
+    private Section section1; // table 1 and table 3
+    private Section section2; // table 2
+
     private Table table1;
     private Table table2;
     private Table table3;
 
     @Before
     public void before() throws ValidationException, DAOException {
-        Section section = new Section();
-        section.setIdentity(1L);
-        section.setName("Section");
+        section1 = new Section();
+        section1.setIdentity(1L);
+        section1.setName("Section1");
 
-        sectionDAO.create(section);
-        assertEquals(1, sectionDAO.find(section).size());
+        sectionDAO.create(section1);
+        assertEquals(1, sectionDAO.find(section1).size());
+
+        section2 = new Section();
+        section2.setIdentity(2L);
+        section2.setName("Section2");
+
+        sectionDAO.create(section2);
+        assertEquals(1, sectionDAO.find(section2).size());
 
         table1 = new Table();
-        table1.setSection(section);
+        table1.setSection(section1);
         table1.setNumber(1L);
         table1.setColumn(1);
         table1.setRow(1);
@@ -51,7 +61,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         assertEquals(1, tableDAO.find(table1).size());
 
         table2 = new Table();
-        table2.setSection(section);
+        table2.setSection(section2);
         table2.setNumber(2L);
         table2.setColumn(2);
         table2.setRow(2);
@@ -61,7 +71,7 @@ public class TestReservationDAO extends AbstractDAOTest {
         assertEquals(1, tableDAO.find(table2).size());
 
         table3 = new Table();
-        table3.setSection(section);
+        table3.setSection(section1);
         table3.setNumber(3L);
         table3.setColumn(3);
         table3.setRow(3);
@@ -656,6 +666,22 @@ public class TestReservationDAO extends AbstractDAOTest {
         Reservation matcher7 = new Reservation(); // empty
         matcher7.setTables(Arrays.asList());
 
+        // search by section 1
+        Table tableMatcherSection1 = new Table();
+        tableMatcherSection1.setSection(section1);
+        Reservation matcher8 = new Reservation(); // for reservation 1 and reservation 3
+        matcher8.setTables(Arrays.asList(tableMatcherSection1));
+
+        // search by section 2
+        Table tableMatcherSection2 = new Table();
+        tableMatcherSection2.setSection(section2);
+        Reservation matcher9 = new Reservation(); // for reservation 2
+        matcher9.setTables(Arrays.asList(tableMatcherSection2));
+
+        // search by section 1 and section 2
+        Reservation matcher10 = new Reservation(); // for reservation 1, reservation 2 and reservation 3
+        matcher10.setTables(Arrays.asList(tableMatcherSection1, tableMatcherSection2));
+
         // WHEN
         List<Reservation> result1 = reservationDAO.find(matcher1);
         List<Reservation> result2 = reservationDAO.find(matcher2);
@@ -664,6 +690,9 @@ public class TestReservationDAO extends AbstractDAOTest {
         List<Reservation> result5 = reservationDAO.find(matcher5);
         List<Reservation> result6 = reservationDAO.find(matcher6);
         List<Reservation> result7 = reservationDAO.find(matcher7);
+        List<Reservation> result8 = reservationDAO.find(matcher8);
+        List<Reservation> result9 = reservationDAO.find(matcher9);
+        List<Reservation> result10 = reservationDAO.find(matcher10);
 
         // THEN
         assertEquals(2, result1.size());
@@ -692,6 +721,18 @@ public class TestReservationDAO extends AbstractDAOTest {
         assertTrue(result6.contains(reservation3));
 
         assertEquals(0, result7.size());
+
+        assertEquals(2, result8.size());
+        assertTrue(result8.contains(reservation1));
+        assertTrue(result8.contains(reservation3));
+
+        assertEquals(1, result9.size());
+        assertTrue(result9.contains(reservation2));
+
+        assertEquals(3, result10.size());
+        assertTrue(result10.contains(reservation1));
+        assertTrue(result10.contains(reservation2));
+        assertTrue(result10.contains(reservation3));
     }
 
     @Test
