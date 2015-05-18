@@ -58,6 +58,7 @@ public class UserValidator implements Validator<User> {
         if (user.getName().isEmpty()) {
             throw new ValidationException("name must not be empty");
         }
+
         if (user.getRole() == null) {
             throw new ValidationException("role must not be null");
         }
