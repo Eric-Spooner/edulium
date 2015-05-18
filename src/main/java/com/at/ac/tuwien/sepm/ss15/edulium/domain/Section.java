@@ -16,6 +16,7 @@ public class Section {
 
     /**
      * Creates a new section object and assigns the given identity to it.
+     *
      * @param identity the identity of the section
      * @return section object with the given identity
      */
@@ -27,8 +28,8 @@ public class Section {
 
     /**
      * @return the unique identity of the section
-     *         can be null (if this instance does not represent
-     *         a persistent dataset)
+     * can be null (if this instance does not represent
+     * a persistent dataset)
      */
     public Long getIdentity() {
         return identity;
@@ -43,7 +44,7 @@ public class Section {
 
     /**
      * @return the name of the section
-     *         can be null
+     * can be null
      */
     public String getName() {
         return name;

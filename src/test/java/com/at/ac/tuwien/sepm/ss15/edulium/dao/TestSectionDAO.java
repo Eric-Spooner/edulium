@@ -145,7 +145,7 @@ public class TestSectionDAO extends AbstractDAOTest {
         Section section = new Section();
         section.setName("section");
         sectionDAO.create(section);
-        
+
         // check if section created
         Assert.assertEquals(1, sectionDAO.find(section).size());
 
@@ -357,7 +357,7 @@ public class TestSectionDAO extends AbstractDAOTest {
         // create data
         Section section1 = new Section();
         section1.setName("section");
-        section1.setIdentity((long)1);
+        section1.setIdentity((long) 1);
         LocalDateTime createTime = LocalDateTime.now();
         sectionDAO.create(section1);
 

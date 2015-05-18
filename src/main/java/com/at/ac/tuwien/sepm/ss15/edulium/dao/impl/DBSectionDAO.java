@@ -33,6 +33,7 @@ class DBSectionDAO implements DAO<Section> {
     /**
      * writes the object into the database and sets the identity parameter of
      * section
+     *
      * @param section object to store
      * @throws DAOException if an error accessing the database occurred
      */
@@ -65,9 +66,10 @@ class DBSectionDAO implements DAO<Section> {
 
     /**
      * updates the object in the database
+     *
      * @param section object to update
      * @throws DAOException if an error accessing the database ocurred or if the
-     *         dataset was not found in the database
+     *                      dataset was not found in the database
      */
     @Override
     public void update(Section section) throws DAOException, ValidationException {
@@ -95,9 +97,10 @@ class DBSectionDAO implements DAO<Section> {
 
     /**
      * removes the object from the database
+     *
      * @param section object to remove
      * @throws DAOException if an error accessing the database occurred or if
-     *         the dataset was not found in the database
+     *                      the dataset was not found in the database
      */
     @Override
     public void delete(Section section) throws DAOException, ValidationException {
@@ -125,6 +128,7 @@ class DBSectionDAO implements DAO<Section> {
      * returns all objects from the database which parameters match the
      * parameters of the object section
      * all parameters with value NULL will not be used for matching
+     *
      * @param section object used for matching
      * @return returns a list of objects from the database which match the criteria
      * @throws DAOException if an error accessing the database occurred
@@ -190,9 +194,9 @@ class DBSectionDAO implements DAO<Section> {
     /**
      * @param section object to get the history for
      * @return returns the history of changes for the section object
-     * @throws DAOException if the data couldn't be retrieved
+     * @throws DAOException        if the data couldn't be retrieved
      * @throws ValidationException if the section object parameters are
-     *         not valid for this action
+     *                             not valid for this action
      */
     @Override
     public List<History<Section>> getHistory(Section section) throws DAOException, ValidationException {
@@ -222,6 +226,7 @@ class DBSectionDAO implements DAO<Section> {
      * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed
      * the changes
+     *
      * @param section updated dataset
      * @throws DAOException if an error accessing the database occurred
      */
@@ -247,6 +252,7 @@ class DBSectionDAO implements DAO<Section> {
 
     /**
      * converts the database query output into a object
+     *
      * @param result database output
      * @return Section object with the data of the resultSet set
      * @throws SQLException if an error accessing the database occurred
@@ -260,6 +266,7 @@ class DBSectionDAO implements DAO<Section> {
 
     /**
      * converts the database query output into a history entry object
+     *
      * @param result database output
      * @return History object with the data of the resultSet set
      * @throws SQLException if an error accessing the database occurred

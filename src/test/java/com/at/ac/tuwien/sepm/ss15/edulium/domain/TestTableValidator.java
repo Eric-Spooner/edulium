@@ -44,7 +44,7 @@ public class TestTableValidator extends AbstractDomainTest {
     @Test(expected = ValidationException.class)
     public void testValidateForCreate_tableWithInvalidNumberShouldThrow() throws ValidationException, DAOException {
         // GIVEN
-        table.setNumber((long)-1);
+        table.setNumber((long) -1);
 
         // WHEN
         tableValidator.validateForCreate(table);
@@ -168,7 +168,7 @@ public class TestTableValidator extends AbstractDomainTest {
     @Test(expected = ValidationException.class)
     public void testValidateForUpdate_tableWithInvalidNumberShouldThrow() throws ValidationException, DAOException {
         // GIVEN
-        table.setNumber((long)-1);
+        table.setNumber((long) -1);
 
         // WHEN
         tableValidator.validateForUpdate(table);
@@ -292,7 +292,7 @@ public class TestTableValidator extends AbstractDomainTest {
     @Test(expected = ValidationException.class)
     public void testValidateForDelete_tableWithInvalidNumberShouldThrow() throws ValidationException {
         // GIVEN
-        table.setNumber((long)-1);
+        table.setNumber((long) -1);
 
         // WHEN
         tableValidator.validateForDelete(table);
@@ -343,7 +343,7 @@ public class TestTableValidator extends AbstractDomainTest {
     @Test(expected = ValidationException.class)
     public void testValidateIdentity_tableWithInvalidNumberShouldThrow() throws ValidationException {
         // GIVEN
-        table.setNumber((long)-1);
+        table.setNumber((long) -1);
 
         // WHEN
         tableValidator.validateIdentity(table);
