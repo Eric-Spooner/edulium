@@ -4,11 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="Spring-Context.xml" />
-
-    <!-- Validator beans -->
-    <import resource="domain/Spring-MenuCategoryValidator.xml" />
-    <import resource="domain/Spring-UserValidator.xml" />
-    <import resource="domain/Spring-TaxRateValidator.xml" />
+    <bean id="menuEntryDAO" class="com.at.ac.tuwien.sepm.ss15.edulium.dao.impl.DBMenuEntryDAO">
+    </bean>
 
 </beans>
