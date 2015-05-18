@@ -202,7 +202,7 @@ public class TestTableDAO extends AbstractDAOTest {
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // GIVEN
         Table table = new Table();
-        table.setNumber((long)1);
+        table.setNumber((long) 1);
         table.setSection(section1);
         table.setUser(user1);
         table.setSeats(3);
@@ -780,6 +780,15 @@ public class TestTableDAO extends AbstractDAOTest {
     }
 
     @Test
+    public void testFindNull_shouldReturnEmptyList() throws DAOException {
+        // WHEN
+        List<Table> storedObjects = tableDAO.find(null);
+
+        // THEN
+        Assert.assertTrue(storedObjects.isEmpty());
+    }
+
+    @Test
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         Table matcher = new Table();
@@ -795,13 +804,13 @@ public class TestTableDAO extends AbstractDAOTest {
         table2.setSeats(13);
         table2.setColumn(14);
         table2.setRow(15);
-        table2.setNumber((long)2);
+        table2.setNumber((long) 2);
         table2.setUser(user2);
         table2.setSection(section2);
         table3.setSeats(23);
         table3.setColumn(24);
         table3.setRow(25);
-        table3.setNumber((long)3);
+        table3.setNumber((long) 3);
         table3.setUser(user3);
         table3.setSection(section3);
         tableDAO.create(table1);

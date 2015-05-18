@@ -13,8 +13,9 @@ public class Table {
 
     /**
      * Creates a new table object and assigns the given number and section to it.
+     *
      * @param section section the table is located
-     * @param number number of the table
+     * @param number  number of the table
      * @return table with assigned identity parameters
      */
     public static Table withIdentity(Section section, long number) {
@@ -26,7 +27,7 @@ public class Table {
 
     /**
      * @return the number of seats on this table
-     *         can be null
+     * can be null
      */
     public Integer getSeats() {
         return seats;
@@ -41,8 +42,8 @@ public class Table {
 
     /**
      * @return the unique number of this table
-     *         can be null (if this instance does not represent
-     *         a persistent dataset)
+     * can be null (if this instance does not represent
+     * a persistent dataset)
      */
     public Long getNumber() {
         return number;
@@ -57,7 +58,7 @@ public class Table {
 
     /**
      * @return the row of this table
-     *         can be null
+     * can be null
      */
     public Integer getRow() {
         return row;
@@ -72,7 +73,7 @@ public class Table {
 
     /**
      * @return the column of this table
-     *         can be null
+     * can be null
      */
     public Integer getColumn() {
         return column;
@@ -87,8 +88,8 @@ public class Table {
 
     /**
      * @return the id of the section the table is located
-     *         can be null (if this instance does not represent
-     *         a persistent dataset)
+     * can be null (if this instance does not represent
+     * a persistent dataset)
      */
     public Section getSection() {
         return section;
@@ -103,7 +104,7 @@ public class Table {
 
     /**
      * @return the id of the user responsible for the table
-     *         can be null
+     * can be null
      */
     public User getUser() {
         return user;

@@ -13,11 +13,10 @@ import java.util.List;
 public class Section {
     private Long identity;
     private String name;
-    @Autowired
-    private DAO<Table> tableDAO;
 
     /**
      * Creates a new section object and assigns the given identity to it.
+     *
      * @param identity the identity of the section
      * @return section object with the given identity
      */
@@ -29,8 +28,8 @@ public class Section {
 
     /**
      * @return the unique identity of the section
-     *         can be null (if this instance does not represent
-     *         a persistent dataset)
+     * can be null (if this instance does not represent
+     * a persistent dataset)
      */
     public Long getIdentity() {
         return identity;
@@ -45,7 +44,7 @@ public class Section {
 
     /**
      * @return the name of the section
-     *         can be null
+     * can be null
      */
     public String getName() {
         return name;
@@ -56,43 +55,6 @@ public class Section {
      */
     public void setName(String name) {
         this.name = name;
-    }
-
-    /**
-     * @return a list of tables in this section
-     *         can be empty if there are no tables in this section
-     */
-    public List getTables() throws DAOException {
-        Table matcher = new Table();
-        matcher.setSection(this);
-        List tableList;
-
-        try {
-            tableList = tableDAO.find(matcher);
-        }
-        catch(DAOException e) {
-            throw new DAOException("cannot find table", e);
-        }
-
-        return tableList;
-    }
-
-    /**
-     * @param table adds one table to this section,
-     *               already existing tables are not changed
-     */
-    public void setTable(Table table) {
-        table.setSection(this);
-    }
-
-    /**
-     * @param tables adds multiple tables to this section,
-     *               already existing tables are not changed
-     */
-    public void setTables(ArrayList<Table> tables) {
-        for(Table table : tables) {
-            table.setSection(this);
-        }
     }
 
     @Override
@@ -110,7 +72,7 @@ public class Section {
 
         Section section = (Section) o;
 
-        if (identity != section.identity) return false;
+        if (identity != null ? !identity.equals(section.identity) : section.identity != null) return false;
         if (name != null ? !name.equals(section.name) : section.name != null) return false;
 
         return true;

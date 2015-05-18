@@ -36,6 +36,7 @@ class DBTableDAO implements DAO<Table> {
     /**
      * writes the object into the database and sets the identity parameter of
      * table
+     *
      * @param table object to store
      * @throws DAOException if an error accessing the database occurred
      */
@@ -51,8 +52,8 @@ class DBTableDAO implements DAO<Table> {
         }
 
         final String query = "MERGE INTO RestaurantTable (section_ID, number, seats, tableRow, tableColumn, user_ID, disabled) " +
-                             "KEY (section_ID, number) " +
-                             "VALUES (?, ?, ?, ?, ?, ?, false)";
+                "KEY (section_ID, number) " +
+                "VALUES (?, ?, ?, ?, ?, ?, false)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, table.getSection().getIdentity());
@@ -73,9 +74,10 @@ class DBTableDAO implements DAO<Table> {
 
     /**
      * updates the object in the database
+     *
      * @param table object to update
      * @throws DAOException if an error accessing the database ocurred or if the
-     *         dataset was not found in the database
+     *                      dataset was not found in the database
      */
     @Override
     public void update(Table table) throws DAOException, ValidationException {
@@ -90,10 +92,7 @@ class DBTableDAO implements DAO<Table> {
             stmt.setInt(1, table.getSeats());
             stmt.setInt(2, table.getRow());
             stmt.setInt(3, table.getColumn());
-            if(table.getUser() == null)
-                stmt.setNull(4, Types.VARCHAR);
-            else
-                stmt.setString(4, table.getUser().getIdentity());
+            stmt.setString(4, table.getUser() != null ? table.getUser().getIdentity() : null); // optional
             stmt.setLong(5, table.getNumber());
             stmt.setLong(6, table.getSection().getIdentity());
 
@@ -111,9 +110,10 @@ class DBTableDAO implements DAO<Table> {
 
     /**
      * removes the object from the database
+     *
      * @param table object to remove
      * @throws DAOException if an error accessing the database occurred or if
-     *         the dataset was not found in the database
+     *                      the dataset was not found in the database
      */
     @Override
     public void delete(Table table) throws DAOException, ValidationException {
@@ -142,6 +142,7 @@ class DBTableDAO implements DAO<Table> {
      * returns all objects from the database which parameters match the
      * parameters of the object table
      * all parameters with value NULL will not be used for matching
+     *
      * @param table object used for matching
      * @return returns a list of objects from the database which match the criteria
      * @throws DAOException if an error accessing the database occurred
@@ -164,17 +165,13 @@ class DBTableDAO implements DAO<Table> {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setObject(1, table.getNumber());
             stmt.setObject(2, table.getSeats());
-            if(table.getSection() == null)
-                stmt.setNull(3, Types.VARCHAR);
-            else
-                stmt.setObject(3, table.getSection().getIdentity());
+            stmt.setObject(3, table.getSection() != null ? table.getSection().getIdentity() : null);
             stmt.setObject(4, table.getRow());
             stmt.setObject(5, table.getColumn());
-            if(table.getUser() == null) {
+            if (table.getUser() == null) {
                 stmt.setNull(6, Types.VARCHAR);
                 stmt.setNull(7, Types.VARCHAR);
-            }
-            else {
+            } else {
                 stmt.setObject(6, table.getUser().getIdentity());
                 stmt.setObject(7, table.getUser().getIdentity());
             }
@@ -224,9 +221,9 @@ class DBTableDAO implements DAO<Table> {
     /**
      * @param table object to get the history for
      * @return returns the history of changes for the table object
-     * @throws DAOException if the data couldn't be retrieved
+     * @throws DAOException        if the data couldn't be retrieved
      * @throws ValidationException if the table object parameters are
-     *         not valid for this action
+     *                             not valid for this action
      */
     @Override
     public List<History<Table>> getHistory(Table table) throws DAOException, ValidationException {
@@ -255,6 +252,7 @@ class DBTableDAO implements DAO<Table> {
      * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed
      * the changes
+     *
      * @param table updated dataset
      * @throws DAOException if an error accessing the database occurred
      */
@@ -280,27 +278,35 @@ class DBTableDAO implements DAO<Table> {
 
     /**
      * converts the database query output into a object
+     *
      * @param result database output
      * @return Table object with the data of the resultSet set
      * @throws SQLException if an error accessing the database occurred
      */
     private Table parseResult(ResultSet result) throws SQLException, DAOException {
-        Section matcherSection = new Section();
-        matcherSection.setIdentity(result.getLong("section_ID"));
-        User matcherUser = new User();
-        matcherUser.setIdentity(result.getString("user_ID"));
         Table table = new Table();
-        table.setSection((Section) sectionDAO.find(matcherSection).get(0));
+        // get user
+        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("user_ID")));
+        if (storedUsers.size() == 1) {
+            table.setUser(storedUsers.get(0));
+        }
+        // get section
+        List<Section> storedSections = sectionDAO.find(Section.withIdentity(Long.valueOf(result.getString("section_ID"))));
+        if (storedSections.size() != 1) {
+            throw new DAOException("section must not be null");
+        }
+        table.setSection(storedSections.get(0));
         table.setNumber(result.getLong("number"));
         table.setSeats(result.getInt("seats"));
         table.setRow(result.getInt("tableRow"));
         table.setColumn(result.getInt("tableColumn"));
-        table.setUser((User)userDAO.find(matcherUser).get(0));
+
         return table;
     }
 
     /**
      * converts the database query output into a history entry object
+     *
      * @param result database output
      * @return History object with the data of the resultSet set
      * @throws SQLException if an error accessing the database occurred

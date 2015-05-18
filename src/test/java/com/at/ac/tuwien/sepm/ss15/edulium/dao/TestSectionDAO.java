@@ -18,8 +18,6 @@ import java.util.List;
  * Unit Test for the SectionDAO
  */
 public class TestSectionDAO extends AbstractDAOTest {
-    private static final Logger LOGGER = LogManager.getLogger(TestSectionDAO.class);
-
     @Autowired
     private DAO<Section> sectionDAO;
 
@@ -147,7 +145,7 @@ public class TestSectionDAO extends AbstractDAOTest {
         Section section = new Section();
         section.setName("section");
         sectionDAO.create(section);
-        
+
         // check if section created
         Assert.assertEquals(1, sectionDAO.find(section).size());
 
@@ -288,6 +286,15 @@ public class TestSectionDAO extends AbstractDAOTest {
     }
 
     @Test
+    public void testFindNull_shouldReturnEmptyList() throws DAOException {
+        // WHEN
+        List<Section> storedObjects = sectionDAO.find(null);
+
+        // THEN
+        Assert.assertTrue(storedObjects.isEmpty());
+    }
+
+    @Test
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         Section section1 = new Section();
@@ -350,7 +357,7 @@ public class TestSectionDAO extends AbstractDAOTest {
         // create data
         Section section1 = new Section();
         section1.setName("section");
-        section1.setIdentity((long)1);
+        section1.setIdentity((long) 1);
         LocalDateTime createTime = LocalDateTime.now();
         sectionDAO.create(section1);
 
