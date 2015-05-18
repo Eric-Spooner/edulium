@@ -3,11 +3,16 @@ package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * implementation of the TableValidator
  */
 public class TableValidator implements Validator<Table> {
+    @Autowired
+    UserValidator userValidator;
+    @Autowired
+    SectionValidator sectionValidator;
 
     /**
      * validates the object for the create action
@@ -36,37 +41,7 @@ public class TableValidator implements Validator<Table> {
      */
     @Override
     public void validateForDelete(Table table) throws ValidationException {
-        if(table == null) {
-            throw new ValidationException("table must not be null");
-        }
-
-        if(table.getNumber() == null) {
-            throw new ValidationException("number must not be null");
-        }
-
-        if(table.getNumber() < 0) {
-            throw new ValidationException("number must not be < 0");
-        }
-
-        if(table.getSection() == null) {
-            throw new ValidationException("section must not be null");
-        }
-
-        if(table.getSection().getIdentity() == null) {
-            throw new ValidationException("section identity must not be null");
-        }
-
-        if(table.getColumn() != null && table.getColumn() < 0) {
-            throw new ValidationException("column must not be < 0");
-        }
-
-        if(table.getRow() != null && table.getRow() < 0) {
-            throw new ValidationException("row must not be < 0");
-        }
-
-        if(table.getSeats() != null && table.getSeats() < 0) {
-            throw new ValidationException("seats must not be < 0");
-        }
+        validateIdentity(table);
     }
 
     /**
@@ -77,7 +52,7 @@ public class TableValidator implements Validator<Table> {
     @Override
     public void validateIdentity(Table table) throws ValidationException {
         if(table == null) {
-            throw new ValidationException("object must not be null");
+            throw new ValidationException("table  must not be null");
         }
 
         if(table.getNumber() == null) {
@@ -88,13 +63,7 @@ public class TableValidator implements Validator<Table> {
             throw new ValidationException("number must not be < 0");
         }
 
-        if(table.getSection() == null) {
-            throw new ValidationException("section must not be null");
-        }
-
-        if(table.getSection().getIdentity() == null) {
-            throw new ValidationException("section identity must not be null");
-        }
+        sectionValidator.validateIdentity(table.getSection());
     }
 
     /**
@@ -129,8 +98,8 @@ public class TableValidator implements Validator<Table> {
             throw new ValidationException("seats must not be < 0");
         }
 
-        if(table.getUser() != null && table.getUser().getIdentity() == null) {
-            throw new ValidationException("user identity must not be null");
+        if(table.getUser() != null) { // optional
+            userValidator.validateIdentity(table.getUser());
         }
     }
 }

@@ -71,7 +71,7 @@ public class Section {
 
         Section section = (Section) o;
 
-        if (identity != section.identity) return false;
+        if (identity != null ? !identity.equals(section.identity) : section.identity != null) return false;
         if (name != null ? !name.equals(section.name) : section.name != null) return false;
 
         return true;

@@ -62,7 +62,7 @@ public class SectionValidator implements Validator<Section> {
     @Override
     public void validateIdentity(Section section) throws ValidationException {
         if(section == null) {
-            throw new ValidationException("object must not be null");
+            throw new ValidationException("section must not be null");
         }
         if(section.getIdentity() == null) {
             throw new ValidationException("identity must not be null");
