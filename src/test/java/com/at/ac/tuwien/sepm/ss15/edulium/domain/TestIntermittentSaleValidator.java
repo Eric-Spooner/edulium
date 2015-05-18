@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 /**
  * Unit Test for the TestIntermittentSaleValidator validator
  */
+//TODO: complete
 public class TestIntermittentSaleValidator extends AbstractDomainTest {
     @Autowired
     private Validator<IntermittentSale> saleValidator;
