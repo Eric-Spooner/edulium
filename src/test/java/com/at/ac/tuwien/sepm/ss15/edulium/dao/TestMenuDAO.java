@@ -62,7 +62,7 @@ public class TestMenuDAO extends AbstractDAOTest {
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
         //Given
-        LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list = new LinkedList<>();
         list.add(createMenuEntry("entry", "desc", "cat", 20, 0.2, true));
         Menu men = createMenu("Menu", list);
 
@@ -95,7 +95,7 @@ public class TestMenuDAO extends AbstractDAOTest {
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         //  GIVEN
-        LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list = new LinkedList<>();
         list.add(createMenuEntry("entry", "desc", "cat", 20, 0.2, true));
         Menu men = createMenu("Menu", list);
         menuDAO.create(men);
@@ -104,7 +104,7 @@ public class TestMenuDAO extends AbstractDAOTest {
         assertEquals(men, menuDAO.find(Menu.withIdentity(men.getIdentity())).get(0));
 
         // WHEN
-        LinkedList<MenuEntry> list2 = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list2 = new LinkedList<>();
         list2.add(createMenuEntry("entry2", "descnew", "newcat", 19, 0.2, true));
         Menu updatedMenu = createMenu("newMenu", list2);
         updatedMenu.setIdentity(men.getIdentity());
@@ -120,7 +120,7 @@ public class TestMenuDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testUpdate_updatingObjectWithIdentityNullShouldFail() throws DAOException, ValidationException {
         //Given
-        LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list = new LinkedList<>();
         list.add(createMenuEntry("entry", "desc", "cat", 20, 0.2, true));
         Menu men = createMenu("Menu", list);
 
@@ -147,7 +147,7 @@ public class TestMenuDAO extends AbstractDAOTest {
             fail();
         }
 
-        LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list = new LinkedList<>();
         list.add(createMenuEntry("entry", "desc", "cat", 20, 0.2, true));
         Menu men2 = createMenu("Menu", list);
         men2.setIdentity(men.getIdentity()+1);
@@ -159,7 +159,7 @@ public class TestMenuDAO extends AbstractDAOTest {
     @Test
     public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // GIVEN
-        LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list = new LinkedList<>();
         list.add(createMenuEntry("entry", "desc", "cat", 20, 0.2, true));
         Menu men = createMenu("Menu", list);
         menuDAO.create(men);
@@ -213,17 +213,17 @@ public class TestMenuDAO extends AbstractDAOTest {
     @Test
     public void testFind_byIdentityShouldReturnObject() throws DAOException, ValidationException {
         // GIVEN
-        LinkedList<MenuEntry> list1 = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list1 = new LinkedList<>();
         list1.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
         Menu men1 = createMenu("Menu1", list1);
         menuDAO.create(men1);
 
-        LinkedList<MenuEntry> list2 = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list2 = new LinkedList<>();
         list2.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
         Menu men2 = createMenu("Menu2", list2);
         menuDAO.create(men2);
 
-        LinkedList<MenuEntry> list3 = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list3 = new LinkedList<>();
         list3.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
         Menu men3 = createMenu("Menu3", list3);
         menuDAO.create(men3);
@@ -252,17 +252,17 @@ public class TestMenuDAO extends AbstractDAOTest {
         // GIVEN
         Menu matcher = new Menu();
 
-        LinkedList<MenuEntry> list1 = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list1 = new LinkedList<>();
         list1.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
         Menu men1 = createMenu("Menu", list1);
         menuDAO.create(men1);
 
-        LinkedList<MenuEntry> list2 = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list2 = new LinkedList<>();
         list2.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
         Menu men2 = createMenu("Menu", list2);
         menuDAO.create(men2);
 
-        LinkedList<MenuEntry> list3 = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list3 = new LinkedList<>();
         list3.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
         Menu men3 = createMenu("Menu3", list3);
         menuDAO.create(men3);
@@ -347,13 +347,13 @@ public class TestMenuDAO extends AbstractDAOTest {
 
         // GIVEN
         // create data
-        LinkedList<MenuEntry> list1 = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list1 = new LinkedList<>();
         list1.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
         Menu men1 = createMenu("Menu1", list1);
         LocalDateTime createTime = LocalDateTime.now();
         menuDAO.create(men1);
 
-        LinkedList<MenuEntry> list2 = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list2 = new LinkedList<>();
         list2.add(createMenuEntry("entry2", "desc", "cat", 20, 0.2, true));
         Menu men2 = createMenu("Menu2", list2);
         men2.setIdentity(men1.getIdentity());
@@ -412,17 +412,17 @@ public class TestMenuDAO extends AbstractDAOTest {
     @Test
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
-        LinkedList<MenuEntry> list1 = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list1 = new LinkedList<>();
         list1.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
         Menu men1 = createMenu("Menu", list1);
         menuDAO.create(men1);
 
-        LinkedList<MenuEntry> list2 = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list2 = new LinkedList<>();
         list2.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
         Menu men2 = createMenu("Menu", list2);
         menuDAO.create(men2);
 
-        LinkedList<MenuEntry> list3 = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list3 = new LinkedList<>();
         list3.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
         Menu men3 = createMenu("Menu3", list3);
         menuDAO.create(men3);
@@ -440,7 +440,7 @@ public class TestMenuDAO extends AbstractDAOTest {
     @Test
     public void testUpdate_DeleteMenuEntryAndAddSameEntryAgain() throws DAOException, ValidationException {
         //  GIVEN
-        LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
+        LinkedList<MenuEntry> list = new LinkedList<>();
         list.add(createMenuEntry("entry1", "desc1", "cat", 20, 0.2, true));
         list.add(createMenuEntry("entry2", "desc2", "cat", 20, 0.2, true));
         Menu men = createMenu("Menu", list);
@@ -474,4 +474,81 @@ public class TestMenuDAO extends AbstractDAOTest {
         assertEquals(1, storedObjects.size());
         assertEquals(men, storedObjects.get(0));
     }
+
+    @Test
+    public void testFind_searchForMenuByMenuEntries() throws DAOException, ValidationException {
+        //GIVEN
+        LinkedList<MenuEntry> list = new LinkedList<>();
+        list.add(createMenuEntry("entry1", "desc1", "cat", 20, 0.2, true));
+        list.add(createMenuEntry("entry2", "desc2", "cat", 20, 0.2, true));
+        Menu men = createMenu("Menu", list);
+        menuDAO.create(men);
+
+        LinkedList<MenuEntry> list2 = new LinkedList<>();
+        list2.add(createMenuEntry("entry3", "desc1", "cat", 20, 0.2, true));
+        list2.add(createMenuEntry("entry4", "desc2", "cat", 20, 0.2, true));
+        Menu men2 = createMenu("Menu2", list2);
+        menuDAO.create(men2);
+
+
+        //WHEN
+        Menu matcher = new Menu();
+        matcher.setEntries(men.getEntries());
+
+        // THEN
+        // check if entry was updated
+        List<Menu> storedObjects = menuDAO.find(matcher);
+        System.out.println(storedObjects);
+        assertEquals(1, storedObjects.size());
+        assertEquals(men, storedObjects.get(0));
+
+
+        //WHEN
+        matcher = new Menu();
+        matcher.setEntries(men2.getEntries());
+
+        // THEN
+        // check if entry was updated
+        storedObjects = menuDAO.find(matcher);
+        System.out.println(storedObjects);
+        assertEquals(1, storedObjects.size());
+        assertEquals(men2, storedObjects.get(0));
+    }
+
+    @Test
+    public void testFind_searchForMenuByMenuEntriesFurtherTests() throws DAOException, ValidationException {
+        //GIVEN
+        LinkedList<MenuEntry> list = new LinkedList<>();
+        list.add(createMenuEntry("entry1", "desc1", "cat", 20, 0.2, true));
+        list.add(createMenuEntry("entry2", "desc2", "cat", 20, 0.2, true));
+        Menu men = createMenu("Menu", list);
+        menuDAO.create(men);
+
+        LinkedList<MenuEntry> list2 = new LinkedList<>();
+        list2.add(createMenuEntry("entry3", "desc1", "cat", 20, 0.2, true));
+        list2.add(createMenuEntry("entry4", "desc2", "cat", 20, 0.2, true));
+        Menu men2 = createMenu("Menu2", list2);
+        menuDAO.create(men2);
+
+        //WHEN
+        MenuEntry entry = men.getEntries().get(0);
+        List<MenuEntry> newList = men2.getEntries();
+        newList.add(entry);
+        men2.setEntries(newList);
+        menuDAO.update(men2);
+
+        Menu matcher = new Menu();
+        newList = new LinkedList<>();
+        newList.add(entry);
+        matcher.setEntries(newList);
+
+        // THEN
+        // check if entry was updated
+        List<Menu> storedObjects = menuDAO.find(matcher);
+        System.out.println(storedObjects);
+        assertEquals(2, storedObjects.size());
+        assertTrue(storedObjects.contains(men));
+        assertTrue(storedObjects.contains(men2));
+    }
+
 }

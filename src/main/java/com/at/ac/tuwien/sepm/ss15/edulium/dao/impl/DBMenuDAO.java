@@ -91,7 +91,7 @@ class DBMenuDAO implements DAO<Menu> {
          * If the entry is not found, then delete it. If there are entries left in the MenuEntrys copy than
          * create new MenuAssoc
          */
-        List<MenuEntry> menuEntries = new LinkedList<MenuEntry>(menu.getEntries());
+        List<MenuEntry> menuEntries = new LinkedList<>(menu.getEntries());
         final String queryGetMenuAssoc = "SELECT * FROM MenuAssoc WHERE menu_ID = ? AND disabled = false";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryGetMenuAssoc)) {
@@ -102,16 +102,17 @@ class DBMenuDAO implements DAO<Menu> {
                 //Look, if the entry ID is in the list
                 //Contains is not appropiate, because the entries only have the same ID
                 Boolean found = false;
+                MenuEntry foundEntry = null;
                 for(MenuEntry entry1 : menuEntries){
                     if(entry1.getIdentity().equals(entry.getIdentity())) {
                         found = true;
-                        //Delete the entry, in order to be able to check at the end, if new MenuAssoc have to be made
-                        menuEntries.remove(entry1);
+                        foundEntry = entry1;
                     }
                 }
                 if(found){
                     //The Entry is in the list, so update the price
                     updateMenuAssoc(menu, entry, entry.getPrice());
+                    menuEntries.remove(foundEntry);
                 }else{
                     //The Entry is not in the list, so it should be deleted
                     deleteMenuAssoc(menu, entry);
@@ -157,7 +158,7 @@ class DBMenuDAO implements DAO<Menu> {
             generateHistoryMenuAssoc(menu, entry, changeNr);
         }
 
-        menu.setEntries(new LinkedList<MenuEntry>());
+        menu.setEntries(new LinkedList<>());
     }
 
     @Override
@@ -168,40 +169,51 @@ class DBMenuDAO implements DAO<Menu> {
             return new ArrayList<>();
         }
 
-        String query = "SELECT * FROM Menu WHERE " +
-                "ID = ISNULL(?, ID) AND " +
-                "name = ISNULL(?, name) AND " +
-                "deleted = false";
-
         final List<Menu> objects = new ArrayList<>();
 
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setObject(1, menu.getIdentity());
-            stmt.setObject(2, menu.getName());
-
-            ResultSet result = stmt.executeQuery();
-            while (result.next()) {
-                objects.add(parseResult(result));
-            }
-        } catch (SQLException e) {
-            LOGGER.error("searching for menu entries failed", e);
-            throw new DAOException("searching for menu entries failed", e);
-        }
-
-        //TODO
         //Check if the user also wants to search for MenuEntries
-        //if the name or the id are != null then check the entries, which have already been found with the entries
-        if(menu.getName() != null || menu.getIdentity() != null){
-            //Search, if the menu has also min. on entry of the MenuEntries
-        }else{
-            //Give back the menus, which have at least one of the given MenuEntries
-            String queryByMenuEntry = "SELECT * FROM (Menu m Join MenuAssoc ma) WHERE " +
-                    "m.deleted = false AND ma.disabled = false AND menuEntry_ID in ?" +
-                    "Group By m.ID";
+        if(menu.getEntries() != null && menu.getEntries().size()>0){
+            //at first find the MenuEntries, which have been given in the menu
+            List<Long> list = new LinkedList<>();
+            for(MenuEntry entry: menu.getEntries()) {
+                    List<MenuEntry> innerList = menuEntryDAO.find(entry);
+                    for(MenuEntry newEntry: innerList){
+                        list.add(newEntry.getIdentity());
+                    }
+            }
+            String queryByMenuEntry =
+                    "SELECT m.ID, m.name FROM (Menu m  JOIN MenuAssoc ma ON m.id  = ma.menu_id) WHERE " +
+                        "m.deleted = false AND ma.disabled = false AND " +
+                        "m.ID = ISNULL(?, ID) AND " +
+                        "m.name = ISNULL(?, name) AND " +
+                        "ma.menuEntry_ID in (" +
+                        getQuestionMarks(list.size()) +
+                        ") " +
+                        "Group By m.ID";
 
             objects.clear();
 
             try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryByMenuEntry)) {
+                stmt.setObject(1, menu.getIdentity());
+                stmt.setObject(2, menu.getName());
+                for (int i = 0; i<list.size(); i++){
+                    stmt.setLong(i+3, list.get(i));
+                }
+
+                ResultSet result = stmt.executeQuery();
+                while (result.next()) {
+                    objects.add(parseResult(result));
+                }
+            } catch (SQLException e) {
+                LOGGER.error("searching for menu entries failed", e);
+                throw new DAOException("searching for menu entries failed", e);
+            }
+        }else{ //Only search for the name and/or the id
+            String query = "SELECT * FROM Menu WHERE " +
+                       "ID = ISNULL(?, ID) AND " +
+                       "name = ISNULL(?, name) AND " +
+                       "deleted = false";
+            try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
                 stmt.setObject(1, menu.getIdentity());
                 stmt.setObject(2, menu.getName());
 
@@ -214,8 +226,24 @@ class DBMenuDAO implements DAO<Menu> {
                 throw new DAOException("searching for menu entries failed", e);
             }
         }
-
         return objects;
+    }
+
+    /**
+     * is used to produce a list of question marks
+     * @param amount the amount of question marks
+     * @return string, with amount number of question marks, spaced by ,
+     */
+    private String getQuestionMarks(int amount) {
+        String retval = "";
+        for (int i = 0; i < amount; i++){
+            if (retval.length() > 0) {
+                retval += ",?";
+            } else {
+                retval += "?";
+            }
+        }
+        return retval;
     }
 
     @Override
@@ -271,7 +299,7 @@ class DBMenuDAO implements DAO<Menu> {
         menu.setIdentity(result.getLong("ID"));
         menu.setName(result.getString("name"));
         /*Get the MenuEntries over MenuAssoc*/
-        List<MenuEntry> menuEntries = new LinkedList<MenuEntry>();
+        List<MenuEntry> menuEntries = new LinkedList<>();
         String query = "SELECT * FROM MenuAssoc WHERE " +
                 "menu_ID = ? AND " +
                 "disabled = false";
@@ -376,7 +404,7 @@ class DBMenuDAO implements DAO<Menu> {
             throw new DAOException("user not found");
         }
         // create history entry
-        History<Menu> historyEntry = new History<Menu>();
+        History<Menu> historyEntry = new History<>();
         historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
         historyEntry.setChangeNumber(result.getLong("changeNr"));
         historyEntry.setDeleted(result.getBoolean("deleted"));
@@ -400,7 +428,7 @@ class DBMenuDAO implements DAO<Menu> {
         menu.setIdentity(result.getLong("ID"));
         menu.setName(result.getString("name"));
         /*Get the MenuEntries over MenuAssocHistory*/
-        List<MenuEntry> menuEntries = new LinkedList<MenuEntry>();
+        List<MenuEntry> menuEntries = new LinkedList<>();
         String query = "SELECT * FROM MenuAssocHistory WHERE " +
                 "menu_ID = ? AND changeNr = ? AND disabled = false";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
