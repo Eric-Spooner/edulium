@@ -1,10 +1,12 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.util.LinkedList;
 
 /**
@@ -14,11 +16,29 @@ public class TestMenuValidator extends AbstractDomainTest {
     @Autowired
     private Validator<Menu> menuValidator;
 
+    private MenuEntry createMenuEntry(String name, String desc, String cat, double price, double tax, boolean available)
+            throws ValidationException {
+        MenuCategory menuCategory = MenuCategory.withIdentity(3);
+        menuCategory.setName(cat);
+
+        TaxRate taxRate = TaxRate.withIdentity(4);
+        taxRate.setValue(BigDecimal.valueOf(tax));
+
+        MenuEntry entry = MenuEntry.withIdentity(3);
+        entry.setCategory(menuCategory);
+        entry.setTaxRate(taxRate);
+        entry.setName(name);
+        entry.setDescription(desc);
+        entry.setPrice(BigDecimal.valueOf(price));
+        entry.setAvailable(available);
+        return entry;
+    }
+
     @Test
     public void testValidateForCreate_shouldAcceptMenu() throws ValidationException {
         // GIVEN
         LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
-        list.add(MenuEntry.withIdentity(5));
+        list.add(createMenuEntry("name", "desc", "cat", 50, 0.02, true));
         Menu menu = new Menu();
         menu.setName("Menu");
         menu.setEntries(list);
@@ -96,7 +116,7 @@ public class TestMenuValidator extends AbstractDomainTest {
         menu.setIdentity(0L);
         menu.setName("Menu");
         LinkedList<MenuEntry> list = new LinkedList<MenuEntry>();
-        list.add(MenuEntry.withIdentity(5));
+        list.add(createMenuEntry("name", "desc", "cat", 50, 0.02, true));
         menu.setEntries(list);
 
         // WHEN

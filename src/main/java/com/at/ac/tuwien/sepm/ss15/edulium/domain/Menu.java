@@ -40,17 +40,6 @@ public class Menu{
     }
 
     /**
-     * Initialise the list, if its null and add the given entry
-     * @param entry (should not be null)
-     */
-    public void addEntry(MenuEntry entry){
-        if(this.entries == null){
-            this.entries = new LinkedList<MenuEntry>();
-            this.entries.add(entry);
-        }
-    }
-
-    /**
      *
      * @return the identity of the menu
      */

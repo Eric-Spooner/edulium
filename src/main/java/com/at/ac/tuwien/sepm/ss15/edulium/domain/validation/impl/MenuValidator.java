@@ -1,14 +1,19 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * validator implementation for the Menu domain object
  */
 public class MenuValidator implements Validator<Menu> {
+    @Autowired
+    private Validator<MenuEntry> menuEntryValidator;
+
     @Override
     public void validateForCreate(Menu object) throws ValidationException {
         if(object == null) {
@@ -47,19 +52,18 @@ public class MenuValidator implements Validator<Menu> {
     private void checkForRequiredDataAttributesForCreateAndUpdate(Menu object) throws ValidationException {
         if(object.getName() == null){
             throw new ValidationException("Menu name must not be null");
-        }else if(object.getName() == ""){
+        }
+        if(object.getName() == ""){
             throw new ValidationException("Menu name must not be empty");
         }
         if(object.getEntries() == null){
             throw new ValidationException("Menu entries not be null");
-        }else if(object.getEntries().size() == 0){
+        }
+        if(object.getEntries().size() == 0){
             throw new ValidationException("There should be at least one menu entry");
-        }else{
-            for(MenuEntry entry:object.getEntries()){
-                if(entry.getIdentity() == null) {
-                    throw new ValidationException("Every MenuEntry must have an Identity");
-                }
-            }
+        }
+        for(MenuEntry entry:object.getEntries()){
+            menuEntryValidator.validateForUpdate(entry);
         }
     }
 }
