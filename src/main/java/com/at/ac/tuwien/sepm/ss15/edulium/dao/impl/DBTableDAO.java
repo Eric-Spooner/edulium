@@ -161,10 +161,7 @@ class DBTableDAO implements DAO<Table> {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setObject(1, table.getNumber());
             stmt.setObject(2, table.getSeats());
-            if(table.getSection() == null)
-                stmt.setNull(3, Types.VARCHAR);
-            else
-                stmt.setObject(3, table.getSection().getIdentity());
+            stmt.setObject(3, table.getSection() != null ? table.getSection().getIdentity() : null);
             stmt.setObject(4, table.getRow());
             stmt.setObject(5, table.getColumn());
             if(table.getUser() == null) {
@@ -282,17 +279,19 @@ class DBTableDAO implements DAO<Table> {
      * @throws SQLException if an error accessing the database occurred
      */
     private Table parseResult(ResultSet result) throws SQLException, DAOException {
-        Section matcherSection = new Section();
-        matcherSection.setIdentity(result.getLong("section_ID"));
-        User matcherUser = new User();
-        matcherUser.setIdentity(result.getString("user_ID"));
         Table table = new Table();
-        table.setSection((Section) sectionDAO.find(matcherSection).get(0));
+        List storedSections = sectionDAO.find(Section.withIdentity(Long.valueOf(result.getString("section_ID"))));
+        if (storedSections.size() == 1) {
+            table.setSection((Section)storedSections.get(0));
+        }
         table.setNumber(result.getLong("number"));
         table.setSeats(result.getInt("seats"));
         table.setRow(result.getInt("tableRow"));
         table.setColumn(result.getInt("tableColumn"));
-        table.setUser((User)userDAO.find(matcherUser).get(0));
+        List storedUsers = userDAO.find(User.withIdentity(result.getString("user_ID")));
+        if (storedUsers.size() == 1) {
+            table.setUser((User)storedUsers.get(0));
+        }
         return table;
     }
 
