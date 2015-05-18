@@ -103,7 +103,7 @@ class DBReservationDAO implements DAO<Reservation> {
 
         reservationValidator.validateForDelete(reservation);
 
-        final String query = "UPDATE Reservation SET closed = true WHERE ID = ?";
+        final String query = "UPDATE Reservation SET deleted = true WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, reservation.getIdentity());
@@ -135,7 +135,7 @@ class DBReservationDAO implements DAO<Reservation> {
         if (reservation.getTables() == null) {  // query without tables - no ReservationAssoc join needed :)
             final String query = "SELECT * FROM Reservation WHERE ID = ISNULL(?, ID) AND name = ISNULL(?, name) " +
                     "AND reservationTime = ISNULL(?, reservationTime) AND quantity = ISNULL(?, quantity) " +
-                    "AND duration = ISNULL(?, duration) AND closed = false";
+                    "AND duration = ISNULL(?, duration) AND deleted = false";
 
             try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
                 stmt.setObject(1, reservation.getIdentity());
@@ -168,7 +168,7 @@ class DBReservationDAO implements DAO<Reservation> {
                     "WHERE (table_section, table_number) IN (" + tablePairs + ") AND disabled = false) " +
                     "ON ID = reservation_ID) WHERE ID = ISNULL(?, ID) AND name = ISNULL(?, name) " +
                     "AND reservationTime = ISNULL(?, reservationTime) AND quantity = ISNULL(?, quantity) " +
-                    "AND duration = ISNULL(?, duration) AND closed = false GROUP BY ID";
+                    "AND duration = ISNULL(?, duration) AND deleted = false GROUP BY ID";
 
             try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
                 int index = 1;
@@ -202,7 +202,7 @@ class DBReservationDAO implements DAO<Reservation> {
     public List<Reservation> getAll() throws DAOException {
         LOGGER.debug("Entering getAll");
 
-        final String query = "SELECT * FROM Reservation WHERE closed = false";
+        final String query = "SELECT * FROM Reservation WHERE deleted = false";
 
         final List<Reservation> reservations = new ArrayList<>();
 

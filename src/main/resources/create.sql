@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS Reservation (
     name VARCHAR(100),
     quantity INT,
     duration BIGINT,
-    closed BOOLEAN DEFAULT FALSE
+    deleted BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS ReservationHistory (
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS ReservationHistory (
     name VARCHAR(100),
     quantity INT,
     duration BIGINT,
-    closed BOOLEAN,
+    deleted BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
