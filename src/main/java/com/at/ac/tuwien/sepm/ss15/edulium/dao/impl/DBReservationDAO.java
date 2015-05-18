@@ -11,6 +11,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -63,9 +64,8 @@ class DBReservationDAO implements DAO<Reservation> {
             throw new DAOException("Inserting reservation into database failed", e);
         }
 
+        updateReservationAssociations(reservation);
         generateHistory(reservation);
-
-        createReservationAssociations(reservation);
     }
 
     @Override
@@ -92,9 +92,8 @@ class DBReservationDAO implements DAO<Reservation> {
             throw new DAOException("Updating reservation in database failed", e);
         }
 
-        generateHistory(reservation);
-
         updateReservationAssociations(reservation);
+        generateHistory(reservation);
     }
 
     @Override
@@ -118,8 +117,6 @@ class DBReservationDAO implements DAO<Reservation> {
         }
 
         generateHistory(reservation);
-
-        deleteReservationAssociations(reservation);
     }
 
     @Override
@@ -163,7 +160,9 @@ class DBReservationDAO implements DAO<Reservation> {
                     }
                 }).collect(Collectors.toList());
 
+            // sadly we have to provide our own list of pairs - fake it with a list of question marks in the prepared stmt
             final String tablePairs = tables.stream().map(t -> "(?, ?)").collect(Collectors.joining(", "));
+
             final String query = "SELECT * FROM (Reservation INNER JOIN (SELECT reservation_ID FROM ReservationAssoc " +
                     "WHERE (table_section, table_number) IN (" + tablePairs + ") AND disabled = false) " +
                     "ON ID = reservation_ID) WHERE ID = ISNULL(?, ID) AND name = ISNULL(?, name) " +
@@ -268,6 +267,30 @@ class DBReservationDAO implements DAO<Reservation> {
             LOGGER.error("generating history for reservation failed", e);
             throw new DAOException("generating history for reservation failed", e);
         }
+
+        // get the latest history change number
+        final String queryChangeNr = "SELECT MAX(changeNr) FROM ReservationHistory WHERE ID = ?";
+
+        long changeNr = -1;
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryChangeNr)) {
+            stmt.setLong(1, reservation.getIdentity());
+
+            ResultSet result = stmt.executeQuery();
+            if (result.next()) {
+                changeNr = result.getLong(1);
+            } else {
+                LOGGER.error("retrieving the change number failed");
+                throw new DAOException("retrieving the change number failed");
+            }
+        } catch (SQLException e) {
+            LOGGER.error("generating history for reservation failed", e);
+            throw new DAOException("generating history for reservation failed", e);
+        }
+
+        assert changeNr >= 0;
+
+        generateReservationAssociationsHistory(reservation, changeNr);
     }
 
     /**
@@ -310,30 +333,9 @@ class DBReservationDAO implements DAO<Reservation> {
         historyEntry.setUser(storedUsers.get(0));
         historyEntry.setData(reservationFromResultSet(result));
 
+        historyEntry.getData().setTables(getTablesForHistoryReservation(historyEntry.getData(), historyEntry.getChangeNumber()));
+
         return historyEntry;
-    }
-
-    private void createReservationAssociations(Reservation reservation) throws DAOException {
-        LOGGER.debug("Entering createReservationAssociations with parameters: " + reservation);
-
-        final String query = "INSERT INTO ReservationAssoc (reservation_ID, table_section, table_number) VALUES (?, ?, ?)";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            for (Table table : reservation.getTables()) {
-                stmt.setLong(1, reservation.getIdentity());
-                stmt.setLong(2, table.getSection().getIdentity());
-                stmt.setLong(3, table.getNumber());
-
-                stmt.addBatch();
-            }
-
-            stmt.executeBatch();
-        } catch (SQLException e) {
-            LOGGER.error("Inserting reservation-table associations into database failed", e);
-            throw new DAOException("Inserting reservation-table associations into database failed", e);
-        }
-
-        //generateHistory(reservation);
     }
 
     private void updateReservationAssociations(Reservation reservation) throws DAOException {
@@ -341,12 +343,22 @@ class DBReservationDAO implements DAO<Reservation> {
 
         // disable all reservation-table associations for now, the update sql query will re-enable all valid
         // associations
-        deleteReservationAssociations(reservation);
+        final String queryDisableAssocs = "UPDATE ReservationAssoc SET disabled = true WHERE reservation_ID = ?";
 
-        final String query = "MERGE INTO ReservationAssoc (reservation_ID, table_section, table_number, disabled) " +
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryDisableAssocs)) {
+            stmt.setLong(1, reservation.getIdentity());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("Disabling reservation-table associations from database failed", e);
+            throw new DAOException("Disabling reservation-table associations from database failed", e);
+        }
+
+        // add (or re-enable) valid assocations
+        final String queryMerge = "MERGE INTO ReservationAssoc (reservation_ID, table_section, table_number, disabled) " +
                 "KEY (reservation_ID, table_section, table_number) VALUES (?, ?, ?, false)";
 
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryMerge)) {
             for (Table table : reservation.getTables()) {
                 stmt.setLong(1, reservation.getIdentity());
                 stmt.setLong(2, table.getSection().getIdentity());
@@ -360,25 +372,6 @@ class DBReservationDAO implements DAO<Reservation> {
             LOGGER.error("Updating reservation-table associations in database failed", e);
             throw new DAOException("Updating reservation-table associations in database failed", e);
         }
-
-        //generateHistory(reservation);
-    }
-
-    private void deleteReservationAssociations(Reservation reservation) throws DAOException {
-        LOGGER.debug("Entering deleteReservationAssociations with parameters: " + reservation);
-
-        final String query = "UPDATE ReservationAssoc SET disabled = true WHERE reservation_ID = ?";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, reservation.getIdentity());
-
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            LOGGER.error("Deleting reservation-table associations from database failed", e);
-            throw new DAOException("Deleting reservation-table associations from database failed", e);
-        }
-
-        //generateHistory(reservation);
     }
 
     private List<Table> getTablesForReservation(Reservation reservation) throws DAOException {
@@ -411,5 +404,63 @@ class DBReservationDAO implements DAO<Reservation> {
         }
 
         return tables;
+    }
+
+    private List<Table> getTablesForHistoryReservation(Reservation reservation, long changeNr) throws DAOException {
+        LOGGER.debug("Entering getTablesForHistoryReservation with parameters: " + reservation);
+
+        final String query = "SELECT table_section, table_number FROM ReservationAssocHistory " +
+                "WHERE reservation_ID = ? AND changeNr = ? AND disabled = false";
+
+        final List<Table> tables = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, reservation.getIdentity());
+            stmt.setLong(2, changeNr);
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                final Long sectionId = result.getLong("table_section");
+                final Long tableNumber = result.getLong("table_number");
+
+                List<Table> storedTables = tableDAO.find(Table.withIdentity(Section.withIdentity(sectionId), tableNumber));
+                if (storedTables.size() != 1) {
+                    LOGGER.error("table not found");
+                    throw new DAOException("table not found");
+                }
+
+                tables.add(storedTables.get(0));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Searching for reservation-tables history failed", e);
+            throw new DAOException("Searching for reservation-tables history failed", e);
+        }
+
+        return tables;
+    }
+
+    /**
+     * writes the association changes of the dataset into the database
+     * stores the time; number of the change (uses the given changeNumber) and the user which executed the changes
+     * @param reservation updated dataset
+     * @param changeNumber reservation history change number
+     * @throws DAOException if an error accessing the database occurred
+     */
+    private void generateReservationAssociationsHistory(Reservation reservation, long changeNumber) throws DAOException {
+        LOGGER.debug("Entering generateReservationAssociationsHistory with parameters: " + reservation);
+
+        final String query = "INSERT INTO ReservationAssocHistory " +
+                "(SELECT *, CURRENT_TIMESTAMP(), ?, ? FROM ReservationAssoc WHERE reservation_ID = ?)";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+            stmt.setLong(2, changeNumber);
+            stmt.setLong(3, reservation.getIdentity());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("generating history for reservation-table associations failed", e);
+            throw new DAOException("generating history for reservation-table associations failed", e);
+        }
     }
 }
