@@ -36,13 +36,13 @@ class DBReservationDAO implements DAO<Reservation> {
     @Autowired
     private DAO<Table> tableDAO;
     @Autowired
-    private Validator<Reservation> reservationValidator;
+    private Validator<Reservation> validator;
 
     @Override
     public void create(Reservation reservation) throws DAOException, ValidationException {
         LOGGER.debug("Entering create with parameters: " + reservation);
 
-        reservationValidator.validateForCreate(reservation);
+        validator.validateForCreate(reservation);
 
         final String query = "INSERT INTO Reservation (reservationTime, name, quantity, duration) VALUES (?, ?, ?, ?)";
 
@@ -71,7 +71,7 @@ class DBReservationDAO implements DAO<Reservation> {
     public void update(Reservation reservation) throws DAOException, ValidationException {
         LOGGER.debug("Entering update with parameters: " + reservation);
 
-        reservationValidator.validateForUpdate(reservation);
+        validator.validateForUpdate(reservation);
 
         final String query = "UPDATE Reservation SET reservationTime = ?, name = ?, quantity = ?, duration = ? WHERE ID = ?";
 
@@ -99,7 +99,7 @@ class DBReservationDAO implements DAO<Reservation> {
     public void delete(Reservation reservation) throws DAOException, ValidationException {
         LOGGER.debug("Entering delete with parameters: " + reservation);
 
-        reservationValidator.validateForDelete(reservation);
+        validator.validateForDelete(reservation);
 
         final String query = "UPDATE Reservation SET deleted = true WHERE ID = ?";
 
@@ -217,7 +217,7 @@ class DBReservationDAO implements DAO<Reservation> {
     public List<History<Reservation>> getHistory(Reservation reservation) throws DAOException, ValidationException {
         LOGGER.debug("Entering getHistory with parameters: " + reservation);
 
-        reservationValidator.validateIdentity(reservation);
+        validator.validateIdentity(reservation);
 
         final String query = "SELECT * FROM ReservationHistory WHERE ID = ? ORDER BY changeNr";
 
