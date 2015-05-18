@@ -669,13 +669,13 @@ public class TestReservationDAO extends AbstractDAOTest {
         // search by section 1
         Table tableMatcherSection1 = new Table();
         tableMatcherSection1.setSection(section1);
-        Reservation matcher8 = new Reservation(); // for reservation 1 and reservation 3
+        Reservation matcher8 = new Reservation(); // for reservation 1, reservation 2 and reservation 3
         matcher8.setTables(Arrays.asList(tableMatcherSection1));
 
         // search by section 2
         Table tableMatcherSection2 = new Table();
         tableMatcherSection2.setSection(section2);
-        Reservation matcher9 = new Reservation(); // for reservation 2
+        Reservation matcher9 = new Reservation(); // for reservation 2 and reservation 3
         matcher9.setTables(Arrays.asList(tableMatcherSection2));
 
         // search by section 1 and section 2
@@ -722,12 +722,14 @@ public class TestReservationDAO extends AbstractDAOTest {
 
         assertEquals(0, result7.size());
 
-        assertEquals(2, result8.size());
+        assertEquals(3, result8.size());
         assertTrue(result8.contains(reservation1));
+        assertTrue(result8.contains(reservation2));
         assertTrue(result8.contains(reservation3));
 
-        assertEquals(1, result9.size());
+        assertEquals(2, result9.size());
         assertTrue(result9.contains(reservation2));
+        assertTrue(result9.contains(reservation3));
 
         assertEquals(3, result10.size());
         assertTrue(result10.contains(reservation1));

@@ -11,7 +11,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -19,7 +18,9 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -36,8 +37,6 @@ class DBReservationDAO implements DAO<Reservation> {
     private DAO<Table> tableDAO;
     @Autowired
     private Validator<Reservation> reservationValidator;
-    @Autowired
-    private Validator<Table> tableValidator;
 
     @Override
     public void create(Reservation reservation) throws DAOException, ValidationException {
@@ -150,15 +149,11 @@ class DBReservationDAO implements DAO<Reservation> {
                 throw new DAOException("Searching for reservations failed", e);
             }
         } else { // more complex query with table - ReservationAssoc join required
-            // filter out all invalid tables
-            final List<Table> tables = reservation.getTables().stream().filter(table -> {
-                    try {
-                        tableValidator.validateIdentity(table);
-                        return true;
-                    } catch (ValidationException e) {
-                        return false;
-                    }
-                }).collect(Collectors.toList());
+            // build a complete set of tables (so that we have the section id and table number for each table)
+            final Set<Table> tables = new HashSet<>();
+            for (Table table : reservation.getTables()) {
+                tables.addAll(tableDAO.find(table));
+            }
 
             // sadly we have to provide our own list of pairs - fake it with a list of question marks in the prepared stmt
             final String tablePairs = tables.stream().map(t -> "(?, ?)").collect(Collectors.joining(", "));
