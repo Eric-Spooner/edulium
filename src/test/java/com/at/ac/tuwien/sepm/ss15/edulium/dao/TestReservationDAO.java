@@ -139,7 +139,7 @@ public class TestReservationDAO extends AbstractDAOTest {
 
         // THEN
         // check if the reservation has been updated
-        List<Reservation> storedObjects = reservationDAO.find(reservation);
+        List<Reservation> storedObjects = reservationDAO.find(updatedReservation);
         assertEquals(1, storedObjects.size());
         assertEquals(updatedReservation, storedObjects.get(0));
     }
@@ -176,7 +176,7 @@ public class TestReservationDAO extends AbstractDAOTest {
 
         // THEN
         // check if the reservation has been updated
-        List<Reservation> storedObjects1 = reservationDAO.find(reservation);
+        List<Reservation> storedObjects1 = reservationDAO.find(Reservation.withIdentity(reservation.getIdentity()));
         assertEquals(1, storedObjects1.size());
         assertEquals(updatedReservation1, storedObjects1.get(0));
 
@@ -194,7 +194,7 @@ public class TestReservationDAO extends AbstractDAOTest {
 
         // THEN
         // check if the reservation has been updated
-        List<Reservation> storedObjects2 = reservationDAO.find(reservation);
+        List<Reservation> storedObjects2 = reservationDAO.find(Reservation.withIdentity(reservation.getIdentity()));
         assertEquals(1, storedObjects2.size());
         assertEquals(updatedReservation2, storedObjects2.get(0));
     }
