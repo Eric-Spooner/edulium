@@ -339,6 +339,10 @@ class DBReservationDAO implements DAO<Reservation> {
     private void updateReservationAssociations(Reservation reservation) throws DAOException {
         LOGGER.debug("Entering updateReservationAssociations with parameters: " + reservation);
 
+        // disable all reservation-table associations for now, the update sql query will re-enable all valid
+        // associations
+        deleteReservationAssociations(reservation);
+
         final String query = "MERGE INTO ReservationAssoc (reservation_ID, table_section, table_number, disabled) " +
                 "KEY (reservation_ID, table_section, table_number) VALUES (?, ?, ?, false)";
 
