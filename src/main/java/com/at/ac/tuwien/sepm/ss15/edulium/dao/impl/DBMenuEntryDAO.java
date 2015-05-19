@@ -160,7 +160,11 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                objects.add(parseResult(result));
+                try {
+                    objects.add(parseResult(result));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("searching for menu entries failed", e);
@@ -181,7 +185,11 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                objects.add(parseResult(result));
+                try {
+                    objects.add(parseResult(result));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("searching for all entries failed", e);
