@@ -95,4 +95,13 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // WHEN
         intermittentSaleDAO.create(intermittentSale);
     }
+
+    @Test(expected = ValidationException.class)
+    public void testCreate_addingNullObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        IntermittentSale intermittentSale = null;
+
+        // WHEN
+        intermittentSaleDAO.create(intermittentSale);
+    }
 }

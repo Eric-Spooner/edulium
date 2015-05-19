@@ -67,4 +67,13 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // WHEN
         onetimeSaleDAO.create(onetimeSale);
     }
+
+    @Test(expected = ValidationException.class)
+    public void testCreate_addingNullObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = null;
+
+        // WHEN
+        onetimeSaleDAO.create(onetimeSale);
+    }
 }
