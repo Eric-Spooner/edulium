@@ -472,4 +472,13 @@ public class TestSectionDAO extends AbstractDAOTest {
         // WHEN
         List<Section> result = sectionDAO.populate(invalidSections);
     }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<Section> invalidSections = Arrays.asList(null);
+
+        // WHEN
+        List<Section> result = sectionDAO.populate(invalidSections);
+    }
 }

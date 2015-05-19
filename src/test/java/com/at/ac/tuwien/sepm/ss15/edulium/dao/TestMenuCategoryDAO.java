@@ -433,4 +433,13 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         // WHEN
         List<MenuCategory> result = menuCategoryDAO.populate(invalidMenuCategorys);
     }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<MenuCategory> invalidMenuCategorys = Arrays.asList(null);
+
+        // WHEN
+        List<MenuCategory> result = menuCategoryDAO.populate(invalidMenuCategorys);
+    }
 }

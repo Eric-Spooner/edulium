@@ -654,7 +654,7 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
     @Test
     public void testPopulate_nullListShouldReturnEmptyObjects() throws DAOException, ValidationException {
         // WHEN
-        List<TaxRate> result = taxRateDAO.populate(null);
+        List<MenuEntry> result = menuEntryDAO.populate(null);
 
         // THEN
         assertTrue(result.isEmpty());
@@ -663,7 +663,7 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
     @Test
     public void testPopulate_emptyListShouldReturnEmptyObjects() throws DAOException, ValidationException {
         // WHEN
-        List<TaxRate> result = taxRateDAO.populate(Arrays.asList());
+        List<MenuEntry> result = menuEntryDAO.populate(Arrays.asList());
 
         // THEN
         assertTrue(result.isEmpty());
@@ -672,9 +672,18 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testPopulate_listWithInvalidObjectsShouldThrow() throws DAOException, ValidationException {
         // GIVEN
-        List<TaxRate> invalidTaxRates = Arrays.asList(new TaxRate());
+        List<MenuEntry> invalidEntries = Arrays.asList(new MenuEntry());
 
         // WHEN
-        List<TaxRate> result = taxRateDAO.populate(invalidTaxRates);
+        List<MenuEntry> result = menuEntryDAO.populate(invalidEntries);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<MenuEntry> invalidEntries = Arrays.asList(null);
+
+        // WHEN
+        List<MenuEntry> result = menuEntryDAO.populate(invalidEntries);
     }
 }

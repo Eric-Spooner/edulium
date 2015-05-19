@@ -1042,4 +1042,13 @@ public class TestTableDAO extends AbstractDAOTest {
         // WHEN
         List<Table> result = tableDAO.populate(invalidTables);
     }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<Table> invalidTables = Arrays.asList(null);
+
+        // WHEN
+        List<Table> result = tableDAO.populate(invalidTables);
+    }
 }

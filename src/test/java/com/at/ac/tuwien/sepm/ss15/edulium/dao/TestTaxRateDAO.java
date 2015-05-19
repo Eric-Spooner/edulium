@@ -512,4 +512,13 @@ public class TestTaxRateDAO extends AbstractDAOTest {
         // WHEN
         List<TaxRate> result = taxRateDAO.populate(invalidTaxRates);
     }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<TaxRate> invalidTaxRates = Arrays.asList(null);
+
+        // WHEN
+        List<TaxRate> result = taxRateDAO.populate(invalidTaxRates);
+    }
 }

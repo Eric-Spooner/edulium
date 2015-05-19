@@ -609,4 +609,13 @@ public class TestUserDAO extends AbstractDAOTest {
         // WHEN
         List<User> result = userDAO.populate(invalidUsers);
     }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<User> invalidUsers = Arrays.asList(null);
+
+        // WHEN
+        List<User> result = userDAO.populate(invalidUsers);
+    }
 }

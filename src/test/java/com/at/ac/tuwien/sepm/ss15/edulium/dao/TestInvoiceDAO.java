@@ -420,4 +420,13 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         // WHEN
         List<Invoice> result = invoiceDAO.populate(invalidInvoices);
     }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<Invoice> invalidInvoices = Arrays.asList(null);
+
+        // WHEN
+        List<Invoice> result = invoiceDAO.populate(invalidInvoices);
+    }
 }
