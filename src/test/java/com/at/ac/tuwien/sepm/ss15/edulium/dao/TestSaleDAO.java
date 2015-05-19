@@ -46,7 +46,7 @@ public class TestSaleDAO extends AbstractDAOTest {
 
         // GIVEN
         Sale sale2 = new Sale();
-        sale.setIdentity(new Long(3));
+        sale2.setIdentity(new Long(3));
         sale2.setName("Another Sale");
 
         // WHEN
@@ -70,5 +70,31 @@ public class TestSaleDAO extends AbstractDAOTest {
 
         // WHEN
         saleDAO.create(sale);
+    }
+
+    @Test
+    public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
+        // PREPARE
+        Sale sale = new Sale();
+        sale.setIdentity(new Long(3));
+        sale.setName("New Sale");
+
+        // check if sale is stored
+        saleDAO.create(sale);
+        assertEquals(1, saleDAO.find(sale).size());
+
+        // GIVEN
+        Sale sale2 = new Sale();
+        sale.setIdentity(sale.getIdentity());
+        sale2.setName("Sale Modified Name");
+
+        // WHEN
+        saleDAO.update(sale2);
+
+        // THEN
+        // check if the sale has been updated;
+        List<Sale> storedObjects = saleDAO.find(sale2);
+        assertEquals(1, storedObjects.size());
+        assertEquals(sale2, storedObjects.get(0));
     }
 }
