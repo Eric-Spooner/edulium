@@ -77,4 +77,22 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // WHEN
         intermittentSaleDAO.create(intermittentSale2);
     }
+
+    @Test(expected = ValidationException.class)
+    public void testCreate_addingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setFromDayTime(LocalDateTime.now());
+        intermittentSale.setDuration(120);
+        intermittentSale.setMonday(true);
+        intermittentSale.setTuesday(true);
+        intermittentSale.setWednesday(true);
+        intermittentSale.setThursday(true);
+        intermittentSale.setFriday(true);
+        intermittentSale.setSaturday(true);
+        intermittentSale.setSunday(true);
+
+        // WHEN
+        intermittentSaleDAO.create(intermittentSale);
+    }
 }

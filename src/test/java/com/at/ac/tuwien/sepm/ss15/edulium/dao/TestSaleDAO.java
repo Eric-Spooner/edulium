@@ -52,4 +52,14 @@ public class TestSaleDAO extends AbstractDAOTest {
         // WHEN
         saleDAO.create(sale2);
     }
+
+    @Test(expected = ValidationException.class)
+    public void testCreate_addingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        Sale sale = new Sale();
+        sale.setName("New Sale");
+
+        // WHEN
+        saleDAO.create(sale);
+    }
 }

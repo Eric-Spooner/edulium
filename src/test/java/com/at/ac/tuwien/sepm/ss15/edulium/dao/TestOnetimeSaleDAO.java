@@ -56,4 +56,15 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // WHEN
         onetimeSaleDAO.create(onetimeSale2);
     }
+
+    @Test(expected = ValidationException.class)
+    public void testCreate_addingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setFromTime(LocalDateTime.now());
+        onetimeSale.setToTime(LocalDateTime.now());
+
+        // WHEN
+        onetimeSaleDAO.create(onetimeSale);
+    }
 }
