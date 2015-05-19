@@ -13,7 +13,6 @@ import static org.junit.Assert.*;
 /**
  * Unit Test for the OnetimeSaleDAO
  */
-//TODO: add tests
 public class TestOnetimeSaleDAO extends AbstractDAOTest {
     @Autowired
     private DAO<OnetimeSale> onetimeSaleDAO;
@@ -34,5 +33,27 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         List<OnetimeSale> storedObjects = onetimeSaleDAO.find(OnetimeSale.withIdentity(onetimeSale.getIdentity()));
         assertEquals(1, storedObjects.size());
         assertEquals(onetimeSale, storedObjects.get(0));
+    }
+
+
+    @Test(expected = DAOException.class)
+    public void testCreate_addingTwoObjectsWithSameIdentityShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setFromTime(LocalDateTime.now());
+        onetimeSale.setToTime(LocalDateTime.now());
+
+        // WHEN
+        onetimeSaleDAO.create(onetimeSale);
+
+        // GIVEN
+        OnetimeSale onetimeSale2 = new OnetimeSale();
+        onetimeSale2.setIdentity(new Long(123));
+        onetimeSale2.setFromTime(LocalDateTime.now());
+        onetimeSale2.setToTime(LocalDateTime.now());
+
+        // WHEN
+        onetimeSaleDAO.create(onetimeSale2);
     }
 }

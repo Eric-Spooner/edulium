@@ -32,4 +32,24 @@ public class TestSaleDAO extends AbstractDAOTest {
         assertEquals(1, storedObjects.size());
         assertEquals(sale, storedObjects.get(0));
     }
+
+
+    @Test(expected = DAOException.class)
+    public void testCreate_addingTwoObjectsWithSameIdentityShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        Sale sale = new Sale();
+        sale.setIdentity(new Long(3));
+        sale.setName("New Sale");
+
+        // WHEN
+        saleDAO.create(sale);
+
+        // GIVEN
+        Sale sale2 = new Sale();
+        sale.setIdentity(new Long(3));
+        sale2.setName("Another Sale");
+
+        // WHEN
+        saleDAO.create(sale2);
+    }
 }
