@@ -241,8 +241,8 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
      * @throws SQLException if an error accessing the database occurred
      * @throws DAOException if an error retrieving the taxRate/category occurred
      */
-    private MenuEntry parseResult(ResultSet result) throws DAOException, SQLException {
-        List<TaxRate> taxRates = taxRateDAO.find(TaxRate.withIdentity(result.getLong("taxRate_ID")));
+    private MenuEntry parseResult(ResultSet result) throws DAOException, ValidationException, SQLException {
+        List<TaxRate> taxRates = taxRateDAO.populate(Arrays.asList(TaxRate.withIdentity(result.getLong("taxRate_ID"))));
         if (taxRates.size() != 1) {
             LOGGER.error("retrieving taxRate failed");
             throw new DAOException("retrieving taxRate failed");

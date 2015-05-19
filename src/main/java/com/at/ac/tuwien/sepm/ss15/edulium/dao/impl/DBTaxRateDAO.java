@@ -20,6 +20,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the TaxRate DAO interface
@@ -179,6 +180,43 @@ class DBTaxRateDAO implements DAO<TaxRate> {
         }
 
         return taxRates;
+    }
+
+    @Override
+    public List<TaxRate> populate(List<TaxRate> taxRates) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + taxRates);
+
+        if (taxRates == null || taxRates.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (TaxRate taxRate : taxRates) {
+            validator.validateIdentity(taxRate);
+        }
+
+        final String query = "SELECT * FROM TaxRate WHERE ID IN (" +
+                taxRates.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<TaxRate> populatedTaxRates = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (TaxRate taxRate : taxRates) {
+                stmt.setLong(index++, taxRate.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedTaxRates.add(taxRateFromResultSet(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating tax rates failed", e);
+            throw new DAOException("Populating tax rates failed", e);
+        }
+
+        return populatedTaxRates;
     }
 
     /**
