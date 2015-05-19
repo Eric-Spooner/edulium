@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -364,5 +365,72 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         assertEquals(user, entry.getUser());
         assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
         assertTrue(entry.isDeleted());
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // menu category 1
+        MenuCategory menuCategory1 = new MenuCategory();
+        menuCategory1.setName("cat1");
+
+        menuCategoryDAO.create(menuCategory1);
+        assertEquals(1, menuCategoryDAO.find(menuCategory1).size());
+
+        // menu category 2
+        MenuCategory menuCategory2 = new MenuCategory();
+        menuCategory2.setName("cat2");
+
+        menuCategoryDAO.create(menuCategory2);
+        assertEquals(1, menuCategoryDAO.find(menuCategory2).size());
+
+        // menu category 3
+        MenuCategory menuCategory3 = new MenuCategory();
+        menuCategory3.setName("cat3");
+
+        menuCategoryDAO.create(menuCategory3);
+        assertEquals(1, menuCategoryDAO.find(menuCategory3).size());
+
+        // GIVEN
+        MenuCategory menuCategoryId1 = MenuCategory.withIdentity(menuCategory1.getIdentity());
+        MenuCategory menuCategoryId2 = MenuCategory.withIdentity(menuCategory2.getIdentity());
+        MenuCategory menuCategoryId3 = MenuCategory.withIdentity(menuCategory3.getIdentity());
+        List<MenuCategory> menuCategoryIds = Arrays.asList(menuCategoryId1, menuCategoryId2, menuCategoryId3);
+
+        // WHEN
+        List<MenuCategory> result = menuCategoryDAO.populate(menuCategoryIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(menuCategory1));
+        assertTrue(result.contains(menuCategory2));
+        assertTrue(result.contains(menuCategory3));
+    }
+
+    @Test
+    public void testPopulate_nullListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<MenuCategory> result = menuCategoryDAO.populate(null);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testPopulate_emptyListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<MenuCategory> result = menuCategoryDAO.populate(Arrays.asList());
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithInvalidObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<MenuCategory> invalidMenuCategorys = Arrays.asList(new MenuCategory());
+
+        // WHEN
+        List<MenuCategory> result = menuCategoryDAO.populate(invalidMenuCategorys);
     }
 }
