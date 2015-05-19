@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * validator implementation for the Menu domain object
  */
-public class MenuValidator implements Validator<Menu> {
+class MenuValidator implements Validator<Menu> {
     @Autowired
     private Validator<MenuEntry> menuEntryValidator;
 
