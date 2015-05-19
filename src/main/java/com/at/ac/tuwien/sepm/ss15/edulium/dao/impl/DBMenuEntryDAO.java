@@ -22,6 +22,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the MenuEntry DAO interface
@@ -212,6 +213,43 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
         }
 
         return history;
+    }
+
+    @Override
+    public List<MenuEntry> populate(List<MenuEntry> menuEntries) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + menuEntries);
+
+        if (menuEntries == null || menuEntries.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (MenuEntry menuEntry : menuEntries) {
+            validator.validateIdentity(menuEntry);
+        }
+
+        final String query = "SELECT * FROM MenuEntry WHERE ID IN (" +
+                menuEntries.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<MenuEntry> populatedMenuEntries = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (MenuEntry menuEntry : menuEntries) {
+                stmt.setLong(index++, menuEntry.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedMenuEntries.add(parseResult(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating menu entries failed", e);
+            throw new DAOException("Populating menu entries failed", e);
+        }
+
+        return populatedMenuEntries;
     }
 
     private void generateHistory(MenuEntry menuEntry) throws DAOException {
