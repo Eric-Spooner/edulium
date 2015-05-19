@@ -333,21 +333,28 @@ class DBTableDAO implements DAO<Table> {
      */
     private Table parseResult(ResultSet result) throws SQLException, ValidationException, DAOException {
         Table table = new Table();
-        // get user
-        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("user_ID"))));
-        if (storedUsers.size() == 1) {
-            table.setUser(storedUsers.get(0));
-        }
-        // get section
-        List<Section> storedSections = sectionDAO.populate(Arrays.asList(Section.withIdentity(Long.valueOf(result.getString("section_ID")))));
-        if (storedSections.size() != 1) {
-            throw new DAOException("section must not be null");
-        }
-        table.setSection(storedSections.get(0));
         table.setNumber(result.getLong("number"));
         table.setSeats(result.getInt("seats"));
         table.setRow(result.getInt("tableRow"));
         table.setColumn(result.getInt("tableColumn"));
+
+        // get user
+        final String userId = result.getString("user_ID");
+        if (userId != null) {  // optional
+            List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(userId)));
+            if (storedUsers.size() != 1) {
+                throw new DAOException("user not found");
+            }
+            table.setUser(storedUsers.get(0));
+        }
+
+        // get section
+        final long sectionId = result.getLong("section_ID");
+        List<Section> storedSections = sectionDAO.populate(Arrays.asList(Section.withIdentity(sectionId)));
+        if (storedSections.size() != 1) {
+            throw new DAOException("section not found");
+        }
+        table.setSection(storedSections.get(0));
 
         return table;
     }
