@@ -182,7 +182,11 @@ class DBTableDAO implements DAO<Table> {
 
             ResultSet result = stmt.getResultSet();
             while (result.next()) {
-                objects.add(parseResult(result));
+                try {
+                    objects.add(parseResult(result));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
             }
 
         } catch (SQLException e) {
@@ -209,7 +213,11 @@ class DBTableDAO implements DAO<Table> {
 
             ResultSet result = stmt.getResultSet();
             while (result.next()) {
-                objects.add(parseResult(result));
+                try {
+                    objects.add(parseResult(result));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
             }
 
         } catch (SQLException e) {
