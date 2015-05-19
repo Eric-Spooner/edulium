@@ -139,7 +139,11 @@ class DBReservationDAO implements DAO<Reservation> {
 
                 ResultSet result = stmt.executeQuery();
                 while (result.next()) {
-                    reservations.add(reservationFromResultSet(result));
+                    try {
+                        reservations.add(reservationFromResultSet(result));
+                    } catch (ValidationException e) {
+                        LOGGER.warn("parsing the result '" + result + "' failed", e);
+                    }
                 }
             } catch (SQLException e) {
                 LOGGER.error("Searching for reservations failed", e);
@@ -177,7 +181,11 @@ class DBReservationDAO implements DAO<Reservation> {
 
                 ResultSet result = stmt.executeQuery();
                 while (result.next()) {
-                    reservations.add(reservationFromResultSet(result));
+                    try {
+                        reservations.add(reservationFromResultSet(result));
+                    } catch (ValidationException e) {
+                        LOGGER.warn("parsing the result '" + result + "' failed", e);
+                    }
                 }
             } catch (SQLException e) {
                 LOGGER.error("Searching for reservations failed", e);
@@ -199,7 +207,11 @@ class DBReservationDAO implements DAO<Reservation> {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                reservations.add(reservationFromResultSet(result));
+                try {
+                    reservations.add(reservationFromResultSet(result));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("Searching for all reservations failed", e);
@@ -341,7 +353,7 @@ class DBReservationDAO implements DAO<Reservation> {
      * @return Reservation object with the data of the resultSet set with all associated tables
      * @throws SQLException if an error accessing the database occurred
      */
-    private Reservation reservationFromResultSet(ResultSet result) throws DAOException, SQLException {
+    private Reservation reservationFromResultSet(ResultSet result) throws DAOException, ValidationException, SQLException {
         Reservation reservation = parseResult(result);
         reservation.setTables(getTablesForReservation(reservation));
         return reservation;
@@ -354,7 +366,7 @@ class DBReservationDAO implements DAO<Reservation> {
      * @return Reservation object with the data of the resultSet set with all associated tables (with the given change number)
      * @throws SQLException if an error accessing the database occurred
      */
-    private Reservation reservationHistoryFromResultSet(ResultSet result, long changeNumber) throws DAOException, SQLException {
+    private Reservation reservationHistoryFromResultSet(ResultSet result, long changeNumber) throws DAOException, ValidationException, SQLException {
         Reservation reservation = parseResult(result);
         reservation.setTables(getTablesForReservationHistory(reservation, changeNumber));
         return reservation;
