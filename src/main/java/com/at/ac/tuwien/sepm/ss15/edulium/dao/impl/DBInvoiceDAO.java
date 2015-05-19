@@ -151,7 +151,11 @@ class DBInvoiceDAO implements DAO<Invoice> {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                results.add(parseResult(rs));
+                try {
+                    results.add(parseResult(rs));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + rs + "' failed", e);
+                }
             }
             rs.close();
         } catch (SQLException e) {
@@ -174,8 +178,10 @@ class DBInvoiceDAO implements DAO<Invoice> {
         final String query = "SELECT * FROM Invoice WHERE canceled = FALSE";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
+            try {
                 results.add(parseResult(rs));
+            } catch (ValidationException e) {
+                LOGGER.warn("parsing the result '" + rs + "' failed", e);
             }
             rs.close();
         } catch (SQLException e) {
