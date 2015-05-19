@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -443,5 +444,72 @@ public class TestTaxRateDAO extends AbstractDAOTest {
         assertEquals(testUser, entry.getUser());
         assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
         assertTrue(entry.isDeleted());
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // tax rate 1
+        TaxRate taxRate1 = new TaxRate();
+        taxRate1.setValue(BigDecimal.valueOf(0.1111));
+
+        taxRateDAO.create(taxRate1);
+        assertEquals(1, taxRateDAO.find(taxRate1).size());
+
+        // tax rate 2
+        TaxRate taxRate2 = new TaxRate();
+        taxRate2.setValue(BigDecimal.valueOf(0.2222));
+
+        taxRateDAO.create(taxRate2);
+        assertEquals(1, taxRateDAO.find(taxRate2).size());
+
+        // tax rate 3
+        TaxRate taxRate3 = new TaxRate();
+        taxRate3.setValue(BigDecimal.valueOf(0.2222));
+
+        taxRateDAO.create(taxRate3);
+        assertEquals(1, taxRateDAO.find(taxRate3).size());
+
+        // GIVEN
+        TaxRate taxRateId1 = TaxRate.withIdentity(taxRate1.getIdentity());
+        TaxRate taxRateId2 = TaxRate.withIdentity(taxRate2.getIdentity());
+        TaxRate taxRateId3 = TaxRate.withIdentity(taxRate3.getIdentity());
+        List<TaxRate> taxRateIds = Arrays.asList(taxRateId1, taxRateId2, taxRateId3);
+
+        // WHEN
+        List<TaxRate> result = taxRateDAO.populate(taxRateIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(taxRate1));
+        assertTrue(result.contains(taxRate2));
+        assertTrue(result.contains(taxRate3));
+    }
+
+    @Test
+    public void testPopulate_nullListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<TaxRate> result = taxRateDAO.populate(null);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testPopulate_emptyListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<TaxRate> result = taxRateDAO.populate(Arrays.asList());
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithInvalidObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<TaxRate> invalidTaxRates = Arrays.asList(new TaxRate());
+
+        // WHEN
+        List<TaxRate> result = taxRateDAO.populate(invalidTaxRates);
     }
 }
