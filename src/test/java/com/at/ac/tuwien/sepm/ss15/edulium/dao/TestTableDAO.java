@@ -1106,7 +1106,7 @@ public class TestTableDAO extends AbstractDAOTest {
     public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
         // GIVEN
         List<Table> invalidTables = new ArrayList<>();
-        invalidUsers.add(null);
+        invalidTables.add(null);
 
         // WHEN
         List<Table> result = tableDAO.populate(invalidTables);
