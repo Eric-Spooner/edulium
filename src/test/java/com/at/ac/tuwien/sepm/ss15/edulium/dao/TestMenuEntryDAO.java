@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -620,5 +621,60 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
         assertEquals(user, historyEntry.getUser());
         assertTrue(Duration.between(deleteTime, historyEntry.getTimeOfChange()).getSeconds() < 1);
         assertTrue(historyEntry.isDeleted());
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);
+        menuEntryDAO.create(entry1);
+
+        MenuEntry entry2 = createMenuEntry("entry1", "desc2", "cat2", 20.0, 0.2, true);
+        menuEntryDAO.create(entry2);
+
+        MenuEntry entry3 = createMenuEntry("entry2", "desc3", "cat3", 30.0, 0.3, true);
+        menuEntryDAO.create(entry3);
+
+        // GIVEN
+        MenuEntry entryId1 = MenuEntry.withIdentity(entry1.getIdentity());
+        MenuEntry entryId2 = MenuEntry.withIdentity(entry2.getIdentity());
+        MenuEntry entryId3 = MenuEntry.withIdentity(entry3.getIdentity());
+        List<MenuEntry> entryIds = Arrays.asList(entryId1, entryId2, entryId3);
+
+        // WHEN
+        List<MenuEntry> result = menuEntryDAO.populate(entryIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(entry1));
+        assertTrue(result.contains(entry2));
+        assertTrue(result.contains(entry3));
+    }
+
+    @Test
+    public void testPopulate_nullListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<TaxRate> result = taxRateDAO.populate(null);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testPopulate_emptyListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<TaxRate> result = taxRateDAO.populate(Arrays.asList());
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithInvalidObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<TaxRate> invalidTaxRates = Arrays.asList(new TaxRate());
+
+        // WHEN
+        List<TaxRate> result = taxRateDAO.populate(invalidTaxRates);
     }
 }
