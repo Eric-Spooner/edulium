@@ -173,4 +173,144 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         assertEquals(numberBefore, storedObjects.size());
         assertEquals(0, onetimeSaleDAO.find(onetimeSale).size());
     }
+
+    @Test(expected = ValidationException.class)
+    public void testDelete_deletingNullObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = null;
+
+        // WHEN
+        onetimeSaleDAO.delete(onetimeSale);
+    }
+
+    @Test(expected = DAOException.class)
+    public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        OnetimeSale sale = new OnetimeSale();
+
+        // search for a non-existing onetimesale identity
+        try {
+            do {
+                sale.setIdentity(new Long((int)(Math.random()*999999999)));
+            } while (!onetimeSaleDAO.find(sale).isEmpty());
+        } catch (DAOException e) {
+            fail("DAOException should not occur while searching for a non-existing onetimesale identity");
+        }
+
+        // WHEN
+        onetimeSaleDAO.delete(sale);
+    }
+
+    @Test
+    public void testFind_byIdentityShouldReturnObject() throws DAOException, ValidationException {
+        // Prepare
+
+        // one time sale 1
+        OnetimeSale onetimeSale1 = new OnetimeSale();
+        onetimeSale1.setIdentity(new Long(123));
+        onetimeSale1.setFromTime(LocalDateTime.now());
+        onetimeSale1.setToTime(LocalDateTime.now());
+
+        onetimeSaleDAO.create(onetimeSale1);
+        assertEquals(1, onetimeSaleDAO.find(onetimeSale1).size());
+
+        // one time sale 2
+        OnetimeSale onetimeSale2 = new OnetimeSale();
+        onetimeSale2.setIdentity(new Long(124));
+        onetimeSale2.setFromTime(LocalDateTime.now());
+        onetimeSale2.setToTime(LocalDateTime.now());
+
+        onetimeSaleDAO.create(onetimeSale2);
+        assertEquals(1, onetimeSaleDAO.find(onetimeSale2).size());
+
+        // one time sale 3
+        OnetimeSale onetimeSale3 = new OnetimeSale();
+        onetimeSale3.setIdentity(new Long(125));
+        onetimeSale3.setFromTime(LocalDateTime.now());
+        onetimeSale3.setToTime(LocalDateTime.now());
+
+        onetimeSaleDAO.create(onetimeSale3);
+        assertEquals(1, onetimeSaleDAO.find(onetimeSale3).size());
+
+        // GIVEN
+        OnetimeSale matcher1 = OnetimeSale.withIdentity(onetimeSale1.getIdentity()); // for sale 1
+        OnetimeSale matcher2 = OnetimeSale.withIdentity(onetimeSale2.getIdentity()); // for sale 2
+        OnetimeSale matcher3 = OnetimeSale.withIdentity(onetimeSale3.getIdentity()); // for sale 3
+
+        // WHEN
+        List<OnetimeSale> result1 = onetimeSaleDAO.find(matcher1);
+        List<OnetimeSale> result2 = onetimeSaleDAO.find(matcher2);
+        List<OnetimeSale> result3 = onetimeSaleDAO.find(matcher3);
+
+        // THEN
+        assertEquals(1, result1.size());
+        assertTrue(result1.contains(onetimeSale1));
+
+        assertEquals(1, result2.size());
+        assertTrue(result2.contains(onetimeSale2));
+
+        assertEquals(1, result3.size());
+        assertTrue(result3.contains(onetimeSale3));
+    }
+
+    @Test
+    public void testFind_byFromTimeShouldReturnObjects() throws DAOException, ValidationException {
+
+    }
+
+    @Test
+    public void testFind_byToTimeShouldReturnObjects() throws DAOException, ValidationException {
+
+    }
+
+    @Test
+    public void testFind_shouldReturnEmptyList() throws DAOException {
+        //find a non existent id
+    }
+
+    @Test
+    public void testFind_nullObjectShouldReturnEmptyList() throws DAOException {
+
+    }
+
+    @Test
+    public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
+
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_withoutObjectShouldFail() throws DAOException, ValidationException {
+        onetimeSaleDAO.getHistory(null);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_withoutIdentityShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+
+        // WHEN
+        onetimeSaleDAO.getHistory(onetimeSale);
+    }
+
+    @Test
+    public void testGetHistory_notPersistentDataShouldReturnEmptyList() throws DAOException, ValidationException {
+        // GIVEN
+        OnetimeSale sale = new OnetimeSale();
+
+        // search for a non-existing onetimesale identity
+        try {
+            do {
+                sale.setIdentity(new Long((int)(Math.random()*999999999)));
+            } while (!onetimeSaleDAO.find(sale).isEmpty());
+        } catch (DAOException e) {
+            fail("DAOException should not occur while searching for a non-existing onetimesale identity");
+        }
+
+        assertTrue(onetimeSaleDAO.getHistory(sale).isEmpty());
+    }
+
+    @Test
+    public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
+
+    }
 }
