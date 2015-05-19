@@ -187,6 +187,39 @@ public class TestOrderValidator extends AbstractDomainTest {
         orderValidator.validateForCreate(order);
     }
 
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_OrderWithNegativBruttoThrow() throws ValidationException {
+        // GIVEN
+        Order order = new Order();
+        order.setTable(createTable(1, 2, 3));
+        order.setMenuEntry(createMenuEntry("name", "desc", "cat", 50, 0.02, true));
+        order.setMenuEntry(new MenuEntry());
+        order.setBrutto(BigDecimal.valueOf(-1));
+        order.setTax(BigDecimal.valueOf(0));
+        order.setInvoice(Invoice.withIdentity(1));
+        order.setTime(LocalDateTime.now());
+        order.setAdditionalInformation("Info");
+
+        // WHEN
+        orderValidator.validateForCreate(order);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_OrderWithInvalidTaxThrow() throws ValidationException {
+        // GIVEN
+        Order order = new Order();
+        order.setTable(createTable(1, 2, 3));
+        order.setMenuEntry(createMenuEntry("name", "desc", "cat", 50, 0.02, true));
+        order.setMenuEntry(new MenuEntry());
+        order.setBrutto(BigDecimal.valueOf(0));
+        order.setTax(BigDecimal.valueOf(-1));
+        order.setInvoice(Invoice.withIdentity(1));
+        order.setTime(LocalDateTime.now());
+        order.setAdditionalInformation("Info");
+
+        // WHEN
+        orderValidator.validateForCreate(order);
+    }
 
     @Test
     public void testValidateForUpdate_shouldAcceptOrder() throws ValidationException {

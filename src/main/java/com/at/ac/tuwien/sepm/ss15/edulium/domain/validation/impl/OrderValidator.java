@@ -66,6 +66,9 @@ class OrderValidator implements Validator<Order> {
         if(order.getBrutto().equals(BigDecimal.valueOf(0))) {
             throw new ValidationException("Brutto must not be 0");
         }
+        if(order.getBrutto().compareTo(BigDecimal.valueOf(0)) == -1) {
+            throw new ValidationException("Brutto must not be greater 0");
+        }
         if(order.getTax() == null) {
             throw new ValidationException("Tax must not be null");
         }

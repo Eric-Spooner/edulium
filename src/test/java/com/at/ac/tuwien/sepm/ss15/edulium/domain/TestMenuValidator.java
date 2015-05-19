@@ -67,10 +67,19 @@ public class TestMenuValidator extends AbstractDomainTest {
 
 
     @Test(expected = ValidationException.class)
-         public void testValidateForCreate_MenuWithoutNameShouldThrow() throws ValidationException {
+         public void testValidateForCreate_MenuWithEmptyNameShouldThrow() throws ValidationException {
         // GIVEN
         Menu menu = new Menu();
         menu.setName("");
+
+        // WHEN
+        menuValidator.validateForCreate(menu);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_MenuWithNameNullShouldThrow() throws ValidationException {
+        // GIVEN
+        Menu menu = new Menu();
 
         // WHEN
         menuValidator.validateForCreate(menu);
