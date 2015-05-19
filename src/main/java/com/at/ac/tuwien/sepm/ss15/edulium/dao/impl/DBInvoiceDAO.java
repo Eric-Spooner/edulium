@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Database implementation of the DAO interface for Invoice objects
@@ -212,6 +213,43 @@ class DBInvoiceDAO implements DAO<Invoice> {
         }
 
         return history;
+    }
+
+    @Override
+    public List<Invoice> populate(List<Invoice> invoices) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + invoices);
+
+        if (invoices == null || invoices.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (Invoice invoice : invoices) {
+            invoiceValidator.validateIdentity(invoice);
+        }
+
+        final String query = "SELECT * FROM Invoice WHERE ID IN (" +
+                invoices.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<Invoice> populatedInvoices = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (Invoice invoice : invoices) {
+                stmt.setLong(index++, invoice.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedInvoices.add(parseResult(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating invoices failed", e);
+            throw new DAOException("Populating invoices failed", e);
+        }
+
+        return populatedInvoices;
     }
 
     /**
