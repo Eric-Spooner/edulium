@@ -18,6 +18,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the TableDAO interface
@@ -247,6 +248,44 @@ class DBTableDAO implements DAO<Table> {
         }
 
         return history;
+    }
+
+    @Override
+    public List<Table> populate(List<Table> tables) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + tables);
+
+        if (tables == null || tables.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (Table table : tables) {
+            validator.validateIdentity(table);
+        }
+
+        final String query = "SELECT * FROM RestaurantTable WHERE (section_ID, number) IN (" +
+                tables.stream().map(t -> "(?, ?)").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<Table> populatedTables = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (Table table : tables) {
+                stmt.setLong(index++, table.getSection().getIdentity());
+                stmt.setLong(index++, table.getNumber());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedTables.add(parseResult(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating tables failed", e);
+            throw new DAOException("Populating tables failed", e);
+        }
+
+        return populatedTables;
     }
 
     /**

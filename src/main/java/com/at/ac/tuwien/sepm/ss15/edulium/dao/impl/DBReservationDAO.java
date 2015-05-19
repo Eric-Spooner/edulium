@@ -397,7 +397,7 @@ class DBReservationDAO implements DAO<Reservation> {
      * @param reservation reservation dataset
      * @throws DAOException if an error accessing the database occurred
      */
-    private List<Table> getTablesForReservation(Reservation reservation) throws DAOException {
+    private List<Table> getTablesForReservation(Reservation reservation) throws DAOException, ValidationException {
         LOGGER.debug("Entering getTablesForReservation with parameters: " + reservation);
 
         final String query = "SELECT table_section, table_number FROM ReservationAssoc WHERE reservation_ID = ? " +
@@ -413,20 +413,15 @@ class DBReservationDAO implements DAO<Reservation> {
                 final Long sectionId = result.getLong("table_section");
                 final Long tableNumber = result.getLong("table_number");
 
-                List<Table> storedTables = tableDAO.find(Table.withIdentity(Section.withIdentity(sectionId), tableNumber));
-                if (storedTables.size() != 1) {
-                    LOGGER.error("table not found");
-                    throw new DAOException("table not found");
-                }
-
-                tables.add(storedTables.get(0));
+                // we populate the list of tables before we return it - so the identity of a table is enough for now
+                tables.add(Table.withIdentity(Section.withIdentity(sectionId), tableNumber));
             }
         } catch (SQLException e) {
             LOGGER.error("Searching for reservation-tables failed", e);
             throw new DAOException("Searching for reservation-tables failed", e);
         }
 
-        return tables;
+        return tableDAO.populate(tables);
     }
 
     /**
@@ -435,7 +430,7 @@ class DBReservationDAO implements DAO<Reservation> {
      * @param changeNumber reservation history change number
      * @throws DAOException if an error accessing the database occurred
      */
-    private List<Table> getTablesForReservationHistory(Reservation reservation, long changeNumber) throws DAOException {
+    private List<Table> getTablesForReservationHistory(Reservation reservation, long changeNumber) throws DAOException, ValidationException {
         LOGGER.debug("Entering getTablesForHistoryReservation with parameters: " + reservation);
 
         final String query = "SELECT table_section, table_number FROM ReservationAssocHistory " +
@@ -452,20 +447,15 @@ class DBReservationDAO implements DAO<Reservation> {
                 final Long sectionId = result.getLong("table_section");
                 final Long tableNumber = result.getLong("table_number");
 
-                List<Table> storedTables = tableDAO.find(Table.withIdentity(Section.withIdentity(sectionId), tableNumber));
-                if (storedTables.size() != 1) {
-                    LOGGER.error("table not found");
-                    throw new DAOException("table not found");
-                }
-
-                tables.add(storedTables.get(0));
+                // we populate the list of tables before we return it - so the identity of a table is enough for now
+                tables.add(Table.withIdentity(Section.withIdentity(sectionId), tableNumber));
             }
         } catch (SQLException e) {
             LOGGER.error("Searching for reservation-tables history failed", e);
             throw new DAOException("Searching for reservation-tables history failed", e);
         }
 
-        return tables;
+        return tableDAO.populate(tables);
     }
 
     /**
