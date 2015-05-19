@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -534,5 +535,78 @@ public class TestUserDAO extends AbstractDAOTest {
         assertEquals(testUser, entry.getUser());
         assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
         assertTrue(entry.isDeleted());
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // user 1
+        User user1 = new User();
+        user1.setIdentity("hardy");
+        user1.setName("Hardy Heron");
+        user1.setRole("manager");
+
+        userDAO.create(user1);
+        assertEquals(1, userDAO.find(user1).size());
+
+        // user 2
+        User user2 = new User();
+        user2.setIdentity("intrepid");
+        user2.setName("Intrepid Ibex");
+        user2.setRole("manager");
+
+        userDAO.create(user2);
+        assertEquals(1, userDAO.find(user2).size());
+
+        // user 3
+        User user3 = new User();
+        user3.setIdentity("precise");
+        user3.setName("Intrepid Ibex");
+        user3.setRole("developer");
+
+        userDAO.create(user3);
+        assertEquals(1, userDAO.find(user3).size());
+
+        // GIVEN
+        User userId1 = User.withIdentity(user1.getIdentity());
+        User userId2 = User.withIdentity(user2.getIdentity());
+        User userId3 = User.withIdentity(user3.getIdentity());
+        List<User> userIds = Arrays.asList(userId1, userId2, userId3);
+
+        // WHEN
+        List<User> result = userDAO.populate(userIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(user1));
+        assertTrue(result.contains(user2));
+        assertTrue(result.contains(user3));
+    }
+
+    @Test
+    public void testPopulate_nullListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<User> result = userDAO.populate(null);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testPopulate_emptyListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<User> result = userDAO.populate(Arrays.asList());
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithInvalidObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<User> invalidUsers = Arrays.asList(new User());
+
+        // WHEN
+        List<User> result = userDAO.populate(invalidUsers);
     }
 }
