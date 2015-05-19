@@ -234,6 +234,43 @@ class DBReservationDAO implements DAO<Reservation> {
         return reservations;
     }
 
+    @Override
+    public List<Reservation> populate(List<Reservation> reservations) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + reservations);
+
+        if (reservations == null || reservations.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (Reservation reservation : reservations) {
+            validator.validateIdentity(reservation);
+        }
+
+        final String query = "SELECT * FROM Reservation WHERE ID IN (" +
+                reservations.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<Reservation> populatedReservations = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (Reservation reservation : reservations) {
+                stmt.setLong(index++, reservation.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedReservations.add(reservationFromResultSet(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating reservations failed", e);
+            throw new DAOException("Populating reservations failed", e);
+        }
+
+        return populatedReservations;
+    }
+
     /**
      * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed the changes
