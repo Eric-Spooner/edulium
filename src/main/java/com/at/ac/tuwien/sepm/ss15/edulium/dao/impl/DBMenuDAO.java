@@ -20,6 +20,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the MenuEntry DAO interface
@@ -182,12 +184,12 @@ class DBMenuDAO implements DAO<Menu> {
                     }
             }
             String queryByMenuEntry =
-                    "SELECT m.ID, m.name FROM (Menu m  JOIN MenuAssoc ma ON m.id  = ma.menu_id) WHERE " +
+                    "SELECT m.ID, m.name FROM (Menu m JOIN MenuAssoc ma ON m.id  = ma.menu_id) WHERE " +
                         "m.deleted = false AND ma.disabled = false AND " +
                         "m.ID = ISNULL(?, ID) AND " +
                         "m.name = ISNULL(?, name) AND " +
                         "ma.menuEntry_ID in (" +
-                        getQuestionMarks(list.size()) +
+                        list.stream().map(m -> "?").collect(Collectors.joining(",")) +
                         ") " +
                         "Group By m.ID";
 
@@ -227,23 +229,6 @@ class DBMenuDAO implements DAO<Menu> {
             }
         }
         return objects;
-    }
-
-    /**
-     * is used to produce a list of question marks
-     * @param amount the amount of question marks
-     * @return string, with amount number of question marks, spaced by ,
-     */
-    private String getQuestionMarks(int amount) {
-        String retval = "";
-        for (int i = 0; i < amount; i++){
-            if (retval.length() > 0) {
-                retval += ",?";
-            } else {
-                retval += "?";
-            }
-        }
-        return retval;
     }
 
     @Override
