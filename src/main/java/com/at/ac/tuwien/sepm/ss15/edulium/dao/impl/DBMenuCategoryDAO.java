@@ -18,6 +18,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the MenuCategoryDAO interface
@@ -170,6 +171,43 @@ class DBMenuCategoryDAO implements DAO<MenuCategory> {
         }
 
         return history;
+    }
+
+    @Override
+    public List<MenuCategory> populate(List<MenuCategory> menuCategories) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + menuCategories);
+
+        if (menuCategories == null || menuCategories.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (MenuCategory menuCategory : menuCategories) {
+            validator.validateIdentity(menuCategory);
+        }
+
+        final String query = "SELECT * FROM MenuCategory WHERE ID IN (" +
+                menuCategories.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<MenuCategory> populatedMenuCategories = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (MenuCategory menuCategory : menuCategories) {
+                stmt.setLong(index++, menuCategory.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedMenuCategories.add(parseResult(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating menu categories failed", e);
+            throw new DAOException("Populating menu categories failed", e);
+        }
+
+        return populatedMenuCategories;
     }
 
     /**

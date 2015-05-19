@@ -248,7 +248,7 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
             throw new DAOException("retrieving taxRate failed");
         }
 
-        List<MenuCategory> categories = menuCategoryDAO.find(MenuCategory.withIdentity(result.getLong("category_ID")));
+        List<MenuCategory> categories = menuCategoryDAO.populate(Arrays.asList(MenuCategory.withIdentity(result.getLong("category_ID"))));
         if (categories.size() != 1) {
             LOGGER.error("retrieving category failed");
             throw new DAOException("retrieving category failed");
