@@ -1052,7 +1052,8 @@ public class TestReservationDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
         // GIVEN
-        List<Reservation> invalidReservations = Arrays.asList(null);
+        List<Reservation> invalidReservations = new ArrayList<>();
+        invalidReservations.add(null);
 
         // WHEN
         List<Reservation> result = reservationDAO.populate(invalidReservations);

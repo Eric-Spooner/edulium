@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -1104,7 +1105,8 @@ public class TestTableDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
         // GIVEN
-        List<Table> invalidTables = Arrays.asList(null);
+        List<Table> invalidTables = new ArrayList<>();
+        invalidUsers.add(null);
 
         // WHEN
         List<Table> result = tableDAO.populate(invalidTables);

@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -665,7 +666,8 @@ public class TestUserDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
         // GIVEN
-        List<User> invalidUsers = Arrays.asList(null);
+        List<User> invalidUsers = new ArrayList<>();
+        invalidUsers.add(null);
 
         // WHEN
         List<User> result = userDAO.populate(invalidUsers);

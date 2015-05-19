@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -474,18 +475,19 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testPopulate_listWithInvalidObjectsShouldThrow() throws DAOException, ValidationException {
         // GIVEN
-        List<MenuCategory> invalidMenuCategorys = Arrays.asList(new MenuCategory());
+        List<MenuCategory> invalidMenuCategories = Arrays.asList(new MenuCategory());
 
         // WHEN
-        List<MenuCategory> result = menuCategoryDAO.populate(invalidMenuCategorys);
+        List<MenuCategory> result = menuCategoryDAO.populate(invalidMenuCategories);
     }
 
     @Test(expected = ValidationException.class)
     public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
         // GIVEN
-        List<MenuCategory> invalidMenuCategorys = Arrays.asList(null);
+        List<MenuCategory> invalidMenuCategories = new ArrayList<>();
+        invalidMenuCategories.add(null);
 
         // WHEN
-        List<MenuCategory> result = menuCategoryDAO.populate(invalidMenuCategorys);
+        List<MenuCategory> result = menuCategoryDAO.populate(invalidMenuCategories);
     }
 }

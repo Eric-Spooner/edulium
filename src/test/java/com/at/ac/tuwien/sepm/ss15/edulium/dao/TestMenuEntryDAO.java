@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -727,7 +728,8 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
         // GIVEN
-        List<MenuEntry> invalidEntries = Arrays.asList(null);
+        List<MenuEntry> invalidEntries = new ArrayList<>();
+        invalidEntries.add(null);
 
         // WHEN
         List<MenuEntry> result = menuEntryDAO.populate(invalidEntries);

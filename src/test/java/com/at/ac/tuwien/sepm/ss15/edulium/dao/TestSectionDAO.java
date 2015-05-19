@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -522,7 +523,8 @@ public class TestSectionDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
         // GIVEN
-        List<Section> invalidSections = Arrays.asList(null);
+        List<Section> invalidSections = new ArrayList<>();
+        invalidSections.add(null);
 
         // WHEN
         List<Section> result = sectionDAO.populate(invalidSections);

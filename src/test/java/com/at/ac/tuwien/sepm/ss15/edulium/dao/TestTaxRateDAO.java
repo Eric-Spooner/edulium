@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -562,7 +563,8 @@ public class TestTaxRateDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
         // GIVEN
-        List<TaxRate> invalidTaxRates = Arrays.asList(null);
+        List<TaxRate> invalidTaxRates = new ArrayList<>();
+        invalidTaxRates.add(null);
 
         // WHEN
         List<TaxRate> result = taxRateDAO.populate(invalidTaxRates);
