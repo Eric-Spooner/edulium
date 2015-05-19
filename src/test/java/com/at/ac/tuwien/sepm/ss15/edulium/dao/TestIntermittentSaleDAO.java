@@ -146,4 +146,59 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         assertEquals(1, storedObjects.size());
         assertEquals(intermittentSale, storedObjects.get(0));
     }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdate_updatingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setFromDayTime(LocalDateTime.now());
+        intermittentSale.setDuration(120);
+        intermittentSale.setMonday(true);
+        intermittentSale.setTuesday(true);
+        intermittentSale.setWednesday(true);
+        intermittentSale.setThursday(true);
+        intermittentSale.setFriday(true);
+        intermittentSale.setSaturday(true);
+        intermittentSale.setSunday(true);
+
+        // WHEN
+        intermittentSaleDAO.update(intermittentSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdate_updatingNullObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        IntermittentSale intermittentSale = null;
+
+        // WHEN
+        intermittentSaleDAO.update(intermittentSale);
+    }
+
+    @Test(expected = DAOException.class)
+    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        IntermittentSale intermittentSale = new IntermittentSale();
+
+        // search for a non-existing intermittent sale identity
+        try {
+            do {
+                intermittentSale.setIdentity(new Long((int)(Math.random()*999999999)));
+            } while (!intermittentSaleDAO.find(intermittentSale).isEmpty());
+        } catch (DAOException e) {
+            fail("DAOException should not occur while searching for a non-existing intermittent sale identity");
+        }
+
+        intermittentSale.setFromDayTime(LocalDateTime.now());
+        intermittentSale.setDuration(90);
+        intermittentSale.setMonday(true);
+        intermittentSale.setTuesday(true);
+        intermittentSale.setWednesday(false);
+        intermittentSale.setThursday(true);
+        intermittentSale.setFriday(true);
+        intermittentSale.setSaturday(true);
+        intermittentSale.setSunday(true);
+
+        // WHEN
+        intermittentSaleDAO.update(intermittentSale);
+    }
 }

@@ -104,4 +104,46 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         assertEquals(1, storedObjects.size());
         assertEquals(onetimeSale2, storedObjects.get(0));
     }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdate_updatingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
+       // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setFromTime(LocalDateTime.now());
+        onetimeSale.setToTime(LocalDateTime.now());
+
+        // WHEN
+        onetimeSaleDAO.update(onetimeSale);
+    }
+
+
+    @Test(expected = ValidationException.class)
+    public void testUpdate_updatingNullObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = null;
+
+        // WHEN
+        onetimeSaleDAO.update(onetimeSale);
+    }
+
+    @Test(expected = DAOException.class)
+    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        OnetimeSale sale = new OnetimeSale();
+
+        // search for a non-existing onetimesale identity
+        try {
+            do {
+                sale.setIdentity(new Long((int)(Math.random()*999999999)));
+            } while (!onetimeSaleDAO.find(sale).isEmpty());
+        } catch (DAOException e) {
+            fail("DAOException should not occur while searching for a non-existing onetimesale identity");
+        }
+
+        sale.setFromTime(LocalDateTime.now());
+        sale.setToTime(LocalDateTime.now());
+
+        // WHEN
+        onetimeSaleDAO.update(sale);
+    }
 }

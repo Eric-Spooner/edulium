@@ -97,4 +97,43 @@ public class TestSaleDAO extends AbstractDAOTest {
         assertEquals(1, storedObjects.size());
         assertEquals(sale2, storedObjects.get(0));
     }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdate_updatingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        Sale sale = new Sale();
+        sale.setName("New Sale");
+
+        // WHEN
+        saleDAO.update(sale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdate_updatingNullObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        Sale sale = null;
+
+        // WHEN
+        saleDAO.update(sale);
+    }
+
+    @Test(expected = DAOException.class)
+    public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
+        // GIVEN
+        Sale sale = new Sale();
+
+        // search for a non-existing sale identity
+        try {
+            do {
+                sale.setIdentity(new Long((int)(Math.random()*999999999)));
+            } while (!saleDAO.find(sale).isEmpty());
+        } catch (DAOException e) {
+            fail("DAOException should not occur while searching for a non-existing sale identity");
+        }
+
+        sale.setName("Updated Sale");
+
+        // WHEN
+        saleDAO.update(sale);
+    }
 }
