@@ -136,4 +136,30 @@ public class TestSaleDAO extends AbstractDAOTest {
         // WHEN
         saleDAO.update(sale);
     }
+
+    @Test
+    public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
+        // PREPARE
+        final int numberBefore = saleDAO.getAll().size();
+        Sale sale = new Sale();
+        sale.setIdentity(new Long(3));
+        sale.setName("New Sale");
+
+        // check if sale is stored
+        saleDAO.create(sale);
+        assertEquals(1, saleDAO.find(sale).size());
+
+        // GIVEN
+        Sale sale2 = new Sale();
+        sale.setIdentity(sale.getIdentity());
+
+        // WHEN
+        saleDAO.delete(sale2);
+
+        // THEN
+        // check if the sale has been updated;
+        List<Sale> storedObjects = saleDAO.find(sale2);
+        assertEquals(numberBefore, storedObjects.size());
+        assertEquals(0, saleDAO.find(sale).size());
+    }
 }

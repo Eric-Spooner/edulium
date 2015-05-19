@@ -201,4 +201,38 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // WHEN
         intermittentSaleDAO.update(intermittentSale);
     }
+
+    @Test
+    public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
+        // PREPARE
+        final int numberBefore = intermittentSaleDAO.getAll().size();
+        IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setFromDayTime(LocalDateTime.now());
+        intermittentSale.setDuration(120);
+        intermittentSale.setMonday(true);
+        intermittentSale.setTuesday(true);
+        intermittentSale.setWednesday(true);
+        intermittentSale.setThursday(true);
+        intermittentSale.setFriday(true);
+        intermittentSale.setSaturday(true);
+        intermittentSale.setSunday(true);
+
+        // check if user is stored
+        intermittentSaleDAO.create(intermittentSale);
+        assertEquals(1, intermittentSaleDAO.find(intermittentSale).size());
+
+        // GIVEN
+        IntermittentSale intermittentSale2 = new IntermittentSale();
+        intermittentSale2.setIdentity(intermittentSale.getIdentity());
+
+        // WHEN
+        intermittentSaleDAO.delete(intermittentSale2);
+
+        // THEN
+        // check if the user has been updated;
+        List<IntermittentSale> storedObjects = intermittentSaleDAO.find(intermittentSale2);
+        assertEquals(numberBefore, storedObjects.size());
+        assertEquals(0, intermittentSaleDAO.find(intermittentSale).size());
+    }
 }

@@ -146,4 +146,31 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // WHEN
         onetimeSaleDAO.update(sale);
     }
+
+    @Test
+    public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
+        // PREPARE
+        final int numberBefore = onetimeSaleDAO.getAll().size();
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setFromTime(LocalDateTime.now());
+        onetimeSale.setToTime(LocalDateTime.now());
+
+        // check if user is stored
+        onetimeSaleDAO.create(onetimeSale);
+        assertEquals(1, onetimeSaleDAO.find(onetimeSale).size());
+
+        // GIVEN
+        OnetimeSale onetimeSale2 = new OnetimeSale();
+        onetimeSale2.setIdentity(onetimeSale.getIdentity());
+
+        // WHEN
+        onetimeSaleDAO.delete(onetimeSale2);
+
+        // THEN
+        // check if the user has been updated;
+        List<OnetimeSale> storedObjects = onetimeSaleDAO.find(onetimeSale2);
+        assertEquals(numberBefore, storedObjects.size());
+        assertEquals(0, onetimeSaleDAO.find(onetimeSale).size());
+    }
 }
