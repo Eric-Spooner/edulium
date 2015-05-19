@@ -292,7 +292,7 @@ class DBTableDAO implements DAO<Table> {
             table.setUser(storedUsers.get(0));
         }
         // get section
-        List<Section> storedSections = sectionDAO.find(Section.withIdentity(Long.valueOf(result.getString("section_ID"))));
+        List<Section> storedSections = sectionDAO.populate(Arrays.asList(Section.withIdentity(Long.valueOf(result.getString("section_ID")))));
         if (storedSections.size() != 1) {
             throw new DAOException("section must not be null");
         }
