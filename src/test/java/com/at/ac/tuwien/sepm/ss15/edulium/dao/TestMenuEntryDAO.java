@@ -627,13 +627,59 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
     public void testPopulate_shouldReturnFullyPopulatedObjects() throws DAOException, ValidationException {
         // PREPARE
         MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);
+
         menuEntryDAO.create(entry1);
+        assertEquals(1, menuEntryDAO.find(entry1).size());
 
         MenuEntry entry2 = createMenuEntry("entry1", "desc2", "cat2", 20.0, 0.2, true);
+
         menuEntryDAO.create(entry2);
+        assertEquals(1, menuEntryDAO.find(entry2).size());
 
         MenuEntry entry3 = createMenuEntry("entry2", "desc3", "cat3", 30.0, 0.3, true);
+
         menuEntryDAO.create(entry3);
+        assertEquals(1, menuEntryDAO.find(entry3).size());
+
+        // GIVEN
+        MenuEntry entryId1 = MenuEntry.withIdentity(entry1.getIdentity());
+        MenuEntry entryId2 = MenuEntry.withIdentity(entry2.getIdentity());
+        MenuEntry entryId3 = MenuEntry.withIdentity(entry3.getIdentity());
+        List<MenuEntry> entryIds = Arrays.asList(entryId1, entryId2, entryId3);
+
+        // WHEN
+        List<MenuEntry> result = menuEntryDAO.populate(entryIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(entry1));
+        assertTrue(result.contains(entry2));
+        assertTrue(result.contains(entry3));
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjectsOfDeletedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);
+
+        menuEntryDAO.create(entry1);
+        assertEquals(1, menuEntryDAO.find(entry1).size());
+        menuEntryDAO.delete(entry1);
+        assertEquals(0, menuEntryDAO.find(entry1).size());
+
+        MenuEntry entry2 = createMenuEntry("entry1", "desc2", "cat2", 20.0, 0.2, true);
+
+        menuEntryDAO.create(entry2);
+        assertEquals(1, menuEntryDAO.find(entry2).size());
+        menuEntryDAO.delete(entry2);
+        assertEquals(0, menuEntryDAO.find(entry2).size());
+
+        MenuEntry entry3 = createMenuEntry("entry2", "desc3", "cat3", 30.0, 0.3, true);
+
+        menuEntryDAO.create(entry3);
+        assertEquals(1, menuEntryDAO.find(entry3).size());
+        menuEntryDAO.delete(entry3);
+        assertEquals(0, menuEntryDAO.find(entry3).size());
 
         // GIVEN
         MenuEntry entryId1 = MenuEntry.withIdentity(entry1.getIdentity());

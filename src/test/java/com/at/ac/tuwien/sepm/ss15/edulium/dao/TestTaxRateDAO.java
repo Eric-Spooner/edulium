@@ -487,6 +487,52 @@ public class TestTaxRateDAO extends AbstractDAOTest {
     }
 
     @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjectsOfDeletedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // tax rate 1
+        TaxRate taxRate1 = new TaxRate();
+        taxRate1.setValue(BigDecimal.valueOf(0.1111));
+
+        taxRateDAO.create(taxRate1);
+        assertEquals(1, taxRateDAO.find(taxRate1).size());
+        taxRateDAO.delete(taxRate1);
+        assertEquals(0, taxRateDAO.find(taxRate1).size());
+
+        // tax rate 2
+        TaxRate taxRate2 = new TaxRate();
+        taxRate2.setValue(BigDecimal.valueOf(0.2222));
+
+        taxRateDAO.create(taxRate2);
+        assertEquals(1, taxRateDAO.find(taxRate2).size());
+        taxRateDAO.delete(taxRate2);
+        assertEquals(0, taxRateDAO.find(taxRate2).size());
+
+        // tax rate 3
+        TaxRate taxRate3 = new TaxRate();
+        taxRate3.setValue(BigDecimal.valueOf(0.2222));
+
+        taxRateDAO.create(taxRate3);
+        assertEquals(1, taxRateDAO.find(taxRate3).size());
+        taxRateDAO.delete(taxRate3);
+        assertEquals(0, taxRateDAO.find(taxRate3).size());
+
+        // GIVEN
+        TaxRate taxRateId1 = TaxRate.withIdentity(taxRate1.getIdentity());
+        TaxRate taxRateId2 = TaxRate.withIdentity(taxRate2.getIdentity());
+        TaxRate taxRateId3 = TaxRate.withIdentity(taxRate3.getIdentity());
+        List<TaxRate> taxRateIds = Arrays.asList(taxRateId1, taxRateId2, taxRateId3);
+
+        // WHEN
+        List<TaxRate> result = taxRateDAO.populate(taxRateIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(taxRate1));
+        assertTrue(result.contains(taxRate2));
+        assertTrue(result.contains(taxRate3));
+    }
+
+    @Test
     public void testPopulate_nullListShouldReturnEmptyObjects() throws DAOException, ValidationException {
         // WHEN
         List<TaxRate> result = taxRateDAO.populate(null);
