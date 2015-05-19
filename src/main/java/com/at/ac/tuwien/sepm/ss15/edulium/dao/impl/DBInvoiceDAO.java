@@ -157,7 +157,6 @@ class DBInvoiceDAO implements DAO<Invoice> {
                     LOGGER.warn("parsing the result '" + rs + "' failed", e);
                 }
             }
-            rs.close();
         } catch (SQLException e) {
             LOGGER.error("Failed to retrieve data from the database", e);
             throw new DAOException("Failed to retrieve data from the database", e);
@@ -178,12 +177,13 @@ class DBInvoiceDAO implements DAO<Invoice> {
         final String query = "SELECT * FROM Invoice WHERE canceled = FALSE";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
-            try {
-                results.add(parseResult(rs));
-            } catch (ValidationException e) {
-                LOGGER.warn("parsing the result '" + rs + "' failed", e);
+            while (rs.next()) {
+                try {
+                    results.add(parseResult(rs));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + rs + "' failed", e);
+                }
             }
-            rs.close();
         } catch (SQLException e) {
             LOGGER.error("Failed to retreive all invoice entries from the database", e);
             throw new DAOException("Failed to retreive all invoice entries from the database", e);
