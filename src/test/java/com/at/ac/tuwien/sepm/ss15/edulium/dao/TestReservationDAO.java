@@ -911,4 +911,83 @@ public class TestReservationDAO extends AbstractDAOTest {
         assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
         assertTrue(entry.isDeleted());
     }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // reservation 1
+        Reservation reservation1 = new Reservation();
+        reservation1.setName("Hardy Heron");
+        reservation1.setTime(LocalDateTime.now());
+        reservation1.setDuration(Duration.ofMinutes(200));
+        reservation1.setQuantity(21);
+        reservation1.setTables(Arrays.asList(table1));
+
+        reservationDAO.create(reservation1);
+        assertEquals(1, reservationDAO.find(reservation1).size());
+
+        // reservation 2
+        Reservation reservation2 = new Reservation();
+        reservation2.setName("Hardy Heron");
+        reservation2.setTime(LocalDateTime.now());
+        reservation2.setDuration(Duration.ofMinutes(200));
+        reservation2.setQuantity(30);
+        reservation2.setTables(Arrays.asList(table1, table2));
+
+        reservationDAO.create(reservation2);
+        assertEquals(1, reservationDAO.find(reservation2).size());
+
+        // reservation 3
+        Reservation reservation3 = new Reservation();
+        reservation3.setName("Jaunty Jackalope");
+        reservation3.setTime(LocalDateTime.now());
+        reservation3.setDuration(Duration.ofMinutes(200));
+        reservation3.setQuantity(30);
+        reservation3.setTables(Arrays.asList(table1, table2));
+
+        reservationDAO.create(reservation3);
+        assertEquals(1, reservationDAO.find(reservation3).size());
+
+        // GIVEN
+        Reservation reservationId1 = Reservation.withIdentity(reservation1.getIdentity());
+        Reservation reservationId2 = Reservation.withIdentity(reservation2.getIdentity());
+        Reservation reservationId3 = Reservation.withIdentity(reservation3.getIdentity());
+        List<Reservation> reservationIds = Arrays.asList(reservationId1, reservationId2, reservationId3);
+
+        // WHEN
+        List<Reservation> result = reservationDAO.populate(reservationIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(reservation1));
+        assertTrue(result.contains(reservation2));
+        assertTrue(result.contains(reservation3));
+    }
+
+    @Test
+    public void testPopulate_nullListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<Reservation> result = reservationDAO.populate(null);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testPopulate_emptyListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<Reservation> result = reservationDAO.populate(Arrays.asList());
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithInvalidObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<Reservation> invalidReservations = Arrays.asList(new Reservation());
+
+        // WHEN
+        List<Reservation> result = reservationDAO.populate(invalidReservations);
+    }
 }
