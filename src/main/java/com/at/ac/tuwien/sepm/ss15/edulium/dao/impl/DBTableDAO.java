@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -283,10 +284,10 @@ class DBTableDAO implements DAO<Table> {
      * @return Table object with the data of the resultSet set
      * @throws SQLException if an error accessing the database occurred
      */
-    private Table parseResult(ResultSet result) throws SQLException, DAOException {
+    private Table parseResult(ResultSet result) throws SQLException, ValidationException, DAOException {
         Table table = new Table();
         // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("user_ID")));
+        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("user_ID"))));
         if (storedUsers.size() == 1) {
             table.setUser(storedUsers.get(0));
         }
@@ -312,9 +313,9 @@ class DBTableDAO implements DAO<Table> {
      * @throws SQLException if an error accessing the database occurred
      * @throws DAOException if an error retrieving the user ocurred
      */
-    private History<Table> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
+    private History<Table> parseHistoryEntry(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             throw new DAOException("user not found");
         }

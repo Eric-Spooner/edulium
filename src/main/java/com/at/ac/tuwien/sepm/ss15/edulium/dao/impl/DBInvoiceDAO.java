@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -244,8 +245,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
      * @throws DAOException If an error, while retrieving the invoice data, occurs
      * @throws SQLException If an error, while accessing database results, occurs
      */
-    private Invoice parseResult(ResultSet rs) throws DAOException, SQLException {
-        List<User> creator = userDAO.find(User.withIdentity(rs.getString("user_ID")));
+    private Invoice parseResult(ResultSet rs) throws DAOException, ValidationException, SQLException {
+        List<User> creator = userDAO.populate(Arrays.asList(User.withIdentity(rs.getString("user_ID"))));
         if (creator.size() != 1) {
             LOGGER.error("Retrieving creator failed");
             throw new DAOException("Retrieving creator failed");
@@ -267,8 +268,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
      * @throws DAOException Thrown in case an error occurs when accessing the database
      * @throws SQLException Thrown in case an error occurs when accessing the database result
      */
-    private History<Invoice> parseHistoryResult(ResultSet rs) throws DAOException, SQLException {
-        List<User> user = userDAO.find(User.withIdentity(rs.getString("changeUser")));
+    private History<Invoice> parseHistoryResult(ResultSet rs) throws DAOException, ValidationException, SQLException {
+        List<User> user = userDAO.populate(Arrays.asList(User.withIdentity(rs.getString("changeUser"))));
         if (user.size() != 1) {
             LOGGER.error("User not found");
             throw new DAOException("User not found");

@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -272,9 +273,9 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
      * @throws SQLException if an error accessing the database occurred
      * @throws DAOException if an error retrieving the user ocurred
      */
-    private History<MenuEntry> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
+    private History<MenuEntry> parseHistoryEntry(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             LOGGER.error("user not found");
             throw new DAOException("user not found");

@@ -17,10 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -333,9 +330,9 @@ class DBReservationDAO implements DAO<Reservation> {
      * @throws SQLException if an error accessing the database occurred
      * @throws DAOException if an error retrieving the user ocurred
      */
-    private History<Reservation> historyFromResultSet(ResultSet result) throws DAOException, SQLException {
+    private History<Reservation> historyFromResultSet(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             LOGGER.error("user not found");
             throw new DAOException("user not found");

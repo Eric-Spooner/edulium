@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -272,9 +273,9 @@ class DBSectionDAO implements DAO<Section> {
      * @throws SQLException if an error accessing the database occurred
      * @throws DAOException if an error retrieving the user ocurred
      */
-    private History<Section> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
+    private History<Section> parseHistoryEntry(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             throw new DAOException("user not found");
         }
