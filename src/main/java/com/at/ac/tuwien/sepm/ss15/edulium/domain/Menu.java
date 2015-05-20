@@ -78,7 +78,7 @@ public class Menu{
 
         Menu menu = (Menu) o;
 
-        if (entries != null ? !entries.equals(menu.entries) : menu.entries != null) return false;
+        if (entries != null ? !entries.containsAll(menu.entries) : menu.entries != null) return false;
         if (identity != null ? !identity.equals(menu.identity) : menu.identity != null) return false;
         if (name != null ? !name.equals(menu.name) : menu.name != null) return false;
 
