@@ -1,31 +1,26 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.AbstractDAOTest;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 /**
- * Unit Test for the TableDAO
+ * Unit test for InteriorService
  */
-public class TestTableService extends AbstractDAOTest {
+public class TestInteriorService extends AbstractServiceTest {
     @Autowired
-    private TableService tableService;
+    private InteriorService interiorService;
     @Autowired
     private DAO<User> userDAO;
     @Autowired
@@ -72,7 +67,7 @@ public class TestTableService extends AbstractDAOTest {
     }
 
     @Test
-    public void testAdd_shouldAddObject() throws ServiceException {
+    public void testAddTable_shouldAddTable() throws ServiceException {
         // GIVEN
         Table table = new Table();
         table.setNumber((long) 1);
@@ -83,21 +78,21 @@ public class TestTableService extends AbstractDAOTest {
         table.setRow(5);
 
         // WHEN
-        tableService.addTable(table);
+        interiorService.addTable(table);
 
         // THEN
         // check if identity is set
         Assert.assertNotNull(table.getNumber());
 
         // check retrieving object
-        List<Table> storedObjects = tableService.findTables(Table.withIdentity(section1, 1L));
+        List<Table> storedObjects = interiorService.findTables(Table.withIdentity(section1, 1L));
         Assert.assertEquals(1, storedObjects.size());
         Assert.assertEquals(table, storedObjects.get(0));
     }
 
     /* user is optional */
     @Test
-    public void testAdd_shouldAddObjectWithoutUser() throws ServiceException {
+    public void testAddTable_shouldAddTableWithoutUser() throws ServiceException {
         // GIVEN
         Table table = new Table();
         table.setNumber((long) 1);
@@ -108,20 +103,20 @@ public class TestTableService extends AbstractDAOTest {
         table.setRow(5);
 
         // WHEN
-        tableService.addTable(table);
+        interiorService.addTable(table);
 
         // THEN
         // check if identity is set
         Assert.assertNotNull(table.getNumber());
 
         // check retrieving object
-        List<Table> storedObjects = tableService.findTables(Table.withIdentity(section1, 1L));
+        List<Table> storedObjects = interiorService.findTables(Table.withIdentity(section1, 1L));
         Assert.assertEquals(1, storedObjects.size());
         Assert.assertEquals(table, storedObjects.get(0));
     }
 
     @Test(expected = ServiceException.class)
-    public void testAdd_addingTwoObjectsWithSameIdentityShouldFail() throws ServiceException {
+    public void testAddTable_addingTwoTablesWithSameIdentityShouldFail() throws ServiceException {
         // PREPARE
         Table table1 = new Table();
         table1.setNumber(1L);
@@ -132,13 +127,13 @@ public class TestTableService extends AbstractDAOTest {
         table1.setRow(5);
 
         try {
-            tableService.addTable(table1);
+            interiorService.addTable(table1);
         } catch (ServiceException e) {
             fail("ServiceException should not occur while adding a new table with a non-existing identity");
         }
 
         // check if table is stored
-        assertEquals(1, tableService.findTables(table1).size());
+        Assert.assertEquals(1, interiorService.findTables(table1).size());
 
         // GIVEN
         Table table2 = new Table();
@@ -150,11 +145,11 @@ public class TestTableService extends AbstractDAOTest {
         table2.setRow(2);
 
         // WHEN
-        tableService.addTable(table2);
+        interiorService.addTable(table2);
     }
 
-    @Test(expected = ValidationException.class)
-    public void testAdd_addingObjectWithoutNumberShouldFail() throws ServiceException {
+    @Test(expected = ServiceException.class)
+    public void testAddTable_addingTableWithoutNumberShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
         table.setSection(section1);
@@ -164,11 +159,11 @@ public class TestTableService extends AbstractDAOTest {
         table.setRow(5);
 
         // WHEN
-        tableService.addTable(table);
+        interiorService.addTable(table);
     }
 
-    @Test(expected = ValidationException.class)
-    public void testAdd_addingObjectWithoutSectionShouldFail() throws ServiceException {
+    @Test(expected = ServiceException.class)
+    public void testAddTable_addingTableWithoutSectionShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
         table.setNumber((long) 1);
@@ -178,31 +173,31 @@ public class TestTableService extends AbstractDAOTest {
         table.setRow(5);
 
         // WHEN
-        tableService.addTable(table);
+        interiorService.addTable(table);
     }
 
-    @Test(expected = ValidationException.class)
-    public void testAdd_addingInvalidObjectShouldFail() throws ServiceException {
+    @Test(expected = ServiceException.class)
+    public void testAddTable_addingInvalidTableShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
         table.setNumber(1L);
         table.setSection(section1);
 
         // WHEN
-        tableService.addTable(table);
+        interiorService.addTable(table);
     }
 
-    @Test(expected = ValidationException.class)
-    public void testAdd_addingNullObjectShouldFail() throws ServiceException {
+    @Test(expected = ServiceException.class)
+    public void testAddTable_addingNullTableShouldFail() throws ServiceException {
         // GIVEN
         Table table = null;
 
         // WHEN
-        tableService.addTable(table);
+        interiorService.addTable(table);
     }
 
     @Test
-    public void testUpdate_shouldUpdateObject() throws ServiceException {
+    public void testUpdateTable_shouldUpdateTable() throws ServiceException {
         // GIVEN
         Table table = new Table();
         table.setNumber((long) 1);
@@ -212,10 +207,10 @@ public class TestTableService extends AbstractDAOTest {
         table.setColumn(4);
         table.setRow(5);
 
-        tableService.addTable(table);
+        interiorService.addTable(table);
 
         // check if cat is stored
-        assertEquals(1, tableService.findTables(table).size());
+        Assert.assertEquals(1, interiorService.findTables(table).size());
 
         // GIVEN
         table.setSeats(6);
@@ -224,18 +219,18 @@ public class TestTableService extends AbstractDAOTest {
         table.setUser(user2);
 
         // WHEN
-        tableService.updateTable(table);
+        interiorService.updateTable(table);
 
         // THEN
         // check if category name was updated
-        List<Table> storedObjects = tableService.findTables(Table.withIdentity(section1, 1L));
+        List<Table> storedObjects = interiorService.findTables(Table.withIdentity(section1, 1L));
         Assert.assertEquals(1, storedObjects.size());
         Assert.assertEquals(table, storedObjects.get(0));
     }
 
     /* user is optional */
     @Test
-    public void testUpdate_shouldUpdateObjectWithoutUser() throws ServiceException {
+    public void testUpdateTable_shouldUpdateTableWithoutUser() throws ServiceException {
         // GIVEN
         Table table = new Table();
         table.setNumber((long) 1);
@@ -245,10 +240,10 @@ public class TestTableService extends AbstractDAOTest {
         table.setColumn(4);
         table.setRow(5);
 
-        tableService.addTable(table);
+        interiorService.addTable(table);
 
         // check if table is stored
-        assertEquals(1, tableService.findTables(table).size());
+        Assert.assertEquals(1, interiorService.findTables(table).size());
 
         // GIVEN
         table.setSeats(6);
@@ -257,17 +252,17 @@ public class TestTableService extends AbstractDAOTest {
         table.setUser(null);
 
         // WHEN
-        tableService.updateTable(table);
+        interiorService.updateTable(table);
 
         // THEN
         // check if table was updated
-        List<Table> storedObjects = tableService.findTables(Table.withIdentity(section1, 1L));
+        List<Table> storedObjects = interiorService.findTables(Table.withIdentity(section1, 1L));
         Assert.assertEquals(1, storedObjects.size());
         Assert.assertEquals(table, storedObjects.get(0));
     }
 
-    @Test(expected = ValidationException.class)
-    public void testUpdate_updatingObjectWithoutNumberShouldFail() throws ServiceException {
+    @Test(expected = ServiceException.class)
+    public void testUpdateTable_updatingTableWithoutNumberShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
         table.setSeats(3);
@@ -277,11 +272,11 @@ public class TestTableService extends AbstractDAOTest {
         table.setSection(section1);
 
         // WHEN
-        tableService.updateTable(table);
+        interiorService.updateTable(table);
     }
 
-    @Test(expected = ValidationException.class)
-    public void testUpdate_updatingObjectWithoutSectionShouldFail() throws ServiceException {
+    @Test(expected = ServiceException.class)
+    public void testUpdateTable_updatingTableWithoutSectionShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
         table.setNumber(1L);
@@ -291,31 +286,31 @@ public class TestTableService extends AbstractDAOTest {
         table.setUser(user1);
 
         // WHEN
-        tableService.updateTable(table);
+        interiorService.updateTable(table);
     }
 
-    @Test(expected = ValidationException.class)
-    public void testUpdate_updatingInvalidObjectShouldFail() throws ServiceException {
+    @Test(expected = ServiceException.class)
+    public void testUpdateTable_updatingInvalidTableShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
         table.setNumber(1L);
         table.setSection(section1);
 
         // WHEN
-        tableService.updateTable(table);
+        interiorService.updateTable(table);
     }
 
-    @Test(expected = ValidationException.class)
-    public void testUpdate_updatingNullObjectShouldFail() throws ServiceException {
+    @Test(expected = ServiceException.class)
+    public void testUpdateTable_updatingNullTableShouldFail() throws ServiceException {
         // GIVEN
         Table table = null;
 
         // WHEN
-        tableService.updateTable(table);
+        interiorService.updateTable(table);
     }
 
     @Test(expected = ServiceException.class)
-    public void testUpdate_updatingNotPersistentObjectShouldFail() throws ServiceException {
+    public void testUpdateTable_updatingNotPersistentTableShouldFail() throws ServiceException {
         // GIVEN
         Table notPersitentTable = new Table();
         Long number = (long) 1;
@@ -324,7 +319,7 @@ public class TestTableService extends AbstractDAOTest {
 
         // check if no item with this number exists
         try {
-            while (!tableService.findTables(notPersitentTable).isEmpty()) {
+            while (!interiorService.findTables(notPersitentTable).isEmpty()) {
                 number++;
                 notPersitentTable.setNumber(number);
             }
@@ -342,11 +337,11 @@ public class TestTableService extends AbstractDAOTest {
         table.setUser(user1);
 
         // WHEN
-        tableService.updateTable(table);
+        interiorService.updateTable(table);
     }
 
     @Test
-    public void testDelete_shouldDeleteObject() throws ServiceException {
+    public void testDeleteTable_shouldDeleteTable() throws ServiceException {
         // GIVEN
         Table table = new Table();
         table.setNumber((long) 2);
@@ -356,20 +351,20 @@ public class TestTableService extends AbstractDAOTest {
         table.setSection(section1);
         table.setUser(user1);
 
-        tableService.addTable(table);
+        interiorService.addTable(table);
 
         // check if table created
-        assertEquals(1, tableService.findTables(table).size());
+        Assert.assertEquals(1, interiorService.findTables(table).size());
 
         // WHEN
-        tableService.deleteTable(table);
+        interiorService.deleteTable(table);
 
         // check if category was removed
-        Assert.assertEquals(0, tableService.findTables(Table.withIdentity(section1, 2L)).size());
+        Assert.assertEquals(0, interiorService.findTables(Table.withIdentity(section1, 2L)).size());
     }
 
-    @Test(expected = ValidationException.class)
-    public void testDelete_deletingObjectWithoutNumberShouldFail() throws ServiceException {
+    @Test(expected = ServiceException.class)
+    public void testDeleteTable_deletingTableWithoutNumberShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
         table.setSection(section1);
@@ -379,11 +374,11 @@ public class TestTableService extends AbstractDAOTest {
         table.setRow(5);
 
         // WHEN
-        tableService.deleteTable(table);
+        interiorService.deleteTable(table);
     }
 
-    @Test(expected = ValidationException.class)
-    public void testDelete_deletingObjectWithoutSectionShouldFail() throws ServiceException {
+    @Test(expected = ServiceException.class)
+    public void testDeleteTable_deletingTableWithoutSectionShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
         table.setNumber(1L);
@@ -393,11 +388,11 @@ public class TestTableService extends AbstractDAOTest {
         table.setRow(5);
 
         // WHEN
-        tableService.deleteTable(table);
+        interiorService.deleteTable(table);
     }
 
     @Test(expected = ServiceException.class)
-    public void testDelete_deletingNotPersistentObjectShouldFail() throws ServiceException {
+    public void testDeleteTable_deletingNotPersistentTableShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
         Long number = (long) 1;
@@ -406,7 +401,7 @@ public class TestTableService extends AbstractDAOTest {
 
         // check if no item with this number exists
         try {
-            while (!tableService.findTables(table).isEmpty()) {
+            while (!interiorService.findTables(table).isEmpty()) {
                 number++;
                 table.setNumber(number);
             }
@@ -416,11 +411,11 @@ public class TestTableService extends AbstractDAOTest {
         }
 
         // WHEN
-        tableService.deleteTable(table);
+        interiorService.deleteTable(table);
     }
 
     @Test
-    public void testFind_byIdentityShouldReturnObject() throws ServiceException {
+    public void testFindTable_byIdentityShouldReturnTable() throws ServiceException {
         // PREPARE
         Table table1 = new Table();
         table1.setSeats(3);
@@ -446,31 +441,31 @@ public class TestTableService extends AbstractDAOTest {
         table3.setUser(user3);
         table3.setSection(section3);
 
-        tableService.addTable(table1);
-        tableService.addTable(table2);
-        tableService.addTable(table3);
+        interiorService.addTable(table1);
+        interiorService.addTable(table2);
+        interiorService.addTable(table3);
 
         // WHEN
-        List<Table> objects = tableService.findTables(Table.withIdentity(section3, 1L));
+        List<Table> objects = interiorService.findTables(Table.withIdentity(section3, 1L));
         // THEN
         Assert.assertEquals(1, objects.size());
         Assert.assertTrue(objects.contains(table1));
 
         // WHEN
-        objects = tableService.findTables(Table.withIdentity(section2, 1L));
+        objects = interiorService.findTables(Table.withIdentity(section2, 1L));
         // THEN
         Assert.assertEquals(1, objects.size());
         Assert.assertTrue(objects.contains(table2));
 
         // WHEN
-        objects = tableService.findTables(Table.withIdentity(section3, 3L));
+        objects = interiorService.findTables(Table.withIdentity(section3, 3L));
         // THEN
         Assert.assertEquals(1, objects.size());
         Assert.assertTrue(objects.contains(table3));
     }
 
     @Test
-    public void testFind_byNumberShouldReturnObject() throws ServiceException {
+    public void testFindTable_byNumberShouldReturnTable() throws ServiceException {
         // PREPARE
         Table table1 = new Table();
         table1.setSeats(3);
@@ -496,14 +491,14 @@ public class TestTableService extends AbstractDAOTest {
         table3.setUser(user3);
         table3.setSection(section3);
 
-        tableService.addTable(table1);
-        tableService.addTable(table2);
-        tableService.addTable(table3);
+        interiorService.addTable(table1);
+        interiorService.addTable(table2);
+        interiorService.addTable(table3);
 
         // WHEN
         Table matcher = new Table();
         matcher.setNumber(1L); // table 1 and table 2
-        List<Table> objects = tableService.findTables(matcher);
+        List<Table> objects = interiorService.findTables(matcher);
         // THEN
         Assert.assertEquals(2, objects.size());
         Assert.assertTrue(objects.contains(table1));
@@ -511,14 +506,14 @@ public class TestTableService extends AbstractDAOTest {
 
         // WHEN
         matcher.setNumber(3L); // table 3
-        objects = tableService.findTables(matcher);
+        objects = interiorService.findTables(matcher);
         // THEN
         Assert.assertEquals(1, objects.size());
         Assert.assertTrue(objects.contains(table3));
     }
 
     @Test
-    public void testFind_bySectionShouldReturnObject() throws ServiceException {
+    public void testFindTable_bySectionShouldReturnTable() throws ServiceException {
         // PREPARE
         Table table1 = new Table();
         table1.setSeats(3);
@@ -544,14 +539,14 @@ public class TestTableService extends AbstractDAOTest {
         table3.setUser(user3);
         table3.setSection(section3);
 
-        tableService.addTable(table1);
-        tableService.addTable(table2);
-        tableService.addTable(table3);
+        interiorService.addTable(table1);
+        interiorService.addTable(table2);
+        interiorService.addTable(table3);
 
         // WHEN
         Table matcher = new Table();
         matcher.setSection(section3); // table 1 and table 3
-        List<Table> objects = tableService.findTables(matcher);
+        List<Table> objects = interiorService.findTables(matcher);
         // THEN
         Assert.assertEquals(2, objects.size());
         Assert.assertTrue(objects.contains(table1));
@@ -559,14 +554,14 @@ public class TestTableService extends AbstractDAOTest {
 
         // WHEN
         matcher.setSection(section2); // table 2
-        objects = tableService.findTables(matcher);
+        objects = interiorService.findTables(matcher);
         // THEN
         Assert.assertEquals(1, objects.size());
         Assert.assertTrue(objects.contains(table2));
     }
 
     @Test
-    public void testFind_byUserShouldReturnObject() throws ServiceException {
+    public void testFindTable_byUserShouldReturnTable() throws ServiceException {
         // PREPARE
         Table table1 = new Table();
         table1.setSeats(3);
@@ -592,14 +587,14 @@ public class TestTableService extends AbstractDAOTest {
         table3.setUser(user3);
         table3.setSection(section3);
 
-        tableService.addTable(table1);
-        tableService.addTable(table2);
-        tableService.addTable(table3);
+        interiorService.addTable(table1);
+        interiorService.addTable(table2);
+        interiorService.addTable(table3);
 
         // WHEN
         Table matcher = new Table();
         matcher.setUser(user2); // table 1 and table 2
-        List<Table> objects = tableService.findTables(matcher);
+        List<Table> objects = interiorService.findTables(matcher);
         // THEN
         Assert.assertEquals(2, objects.size());
         Assert.assertTrue(objects.contains(table1));
@@ -607,14 +602,14 @@ public class TestTableService extends AbstractDAOTest {
 
         // WHEN
         matcher.setUser(user3); // table 3
-        objects = tableService.findTables(matcher);
+        objects = interiorService.findTables(matcher);
         // THEN
         Assert.assertEquals(1, objects.size());
         Assert.assertTrue(objects.contains(table3));
     }
 
     @Test
-    public void testFind_bySeatsShouldReturnObject() throws ServiceException {
+    public void testFindTable_bySeatsShouldReturnTable() throws ServiceException {
         // PREPARE
         Table table1 = new Table();
         table1.setSeats(3);
@@ -640,14 +635,14 @@ public class TestTableService extends AbstractDAOTest {
         table3.setUser(user3);
         table3.setSection(section3);
 
-        tableService.addTable(table1);
-        tableService.addTable(table2);
-        tableService.addTable(table3);
+        interiorService.addTable(table1);
+        interiorService.addTable(table2);
+        interiorService.addTable(table3);
 
         // WHEN
         Table matcher = new Table();
         matcher.setSeats(3); // table 1 and table 3
-        List<Table> objects = tableService.findTables(matcher);
+        List<Table> objects = interiorService.findTables(matcher);
         // THEN
         Assert.assertEquals(2, objects.size());
         Assert.assertTrue(objects.contains(table1));
@@ -655,14 +650,14 @@ public class TestTableService extends AbstractDAOTest {
 
         // WHEN
         matcher.setSeats(13); // table 2
-        objects = tableService.findTables(matcher);
+        objects = interiorService.findTables(matcher);
         // THEN
         Assert.assertEquals(1, objects.size());
         Assert.assertTrue(objects.contains(table2));
     }
 
     @Test
-    public void testFind_byRowShouldReturnObject() throws ServiceException {
+    public void testFindTable_byRowShouldReturnTable() throws ServiceException {
         // PREPARE
         Table table1 = new Table();
         table1.setSeats(3);
@@ -688,14 +683,14 @@ public class TestTableService extends AbstractDAOTest {
         table3.setUser(user3);
         table3.setSection(section3);
 
-        tableService.addTable(table1);
-        tableService.addTable(table2);
-        tableService.addTable(table3);
+        interiorService.addTable(table1);
+        interiorService.addTable(table2);
+        interiorService.addTable(table3);
 
         // WHEN
         Table matcher = new Table();
         matcher.setRow(15); // table 2 and table 3
-        List<Table> objects = tableService.findTables(matcher);
+        List<Table> objects = interiorService.findTables(matcher);
         // THEN
         Assert.assertEquals(2, objects.size());
         Assert.assertTrue(objects.contains(table2));
@@ -703,14 +698,14 @@ public class TestTableService extends AbstractDAOTest {
 
         // WHEN
         matcher.setRow(5); // table 1
-        objects = tableService.findTables(matcher);
+        objects = interiorService.findTables(matcher);
         // THEN
         Assert.assertEquals(1, objects.size());
         Assert.assertTrue(objects.contains(table1));
     }
 
     @Test
-    public void testFind_byColumnShouldReturnObject() throws ServiceException {
+    public void testFindTable_byColumnShouldReturnTable() throws ServiceException {
         // PREPARE
         Table table1 = new Table();
         table1.setSeats(3);
@@ -736,14 +731,14 @@ public class TestTableService extends AbstractDAOTest {
         table3.setUser(user3);
         table3.setSection(section3);
 
-        tableService.addTable(table1);
-        tableService.addTable(table2);
-        tableService.addTable(table3);
+        interiorService.addTable(table1);
+        interiorService.addTable(table2);
+        interiorService.addTable(table3);
 
         // WHEN
         Table matcher = new Table();
         matcher.setColumn(14); // table 1 and table 2
-        List<Table> objects = tableService.findTables(matcher);
+        List<Table> objects = interiorService.findTables(matcher);
         // THEN
         Assert.assertEquals(2, objects.size());
         Assert.assertTrue(objects.contains(table1));
@@ -751,14 +746,14 @@ public class TestTableService extends AbstractDAOTest {
 
         // WHEN
         matcher.setColumn(24); // table 3
-        objects = tableService.findTables(matcher);
+        objects = interiorService.findTables(matcher);
         // THEN
         Assert.assertEquals(1, objects.size());
         Assert.assertTrue(objects.contains(table3));
     }
 
     @Test
-    public void testFind_shouldReturnEmptyList() throws ServiceException {
+    public void testFindTable_shouldReturnEmptyList() throws ServiceException {
         // GIVEN
         Long number = (long) 1;
         Table matcher = new Table();
@@ -766,7 +761,7 @@ public class TestTableService extends AbstractDAOTest {
 
         // check if no item with this number exists
         try {
-            while (!tableService.findTables(matcher).isEmpty()) {
+            while (!interiorService.findTables(matcher).isEmpty()) {
                 number++;
                 matcher.setNumber(number);
             }
@@ -776,23 +771,23 @@ public class TestTableService extends AbstractDAOTest {
         }
 
         // WHEN
-        List<Table> storedObjects = tableService.findTables(matcher);
+        List<Table> storedObjects = interiorService.findTables(matcher);
 
         // THEN
         Assert.assertEquals(0, storedObjects.size());
     }
 
     @Test
-    public void testFindNull_shouldReturnEmptyList() throws ServiceException {
+    public void testFindNullTable_shouldReturnEmptyList() throws ServiceException {
         // WHEN
-        List<Table> storedObjects = tableService.findTables(null);
+        List<Table> storedObjects = interiorService.findTables(null);
 
         // THEN
         Assert.assertTrue(storedObjects.isEmpty());
     }
 
     @Test
-    public void testGetAll_shouldReturnObjects() throws ServiceException {
+    public void testGetAllTables_shouldReturnTables() throws ServiceException {
         // GIVEN
         Table matcher = new Table();
         Table table1 = new Table();
@@ -816,12 +811,12 @@ public class TestTableService extends AbstractDAOTest {
         table3.setNumber((long) 3);
         table3.setUser(user3);
         table3.setSection(section3);
-        tableService.addTable(table1);
-        tableService.addTable(table2);
-        tableService.addTable(table3);
+        interiorService.addTable(table1);
+        interiorService.addTable(table2);
+        interiorService.addTable(table3);
 
         // WHEN
-        List<Table> objects = tableService.getAllTables();
+        List<Table> objects = interiorService.getAllTables();
 
         // THEN
         Assert.assertTrue(objects.contains(table1));
@@ -835,7 +830,7 @@ public class TestTableService extends AbstractDAOTest {
      * 3. add the table again (same section and same number)
      */
     @Test
-    public void testAdd_shouldAddRemoveAndReaddObject() throws ServiceException {
+    public void testAddTable_shouldAddRemoveAndReaddTable() throws ServiceException {
         // GIVEN
         Table table = new Table();
         table.setNumber(1L);
@@ -846,18 +841,313 @@ public class TestTableService extends AbstractDAOTest {
         table.setRow(5);
 
         // WHEN
-        tableService.addTable(table);
+        interiorService.addTable(table);
         // THEN
-        Assert.assertEquals(1, tableService.findTables(table).size());
+        Assert.assertEquals(1, interiorService.findTables(table).size());
 
         // WHEN
-        tableService.deleteTable(table);
+        interiorService.deleteTable(table);
         // THEN
-        Assert.assertEquals(0, tableService.findTables(table).size());
+        Assert.assertEquals(0, interiorService.findTables(table).size());
 
         // WHEN
-        tableService.addTable(table); // readd
+        interiorService.addTable(table); // readd
         // THEN
-        Assert.assertEquals(1, tableService.findTables(table).size());
+        Assert.assertEquals(1, interiorService.findTables(table).size());
+    }
+    
+    @Test
+    public void testAddSection_shouldAddSection() throws ServiceException {
+        // GIVEN
+        Section section = new Section();
+        section.setName("section");
+
+        // WHEN
+        interiorService.addSection(section);
+
+        // THEN
+        // check if identity is set
+        Assert.assertNotNull(section.getIdentity());
+
+        // check retrieving object
+        List<Section> storedObjects = interiorService.findSections(Section.withIdentity(section.getIdentity()));
+        Assert.assertEquals(1, storedObjects.size());
+        Assert.assertEquals(section, storedObjects.get(0));
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testAddSection_addingInvalidSectionShouldFail() throws ServiceException {
+        // GIVEN
+        Section section = new Section();
+
+        // WHEN
+        try {
+            interiorService.addSection(section);
+        } finally {
+            Assert.assertNull(section.getIdentity());
+        }
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testAddSection_addingNullSectionShouldFail() throws ServiceException {
+        // GIVEN
+        Section section = null;
+
+        // WHEN
+        interiorService.addSection(section);
+    }
+
+    @Test
+    public void testUpdateSection_shouldUpdateSection() throws ServiceException {
+        // PREPARE
+        Section section = new Section();
+        section.setName("section");
+        interiorService.addSection(section);
+
+        // check if section is stored
+        Assert.assertEquals(1, interiorService.findSections(section).size());
+
+        // GIVEN
+        section.setName("newSection");
+
+        // WHEN
+        interiorService.updateSection(section);
+
+        // THEN
+        // check if section name was updated
+        List<Section> storedObjects = interiorService.findSections(Section.withIdentity(section.getIdentity()));
+        Assert.assertEquals(1, storedObjects.size());
+        Assert.assertEquals(section, storedObjects.get(0));
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testUpdateSection_updatingSectionWithIdentityNullShouldFail() throws ServiceException {
+        // GIVEN
+        Section section = new Section();
+        section.setName("section");
+
+        // WHEN
+        interiorService.updateSection(section);
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testUpdateSection_updatingInvalidSectionShouldFail() throws ServiceException {
+        // GIVEN
+        Section section = new Section();
+
+        // WHEN
+        interiorService.updateSection(section);
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testUpdateSection_updatingNullSectionShouldFail() throws ServiceException {
+        // GIVEN
+        Section section = null;
+
+        // WHEN
+        interiorService.updateSection(section);
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testUpdateSection_updatingNotPersistentSectionShouldFail() throws ServiceException {
+        // GIVEN
+        Section notPersitentSection = new Section();
+        Long identity = (long) 1;
+        notPersitentSection.setIdentity(identity);
+
+        // check if no item with the id IDENTITY exists
+        try {
+            while (!interiorService.findSections(notPersitentSection).isEmpty()) {
+                identity++;
+                notPersitentSection.setIdentity(identity);
+            }
+        } catch (ServiceException e) {
+            // exception should not occur here
+            Assert.fail();
+        }
+
+        Section section = new Section();
+        section.setIdentity(notPersitentSection.getIdentity());
+        section.setName("section");
+
+        // WHEN
+        interiorService.updateSection(section);
+    }
+
+    @Test
+    public void testDeleteSection_shouldDeleteSection() throws ServiceException {
+        // PREPARE
+        Section section = new Section();
+        section.setName("section");
+        interiorService.addSection(section);
+
+        // check if section added
+        Assert.assertEquals(1, interiorService.findSections(section).size());
+
+        // WHEN
+        interiorService.deleteSection(section);
+
+        // THEN
+        // check if section was removed
+        Assert.assertEquals(0, interiorService.findSections(section).size());
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testDeleteSection_deletingSectionWithIdentityNullShouldFail() throws ServiceException {
+        // GIVEN
+        Section section = new Section();
+
+        // WHEN
+        interiorService.deleteSection(section);
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testDeleteSection_deletingNullSectionShouldFail() throws ServiceException {
+        // GIVEN
+        Section section = null;
+
+        // WHEN
+        interiorService.deleteSection(section);
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testDeleteSection_deletingNotPersistentSectionShouldFail() throws ServiceException {
+        // GIVEN
+        Section section = new Section();
+        Long identity = (long) 1;
+        section.setIdentity(identity);
+
+        // check if no item with the id IDENTITY exists
+        try {
+            while (!interiorService.findSections(section).isEmpty()) {
+                identity++;
+                section.setIdentity(identity);
+            }
+        } catch (ServiceException e) {
+            // exception should not occur here
+            Assert.fail();
+        }
+
+        // WHEN
+        interiorService.deleteSection(section);
+    }
+
+    @Test
+    public void testFindSection_byIdentityShouldReturnSection() throws ServiceException {
+        // GIVEN
+        Section matcher = new Section();
+        Section section1 = new Section();
+        Section section2 = new Section();
+        Section section3 = new Section();
+        section1.setName("section1");
+        section2.setName("section2");
+        section3.setName("section3");
+        interiorService.addSection(section1);
+        interiorService.addSection(section2);
+        interiorService.addSection(section3);
+
+        // WHEN
+        matcher.setIdentity(section1.getIdentity());
+        List<Section> objects = interiorService.findSections(matcher);
+        // THEN
+        Assert.assertEquals(1, objects.size());
+        Assert.assertEquals(section1, objects.get(0));
+
+        // WHEN
+        matcher.setIdentity(section2.getIdentity());
+        objects = interiorService.findSections(matcher);
+        // THEN
+        Assert.assertEquals(1, objects.size());
+        Assert.assertEquals(section2, objects.get(0));
+
+        // WHEN
+        matcher.setIdentity(section3.getIdentity());
+        objects = interiorService.findSections(matcher);
+        // THEN
+        Assert.assertEquals(1, objects.size());
+        Assert.assertEquals(section3, objects.get(0));
+    }
+
+    @Test
+    public void testFindSection_byNameShouldReturnSections() throws ServiceException {
+        // GIVEN
+        Section matcher = new Section();
+        Section section1 = new Section();
+        Section section2 = new Section();
+        Section section3 = new Section();
+        section1.setName("section");
+        section2.setName("section");
+        section3.setName("section2");
+        interiorService.addSection(section1);
+        interiorService.addSection(section2);
+        interiorService.addSection(section3);
+
+        // WHEN
+        matcher.setName(section1.getName());
+        List<Section> objects = interiorService.findSections(matcher);
+
+        // THEN
+        Assert.assertEquals(2, objects.size());
+        Assert.assertTrue(objects.contains(section1));
+        Assert.assertTrue(objects.contains(section2));
+
+        // WHEN
+        matcher.setName(section3.getName());
+        objects = interiorService.findSections(matcher);
+
+        // THEN
+        Assert.assertEquals(1, objects.size());
+        Assert.assertEquals(objects.get(0), section3);
+    }
+
+    @Test
+    public void testFindSection_shouldReturnEmptyList() throws ServiceException {
+        // GIVEN
+        Long identity = (long) 1;
+        Section matcher = new Section();
+        matcher.setIdentity(identity);
+
+        // check if no item with the id IDENTITY exists
+        while (!interiorService.findSections(matcher).isEmpty()) {
+            identity++;
+            matcher.setIdentity(identity);
+        }
+
+        // WHEN
+        List<Section> storedObjects = interiorService.findSections(matcher);
+
+        // THEN
+        Assert.assertTrue(storedObjects.isEmpty());
+    }
+
+    @Test
+    public void testFindNullSection_shouldReturnEmptyList() throws ServiceException {
+        // WHEN
+        List<Section> storedObjects = interiorService.findSections(null);
+
+        // THEN
+        Assert.assertTrue(storedObjects.isEmpty());
+    }
+
+    @Test
+    public void testGetAllSections_shouldReturnSections() throws ServiceException {
+        // GIVEN
+        Section section1 = new Section();
+        Section section2 = new Section();
+        Section section3 = new Section();
+        section1.setName("section1");
+        section2.setName("section2");
+        section3.setName("section3");
+        interiorService.addSection(section1);
+        interiorService.addSection(section2);
+        interiorService.addSection(section3);
+
+        // WHEN
+        List<Section> objects = interiorService.getAllSections();
+
+        // THEN
+        Assert.assertTrue(objects.contains(section1));
+        Assert.assertTrue(objects.contains(section2));
+        Assert.assertTrue(objects.contains(section3));
     }
 }

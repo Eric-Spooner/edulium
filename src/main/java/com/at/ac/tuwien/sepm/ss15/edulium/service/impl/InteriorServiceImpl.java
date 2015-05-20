@@ -1,17 +1,17 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.SectionService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 
 import java.util.List;
 
 /**
- * Created by Administrator on 19.05.2015.
+ * Implementation of InteriorService
  */
-public class SectionServiceImpl implements SectionService {
+public class InteriorServiceImpl implements InteriorService {
+
     @Override
     public void addSection(Section section) throws ServiceException {
 
@@ -38,12 +38,27 @@ public class SectionServiceImpl implements SectionService {
     }
 
     @Override
-    public void addTable(Section section, Table table) throws ServiceException {
+    public void addTable(Table table) throws ServiceException {
 
     }
 
     @Override
-    public List<Table> getAllTables(Section section) throws ServiceException {
+    public void updateTable(Table table) throws ServiceException {
+
+    }
+
+    @Override
+    public void deleteTable(Table table) throws ServiceException {
+
+    }
+
+    @Override
+    public List<Table> findTables(Table table) throws ServiceException {
+        return null;
+    }
+
+    @Override
+    public List<Table> getAllTables() throws ServiceException {
         return null;
     }
 }
