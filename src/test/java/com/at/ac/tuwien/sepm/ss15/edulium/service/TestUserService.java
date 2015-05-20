@@ -80,6 +80,17 @@ public class TestUserService extends AbstractServiceTest {
         Mockito.verify(userDAO, never()).create(user);
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testAddUser_shouldRethrowDAOExceptionAsServiceException() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        User user = new User();
+        Mockito.doThrow(new DAOException("mocked dao exception")).when(userDAO).create(user);
+
+        // WHEN
+        userService.addUser(user);
+    }
+
     @Test
     @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testUpdateUser_shouldUpdateUser() throws ServiceException, ValidationException, DAOException {
@@ -118,6 +129,17 @@ public class TestUserService extends AbstractServiceTest {
 
         // THEN
         Mockito.verify(userDAO, never()).update(user);
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testUpdateUser_shouldRethrowDAOExceptionAsServiceException() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        User user = new User();
+        Mockito.doThrow(new DAOException("mocked dao exception")).when(userDAO).update(user);
+
+        // WHEN
+        userService.updateUser(user);
     }
 
     @Test
@@ -160,6 +182,17 @@ public class TestUserService extends AbstractServiceTest {
         Mockito.verify(userDAO, never()).delete(user);
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testDeleteUser_shouldRethrowDAOExceptionAsServiceException() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        User user = new User();
+        Mockito.doThrow(new DAOException("mocked dao exception")).when(userDAO).delete(user);
+
+        // WHEN
+        userService.deleteUser(user);
+    }
+
     @Test
     @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testFindUsers_shouldFindUsers() throws ServiceException, ValidationException, DAOException {
@@ -192,6 +225,17 @@ public class TestUserService extends AbstractServiceTest {
 
         assertEquals(1, result.size());
         assertTrue(result.contains(user));
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testFindUsers_shouldRethrowDAOExceptionAsServiceException() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        User user = new User();
+        Mockito.doThrow(new DAOException("mocked dao exception")).when(userDAO).find(user);
+
+        // WHEN
+        userService.findUsers(user);
     }
 
     @Test
@@ -230,5 +274,15 @@ public class TestUserService extends AbstractServiceTest {
         assertEquals(2, result.size());
         assertTrue(result.contains(user1));
         assertTrue(result.contains(user2));
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testGetAllUsers_shouldRethrowDAOExceptionAsServiceException() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Mockito.doThrow(new DAOException("mocked dao exception")).when(userDAO).getAll();
+
+        // WHEN
+        userService.getAllUsers();
     }
 }
