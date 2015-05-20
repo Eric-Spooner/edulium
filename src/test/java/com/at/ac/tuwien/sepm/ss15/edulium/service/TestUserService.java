@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -66,7 +67,7 @@ public class TestUserService extends AbstractServiceTest {
         Mockito.verify(userDAO, never()).create(user);
     }
 
-    @Test
+    @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"NOROLE"})
     public void testAddUser_withoutPermissionShouldNotAddUser() throws ServiceException, ValidationException, DAOException {
         // PREPARE
@@ -106,7 +107,7 @@ public class TestUserService extends AbstractServiceTest {
         Mockito.verify(userDAO, never()).update(user);
     }
 
-    @Test
+    @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"NOROLE"})
     public void testUpdateUser_withoutPermissionShouldNotUpdateUser() throws ServiceException, ValidationException, DAOException {
         // PREPARE
@@ -146,7 +147,7 @@ public class TestUserService extends AbstractServiceTest {
         Mockito.verify(userDAO, never()).delete(user);
     }
 
-    @Test
+    @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"NOROLE"})
     public void testDeleteUser_withoutPermissionShouldNotDeleteUser() throws ServiceException, ValidationException, DAOException {
         // PREPARE
