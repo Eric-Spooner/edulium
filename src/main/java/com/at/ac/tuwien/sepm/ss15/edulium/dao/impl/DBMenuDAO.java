@@ -62,8 +62,8 @@ class DBMenuDAO implements DAO<Menu> {
         Long changeNr =  generateHistoryMenu(menu);
         for(MenuEntry entry:menu.getEntries()) {
             createMenuAssoc(menu, entry, entry.getPrice());
-            generateHistoryMenuAssoc(menu,entry, changeNr);
         }
+        generateHistoryMenuAssoc(menu.getEntries(), changeNr);
     }
 
     @Override
@@ -94,8 +94,9 @@ class DBMenuDAO implements DAO<Menu> {
          * create new MenuAssoc
          */
         List<MenuEntry> menuEntries = new LinkedList<>(menu.getEntries());
-        final String queryGetMenuAssoc = "SELECT * FROM MenuAssoc WHERE menu_ID = ? AND disabled = false";
+        List<MenuEntry> updatedEntries = new LinkedList<>();
 
+        final String queryGetMenuAssoc = "SELECT * FROM MenuAssoc WHERE menu_ID = ? AND disabled = false";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryGetMenuAssoc)) {
             stmt.setLong(1,menu.getIdentity());
             ResultSet result = stmt.executeQuery();
@@ -119,19 +120,20 @@ class DBMenuDAO implements DAO<Menu> {
                     //The Entry is not in the list, so it should be deleted
                     deleteMenuAssoc(menu, entry);
                 }
-                generateHistoryMenuAssoc(menu, entry, changeNr);
+                updatedEntries.add(entry);
             }
         } catch (SQLException e) {
             LOGGER.error("updating menu in database failed", e);
             throw new DAOException("updating menu in database failed", e);
         }
+        generateHistoryMenuAssoc(updatedEntries, changeNr);
 
         //Check if there are Entries left
         if(menuEntries.size() >0){
             for(MenuEntry entry : menuEntries){
                 createMenuAssoc(menu, entry, entry.getPrice());
-                generateHistoryMenuAssoc(menu, entry, changeNr);
             }
+            generateHistoryMenuAssoc(menuEntries, changeNr);
         }
     }
 
@@ -157,8 +159,8 @@ class DBMenuDAO implements DAO<Menu> {
 
         for(MenuEntry entry:menu.getEntries()){
             deleteMenuAssoc(menu, entry);
-            generateHistoryMenuAssoc(menu, entry, changeNr);
         }
+        generateHistoryMenuAssoc(menu.getEntries(), changeNr);
 
         menu.setEntries(new LinkedList<>());
     }
@@ -356,6 +358,8 @@ class DBMenuDAO implements DAO<Menu> {
         }
     }
 
+
+    /*
     private void generateHistoryMenuAssoc(Menu menu, MenuEntry entry, Long changeNr) throws DAOException {
         LOGGER.debug("entering generateHistory with parameters " + menu);
         final String query2 = "INSERT INTO MenuAssocHistory " +
@@ -373,6 +377,31 @@ class DBMenuDAO implements DAO<Menu> {
             throw new DAOException("generating MenuAssoc history failed", e);
         }
     }
+    */
+
+    private void generateHistoryMenuAssoc(List<MenuEntry> entries, Long changeNr) throws DAOException {
+        LOGGER.debug("entering generateHistory with parameters " + entries + changeNr);
+        final String queryMerge = "Merge INTO MenuAssocHistory " +
+                "(SELECT *, CURRENT_TIMESTAMP(), ?, ? " +
+                "FROM MenuAssoc WHERE menu_ID = ? AND menuEntry_ID = ?)";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryMerge)) {
+            for(MenuEntry entry:entries){
+                stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+                stmt.setLong(2, changeNr);
+                stmt.setLong(3, entry.getIdentity());          // dataset id
+                stmt.setLong(4, entry.getIdentity());          // dataset id
+                stmt.addBatch();
+            }
+
+            stmt.executeBatch();
+
+        } catch (SQLException e) {
+            LOGGER.error("generating MenuAssoc history failed", e);
+            throw new DAOException("generating MenuAssoc history failed", e);
+        }
+    }
+
 
     /**
      * converts the database query output into a history entry object
