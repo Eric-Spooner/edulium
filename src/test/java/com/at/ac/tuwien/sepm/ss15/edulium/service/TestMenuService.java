@@ -53,7 +53,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = AuthenticationCredentialsNotFoundException.class)
-    @WithMockUser(roles={"ROLE_SERVICE"})
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testAddMenuEntry_WithoutPermissionShouldNotAdd() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuEntry entry = new MenuEntry();
@@ -66,7 +66,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testAddMenuEntry_shouldAddEntry() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuEntry entry = new MenuEntry();
@@ -79,7 +79,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testAddMenuEntry_shouldNotAddInvalidMenuEntry() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuEntry entry = new MenuEntry();
@@ -91,7 +91,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = AuthenticationCredentialsNotFoundException.class)
-    @WithMockUser(roles={"ROLE_SERVICE"})
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateMenuEntry_WithoutPermissionShouldNotUpdate() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuEntry entry = new MenuEntry();
@@ -104,7 +104,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testUpdateMenuEntry_shouldUpdateEntry() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuEntry entry = new MenuEntry();
@@ -117,7 +117,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testUpdateMenuEntry_shouldNotUpdateInvalidMenuEntry() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuEntry entry = new MenuEntry();
@@ -129,7 +129,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = AuthenticationCredentialsNotFoundException.class)
-    @WithMockUser(roles={"ROLE_SERVICE"})
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testRemoveMenuEntry_WithoutPermissionShouldFail() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuEntry entry = new MenuEntry();
@@ -142,7 +142,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testRemoveMenuEntry_shouldRemove() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuEntry entry = new MenuEntry();
@@ -155,7 +155,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testRemoveMenuEntry_ObjectWithInvalidIdentityShouldNotRemove() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuEntry entry = new MenuEntry();
@@ -201,7 +201,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = AuthenticationCredentialsNotFoundException.class)
-    @WithMockUser(roles={"ROLE_SERVICE"})
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testAddMenuCategory_WithoutPermissionShouldNotAdd() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuCategory category = new MenuCategory();
@@ -214,7 +214,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testAddMenuCategory_shouldAddCategory() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuCategory category = new MenuCategory();
@@ -227,7 +227,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testAddMenuCategory_shouldNotAddInvalidMenuCategory() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuCategory category = new MenuCategory();
@@ -239,7 +239,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = AuthenticationCredentialsNotFoundException.class)
-    @WithMockUser(roles={"ROLE_SERVICE"})
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateMenuCategory_WithoutPermissionShouldNotUpdate() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuCategory category = new MenuCategory();
@@ -252,7 +252,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testUpdateMenuCategory_shouldUpdateCategory() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuCategory category = new MenuCategory();
@@ -265,7 +265,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testUpdateMenuCategory_shouldNotUpdateInvalidMenuCategory() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuCategory category = new MenuCategory();
@@ -277,7 +277,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = AuthenticationCredentialsNotFoundException.class)
-    @WithMockUser(roles={"ROLE_SERVICE"})
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testRemoveMenuCategory_WithoutPermissionShouldFail() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuCategory category = new MenuCategory();
@@ -290,7 +290,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testRemoveMenuCategory_shouldRemove() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuCategory category = new MenuCategory();
@@ -303,7 +303,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testRemoveMenuCategory_ObjectWithInvalidIdentityShouldNotRemove() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuCategory category = new MenuCategory();
@@ -349,7 +349,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = AuthenticationCredentialsNotFoundException.class)
-    @WithMockUser(roles={"ROLE_SERVICE"})
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testAddMenu_WithoutPermissionShouldNotAdd() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         Menu menu = new Menu();
@@ -362,7 +362,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testAddMenu_shouldAdd() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         Menu menu = new Menu();
@@ -375,7 +375,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testAddMenuy_shouldNotAddInvalidMenu() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         Menu menu = new Menu();
@@ -387,7 +387,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = AuthenticationCredentialsNotFoundException.class)
-    @WithMockUser(roles={"ROLE_SERVICE"})
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testRemoveMenu_WithoutPermissionShouldFail() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         Menu menu = new Menu();
@@ -400,7 +400,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testRemoveMenu_shouldRemove() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         Menu menu = new Menu();
@@ -413,7 +413,7 @@ public class TestMenuService extends AbstractServiceTest {
     }
 
     @Test(expected = ValidationException.class)
-    @WithMockUser(roles={"ROLE_MANAGER"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testRemoveMenu_ObjectWithInvalidIdentityShouldNotRemove() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         Menu menu = new Menu();

@@ -18,7 +18,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the MenuEntry object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    @Secured({"ROLE_MANAGER"})
+    @Secured({"MANAGER"})
     void addMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException;
 
     /**
@@ -27,7 +27,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the MenuEntry object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    @Secured({"ROLE_MANAGER"})
+    @Secured({"MANAGER"})
     void updateMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException;
 
     /**
@@ -36,7 +36,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the MenuEntry object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    @Secured({"ROLE_MANAGER"})
+    @Secured({"MANAGER"})
     void removeMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException;
 
     /**
@@ -60,7 +60,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the MenuCategory object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    @Secured({"ROLE_MANAGER"})
+    @Secured({"MANAGER"})
     void addMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException;
 
     /**
@@ -69,7 +69,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the MenuCategory object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    @Secured({"ROLE_MANAGER"})
+    @Secured({"MANAGER"})
     void updateMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException;
 
     /**
@@ -78,7 +78,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the MenuCategory object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    @Secured({"ROLE_MANAGER"})
+    @Secured({"MANAGER"})
     void removeMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException;
 
     /**
@@ -102,7 +102,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the menu object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    @Secured({"ROLE_MANAGER"})
+    @Secured({"MANAGER"})
     void addMenu(Menu menu) throws ValidationException, ServiceException;
 
     /**
@@ -111,7 +111,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the Menu object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    @Secured({"ROLE_MANAGER"})
+    @Secured({"MANAGER"})
     void updateMenu(Menu menu) throws ValidationException, ServiceException;
 
     /**
@@ -120,7 +120,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the menu object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    @Secured({"ROLE_MANAGER"})
+    @Secured({"MANAGER"})
     void removeMenu(Menu menu) throws ValidationException, ServiceException;
 
     /**
