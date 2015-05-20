@@ -57,11 +57,8 @@ class DBMenuDAO implements DAO<Menu> {
             LOGGER.error("inserting menu into database failed", e);
             throw new DAOException("inserting menu into database failed", e);
         }
-        Long changeNr = generateHistoryMenu(menu);
         updateMenuAssoc(menu);
-        for (MenuEntry entry : menu.getEntries()) {
-            generateHistoryMenuAssoc(menu, entry, changeNr);
-        }
+        generateHistoryMenu(menu);
     }
 
     @Override
@@ -83,18 +80,9 @@ class DBMenuDAO implements DAO<Menu> {
             LOGGER.error("updating menu in database failed", e);
             throw new DAOException("updating menu in database failed", e);
         }
-        Long changeNr = generateHistoryMenu(menu);
-        /**
-         * Update Entries:
-         * Check the MenuAssoc Table. If the entry is found in the MenuEntrys copy, then update the price
-         * and delete the entry of the MenuEntrys copy
-         * If the entry is not found, then delete it. If there are entries left in the MenuEntrys copy than
-         * create new MenuAssoc
-         */
+
         updateMenuAssoc(menu);
-        for (MenuEntry entry : menu.getEntries()) {
-            generateHistoryMenuAssoc(menu, entry, changeNr);
-        }
+        generateHistoryMenu(menu);
     }
 
     @Override
@@ -115,14 +103,10 @@ class DBMenuDAO implements DAO<Menu> {
             LOGGER.error("deleting menu failed", e);
             throw new DAOException("deleting menu failed", e);
         }
-        Long changeNr = generateHistoryMenu(menu);
-
-        for (MenuEntry entry : menu.getEntries()) {
-            deleteMenuAssoc(menu, entry);
-            generateHistoryMenuAssoc(menu, entry, changeNr);
-        }
-
         menu.setEntries(new LinkedList<>());
+        updateMenuAssoc(menu);
+        generateHistoryMenu(menu);
+
     }
 
     @Override
@@ -278,7 +262,7 @@ class DBMenuDAO implements DAO<Menu> {
      * @param menu updated dataset
      * @throws DAOException if an error accessing the database occurred
      */
-    private Long generateHistoryMenu(Menu menu) throws DAOException {
+    private void generateHistoryMenu(Menu menu) throws DAOException {
         LOGGER.debug("entering generateHistory with parameters " + menu);
 
         final String query = "INSERT INTO MenuHistory " +
@@ -297,24 +281,23 @@ class DBMenuDAO implements DAO<Menu> {
         }
         //get the change Nr, for Menu Assoc
         final String queryGetChangeNr = "SELECT MAX(changeNr) FROM MenuHistory WHERE ID = ?";
-
+        Long resultNr = -1L;
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryGetChangeNr)) {
             stmt.setLong(1, menu.getIdentity());          // dataset id
             ResultSet result = stmt.executeQuery();
-            Long resultNr = -1L;
             while (result.next()) {
                 resultNr = result.getLong(1);
             }
             if (resultNr == -1) {
                 LOGGER.error("getting changeNr failed");
                 throw new DAOException("getting changeNr failed");
-            } else {
-                return resultNr;
             }
         } catch (SQLException e) {
             LOGGER.error("getting changeNr failed", e);
             throw new DAOException("getting changeNr failed", e);
         }
+
+        generateHistoryMenuAssoc(menu, resultNr);
     }
     /**
      * writes the changes of the dataset into the database
@@ -322,21 +305,19 @@ class DBMenuDAO implements DAO<Menu> {
      * the changes
      *
      * @param menu     updated dataset
-     * @param entry    The Menu Entry, which identifies the MenuAssociation
      * @param changeNr The Change Nr of the Menu History
      * @throws DAOException if an error accessing the database occurred
      */
-    private void generateHistoryMenuAssoc(Menu menu, MenuEntry entry, Long changeNr) throws DAOException {
+    private void generateHistoryMenuAssoc(Menu menu, Long changeNr) throws DAOException {
         LOGGER.debug("entering generateHistory with parameters " + menu);
         final String query2 = "INSERT INTO MenuAssocHistory " +
                 "(SELECT *, CURRENT_TIMESTAMP(), ?, ? " +
-                "FROM MenuAssoc WHERE menu_ID = ? AND menuEntry_ID = ?)";
+                "FROM MenuAssoc WHERE menu_ID = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query2)) {
             stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
             stmt.setLong(2, changeNr);
             stmt.setLong(3, menu.getIdentity());          // dataset id
-            stmt.setLong(4, entry.getIdentity());          // dataset id
             stmt.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error("generating MenuAssoc history failed", e);
@@ -440,31 +421,6 @@ class DBMenuDAO implements DAO<Menu> {
         } catch (SQLException e) {
             LOGGER.error("updating menuAssoc in database failed", e);
             throw new DAOException("updating menuAssoc in database failed", e);
-        }
-    }
-
-    /**
-     * This function is used, to delete Menu Assoc Entries
-     * if the Menu Assoc is enabled, than disable it.
-     *
-     * @param menu  Menu Is used to identify the MenuAssoc
-     * @param entry Entry is used to identify the Menu Assoc
-     */
-    private void deleteMenuAssoc(Menu menu, MenuEntry entry) throws DAOException {
-        //The Entry is not in the list, so it should be disabled
-        final String query = "UPDATE MenuAssoc SET disabled = true WHERE menu_ID = ? AND menuEntry_ID = ?";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, menu.getIdentity());
-            stmt.setLong(2, entry.getIdentity());
-
-            if (stmt.executeUpdate() == 0) {
-                LOGGER.error("deleting menuAssoc failed, dataset not found");
-                throw new DAOException("deleting menuAssoc failed, dataset not found");
-            }
-        } catch (SQLException e) {
-            LOGGER.error("deleting menuAssoc failed", e);
-            throw new DAOException("deleting menuAssoc failed", e);
         }
     }
 }
