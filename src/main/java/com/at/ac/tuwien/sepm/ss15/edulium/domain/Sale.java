@@ -3,7 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 import java.time.LocalDateTime;
 
 /**
- * Domain object representing a Sale
+ * Abstract domain object representing a Sale
  */
 public abstract class Sale {
     protected Long identity = null;
