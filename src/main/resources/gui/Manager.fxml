@@ -81,8 +81,8 @@
                         <Button fx:id="buttonAdd111" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuCategoryAddClicked" prefWidth="92.0" text="Add..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
                         <TableView layoutX="14.0" layoutY="14.0" prefHeight="343.0" prefWidth="451.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="14.0">
                            <columns>
-                              <TableColumn fx:id="employeeId111" prefWidth="59.0" text="ID" />
-                              <TableColumn fx:id="employeeName111" prefWidth="179.0" text="Name" />
+                              <TableColumn fx:id="MenuCategoryID" prefWidth="59.0" text="ID" />
+                              <TableColumn fx:id="MenuCategoryName" prefWidth="179.0" text="Name" />
                            </columns>
                         </TableView>
                      </children>
@@ -99,8 +99,8 @@
                         <Button fx:id="buttonAdd1111" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonTaxRateAddClicked" prefWidth="92.0" text="Add..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
                         <TableView layoutX="14.0" layoutY="14.0" prefHeight="343.0" prefWidth="451.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="14.0">
                            <columns>
-                              <TableColumn fx:id="employeeId1111" prefWidth="59.0" text="ID" />
-                              <TableColumn fx:id="employeeName1111" prefWidth="179.0" text="Value" />
+                              <TableColumn fx:id="TaxRateID" prefWidth="59.0" text="ID" />
+                              <TableColumn fx:id="TaxRateValue" prefWidth="179.0" text="Value" />
                            </columns>
                         </TableView>
                      </children>
