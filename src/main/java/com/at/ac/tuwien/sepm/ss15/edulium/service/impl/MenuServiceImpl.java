@@ -1,18 +1,54 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 /**
  * Implementation of the MenuService
  */
-class MenuServiceImpl implements MenuService {
+public class MenuServiceImpl implements MenuService {
+    private static final Logger LOGGER = LogManager.getLogger(MenuServiceImpl.class);
+
+    @Autowired
+    private DAO<MenuEntry> menuEntryDAO;
+    @Autowired
+    private DAO<MenuCategory> menuCategoryDAO;
+    @Autowired
+    private DAO<Menu> menuDAO;
+    @Autowired
+    private Validator<MenuEntry> menuEntryValidator;
+    @Autowired
+    private Validator<MenuCategory> menuCategoryValidator;
+    @Autowired
+    private Validator<Menu> menuValidator;
+
+    @Autowired
+    public MenuServiceImpl(DAO<MenuEntry> menuEntryDAO, DAO<MenuCategory> menuCategoryDAO, DAO<Menu> menuDAO) {
+        this.menuEntryDAO = menuEntryDAO;
+        this.menuCategoryDAO = menuCategoryDAO;
+        this.menuDAO = menuDAO;
+    }
+
+    @Autowired
+    public void setValidators(Validator<MenuEntry> menuEntryValidator,
+                              Validator<MenuCategory> menuCategoryValidator,
+                              Validator<Menu> menuValidator) {
+        this.menuEntryValidator = menuEntryValidator;
+        this.menuCategoryValidator = menuCategoryValidator;
+        this.menuValidator = menuValidator;
+    }
 
     @Override
     public void addMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException {
@@ -45,12 +81,12 @@ class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public List<MenuEntry> findMenuCategory(MenuCategory matcher) throws ServiceException {
+    public List<MenuCategory> findMenuCategory(MenuCategory matcher) throws ServiceException {
         return null;
     }
 
     @Override
-    public List<MenuEntry> getAllMenuCategories() throws ServiceException {
+    public List<MenuCategory> getAllMenuCategories() throws ServiceException {
         return null;
     }
 
