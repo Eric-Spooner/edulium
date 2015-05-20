@@ -1,0 +1,107 @@
+package com.at.ac.tuwien.sepm.ss15.edulium.service;
+
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+
+import java.util.List;
+
+/**
+ * Service interface for the MenuCategory, MenuEntry and Menu domain objects
+ */
+public interface MenuService extends Service {
+    /**
+     * adds a MenuEntry to the underlying datasource
+     * @param menuEntry MenuEntry to add
+     * @throws ValidationException if the MenuEntry object is not valid
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    void addMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException;
+
+    /**
+     * removes a MenuEntry from the underlying datasource
+     * @param menuEntry MenuEntry to remove
+     * @throws ValidationException if the MenuEntry object is not valid
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    void removeMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException;
+
+    /**
+     * returns all menuEntries from the underlying datasource
+     * which parameters match the parameters of the matcher
+     * @param matcher matcher
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    List<MenuEntry> findMenuEntry(MenuEntry matcher) throws ServiceException;
+
+    /**
+     * returns all menuEntries from the underlying datasource
+     * @throws ValidationException if the MenuEntry object is not valid
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    List<MenuEntry> getAllMenuEntries() throws ServiceException;
+
+    /**
+     * adds a MenuCategory to the underlying datasource
+     * @param menuCategory MenuCategory to add
+     * @throws ValidationException if the MenuCategory object is not valid
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    void addMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException;
+
+    /**
+     * removes a MenuCategory from the underlying datasource
+     * @param menuCategory MenuCategory to remove
+     * @throws ValidationException if the MenuCategory object is not valid
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    void removeMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException;
+
+    /**
+     * returns all menuCategories from the underlying datasource
+     * which parameters match the parameters of the matcher
+     * @param matcher matcher
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    List<MenuEntry> findMenuCategory(MenuCategory matcher) throws ServiceException;
+
+    /**
+     * returns all menuCategories from the underlying datasource
+     * @throws ValidationException if the MenuEntry object is not valid
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    List<MenuEntry> getAllMenuCategories() throws ServiceException;
+
+    /**
+     * adds a menu to the underlying datasource
+     * @param menu menu to add
+     * @throws ValidationException if the menu object is not valid
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    void addMenu(Menu menu) throws ValidationException, ServiceException;
+
+    /**
+     * removes a menu from the underlying datasource
+     * @param menu MenuCategory to remove
+     * @throws ValidationException if the menu object is not valid
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    void removeMenu(Menu menu) throws ValidationException, ServiceException;
+
+    /**
+     * returns all menus from the underlying datasource
+     * which parameters match the parameters of the matcher
+     * @param matcher matcher
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    List<Menu> findMenu(Menu matcher) throws ServiceException;
+
+    /**
+     * returns all menus from the underlying datasource
+     * @throws ValidationException if the Menu object is not valid
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    List<Menu> getAllMenus() throws ServiceException;
+
+}
