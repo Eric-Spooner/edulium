@@ -9,17 +9,17 @@
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="369.0" prefWidth="421.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.DialogMenuEntryController">
    <children>
       <Text layoutX="14.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name: " />
-      <Button layoutX="359.0" layoutY="324.0" mnemonicParsing="false" text="OK"  onAction="#buttonOKClick"/>
-      <Button layoutX="288.0" layoutY="324.0" mnemonicParsing="false" onAction="#buttonCancelClick" text="Cancel"/>
-      <TextField layoutX="140.0" layoutY="21.0" prefHeight="31.0" prefWidth="260.0" />
-      <TextField layoutX="140.0" layoutY="57.0" prefHeight="31.0" prefWidth="260.0" />
+      <Button layoutX="359.0" layoutY="324.0" mnemonicParsing="false" onAction="#buttonOKClick" text="OK" />
+      <Button layoutX="288.0" layoutY="324.0" mnemonicParsing="false" onAction="#buttonCancelClick" text="Cancel" />
+      <TextField fx:id="textFieldName" layoutX="140.0" layoutY="21.0" prefHeight="31.0" prefWidth="260.0" />
+      <TextField fx:id="textFieldPrice" layoutX="140.0" layoutY="57.0" prefHeight="31.0" prefWidth="260.0" />
       <Text layoutX="17.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Price: " />
-      <CheckBox layoutX="140.0" layoutY="329.0" mnemonicParsing="false" text="Availible" />
+      <CheckBox fx:id="checkAvailible" layoutX="140.0" layoutY="329.0" mnemonicParsing="false" text="Availible" />
       <Text layoutX="17.0" layoutY="112.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Description:" />
-      <TextArea layoutX="140.0" layoutY="93.0" prefHeight="118.0" prefWidth="260.0" />
+      <TextArea fx:id="textFieldDesription" layoutX="140.0" layoutY="93.0" prefHeight="118.0" prefWidth="260.0" />
       <Text layoutX="14.0" layoutY="285.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tax Rate:" />
       <Text layoutX="14.0" layoutY="243.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Menu Category:" />
-      <ChoiceBox layoutX="140.0" layoutY="222.0" prefHeight="31.0" prefWidth="260.0" />
-      <ChoiceBox layoutX="140.0" layoutY="263.0" prefHeight="31.0" prefWidth="260.0" />
+      <ChoiceBox fx:id="dropMenuCategory" layoutX="140.0" layoutY="222.0" prefHeight="31.0" prefWidth="260.0" />
+      <ChoiceBox fx:id="dropTaxRate" layoutX="140.0" layoutY="263.0" prefHeight="31.0" prefWidth="260.0" />
    </children>
 </Pane>

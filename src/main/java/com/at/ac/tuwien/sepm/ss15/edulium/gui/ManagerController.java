@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -18,6 +19,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -30,6 +32,7 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Controller used for the Manager View
  */
+@Component
 public class ManagerController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(ManagerController.class);
 
@@ -289,5 +292,14 @@ public class ManagerController implements Initializable {
         }catch (IOException e){
             LOGGER.error("Add TaxRate Button Click did not work");
         }
+    }
+
+    public static void showErrorDialog(String title, String head, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(head);
+        alert.setContentText(content);
+
+        alert.showAndWait();
     }
 }

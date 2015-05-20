@@ -1,12 +1,14 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Slider;
-import javafx.scene.text.Text;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,6 +28,19 @@ public class DialogMenuEntryController implements Initializable{
         DialogMenuEntryController.thisStage = thisStage;
     }
 
+    @FXML
+    private TextField textFieldName;
+    @FXML
+    private TextField textFieldPrice;
+    @FXML
+    private CheckBox checkAvailible;
+    @FXML
+    private TextArea textFieldDesription;
+    @FXML
+    private ChoiceBox<MenuCategory> dropMenuCategory;
+    @FXML
+    private ChoiceBox<TaxRate> dropTaxRate;
+    
     @Override
     public void initialize(URL location, ResourceBundle resources){
         LOGGER.info("Initialize Dialog MenuEntry");
