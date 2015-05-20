@@ -1,6 +1,8 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 import org.junit.runner.RunWith;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -14,4 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser(username="servicetester")
 @Transactional
 public abstract class AbstractServiceTest {
+
+    protected <T> T getTargetObject(Object proxy) throws Exception {
+        if (AopUtils.isJdkDynamicProxy(proxy)) {
+            return (T) ((Advised) proxy).getTargetSource().getTarget();
+        } else {
+            return (T) proxy;
+        }
+    }
+
 }
