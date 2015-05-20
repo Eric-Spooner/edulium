@@ -1,22 +1,13 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
+import java.time.LocalDateTime;
+
 /**
  * Domain object representing a Sale
  */
-public class Sale {
-    private Long identity = null;
-    private String name = null;
-
-    /**
-     * Creates a new sale object and assigns the given identity to it.
-     * @param identity the identity of the sale
-     * @return Sale object with the given identity
-     */
-    public static Sale withIdentity(long identity) {
-        Sale sale = new Sale();
-        sale.setIdentity(identity);
-        return sale;
-    }
+public abstract class Sale {
+    protected Long identity = null;
+    protected String name = null;
 
     /**
      * @return the identity of the sale (can be null)
@@ -48,23 +39,10 @@ public class Sale {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return "Sale{" +
-                "identity=" + identity +
-                ", name=" + name +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Sale)) return false;
-
-        Sale sale = (Sale) o;
-
-        if (identity != null ? !identity.equals(sale.identity) : sale.identity != null) return false;
-        return !(name != null ? !name.equals(sale.name) : sale.name != null);
-
-    }
+    /**
+     *
+     * @param time the time that has to be checked
+     * @return true if the Sale is active at the given time
+     */
+    public abstract boolean isAt(LocalDateTime time);
 }

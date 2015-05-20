@@ -5,8 +5,7 @@ import java.time.LocalDateTime;
 /**
  * Domain object representing an intermittentSale
  */
-public class IntermittentSale {
-    private Long identity = null;
+public class IntermittentSale extends Sale {
     private Boolean monday = null;
     private Boolean tuesday = null;
     private Boolean wednesday = null;
@@ -27,21 +26,6 @@ public class IntermittentSale {
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(identity);
         return intermittentSale;
-    }
-
-    /**
-     * @return the identity of the intermittentSale (can be null)
-     */
-    public Long getIdentity() {
-        return identity;
-    }
-
-    /**
-     * Sets the identity of the intermittentSale
-     * @param identity identity of the intermittentSale
-     */
-    public void setIdentity(Long identity) {
-        this.identity = identity;
     }
 
     /**
@@ -196,16 +180,17 @@ public class IntermittentSale {
     public String toString() {
         return "IntermittentSale{" +
                 "identity=" + identity +
-                "monday=" + monday +
-                "tuesday=" + tuesday +
-                "wednesday=" + wednesday +
-                "thursday=" + thursday +
-                "friday=" + friday +
-                "saturday=" + saturday +
-                "sunday=" + sunday +
-                "fromDayTime=" + fromDayTime +
-                "duration=" + duration +
-                "enabled=" + enabled +
+                ", name=" + name +
+                ", monday=" + monday +
+                ", tuesday=" + tuesday +
+                ", wednesday=" + wednesday +
+                ", thursday=" + thursday +
+                ", friday=" + friday +
+                ", saturday=" + saturday +
+                ", sunday=" + sunday +
+                ", fromDayTime=" + fromDayTime +
+                ", duration=" + duration +
+                ", enabled=" + enabled +
                 '}';
     }
 
@@ -217,6 +202,7 @@ public class IntermittentSale {
         IntermittentSale iSale = (IntermittentSale) o;
 
         if (identity != null ? !identity.equals(iSale.identity) : iSale.identity != null) return false;
+        if (name != null ? !name.equals(iSale.name) : iSale.name != null) return false;
         if (monday != null ? !monday.equals(iSale.monday) : iSale.monday != null) return false;
         if (tuesday != null ? !tuesday.equals(iSale.tuesday) : iSale.tuesday != null) return false;
         if (wednesday != null ? !wednesday.equals(iSale.wednesday) : iSale.wednesday != null) return false;
@@ -228,5 +214,10 @@ public class IntermittentSale {
         if (duration != null ? !duration.equals(iSale.duration) : iSale.duration != null) return false;
         return !(enabled != null ? !enabled.equals(iSale.enabled) : iSale.enabled != null);
 
+    }
+
+    @Override
+    public boolean isAt(LocalDateTime time) {
+        return false; //TODO
     }
 }

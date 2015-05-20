@@ -5,8 +5,7 @@ import java.time.LocalDateTime;
 /**
  * Domain object representing a OneTimeSale
  */
-public class OnetimeSale {
-    private Long identity = null;
+public class OnetimeSale extends Sale {
     private LocalDateTime fromTime = null;
     private LocalDateTime toTime = null;
 
@@ -19,21 +18,6 @@ public class OnetimeSale {
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(identity);
         return onetimeSale;
-    }
-
-    /**
-     * @return the identity of the sale (can be null)
-     */
-    public Long getIdentity() {
-        return identity;
-    }
-
-    /**
-     * Sets the identity of the sale
-     * @param identity identity of the sale
-     */
-    public void setIdentity(Long identity) {
-        this.identity = identity;
     }
 
     /**
@@ -68,6 +52,7 @@ public class OnetimeSale {
     public String toString() {
         return "OnetimeSale{" +
                 "identity=" + identity +
+                ", name=" + name +
                 ", fromTime=" + fromTime +
                 ", toTime=" + toTime +
                 '}';
@@ -81,8 +66,14 @@ public class OnetimeSale {
         OnetimeSale onetimeSale = (OnetimeSale) o;
 
         if (identity != null ? !identity.equals(onetimeSale.identity) : onetimeSale.identity != null) return false;
+        if (name != null ? !name.equals(onetimeSale.name) : onetimeSale.name != null) return false;
         if (fromTime != null ? !fromTime.equals(onetimeSale.fromTime) : onetimeSale.fromTime != null) return false;
         return !(toTime != null ? !toTime.equals(onetimeSale.toTime) : onetimeSale.toTime != null);
 
+    }
+
+    @Override
+    public boolean isAt(LocalDateTime time) {
+        return false; //TODO
     }
 }
