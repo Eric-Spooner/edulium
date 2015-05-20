@@ -1,7 +1,9 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -47,8 +49,8 @@ public class DialogMenuCategoryController implements Initializable{
                 menuCategory.setName(textFieldName.getText());
                 menuService.addMenuCategory(menuCategory);
                 thisStage.close();
-            }catch (Exception e){
-                LOGGER.error("Was not able to create Menu Category" + e);
+            }catch (Exception e) {
+                LOGGER.error("Was not able to create Menu Category " + e);
             }
         }
     }

@@ -17,6 +17,8 @@ import org.apache.logging.log4j.Logger;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import static javafx.collections.FXCollections.observableArrayList;
+
 /**
  * Controller for the TaxRate Dialog
  */
@@ -49,7 +51,11 @@ public class DialogMenuEntryController implements Initializable{
     @Override
     public void initialize(URL location, ResourceBundle resources){
         LOGGER.info("Initialize Dialog MenuEntry");
-
+        try {
+            dropMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
+        }catch (Exception e){
+            LOGGER.error("Init Menu Entry crashed " + e);
+        }
     }
 
     public void buttonOKClick(ActionEvent actionEvent) {
