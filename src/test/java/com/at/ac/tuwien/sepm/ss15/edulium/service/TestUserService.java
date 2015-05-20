@@ -178,8 +178,44 @@ public class TestUserService extends AbstractServiceTest {
     }
 
     @Test
+    @WithMockUser(username = "servicetester", roles={"NOROLE"})
+    public void testFindUsers_shouldFindUsersWithNoRole() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        User user = new User();
+        Mockito.when(userDAO.find(user)).thenReturn(Arrays.asList(user));
+
+        // WHEN
+        List<User> result = userService.findUsers(user);
+
+        // THEN
+        Mockito.verify(userDAO).find(user);
+
+        assertEquals(1, result.size());
+        assertTrue(result.contains(user));
+    }
+
+    @Test
     @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testGetAllUsers_shouldGetAllUsers() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        User user1 = new User();
+        User user2 = new User();
+        Mockito.when(userDAO.getAll()).thenReturn(Arrays.asList(user1, user2));
+
+        // WHEN
+        List<User> result = userService.getAllUsers();
+
+        // THEN
+        Mockito.verify(userDAO).getAll();
+
+        assertEquals(2, result.size());
+        assertTrue(result.contains(user1));
+        assertTrue(result.contains(user2));
+    }
+
+    @Test
+    @WithMockUser(username = "servicetester", roles={"NOROLE"})
+    public void testGetAllUsers_shouldGetAllUsersWithNoRole() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         User user1 = new User();
         User user2 = new User();
