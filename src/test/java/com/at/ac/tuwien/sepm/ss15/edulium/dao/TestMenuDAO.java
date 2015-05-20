@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -551,4 +553,132 @@ public class TestMenuDAO extends AbstractDAOTest {
         assertTrue(storedObjects.contains(men2));
     }
 
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // menu 1
+        LinkedList<MenuEntry> list1 = new LinkedList<>();
+        list1.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
+        Menu menu1 = createMenu("Menu", list1);
+
+        menuDAO.create(menu1);
+        assertEquals(1, menuDAO.find(menu1).size());
+
+        // menu 2
+        LinkedList<MenuEntry> list2 = new LinkedList<>();
+        list2.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
+        Menu menu2 = createMenu("Menu", list2);
+
+        menuDAO.create(menu2);
+        assertEquals(1, menuDAO.find(menu2).size());
+
+        // menu 3
+        LinkedList<MenuEntry> list3 = new LinkedList<>();
+        list3.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
+        Menu menu3 = createMenu("Menu3", list3);
+
+        menuDAO.create(menu3);
+        assertEquals(1, menuDAO.find(menu3).size());
+
+        // GIVEN
+        Menu menuId1 = Menu.withIdentity(menu1.getIdentity());
+        Menu menuId2 = Menu.withIdentity(menu2.getIdentity());
+        Menu menuId3 = Menu.withIdentity(menu3.getIdentity());
+        List<Menu> menuIds = Arrays.asList(menuId1, menuId2, menuId3);
+
+        // WHEN
+        List<Menu> result = menuDAO.populate(menuIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(menu1));
+        assertTrue(result.contains(menu2));
+        assertTrue(result.contains(menu3));
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjectsOfDeletedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // menu 1
+        LinkedList<MenuEntry> list1 = new LinkedList<>();
+        list1.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
+        Menu menu1 = createMenu("Menu", list1);
+
+        menuDAO.create(menu1);
+        assertEquals(1, menuDAO.find(menu1).size());
+        menuDAO.delete(menu1);
+        assertEquals(0, menuDAO.find(menu1).size());
+
+        // menu 2
+        LinkedList<MenuEntry> list2 = new LinkedList<>();
+        list2.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
+        Menu menu2 = createMenu("Menu", list2);
+
+        menuDAO.create(menu2);
+        assertEquals(1, menuDAO.find(menu2).size());
+        menuDAO.delete(menu2);
+        assertEquals(0, menuDAO.find(menu2).size());
+
+        // menu 3
+        LinkedList<MenuEntry> list3 = new LinkedList<>();
+        list3.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
+        Menu menu3 = createMenu("Menu3", list3);
+
+        menuDAO.create(menu3);
+        assertEquals(1, menuDAO.find(menu3).size());
+        menuDAO.delete(menu3);
+        assertEquals(0, menuDAO.find(menu3).size());
+
+        // GIVEN
+        Menu menuId1 = Menu.withIdentity(menu1.getIdentity());
+        Menu menuId2 = Menu.withIdentity(menu2.getIdentity());
+        Menu menuId3 = Menu.withIdentity(menu3.getIdentity());
+        List<Menu> menuIds = Arrays.asList(menuId1, menuId2, menuId3);
+
+        // WHEN
+        List<Menu> result = menuDAO.populate(menuIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(menu1));
+        assertTrue(result.contains(menu2));
+        assertTrue(result.contains(menu3));
+    }
+
+    @Test
+    public void testPopulate_nullListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<Menu> result = menuDAO.populate(null);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testPopulate_emptyListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<Menu> result = menuDAO.populate(Arrays.asList());
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithInvalidObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<Menu> invalidMenus = Arrays.asList(new Menu());
+
+        // WHEN
+        List<Menu> result = menuDAO.populate(invalidMenus);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<Menu> invalidMenus = new ArrayList<>();
+        invalidMenus.add(null);
+
+        // WHEN
+        List<Menu> result = menuDAO.populate(invalidMenus);
+    }
 }
