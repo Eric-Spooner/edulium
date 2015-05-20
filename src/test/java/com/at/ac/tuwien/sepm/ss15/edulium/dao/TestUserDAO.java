@@ -319,7 +319,7 @@ public class TestUserDAO extends AbstractDAOTest {
         User user1 = new User();
         user1.setIdentity("hardy");
         user1.setName("Hardy Heron");
-        user1.setRole("manager");
+        user1.setRole("tester");
 
         userDAO.create(user1);
         assertEquals(1, userDAO.find(user1).size());
@@ -328,7 +328,7 @@ public class TestUserDAO extends AbstractDAOTest {
         User user2 = new User();
         user2.setIdentity("intrepid");
         user2.setName("Intrepid Ibex");
-        user2.setRole("manager");
+        user2.setRole("tester");
 
         userDAO.create(user2);
         assertEquals(1, userDAO.find(user2).size());
@@ -344,7 +344,7 @@ public class TestUserDAO extends AbstractDAOTest {
 
         // GIVEN
         User matcher1 = new User(); // for user 1 and user 2
-        matcher1.setRole("manager");
+        matcher1.setRole("tester");
 
         User matcher2 = new User(); // for user 3
         matcher2.setRole("developer");
