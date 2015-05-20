@@ -207,6 +207,44 @@ class DBMenuDAO implements DAO<Menu> {
         }
         return history;
     }
+
+    @Override
+    public List<Menu> populate(List<Menu> menus) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + menus);
+
+        if (menus == null || menus.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (Menu menu : menus) {
+            validator.validateIdentity(menu);
+        }
+
+        final String query = "SELECT * FROM Menu WHERE ID IN (" +
+                menus.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<Menu> populatedMenus = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (Menu menu : menus) {
+                stmt.setLong(index++, menu.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedMenus.add(parseResult(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating menus failed", e);
+            throw new DAOException("Populating menus failed", e);
+        }
+
+        return populatedMenus;
+    }
+
     /**
      * converts the database query output into a object
      *
