@@ -1,10 +1,12 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.Service;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,17 +16,20 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static javafx.collections.FXCollections.observableArrayList;
@@ -36,7 +41,6 @@ import static javafx.collections.FXCollections.observableArrayList;
 public class ManagerController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(ManagerController.class);
 
-    @Autowired
     private MenuService menuService;
 
     @FXML
@@ -62,15 +66,27 @@ public class ManagerController implements Initializable {
     @FXML
     private TableColumn<MenuEntry,BigDecimal> tableColMenuEntryPrice;
     @FXML
-    private TableColumn<MenuEntry,Long> tableColMenuEntryCategory;
+    private TableColumn<MenuEntry, MenuCategory> tableColMenuEntryCategory;
     @FXML
-    private TableColumn<MenuEntry,Long> tableColMenuEntryTaxRate;
+    private TableColumn<MenuEntry,TaxRate> tableColMenuEntryTaxRate;
+
+    @FXML
+    private TableView<Menu> tableViewMenu;
+    @FXML
+    private TableColumn<Menu,Long> tableColMenuId;
+    @FXML
+    private TableColumn<Menu,String> tableColMenuName;
+    @FXML
+    private TableColumn<Menu,List<MenuEntry>> tableColMenuEntries;
+
 
 
     @Override
-    @PostConstruct
     public void initialize(URL location, ResourceBundle resources){
         try {
+            ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Service.xml");
+            menuService = context.getBean("menuService", MenuService.class);
+
             //tableViewTaxRate.setItems(observableArrayList(menuService.get));
             tableColTaxRateID.setCellValueFactory(new PropertyValueFactory<TaxRate, Long>("identity"));
             tableColTaxRateValue.setCellValueFactory(new PropertyValueFactory<TaxRate, BigDecimal>("value"));
@@ -83,8 +99,15 @@ public class ManagerController implements Initializable {
             tableColMenuEntryId.setCellValueFactory(new PropertyValueFactory<MenuEntry, Long>("identity"));
             tableColMenuEntryName.setCellValueFactory(new PropertyValueFactory<MenuEntry, String>("name"));
             tableColMenuEntryPrice.setCellValueFactory(new PropertyValueFactory<MenuEntry, BigDecimal>("price"));
-            tableColMenuEntryCategory.setCellValueFactory(new PropertyValueFactory<MenuEntry, Long>("category.id"));
-            tableColMenuEntryTaxRate.setCellValueFactory(new PropertyValueFactory<MenuEntry, Long>("taxRate.id"));
+            tableColMenuEntryCategory.setCellValueFactory(new PropertyValueFactory<MenuEntry, MenuCategory>("category"));
+            tableColMenuEntryTaxRate.setCellValueFactory(new PropertyValueFactory<MenuEntry, TaxRate>("taxRate"));
+
+            tableViewMenu.setItems(observableArrayList(menuService.getAllMenus()));
+            tableColMenuId.setCellValueFactory(new PropertyValueFactory<Menu, Long>("identity"));
+            tableColMenuName.setCellValueFactory(new PropertyValueFactory<Menu, String>("name"));
+            tableColMenuEntries.setCellValueFactory(new PropertyValueFactory<Menu, List<MenuEntry>>("entries"));
+
+
         }catch (Exception e){
             LOGGER.error("Initialize Manager View Fail" + e);
         }
@@ -107,6 +130,7 @@ public class ManagerController implements Initializable {
             LOGGER.info("Update Menu Button Click");
             Stage stage = new Stage();
             DialogMenuController.setThisStage(stage);
+            DialogMenuController.setMenuService(menuService);
             stage.setTitle("Update Menu");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
             Scene scene = new Scene(myPane);
@@ -122,6 +146,7 @@ public class ManagerController implements Initializable {
             LOGGER.info("Search Menu Button Click");
             Stage stage = new Stage();
             DialogMenuController.setThisStage(stage);
+            DialogMenuController.setMenuService(menuService);
             stage.setTitle("Search Menu");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
             Scene scene = new Scene(myPane);
@@ -140,6 +165,7 @@ public class ManagerController implements Initializable {
             LOGGER.info("Add Menu Button Click");
             Stage stage = new Stage();
             DialogMenuController.setThisStage(stage);
+            DialogMenuController.setMenuService(menuService);
             stage.setTitle("Add Menu");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
             Scene scene = new Scene(myPane);
@@ -158,6 +184,7 @@ public class ManagerController implements Initializable {
             LOGGER.info("Search MenuEntry Button Click");
             Stage stage = new Stage();
             DialogMenuEntryController.setThisStage(stage);
+            DialogMenuEntryController.setMenuService(menuService);
             stage.setTitle("Search MenuEntry");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
             Scene scene = new Scene(myPane);
@@ -173,6 +200,7 @@ public class ManagerController implements Initializable {
             LOGGER.info("Update MenuEntry Button Click");
             Stage stage = new Stage();
             DialogMenuEntryController.setThisStage(stage);
+            DialogMenuEntryController.setMenuService(menuService);
             stage.setTitle("Update MenuEntry");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
             Scene scene = new Scene(myPane);
@@ -188,6 +216,7 @@ public class ManagerController implements Initializable {
             LOGGER.info("Add MenuEntry Button Click");
             Stage stage = new Stage();
             DialogMenuEntryController.setThisStage(stage);
+            DialogMenuEntryController.setMenuService(menuService);
             stage.setTitle("Insert MenuEntry");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
             Scene scene = new Scene(myPane);
@@ -206,6 +235,7 @@ public class ManagerController implements Initializable {
             LOGGER.info("Search MenuCategory Button Click");
             Stage stage = new Stage();
             DialogMenuCategoryController.setThisStage(stage);
+            DialogMenuCategoryController.setMenuService(menuService);
             stage.setTitle("Search Menu Category");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
             Scene scene = new Scene(myPane);
@@ -221,13 +251,15 @@ public class ManagerController implements Initializable {
             LOGGER.info("Update MenuCategory Button Click");
             Stage stage = new Stage();
             DialogMenuCategoryController.setThisStage(stage);
+            DialogMenuCategoryController.setMenuService(menuService);
             stage.setTitle("Update Menu Category");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
-        }catch (IOException e){
-            LOGGER.error("Update MenuCategory Button Click did not work");
+            tableViewMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
+        }catch (Exception e){
+            LOGGER.error("Update MenuCategory Button Click did not work" + e);
         }
     }
 
@@ -236,13 +268,15 @@ public class ManagerController implements Initializable {
             LOGGER.info("Add MenuCategory Button Click");
             Stage stage = new Stage();
             DialogMenuCategoryController.setThisStage(stage);
+            DialogMenuCategoryController.setMenuService(menuService);
             stage.setTitle("Insert Menu Category");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
-        }catch (IOException e){
-            LOGGER.error("Add MenuCategory Button Click did not work");
+            tableViewMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
+        }catch (Exception e){
+            LOGGER.error("Add MenuCategory Button Click did not work" + e);
         }
     }
 

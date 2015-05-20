@@ -40,7 +40,7 @@
                         <Button fx:id="buttonMenuSearch" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuSearchClicked" prefWidth="92.0" text="Search..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="84.0" />
                         <Button fx:id="buttonMenuUpdate" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuUpdateClicked" prefWidth="92.0" text="Update..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="49.0" />
                         <Button fx:id="buttonMenuAdd" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuAddClicked" prefWidth="92.0" text="Add..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
-                        <TableView layoutX="14.0" layoutY="14.0" prefHeight="343.0" prefWidth="451.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="14.0">
+                        <TableView fx:id="tableViewMenu" layoutX="14.0" layoutY="14.0" prefHeight="343.0" prefWidth="451.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="14.0">
                            <columns>
                               <TableColumn fx:id="tableColMenuId" prefWidth="95.0" text="ID" />
                               <TableColumn fx:id="tableColMenuName" prefWidth="143.0" text="Name" />

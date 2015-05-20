@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -23,9 +24,13 @@ public class DialogMenuEntryController implements Initializable{
     private static final Logger LOGGER = LogManager.getLogger(DialogTaxRateController.class);
 
     private static Stage thisStage;
+    private static MenuService menuService;
 
     public static void setThisStage(Stage thisStage) {
         DialogMenuEntryController.thisStage = thisStage;
+    }
+    public static void setMenuService(MenuService menuService) {
+        DialogMenuEntryController.menuService = menuService;
     }
 
     @FXML
@@ -40,7 +45,7 @@ public class DialogMenuEntryController implements Initializable{
     private ChoiceBox<MenuCategory> dropMenuCategory;
     @FXML
     private ChoiceBox<TaxRate> dropTaxRate;
-    
+
     @Override
     public void initialize(URL location, ResourceBundle resources){
         LOGGER.info("Initialize Dialog MenuEntry");

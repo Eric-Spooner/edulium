@@ -1,5 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -18,9 +20,13 @@ public class DialogMenuCategoryController implements Initializable{
     private static final Logger LOGGER = LogManager.getLogger(DialogTaxRateController.class);
 
     private static Stage thisStage;
+    private static MenuService menuService;
 
     public static void setThisStage(Stage thisStage) {
         DialogMenuCategoryController.thisStage = thisStage;
+    }
+    public static void setMenuService(MenuService menuService) {
+        DialogMenuCategoryController.menuService = menuService;
     }
 
     @FXML
@@ -36,7 +42,14 @@ public class DialogMenuCategoryController implements Initializable{
         if(textFieldName.getText().equals("")){
             ManagerController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
         }else {
-            thisStage.close();
+            try {
+                MenuCategory menuCategory = new MenuCategory();
+                menuCategory.setName(textFieldName.getText());
+                menuService.addMenuCategory(menuCategory);
+                thisStage.close();
+            }catch (Exception e){
+                LOGGER.error("Was not able to create Menu Category" + e);
+            }
         }
     }
 
