@@ -20,6 +20,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
 
@@ -31,8 +32,30 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
     public void testValidateForCreate_onetimeSaleWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
+
+        // WHEN
+        saleValidator.validateForCreate(onetimeSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_saleWithoutNameShouldThrow() throws ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+
+        // WHEN
+        saleValidator.validateForCreate(onetimeSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_saleWithEmptyNameShouldThrow() throws ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("");
 
         // WHEN
         saleValidator.validateForCreate(onetimeSale);
@@ -52,6 +75,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
 
@@ -63,8 +87,30 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
     public void testValidateForUpdate_onetimeSaleWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
+
+        // WHEN
+        saleValidator.validateForUpdate(onetimeSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_saleWithoutNameShouldThrow() throws ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+
+        // WHEN
+        saleValidator.validateForUpdate(onetimeSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_saleWithEmptyNameShouldThrow() throws ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("");
 
         // WHEN
         saleValidator.validateForUpdate(onetimeSale);
@@ -84,6 +130,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
 
@@ -95,8 +142,30 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
     public void testValidateForDelete_onetimeSaleWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
+
+        // WHEN
+        saleValidator.validateForDelete(onetimeSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForDelete_saleWithoutNameShouldThrow() throws ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+
+        // WHEN
+        saleValidator.validateForDelete(onetimeSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForDelete_saleWithEmptyNameShouldThrow() throws ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("");
 
         // WHEN
         saleValidator.validateForDelete(onetimeSale);
@@ -117,6 +186,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
 
@@ -128,6 +198,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
     public void testValidateIdentity_saleWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
 
@@ -135,6 +206,26 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         saleValidator.validateIdentity(onetimeSale);
     }
 
+    @Test(expected = ValidationException.class)
+    public void testValidateIdntity_saleWithoutNameShouldThrow() throws ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+
+        // WHEN
+        saleValidator.validateIdentity(onetimeSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateIdentity_saleWithEmptyNameShouldThrow() throws ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("");
+
+        // WHEN
+        saleValidator.validateIdentity(onetimeSale);
+    }
 
     @Test(expected = ValidationException.class)
     public void testValidateIdentity_nullObjectShouldThrow() throws ValidationException {

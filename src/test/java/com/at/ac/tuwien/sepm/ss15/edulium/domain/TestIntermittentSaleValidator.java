@@ -20,6 +20,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(120);
         intermittentSale.setFromDayTime(LocalDateTime.now());
@@ -39,6 +40,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForCreate_intermittentSaleWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(120);
         intermittentSale.setFromDayTime(LocalDateTime.now());
@@ -55,10 +57,32 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForCreate_intermittentSaleWithoutNegativeDurationShouldThrow() throws ValidationException {
+    public void testValidateForCreate_saleWithoutNameShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(new Long(123));
+
+        // WHEN
+        saleValidator.validateForCreate(intermittentSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_saleWithEmptyNameShouldThrow() throws ValidationException {
+        // GIVEN
+        IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setName("");
+
+        // WHEN
+        saleValidator.validateForCreate(intermittentSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_intermittentSaleWithNegativeDurationShouldThrow() throws ValidationException {
+        // GIVEN
+        IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(-120);
         intermittentSale.setFromDayTime(LocalDateTime.now());
@@ -88,6 +112,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(120);
         intermittentSale.setFromDayTime(LocalDateTime.now());
@@ -107,6 +132,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForUpdate_intermittentSaleWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(120);
         intermittentSale.setFromDayTime(LocalDateTime.now());
@@ -123,10 +149,32 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_saleWithoutNameShouldThrow() throws ValidationException {
+        // GIVEN
+        IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setIdentity(new Long(123));
+
+        // WHEN
+        saleValidator.validateForUpdate(intermittentSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_saleWithEmptyNameShouldThrow() throws ValidationException {
+        // GIVEN
+        IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setName("");
+
+        // WHEN
+        saleValidator.validateForUpdate(intermittentSale);
+    }
+
+    @Test(expected = ValidationException.class)
     public void testValidateForUpdate_intermittentSaleWithNegativeDurationShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(-120);
         intermittentSale.setFromDayTime(LocalDateTime.now());
@@ -156,6 +204,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(120);
         intermittentSale.setFromDayTime(LocalDateTime.now());
@@ -175,6 +224,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForDelete_intermittentSaleWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(120);
         intermittentSale.setFromDayTime(LocalDateTime.now());
@@ -185,6 +235,27 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setFriday(false);
         intermittentSale.setSaturday(false);
         intermittentSale.setSunday(false);
+
+        // WHEN
+        saleValidator.validateForDelete(intermittentSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForDelete_saleWithoutNameShouldThrow() throws ValidationException {
+        // GIVEN
+        IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setIdentity(new Long(123));
+
+        // WHEN
+        saleValidator.validateForDelete(intermittentSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForDelete_saleWithEmptyNameShouldThrow() throws ValidationException {
+        // GIVEN
+        IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setName("");
 
         // WHEN
         saleValidator.validateForDelete(intermittentSale);
@@ -205,6 +276,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(120);
         intermittentSale.setFromDayTime(LocalDateTime.now());
@@ -225,6 +297,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateIdentity_saleWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(120);
         intermittentSale.setFromDayTime(LocalDateTime.now());
@@ -242,9 +315,31 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void testValidateIdentity_saleWithoutNameShouldThrow() throws ValidationException {
+        // GIVEN
+        IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setIdentity(new Long(123));
+
+        // WHEN
+        saleValidator.validateIdentity(intermittentSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateIdentitysaleWithEmptyNameShouldThrow() throws ValidationException {
+        // GIVEN
+        IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setName("");
+
+        // WHEN
+        saleValidator.validateIdentity(intermittentSale);
+    }
+
+    @Test(expected = ValidationException.class)
     public void testValidateIdentity_saleWithNegativeDurationShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setName("Sale");
         intermittentSale.setIdentity(new Long(123));
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(-120);
