@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Unit Test for the SectionDAO
+ * Unit Test for the SectionService
  */
-public class TestSectionService extends AbstractDAOTest {
+public class TestSectionService extends AbstractServiceTest {
     @Autowired
     private SectionService sectionService;
     @Autowired
@@ -43,7 +43,7 @@ public class TestSectionService extends AbstractDAOTest {
         Assert.assertEquals(section, storedObjects.get(0));
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testAdd_addingInvalidObjectShouldFail() throws ServiceException {
         // GIVEN
         Section section = new Section();
@@ -56,7 +56,7 @@ public class TestSectionService extends AbstractDAOTest {
         }
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testAdd_addingNullObjectShouldFail() throws ServiceException {
         // GIVEN
         Section section = null;
@@ -88,7 +88,7 @@ public class TestSectionService extends AbstractDAOTest {
         Assert.assertEquals(section, storedObjects.get(0));
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testUpdate_updatingObjectWithIdentityNullShouldFail() throws ServiceException {
         // GIVEN
         Section section = new Section();
@@ -98,7 +98,7 @@ public class TestSectionService extends AbstractDAOTest {
         sectionService.updateSection(section);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testUpdate_updatingInvalidObjectShouldFail() throws ServiceException {
         // GIVEN
         Section section = new Section();
@@ -107,7 +107,7 @@ public class TestSectionService extends AbstractDAOTest {
         sectionService.updateSection(section);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testUpdate_updatingNullObjectShouldFail() throws ServiceException {
         // GIVEN
         Section section = null;
@@ -160,7 +160,7 @@ public class TestSectionService extends AbstractDAOTest {
         Assert.assertEquals(0, sectionService.findSections(section).size());
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testDelete_deletingObjectWithIdentityNullShouldFail() throws ServiceException {
         // GIVEN
         Section section = new Section();
@@ -169,7 +169,7 @@ public class TestSectionService extends AbstractDAOTest {
         sectionService.deleteSection(section);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testDelete_deletingNullObjectShouldFail() throws ServiceException {
         // GIVEN
         Section section = null;

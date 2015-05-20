@@ -21,9 +21,9 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * Unit Test for the TableDAO
+ * Unit Test for the TableService
  */
-public class TestTableService extends AbstractDAOTest {
+public class TestTableService extends AbstractServiceTest {
     @Autowired
     private TableService tableService;
     @Autowired
@@ -153,7 +153,7 @@ public class TestTableService extends AbstractDAOTest {
         tableService.addTable(table2);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testAdd_addingObjectWithoutNumberShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
@@ -167,7 +167,7 @@ public class TestTableService extends AbstractDAOTest {
         tableService.addTable(table);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testAdd_addingObjectWithoutSectionShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
@@ -181,7 +181,7 @@ public class TestTableService extends AbstractDAOTest {
         tableService.addTable(table);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testAdd_addingInvalidObjectShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
@@ -192,7 +192,7 @@ public class TestTableService extends AbstractDAOTest {
         tableService.addTable(table);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testAdd_addingNullObjectShouldFail() throws ServiceException {
         // GIVEN
         Table table = null;
@@ -266,7 +266,7 @@ public class TestTableService extends AbstractDAOTest {
         Assert.assertEquals(table, storedObjects.get(0));
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testUpdate_updatingObjectWithoutNumberShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
@@ -280,7 +280,7 @@ public class TestTableService extends AbstractDAOTest {
         tableService.updateTable(table);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testUpdate_updatingObjectWithoutSectionShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
@@ -294,7 +294,7 @@ public class TestTableService extends AbstractDAOTest {
         tableService.updateTable(table);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testUpdate_updatingInvalidObjectShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
@@ -305,7 +305,7 @@ public class TestTableService extends AbstractDAOTest {
         tableService.updateTable(table);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testUpdate_updatingNullObjectShouldFail() throws ServiceException {
         // GIVEN
         Table table = null;
@@ -368,7 +368,7 @@ public class TestTableService extends AbstractDAOTest {
         Assert.assertEquals(0, tableService.findTables(Table.withIdentity(section1, 2L)).size());
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testDelete_deletingObjectWithoutNumberShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();
@@ -382,7 +382,7 @@ public class TestTableService extends AbstractDAOTest {
         tableService.deleteTable(table);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = ServiceException.class)
     public void testDelete_deletingObjectWithoutSectionShouldFail() throws ServiceException {
         // GIVEN
         Table table = new Table();

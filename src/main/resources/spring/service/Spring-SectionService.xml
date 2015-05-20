@@ -4,10 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="Spring-DAO.xml" />
-
-    <!-- Service beans -->
-    <import resource="service/Spring-SectionService.xml" />
-    <import resource="service/Spring-TableService.xml" />
+    <bean id="sectionService" class="com.at.ac.tuwien.sepm.ss15.edulium.service.impl.SectionServiceImpl">
+    </bean>
 
 </beans>
