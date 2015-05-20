@@ -7,7 +7,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.impl.MenuServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -47,13 +46,13 @@ public class TestMenuService extends AbstractServiceTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        ReflectionTestUtils.setField(this.<MenuServiceImpl>getTargetObject(menuService), "menuCategoryDAO", menuCategoryDAO);
-        ReflectionTestUtils.setField(this.<MenuServiceImpl>getTargetObject(menuService), "menuEntryDAO", menuEntryDAO);
-        ReflectionTestUtils.setField(this.<MenuServiceImpl>getTargetObject(menuService), "menuDAO", menuDAO);
+        ReflectionTestUtils.setField(getTargetObject(menuService), "menuCategoryDAO", menuCategoryDAO);
+        ReflectionTestUtils.setField(getTargetObject(menuService), "menuEntryDAO", menuEntryDAO);
+        ReflectionTestUtils.setField(getTargetObject(menuService), "menuDAO", menuDAO);
 
-        ReflectionTestUtils.setField(this.<MenuServiceImpl>getTargetObject(menuService), "menuEntryValidator", menuEntryValidator);
-        ReflectionTestUtils.setField(this.<MenuServiceImpl>getTargetObject(menuService), "menuCategoryValidator", menuCategoryValidator);
-        ReflectionTestUtils.setField(this.<MenuServiceImpl>getTargetObject(menuService), "menuValidator", menuValidator);
+        ReflectionTestUtils.setField(getTargetObject(menuService), "menuEntryValidator", menuEntryValidator);
+        ReflectionTestUtils.setField(getTargetObject(menuService), "menuCategoryValidator", menuCategoryValidator);
+        ReflectionTestUtils.setField(getTargetObject(menuService), "menuValidator", menuValidator);
     }
 
     @Test(expected = AccessDeniedException.class)
