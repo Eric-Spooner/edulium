@@ -19,6 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -64,24 +65,18 @@ public class ManagerController implements Initializable {
 
 
     @Override
+    @PostConstruct
     public void initialize(URL location, ResourceBundle resources){
         try {
             //tableViewTaxRate.setItems(observableArrayList(menuService.get));
             tableColTaxRateID.setCellValueFactory(new PropertyValueFactory<TaxRate, Long>("identity"));
             tableColTaxRateValue.setCellValueFactory(new PropertyValueFactory<TaxRate, BigDecimal>("value"));
 
-            if(menuService == null){
-                throw new Exception("menu Service = null");
-            }
-            if(menuService.getAllMenuCategories() != null) {
-                tableViewMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
-            }
+            tableViewMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
             tableColMenuCategoryID.setCellValueFactory(new PropertyValueFactory<MenuCategory, Long>("identity"));
             tableColMenuCategoryName.setCellValueFactory(new PropertyValueFactory<MenuCategory, String>("name"));
 
-            if(menuService.getAllMenuEntries() != null) {
-                tableViewMenuEntry.setItems(observableArrayList(menuService.getAllMenuEntries()));
-            }
+            tableViewMenuEntry.setItems(observableArrayList(menuService.getAllMenuEntries()));
             tableColMenuEntryId.setCellValueFactory(new PropertyValueFactory<MenuEntry, Long>("identity"));
             tableColMenuEntryName.setCellValueFactory(new PropertyValueFactory<MenuEntry, String>("name"));
             tableColMenuEntryPrice.setCellValueFactory(new PropertyValueFactory<MenuEntry, BigDecimal>("price"));
