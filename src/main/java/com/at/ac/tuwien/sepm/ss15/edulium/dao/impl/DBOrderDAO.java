@@ -168,8 +168,8 @@ class DBOrderDAO implements DAO<Order> {
                 stmt.setNull(9, Types.VARCHAR);
             } else {
                 Table table = order.getTable();
-                stmt.setObject(9, table.getSection() == null ? null : table.getSection().getIdentity());
-                stmt.setLong(8, table.getNumber());
+                stmt.setObject(8, table.getSection() == null ? null : table.getSection().getIdentity());
+                stmt.setLong(9, table.getNumber());
             }
             stmt.setObject(10, order.getMenuEntry() == null ? null : order.getMenuEntry().getIdentity());
 
