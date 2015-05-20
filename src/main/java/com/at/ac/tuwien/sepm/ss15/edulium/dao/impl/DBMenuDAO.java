@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
-import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,7 +19,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -59,11 +57,11 @@ class DBMenuDAO implements DAO<Menu> {
             LOGGER.error("inserting menu into database failed", e);
             throw new DAOException("inserting menu into database failed", e);
         }
-        Long changeNr =  generateHistoryMenu(menu);
-        for(MenuEntry entry:menu.getEntries()) {
-            createMenuAssoc(menu, entry, entry.getPrice());
+        Long changeNr = generateHistoryMenu(menu);
+        updateMenuAssoc(menu);
+        for (MenuEntry entry : menu.getEntries()) {
+            generateHistoryMenuAssoc(menu, entry, changeNr);
         }
-        generateHistoryMenuAssoc(menu.getEntries(), changeNr);
     }
 
     @Override
@@ -74,8 +72,8 @@ class DBMenuDAO implements DAO<Menu> {
         final String queryUpdateMenu = "UPDATE Menu SET name = ? WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryUpdateMenu)) {
-            stmt.setString(1,menu.getName());
-            stmt.setLong(2,menu.getIdentity());
+            stmt.setString(1, menu.getName());
+            stmt.setLong(2, menu.getIdentity());
 
             if (stmt.executeUpdate() == 0) {
                 LOGGER.error("updating menu in database failed, dataset not found");
@@ -93,47 +91,9 @@ class DBMenuDAO implements DAO<Menu> {
          * If the entry is not found, then delete it. If there are entries left in the MenuEntrys copy than
          * create new MenuAssoc
          */
-        List<MenuEntry> menuEntries = new LinkedList<>(menu.getEntries());
-        List<MenuEntry> updatedEntries = new LinkedList<>();
-
-        final String queryGetMenuAssoc = "SELECT * FROM MenuAssoc WHERE menu_ID = ? AND disabled = false";
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryGetMenuAssoc)) {
-            stmt.setLong(1,menu.getIdentity());
-            ResultSet result = stmt.executeQuery();
-            while (result.next()) {
-                MenuEntry entry = MenuEntry.withIdentity(result.getLong("menuEntry_ID"));
-                //Look, if the entry ID is in the list
-                //Contains is not appropiate, because the entries only have the same ID
-                Boolean found = false;
-                MenuEntry foundEntry = null;
-                for(MenuEntry entry1 : menuEntries){
-                    if(entry1.getIdentity().equals(entry.getIdentity())) {
-                        found = true;
-                        foundEntry = entry1;
-                    }
-                }
-                if(found){
-                    //The Entry is in the list, so update the price
-                    updateMenuAssoc(menu, entry, entry.getPrice());
-                    menuEntries.remove(foundEntry);
-                }else{
-                    //The Entry is not in the list, so it should be deleted
-                    deleteMenuAssoc(menu, entry);
-                }
-                updatedEntries.add(entry);
-            }
-        } catch (SQLException e) {
-            LOGGER.error("updating menu in database failed", e);
-            throw new DAOException("updating menu in database failed", e);
-        }
-        generateHistoryMenuAssoc(updatedEntries, changeNr);
-
-        //Check if there are Entries left
-        if(menuEntries.size() >0){
-            for(MenuEntry entry : menuEntries){
-                createMenuAssoc(menu, entry, entry.getPrice());
-            }
-            generateHistoryMenuAssoc(menuEntries, changeNr);
+        updateMenuAssoc(menu);
+        for (MenuEntry entry : menu.getEntries()) {
+            generateHistoryMenuAssoc(menu, entry, changeNr);
         }
     }
 
@@ -157,10 +117,10 @@ class DBMenuDAO implements DAO<Menu> {
         }
         Long changeNr = generateHistoryMenu(menu);
 
-        for(MenuEntry entry:menu.getEntries()){
+        for (MenuEntry entry : menu.getEntries()) {
             deleteMenuAssoc(menu, entry);
+            generateHistoryMenuAssoc(menu, entry, changeNr);
         }
-        generateHistoryMenuAssoc(menu.getEntries(), changeNr);
 
         menu.setEntries(new LinkedList<>());
     }
@@ -176,32 +136,32 @@ class DBMenuDAO implements DAO<Menu> {
         final List<Menu> objects = new ArrayList<>();
 
         //Check if the user also wants to search for MenuEntries
-        if(menu.getEntries() != null && menu.getEntries().size()>0){
+        if (menu.getEntries() != null && menu.getEntries().size() > 0) {
             //at first find the MenuEntries, which have been given in the menu
             List<Long> list = new LinkedList<>();
-            for(MenuEntry entry: menu.getEntries()) {
-                    List<MenuEntry> innerList = menuEntryDAO.find(entry);
-                    for(MenuEntry newEntry: innerList){
-                        list.add(newEntry.getIdentity());
-                    }
+            for (MenuEntry entry : menu.getEntries()) {
+                List<MenuEntry> innerList = menuEntryDAO.find(entry);
+                for (MenuEntry newEntry : innerList) {
+                    list.add(newEntry.getIdentity());
+                }
             }
             String queryByMenuEntry =
                     "SELECT m.ID, m.name FROM (Menu m JOIN MenuAssoc ma ON m.id  = ma.menu_id) WHERE " +
-                        "m.deleted = false AND ma.disabled = false AND " +
-                        "m.ID = ISNULL(?, ID) AND " +
-                        "m.name = ISNULL(?, name) AND " +
-                        "ma.menuEntry_ID in (" +
-                        list.stream().map(m -> "?").collect(Collectors.joining(",")) +
-                        ") " +
-                        "Group By m.ID";
+                            "m.deleted = false AND ma.disabled = false AND " +
+                            "m.ID = ISNULL(?, ID) AND " +
+                            "m.name = ISNULL(?, name) AND " +
+                            "ma.menuEntry_ID in (" +
+                            list.stream().map(m -> "?").collect(Collectors.joining(",")) +
+                            ") " +
+                            "Group By m.ID";
 
             objects.clear();
 
             try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryByMenuEntry)) {
                 stmt.setObject(1, menu.getIdentity());
                 stmt.setObject(2, menu.getName());
-                for (int i = 0; i<list.size(); i++){
-                    stmt.setLong(i+3, list.get(i));
+                for (int i = 0; i < list.size(); i++) {
+                    stmt.setLong(i + 3, list.get(i));
                 }
 
                 ResultSet result = stmt.executeQuery();
@@ -212,11 +172,11 @@ class DBMenuDAO implements DAO<Menu> {
                 LOGGER.error("searching for menu entries failed", e);
                 throw new DAOException("searching for menu entries failed", e);
             }
-        }else{ //Only search for the name and/or the id
+        } else { //Only search for the name and/or the id
             String query = "SELECT * FROM Menu WHERE " +
-                       "ID = ISNULL(?, ID) AND " +
-                       "name = ISNULL(?, name) AND " +
-                       "deleted = false";
+                    "ID = ISNULL(?, ID) AND " +
+                    "name = ISNULL(?, name) AND " +
+                    "deleted = false";
             try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
                 stmt.setObject(1, menu.getIdentity());
                 stmt.setObject(2, menu.getName());
@@ -272,10 +232,9 @@ class DBMenuDAO implements DAO<Menu> {
         }
         return history;
     }
-
-
     /**
      * converts the database query output into a object
+     *
      * @param result database output
      * @return Menu object with the data of the resultSet set
      * @throws SQLException if an error accessing the database occurred
@@ -303,19 +262,19 @@ class DBMenuDAO implements DAO<Menu> {
             throw new DAOException("searching for menu entries failed", e);
         }
 
-        if(menuEntries.size()>0){
+        if (menuEntries.size() > 0) {
             menu.setEntries(menuEntries);
-        }else{
+        } else {
             throw new DAOException("there is no menu Entry for the searched menu");
         }
 
-        return  menu;
+        return menu;
     }
-
     /**
      * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed
      * the changes
+     *
      * @param menu updated dataset
      * @throws DAOException if an error accessing the database occurred
      */
@@ -340,16 +299,16 @@ class DBMenuDAO implements DAO<Menu> {
         final String queryGetChangeNr = "SELECT MAX(changeNr) FROM MenuHistory WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryGetChangeNr)) {
-            stmt.setLong(1,menu.getIdentity());          // dataset id
+            stmt.setLong(1, menu.getIdentity());          // dataset id
             ResultSet result = stmt.executeQuery();
             Long resultNr = -1L;
-            while(result.next()){
+            while (result.next()) {
                 resultNr = result.getLong(1);
             }
-            if(resultNr == -1){
+            if (resultNr == -1) {
                 LOGGER.error("getting changeNr failed");
                 throw new DAOException("getting changeNr failed");
-            }else{
+            } else {
                 return resultNr;
             }
         } catch (SQLException e) {
@@ -357,9 +316,16 @@ class DBMenuDAO implements DAO<Menu> {
             throw new DAOException("getting changeNr failed", e);
         }
     }
-
-
-    /*
+    /**
+     * writes the changes of the dataset into the database
+     * stores the time; number of the change and the user which executed
+     * the changes
+     *
+     * @param menu     updated dataset
+     * @param entry    The Menu Entry, which identifies the MenuAssociation
+     * @param changeNr The Change Nr of the Menu History
+     * @throws DAOException if an error accessing the database occurred
+     */
     private void generateHistoryMenuAssoc(Menu menu, MenuEntry entry, Long changeNr) throws DAOException {
         LOGGER.debug("entering generateHistory with parameters " + menu);
         final String query2 = "INSERT INTO MenuAssocHistory " +
@@ -377,34 +343,9 @@ class DBMenuDAO implements DAO<Menu> {
             throw new DAOException("generating MenuAssoc history failed", e);
         }
     }
-    */
-
-    private void generateHistoryMenuAssoc(List<MenuEntry> entries, Long changeNr) throws DAOException {
-        LOGGER.debug("entering generateHistory with parameters " + entries + changeNr);
-        final String queryMerge = "Merge INTO MenuAssocHistory " +
-                "(SELECT *, CURRENT_TIMESTAMP(), ?, ? " +
-                "FROM MenuAssoc WHERE menu_ID = ? AND menuEntry_ID = ?)";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryMerge)) {
-            for(MenuEntry entry:entries){
-                stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
-                stmt.setLong(2, changeNr);
-                stmt.setLong(3, entry.getIdentity());          // dataset id
-                stmt.setLong(4, entry.getIdentity());          // dataset id
-                stmt.addBatch();
-            }
-
-            stmt.executeBatch();
-
-        } catch (SQLException e) {
-            LOGGER.error("generating MenuAssoc history failed", e);
-            throw new DAOException("generating MenuAssoc history failed", e);
-        }
-    }
-
-
     /**
      * converts the database query output into a history entry object
+     *
      * @param result database output
      * @return History object with the data of the resultSet set
      * @throws SQLException if an error accessing the database occurred
@@ -427,11 +368,10 @@ class DBMenuDAO implements DAO<Menu> {
 
         return historyEntry;
     }
-
-
     /**
      * converts the database query output into a object
      * get the History Menu with the MenuEntries with the same History ChangeNr
+     *
      * @param result database output from History
      * @return Menu object with the data of the resultSet set
      * @throws SQLException if an error accessing the database occurred
@@ -459,80 +399,64 @@ class DBMenuDAO implements DAO<Menu> {
             throw new DAOException("searching for menu entries failed", e);
         }
         menu.setEntries(menuEntries);
-        return  menu;
+        return menu;
     }
 
 
     /**
-     * This function is used, to update Menu Assoc Entries
-     * if the Menu Assoc is disabled, then enable it again
+     * This function is used, to update/create Menu Assoc Entries
+     * All MenuAssoc with the MenuID are disabled, the one, which are used are enabled again and the rest is added
      * the parameters are used, to identify the Menu Assoc and to set the values
+     *
      * @param menu Menu Is used to identify the MenuAssoc
-     * @param entry Entry is used to identify the Menu Assoc
-     * @param price the value
      */
-    private void updateMenuAssoc(Menu menu, MenuEntry entry, BigDecimal price) throws DAOException{
+    private void updateMenuAssoc(Menu menu) throws DAOException {
         //At first, look if the
-        findAndEnableMenuAssoc(menu, entry);
+        // disable all MenuAssoc for now, the update sql query will re-enable all valid
+        // associations
+        final String queryDiasbleMenuAssoc = "UPDATE MenuAssoc SET disabled = true WHERE menu_ID = ?";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryDiasbleMenuAssoc)) {
+            stmt.setLong(1, menu.getIdentity());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("Disabling Menu-MenuEntry associations from database failed", e);
+            throw new DAOException("Disabling Menu-MenuEntry associations from database failed", e);
+        }
 
         final String queryUpdateMenuAssoc =
-                "UPDATE MenuAssoc SET menuPrice = ? WHERE menu_ID = ? AND menuEntry_ID = ? AND disabled = false";
+                "Merge INTO MenuAssoc (menu_ID, menuEntry_ID, menuPrice, disabled) " +
+                        "KEY (menu_ID, menuEntry_ID) VALUES (?, ?, ?, false)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryUpdateMenuAssoc)) {
-            stmt.setBigDecimal(1, price);
-            stmt.setLong(2, menu.getIdentity());
-            stmt.setLong(3,entry.getIdentity());
-
-            if (stmt.executeUpdate() == 0) {
-                LOGGER.error("updating menuAssoc in database failed, dataset not found");
-                throw new DAOException("updating menuAssoc in database failed, dataset not found");
+            for (MenuEntry entry : menu.getEntries()) {
+                stmt.setLong(1, menu.getIdentity());
+                stmt.setLong(2, entry.getIdentity());
+                stmt.setBigDecimal(3, entry.getPrice());
+                stmt.addBatch();
             }
+            stmt.executeBatch();
         } catch (SQLException e) {
             LOGGER.error("updating menuAssoc in database failed", e);
             throw new DAOException("updating menuAssoc in database failed", e);
         }
     }
-    /**
-     * This function is used, to insert Menu Assoc Entries
-     * if the Menu Assoc is disabled, then enable it again
-     * the parameters are used, to identify the Menu Assoc and to set the values
-     * @param menu Menu Is used to identify the MenuAssoc
-     * @param entry Entry is used to identify the Menu Assoc
-     * @param price the value
-     */
-    private void createMenuAssoc(Menu menu, MenuEntry entry, BigDecimal price) throws  DAOException{
-        if(findAndEnableMenuAssoc(menu, entry)) {
-            //The Menu Assoc is already there, but and if necessary, it has been enabled
-            updateMenuAssoc(menu, entry, price);
-        }else{
-            final String queryInsertIntoMenuAssoc =
-                    "INSERT INTO MenuAssoc (menu_ID, menuEntry_ID, menuPrice) VALUES (?,?,?)";
 
-            try (PreparedStatement stmt =
-                         dataSource.getConnection().prepareStatement(queryInsertIntoMenuAssoc, Statement.RETURN_GENERATED_KEYS)) {
-                stmt.setLong(1, menu.getIdentity());
-                stmt.setLong(2, entry.getIdentity());
-                stmt.setBigDecimal(3,price);
-                stmt.executeUpdate();
-            } catch (SQLException e) {
-                LOGGER.error("inserting menu association to menuEntry into database failed", e);
-                throw new DAOException("inserting menu association to menuEntry into database failed", e);
-            }
-        }
-    }
     /**
      * This function is used, to delete Menu Assoc Entries
      * if the Menu Assoc is enabled, than disable it.
-     * @param menu Menu Is used to identify the MenuAssoc
+     *
+     * @param menu  Menu Is used to identify the MenuAssoc
      * @param entry Entry is used to identify the Menu Assoc
      */
-    private void deleteMenuAssoc(Menu menu, MenuEntry entry) throws DAOException{
+    private void deleteMenuAssoc(Menu menu, MenuEntry entry) throws DAOException {
         //The Entry is not in the list, so it should be disabled
         final String query = "UPDATE MenuAssoc SET disabled = true WHERE menu_ID = ? AND menuEntry_ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, menu.getIdentity());
-            stmt.setLong(2,entry.getIdentity());
+            stmt.setLong(2, entry.getIdentity());
 
             if (stmt.executeUpdate() == 0) {
                 LOGGER.error("deleting menuAssoc failed, dataset not found");
@@ -541,51 +465,6 @@ class DBMenuDAO implements DAO<Menu> {
         } catch (SQLException e) {
             LOGGER.error("deleting menuAssoc failed", e);
             throw new DAOException("deleting menuAssoc failed", e);
-        }
-    }
-
-    /**
-     * This function is used to search MenuAssocs and to enable it again, if they are disabled
-     * @param menu Menu Is used to identify the MenuAssoc
-     * @param entry Entry is used to identify the Menu Assoc
-     * @return true, if the MenuAssoc is already there
-     */
-    private boolean findAndEnableMenuAssoc(Menu menu, MenuEntry entry) throws DAOException{
-        final String querySelect =
-                "SELECT * FROM MenuAssoc WHERE menu_ID = ? AND menuEntry_ID = ?";
-
-        try (PreparedStatement stmt =
-                     dataSource.getConnection().prepareStatement(querySelect)) {
-            stmt.setLong(1, menu.getIdentity());
-            stmt.setLong(2, entry.getIdentity());
-            ResultSet result = stmt.executeQuery();
-            if(result.next()){
-                //The Menu Assoc has been found
-                if(result.getBoolean("disabled")){
-                    //Enable the entry again
-                    final String query = "UPDATE MenuAssoc SET disabled = false WHERE menu_ID = ? AND menuEntry_ID = ?";
-
-                    try (PreparedStatement stmt2 = dataSource.getConnection().prepareStatement(query)) {
-                        stmt2.setLong(1, menu.getIdentity());
-                        stmt2.setLong(2,entry.getIdentity());
-
-                        if (stmt2.executeUpdate() == 0) {
-                            LOGGER.error("enabling menuAssoc failed, dataset not found");
-                            throw new DAOException("enabling menuAssoc failed, dataset not found");
-                        }
-                    } catch (SQLException e) {
-                        LOGGER.error("enabling menuAssoc failed", e);
-                        throw new DAOException("enabling menuAssoc failed", e);
-                    }
-                }
-                return true;
-            }else{
-                //The Menu Assoc has not been found
-                return false;
-            }
-        } catch (SQLException e) {
-            LOGGER.error("searching menu association in database failed", e);
-            throw new DAOException("searching menu association in database failed", e);
         }
     }
 }
