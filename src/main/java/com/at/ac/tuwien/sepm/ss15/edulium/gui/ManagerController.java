@@ -2,8 +2,15 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -11,6 +18,9 @@ import java.util.ResourceBundle;
  * Controller used for the Manager View
  */
 public class ManagerController implements Initializable {
+    private static final Logger LOGGER = LogManager.getLogger(ManagerController.class);
+
+
     @Override
     public void initialize(URL location, ResourceBundle resources){
 
@@ -73,6 +83,14 @@ public class ManagerController implements Initializable {
     public void buttonTaxRateUpdateClicked(ActionEvent actionEvent) {
     }
 
-    public void buttonTaxRateAddClicked(ActionEvent actionEvent) {
+    public void buttonTaxRateAddClicked(ActionEvent actionEvent) throws IOException{
+        LOGGER.info("Insert Tax Rate Button Click");
+        Stage stage = new Stage();
+        DialogTaxRateController.setThisStage(stage);
+        stage.setTitle("Insert Tax Rate");
+        Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogTaxRate.fxml"));
+        Scene scene = new Scene(myPane);
+        stage.setScene(scene);
+        stage.showAndWait();
     }
 }
