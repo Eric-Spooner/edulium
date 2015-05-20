@@ -14,8 +14,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,16 +44,19 @@ public class TestMenuService extends AbstractServiceTest {
     private Validator<Menu> menuValidator;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        MenuServiceImpl service = new MenuServiceImpl(menuEntryDAO, menuCategoryDAO, menuDAO);
-        service.setValidators(menuEntryValidator, menuCategoryValidator, menuValidator);
+        ReflectionTestUtils.setField(this.<MenuServiceImpl>getTargetObject(menuService), "menuCategoryDAO", menuCategoryDAO);
+        ReflectionTestUtils.setField(this.<MenuServiceImpl>getTargetObject(menuService), "menuEntryDAO", menuEntryDAO);
+        ReflectionTestUtils.setField(this.<MenuServiceImpl>getTargetObject(menuService), "menuDAO", menuDAO);
 
-        menuService = service;
+        ReflectionTestUtils.setField(this.<MenuServiceImpl>getTargetObject(menuService), "menuEntryValidator", menuEntryValidator);
+        ReflectionTestUtils.setField(this.<MenuServiceImpl>getTargetObject(menuService), "menuCategoryValidator", menuCategoryValidator);
+        ReflectionTestUtils.setField(this.<MenuServiceImpl>getTargetObject(menuService), "menuValidator", menuValidator);
     }
 
-    @Test(expected = AuthenticationCredentialsNotFoundException.class)
+    @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testAddMenuEntry_WithoutPermissionShouldNotAdd() throws ValidationException, DAOException, ServiceException {
         // PREPARE
@@ -90,7 +94,7 @@ public class TestMenuService extends AbstractServiceTest {
         Mockito.verify(menuEntryDAO, never()).create(entry);
     }
 
-    @Test(expected = AuthenticationCredentialsNotFoundException.class)
+    @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateMenuEntry_WithoutPermissionShouldNotUpdate() throws ValidationException, DAOException, ServiceException {
         // PREPARE
@@ -128,7 +132,7 @@ public class TestMenuService extends AbstractServiceTest {
         Mockito.verify(menuEntryDAO, never()).update(entry);
     }
 
-    @Test(expected = AuthenticationCredentialsNotFoundException.class)
+    @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testRemoveMenuEntry_WithoutPermissionShouldFail() throws ValidationException, DAOException, ServiceException {
         // PREPARE
@@ -200,7 +204,7 @@ public class TestMenuService extends AbstractServiceTest {
         assertTrue(entries.contains(entry3));
     }
 
-    @Test(expected = AuthenticationCredentialsNotFoundException.class)
+    @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testAddMenuCategory_WithoutPermissionShouldNotAdd() throws ValidationException, DAOException, ServiceException {
         // PREPARE
@@ -238,7 +242,7 @@ public class TestMenuService extends AbstractServiceTest {
         Mockito.verify(menuCategoryDAO, never()).create(category);
     }
 
-    @Test(expected = AuthenticationCredentialsNotFoundException.class)
+    @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateMenuCategory_WithoutPermissionShouldNotUpdate() throws ValidationException, DAOException, ServiceException {
         // PREPARE
@@ -276,7 +280,7 @@ public class TestMenuService extends AbstractServiceTest {
         Mockito.verify(menuCategoryDAO, never()).update(category);
     }
 
-    @Test(expected = AuthenticationCredentialsNotFoundException.class)
+    @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testRemoveMenuCategory_WithoutPermissionShouldFail() throws ValidationException, DAOException, ServiceException {
         // PREPARE
@@ -348,7 +352,7 @@ public class TestMenuService extends AbstractServiceTest {
         assertTrue(entries.contains(category3));
     }
 
-    @Test(expected = AuthenticationCredentialsNotFoundException.class)
+    @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testAddMenu_WithoutPermissionShouldNotAdd() throws ValidationException, DAOException, ServiceException {
         // PREPARE
@@ -386,7 +390,7 @@ public class TestMenuService extends AbstractServiceTest {
         Mockito.verify(menuDAO, never()).create(menu);
     }
 
-    @Test(expected = AuthenticationCredentialsNotFoundException.class)
+    @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testRemoveMenu_WithoutPermissionShouldFail() throws ValidationException, DAOException, ServiceException {
         // PREPARE
