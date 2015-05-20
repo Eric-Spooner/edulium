@@ -138,7 +138,7 @@ public class Reservation {
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (quantity != null ? !quantity.equals(that.quantity) : that.quantity != null) return false;
         if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
-        return !(tables != null ? !tables.equals(that.tables) : that.tables != null);
+        return !(tables != null ? !tables.containsAll(that.tables) : that.tables != null);
 
     }
 }
