@@ -241,7 +241,7 @@ public class TestOrderValidator extends AbstractDomainTest {
     @Test
     public void testValidateForUpdate_shouldAcceptOrder() throws ValidationException {
         // GIVEN
-        Order order = new Order();
+        Order order =  Order.withIdentity(3);
         order.setIdentity((long) 1);
         order.setTable(createTable(1, 2, 3));
         order.setMenuEntry(createMenuEntry("name", "desc", "cat", 50, 0.02, true));
@@ -258,7 +258,7 @@ public class TestOrderValidator extends AbstractDomainTest {
     @Test(expected = ValidationException.class)
     public void testValidateForUpdate_OrderWithoutIdentityShouldThrow() throws ValidationException {
         // GIVEN
-        Order order = new Order();
+        Order order =  Order.withIdentity(3);
         order.setTable(createTable(1, 2, 3));
         order.setMenuEntry(createMenuEntry("name", "desc", "cat", 50, 0.02, true));
         order.setBrutto(BigDecimal.valueOf(0));
@@ -283,7 +283,7 @@ public class TestOrderValidator extends AbstractDomainTest {
     @Test(expected = ValidationException.class)
     public void testValidateForUpdate_OrderWithInvalidTableThrow() throws ValidationException {
         // GIVEN
-        Order order = new Order();
+        Order order =  Order.withIdentity(3);
         order.setTable(new Table());
         order.setMenuEntry(createMenuEntry("name", "desc", "cat", 50, 0.02, true));
         order.setBrutto(BigDecimal.valueOf(0));
@@ -299,7 +299,7 @@ public class TestOrderValidator extends AbstractDomainTest {
     @Test(expected = ValidationException.class)
     public void testValidateForUpdate_OrderWithInvalidMenuEntryThrow() throws ValidationException {
         // GIVEN
-        Order order = new Order();
+        Order order =  Order.withIdentity(3);
         order.setTable(createTable(1, 2, 3));
         order.setMenuEntry(new MenuEntry());
         order.setBrutto(BigDecimal.valueOf(0));
@@ -311,6 +311,41 @@ public class TestOrderValidator extends AbstractDomainTest {
         // WHEN
         orderValidator.validateForUpdate(order);
     }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_OrderWithNullTaxThrow() throws ValidationException {
+        // GIVEN
+        Order order = Order.withIdentity(3);
+        order.setTable(createTable(1, 2, 3));
+        order.setMenuEntry(createMenuEntry("name", "desc", "cat", 50, 0.02, true));
+        order.setMenuEntry(new MenuEntry());
+        order.setBrutto(BigDecimal.valueOf(0));
+        order.setTax(null);
+        order.setInvoice(Invoice.withIdentity(1));
+        order.setTime(LocalDateTime.now());
+        order.setAdditionalInformation("Info");
+
+        // WHEN
+        orderValidator.validateForUpdate(order);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_OrderWithInvalidTaxThrow() throws ValidationException {
+        // GIVEN
+        Order order = Order.withIdentity(3);
+        order.setTable(createTable(1, 2, 3));
+        order.setMenuEntry(createMenuEntry("name", "desc", "cat", 50, 0.02, true));
+        order.setMenuEntry(new MenuEntry());
+        order.setBrutto(BigDecimal.valueOf(0));
+        order.setTax(BigDecimal.valueOf(-1));
+        order.setInvoice(Invoice.withIdentity(1));
+        order.setTime(LocalDateTime.now());
+        order.setAdditionalInformation("Info");
+
+        // WHEN
+        orderValidator.validateForUpdate(order);
+    }
+
 
     @Test
     public void testValidateForDelete_shouldAcceptOrder() throws ValidationException {
