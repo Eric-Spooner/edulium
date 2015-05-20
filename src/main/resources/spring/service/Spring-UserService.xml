@@ -4,10 +4,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="Spring-DAO.xml" />
-
-    <!-- Service beans -->
-    <import resource="service/Spring-UserService.xml" />
-    <import resource="service/Spring-UserDetailsService.xml" />
+    <bean id="userService" class="com.at.ac.tuwien.sepm.ss15.edulium.service.impl.UserServiceImpl" />
 
 </beans>
