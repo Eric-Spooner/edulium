@@ -6,11 +6,11 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="369.0" prefWidth="421.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="369.0" prefWidth="421.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.DialogMenuEntryController">
    <children>
       <Text layoutX="14.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name: " />
-      <Button layoutX="359.0" layoutY="324.0" mnemonicParsing="false" text="OK" />
-      <Button layoutX="288.0" layoutY="324.0" mnemonicParsing="false" text="Cancle" />
+      <Button layoutX="359.0" layoutY="324.0" mnemonicParsing="false" text="OK"  onAction="#buttonOKClick"/>
+      <Button layoutX="288.0" layoutY="324.0" mnemonicParsing="false" text="Cancle"  onAction="#buttonCancleClick"/>
       <TextField layoutX="140.0" layoutY="21.0" prefHeight="31.0" prefWidth="260.0" />
       <TextField layoutX="140.0" layoutY="57.0" prefHeight="31.0" prefWidth="260.0" />
       <Text layoutX="17.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Price: " />

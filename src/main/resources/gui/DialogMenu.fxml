@@ -6,11 +6,11 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="438.0" prefWidth="712.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="438.0" prefWidth="712.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.DialogMenuController">
    <children>
       <Text layoutX="20.0" layoutY="405.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name: " />
-      <Button layoutX="658.0" layoutY="384.0" mnemonicParsing="false" text="OK" />
-      <Button layoutX="588.0" layoutY="384.0" mnemonicParsing="false" text="Cancle" />
+      <Button layoutX="658.0" layoutY="384.0" mnemonicParsing="false" text="OK"  onAction="#buttonOKClick"/>
+      <Button layoutX="588.0" layoutY="384.0" mnemonicParsing="false" text="Cancle" onAction="#buttonCancleClick"/>
       <TextField layoutX="75.0" layoutY="384.0" prefHeight="31.0" prefWidth="491.0" />
       <TableView layoutX="14.0" layoutY="14.0" prefHeight="342.0" prefWidth="285.0">
         <columns>
@@ -21,7 +21,7 @@
       </TableView>
       <TextField layoutX="306.0" layoutY="138.0" prefHeight="31.0" prefWidth="97.0" />
       <Text layoutX="315.0" layoutY="126.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Menu Price:" />
-      <Button layoutX="330.0" layoutY="178.0" mnemonicParsing="false" text="Add" />
+      <Button layoutX="330.0" layoutY="178.0" mnemonicParsing="false" text="Add" onAction="#buttonAddClick"/>
       <TableView layoutX="413.0" layoutY="14.0" prefHeight="342.0" prefWidth="285.0">
          <columns>
             <TableColumn prefWidth="89.0" text="Name" />
