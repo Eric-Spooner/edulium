@@ -56,6 +56,11 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    public void updateMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException {
+
+    }
+
+    @Override
     public void removeMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException {
 
     }
@@ -76,6 +81,11 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    public void updateMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException {
+
+    }
+
+    @Override
     public void removeMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException {
 
     }
@@ -92,6 +102,11 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public void addMenu(Menu menu) throws ValidationException, ServiceException {
+
+    }
+
+    @Override
+    public void updateMenu(Menu menu) throws ValidationException, ServiceException {
 
     }
 

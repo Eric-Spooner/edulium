@@ -92,6 +92,44 @@ public class TestMenuService extends AbstractServiceTest {
 
     @Test(expected = AuthenticationCredentialsNotFoundException.class)
     @WithMockUser(roles={"ROLE_SERVICE"})
+    public void testUpdateMenuEntry_WithoutPermissionShouldNotUpdate() throws ValidationException, DAOException, ServiceException {
+        // PREPARE
+        MenuEntry entry = new MenuEntry();
+
+        // WHEN
+        menuService.updateMenuEntry(entry);
+
+        // THEN
+        Mockito.verify(menuEntryDAO, never()).update(entry);
+    }
+
+    @Test
+    @WithMockUser(roles={"ROLE_MANAGER"})
+    public void testUpdateMenuEntry_shouldUpdateEntry() throws ValidationException, DAOException, ServiceException {
+        // PREPARE
+        MenuEntry entry = new MenuEntry();
+
+        // WHEN
+        menuService.updateMenuEntry(entry);
+
+        // THEN
+        Mockito.verify(menuEntryDAO).update(entry);
+    }
+
+    @Test(expected = ValidationException.class)
+    @WithMockUser(roles={"ROLE_MANAGER"})
+    public void testUpdateMenuEntry_shouldNotUpdateInvalidMenuEntry() throws ValidationException, DAOException, ServiceException {
+        // PREPARE
+        MenuEntry entry = new MenuEntry();
+        Mockito.doThrow(new ValidationException("")).when(menuEntryValidator).validateForUpdate(entry);
+
+        // WHEN
+        menuService.updateMenuEntry(entry);
+        Mockito.verify(menuEntryDAO, never()).update(entry);
+    }
+
+    @Test(expected = AuthenticationCredentialsNotFoundException.class)
+    @WithMockUser(roles={"ROLE_SERVICE"})
     public void testRemoveMenuEntry_WithoutPermissionShouldFail() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuEntry entry = new MenuEntry();
@@ -121,7 +159,7 @@ public class TestMenuService extends AbstractServiceTest {
     public void testRemoveMenuEntry_ObjectWithInvalidIdentityShouldNotRemove() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuEntry entry = new MenuEntry();
-        Mockito.doThrow(new ValidationException("")).when(menuEntryValidator).validateIdentity(entry);
+        Mockito.doThrow(new ValidationException("")).when(menuEntryValidator).validateForDelete(entry);
 
         // WHEN
         menuService.removeMenuEntry(entry);
@@ -202,6 +240,44 @@ public class TestMenuService extends AbstractServiceTest {
 
     @Test(expected = AuthenticationCredentialsNotFoundException.class)
     @WithMockUser(roles={"ROLE_SERVICE"})
+    public void testUpdateMenuCategory_WithoutPermissionShouldNotUpdate() throws ValidationException, DAOException, ServiceException {
+        // PREPARE
+        MenuCategory category = new MenuCategory();
+
+        // WHEN
+        menuService.updateMenuCategory(category);
+
+        // THEN
+        Mockito.verify(menuCategoryDAO, never()).update(category);
+    }
+
+    @Test
+    @WithMockUser(roles={"ROLE_MANAGER"})
+    public void testUpdateMenuCategory_shouldUpdateCategory() throws ValidationException, DAOException, ServiceException {
+        // PREPARE
+        MenuCategory category = new MenuCategory();
+
+        // WHEN
+        menuService.updateMenuCategory(category);
+
+        // THEN
+        Mockito.verify(menuCategoryDAO).update(category);
+    }
+
+    @Test(expected = ValidationException.class)
+    @WithMockUser(roles={"ROLE_MANAGER"})
+    public void testUpdateMenuCategory_shouldNotUpdateInvalidMenuCategory() throws ValidationException, DAOException, ServiceException {
+        // PREPARE
+        MenuCategory category = new MenuCategory();
+        Mockito.doThrow(new ValidationException("")).when(menuCategoryValidator).validateForUpdate(category);
+
+        // WHEN
+        menuService.updateMenuCategory(category);
+        Mockito.verify(menuCategoryDAO, never()).update(category);
+    }
+
+    @Test(expected = AuthenticationCredentialsNotFoundException.class)
+    @WithMockUser(roles={"ROLE_SERVICE"})
     public void testRemoveMenuCategory_WithoutPermissionShouldFail() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuCategory category = new MenuCategory();
@@ -231,7 +307,7 @@ public class TestMenuService extends AbstractServiceTest {
     public void testRemoveMenuCategory_ObjectWithInvalidIdentityShouldNotRemove() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuCategory category = new MenuCategory();
-        Mockito.doThrow(new ValidationException("")).when(menuCategoryValidator).validateIdentity(category);
+        Mockito.doThrow(new ValidationException("")).when(menuCategoryValidator).validateForDelete(category);
 
         // WHEN
         menuService.removeMenuCategory(category);
@@ -341,7 +417,7 @@ public class TestMenuService extends AbstractServiceTest {
     public void testRemoveMenu_ObjectWithInvalidIdentityShouldNotRemove() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         Menu menu = new Menu();
-        Mockito.doThrow(new ValidationException("")).when(menuValidator).validateIdentity(menu);
+        Mockito.doThrow(new ValidationException("")).when(menuValidator).validateForDelete(menu);
 
         // WHEN
         menuService.removeMenu(menu);

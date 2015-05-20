@@ -22,6 +22,15 @@ public interface MenuService extends Service {
     void addMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException;
 
     /**
+     * updates a MenuEntry in the underlying datasource
+     * @param menuEntry MenuEntry to udpate
+     * @throws ValidationException if the MenuEntry object is not valid
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    @Secured({"ROLE_MANAGER"})
+    void updateMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException;
+
+    /**
      * removes a MenuEntry from the underlying datasource
      * @param menuEntry MenuEntry to remove
      * @throws ValidationException if the MenuEntry object is not valid
@@ -55,6 +64,15 @@ public interface MenuService extends Service {
     void addMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException;
 
     /**
+     * updates a MenuCategory in the underlying datasource
+     * @param menuCategory MenuCategory to udpate
+     * @throws ValidationException if the MenuCategory object is not valid
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    @Secured({"ROLE_MANAGER"})
+    void updateMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException;
+
+    /**
      * removes a MenuCategory from the underlying datasource
      * @param menuCategory MenuCategory to remove
      * @throws ValidationException if the MenuCategory object is not valid
@@ -86,6 +104,15 @@ public interface MenuService extends Service {
      */
     @Secured({"ROLE_MANAGER"})
     void addMenu(Menu menu) throws ValidationException, ServiceException;
+
+    /**
+     * updates a Menu in the underlying datasource
+     * @param menu Menu to udpate
+     * @throws ValidationException if the Menu object is not valid
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    @Secured({"ROLE_MANAGER"})
+    void updateMenu(Menu menu) throws ValidationException, ServiceException;
 
     /**
      * removes a menu from the underlying datasource
