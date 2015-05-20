@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -11,14 +10,13 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/gui/TablesOverview.fxml"));
-        fxmlLoader.setController(new Controller());
-        Parent root = (Parent)fxmlLoader.load();
-        Controller controller = fxmlLoader.<Controller>getController();
-        primaryStage.setTitle("TablesOverview");
-        primaryStage.setScene(new Scene(root));
+        Parent root = FXMLLoader.load(getClass().getResource("fxml_example.fxml"));
+
+        Scene scene = new Scene(root, 300, 275);
+
+        primaryStage.setTitle("FXML Welcome");
+        primaryStage.setScene(scene);
         primaryStage.show();
-        controller.setupListeners();
     }
 
 
