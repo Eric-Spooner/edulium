@@ -47,7 +47,6 @@ public interface UserService extends Service {
      * @return A list of existing users which match with the given userTemplate
      * @throws ServiceException if searching for users wasn't possible
      */
-    @PreAuthorize("hasRole('MANAGER')")
     List<User> findUsers(User userTemplate) throws ServiceException;
 
     /**
@@ -56,6 +55,5 @@ public interface UserService extends Service {
      * @return A list of existing users
      * @throws ServiceException if searching for users wasn't possible
      */
-    @PreAuthorize("hasRole('MANAGER')")
     List<User> getAllUsers() throws ServiceException;
 }
