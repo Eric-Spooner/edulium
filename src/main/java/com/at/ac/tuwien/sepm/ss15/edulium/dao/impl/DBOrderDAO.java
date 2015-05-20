@@ -13,7 +13,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -252,49 +251,47 @@ class DBOrderDAO implements DAO<Order> {
         }
     }
 
-    /**
-     * converts the database query output into a object
-     * @param result database output
-     * @return MenuEntry object with the data of the resultSet set
-     * @throws SQLException if an error accessing the database occurred
-     * @throws DAOException if an error retrieving the taxRate/category occurred
-     */
     private Order parseResult(ResultSet result) throws DAOException, SQLException {
-        List<MenuEntry> menuEntries = menuEntryDAO.find(MenuEntry.withIdentity(result.getLong("menuEntry_ID")));
-        if (menuEntries.size() != 1) {
-            LOGGER.error("retrieving MenuEntry failed");
-            throw new DAOException("retrieving MenuEntry failed");
-        }
-        List<Table> tables = tableDAO.find(Table.withIdentity(Section.withIdentity(result.getLong("table_section")),result.getLong("table_number")));
-        if (tables.size() != 1) {
-            LOGGER.error("retrieving MenuEntry failed");
-            throw new DAOException("retrieving MenuEntry failed");
-        }
-        List<Invoice> invoices = invoiceDAO.find(Invoice.withIdentity(result.getLong("invoice_ID")));
-        if (invoices.size() > 1) {
-            LOGGER.error("retrieving Invoice failed");
-            throw new DAOException("retrieving Invoice failed");
-        }
-
         Order order = new Order();
         order.setIdentity(result.getLong("ID"));
         order.setAdditionalInformation(result.getString("info"));
         order.setBrutto(result.getBigDecimal("brutto"));
         order.setTax(result.getBigDecimal("tax"));
         order.setTime(result.getTimestamp("orderTime").toLocalDateTime());
-        order.setTable(tables.get(0));
-        if(invoices.size()>0) order.setInvoice(invoices.get(0));
+
+        final List<MenuEntry> menuEntries = menuEntryDAO.find(MenuEntry.withIdentity(result.getLong("menuEntry_ID")));
+        if (menuEntries.size() != 1) {
+            LOGGER.error("retrieving MenuEntry failed");
+            throw new DAOException("retrieving MenuEntry failed");
+        }
         order.setMenuEntry(menuEntries.get(0));
+
+        Section section = Section.withIdentity(result.getLong("table_section"));
+        final List<Table> tables = tableDAO.find(Table.withIdentity(section, result.getLong("table_number")));
+        if (tables.size() != 1) {
+            LOGGER.error("retrieving Table failed");
+            throw new DAOException("retrieving Table failed");
+        }
+        order.setTable(tables.get(0));
+
+        if (result.getObject("invoice_ID") != null) {
+            final List<Invoice> invoices = invoiceDAO.find(Invoice.withIdentity(result.getLong("invoice_ID")));
+            if (invoices.size() != 1) {
+                LOGGER.error("retrieving Invoice failed");
+                throw new DAOException("retrieving Invoice failed");
+            }
+            order.setInvoice(invoices.get(0));
+        }
         return order;
     }
 
-    /**
-     * converts the database query output into a history entry object
-     * @param result database output
-     * @return History object with the data of the resultSet set
-     * @throws SQLException if an error accessing the database occurred
-     * @throws DAOException if an error retrieving the user ocurred
-     */
+        /**
+         * converts the database query output into a history entry object
+         * @param result database output
+         * @return History object with the data of the resultSet set
+         * @throws SQLException if an error accessing the database occurred
+         * @throws DAOException if an error retrieving the user ocurred
+         */
     private History<Order> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
         // get user
         List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
