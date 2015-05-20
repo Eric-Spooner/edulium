@@ -22,6 +22,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
 
@@ -41,6 +42,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
 
@@ -50,6 +52,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // GIVEN
         OnetimeSale onetimeSale2 = new OnetimeSale();
         onetimeSale2.setIdentity(new Long(123));
+        onetimeSale.setName("Sale2");
         onetimeSale2.setFromTime(LocalDateTime.now());
         onetimeSale2.setToTime(LocalDateTime.now());
 
@@ -61,6 +64,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     public void testCreate_addingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
 
@@ -82,6 +86,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // PREPARE
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
 
@@ -92,6 +97,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // GIVEN
         OnetimeSale onetimeSale2 = new OnetimeSale();
         onetimeSale2.setIdentity(new Long(123));
+        onetimeSale.setName("Sale2");
         onetimeSale2.setFromTime(LocalDateTime.now());
         onetimeSale2.setToTime(LocalDateTime.now());
 
@@ -140,6 +146,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
             fail("DAOException should not occur while searching for a non-existing onetimesale identity");
         }
 
+        sale.setName("Sale");
         sale.setFromTime(LocalDateTime.now());
         sale.setToTime(LocalDateTime.now());
 
@@ -153,6 +160,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         final int numberBefore = onetimeSaleDAO.getAll().size();
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
 
@@ -208,6 +216,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // one time sale 1
         OnetimeSale onetimeSale1 = new OnetimeSale();
         onetimeSale1.setIdentity(new Long(123));
+        onetimeSale1.setName("Sale");
         onetimeSale1.setFromTime(LocalDateTime.now());
         onetimeSale1.setToTime(LocalDateTime.now());
 
@@ -217,6 +226,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // one time sale 2
         OnetimeSale onetimeSale2 = new OnetimeSale();
         onetimeSale2.setIdentity(new Long(124));
+        onetimeSale2.setName("Sale2");
         onetimeSale2.setFromTime(LocalDateTime.now());
         onetimeSale2.setToTime(LocalDateTime.now());
 
@@ -226,6 +236,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // one time sale 3
         OnetimeSale onetimeSale3 = new OnetimeSale();
         onetimeSale3.setIdentity(new Long(125));
+        onetimeSale3.setName("Sale3");
         onetimeSale3.setFromTime(LocalDateTime.now());
         onetimeSale3.setToTime(LocalDateTime.now());
 

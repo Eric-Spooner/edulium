@@ -22,6 +22,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setName("Sale");
         intermittentSale.setFromDayTime(LocalDateTime.now());
         intermittentSale.setDuration(120);
         intermittentSale.setMonday(true);
@@ -48,6 +49,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setName("Sale");
         intermittentSale.setFromDayTime(LocalDateTime.now());
         intermittentSale.setDuration(120);
         intermittentSale.setMonday(true);
@@ -64,6 +66,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // GIVEN
         IntermittentSale intermittentSale2 = new IntermittentSale();
         intermittentSale2.setIdentity(new Long(123));
+        intermittentSale.setName("Sale2");
         intermittentSale2.setFromDayTime(LocalDateTime.now());
         intermittentSale2.setDuration(60);
         intermittentSale2.setMonday(true);
@@ -82,6 +85,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
     public void testCreate_addingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setName("Sale");
         intermittentSale.setFromDayTime(LocalDateTime.now());
         intermittentSale.setDuration(120);
         intermittentSale.setMonday(true);
@@ -110,6 +114,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // PREPARE
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setName("Sale");
         intermittentSale.setFromDayTime(LocalDateTime.now());
         intermittentSale.setDuration(120);
         intermittentSale.setMonday(true);
@@ -127,6 +132,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // GIVEN
         IntermittentSale intermittentSale2 = new IntermittentSale();
         intermittentSale2.setIdentity(new Long(123));
+        intermittentSale.setName("Sale");
         intermittentSale2.setFromDayTime(LocalDateTime.now());
         intermittentSale2.setDuration(180);
         intermittentSale2.setMonday(false);
@@ -153,6 +159,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setFromDayTime(LocalDateTime.now());
         intermittentSale.setDuration(120);
+        intermittentSale.setName("Sale");
         intermittentSale.setMonday(true);
         intermittentSale.setTuesday(true);
         intermittentSale.setWednesday(true);
@@ -188,6 +195,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
             fail("DAOException should not occur while searching for a non-existing intermittent sale identity");
         }
 
+        intermittentSale.setName("Sale");
         intermittentSale.setFromDayTime(LocalDateTime.now());
         intermittentSale.setDuration(90);
         intermittentSale.setMonday(true);
@@ -208,6 +216,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         final int numberBefore = intermittentSaleDAO.getAll().size();
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setName("Sale");
         intermittentSale.setFromDayTime(LocalDateTime.now());
         intermittentSale.setDuration(120);
         intermittentSale.setMonday(true);
@@ -270,6 +279,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // intermittent sale 1
         IntermittentSale intermittentSale1 = new IntermittentSale();
         intermittentSale1.setIdentity(new Long(123));
+        intermittentSale1.setName("Sale");
         intermittentSale1.setFromDayTime(LocalDateTime.now());
         intermittentSale1.setDuration(120);
         intermittentSale1.setMonday(true);
@@ -286,6 +296,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // intermittent sale 2
         IntermittentSale intermittentSale2 = new IntermittentSale();
         intermittentSale2.setIdentity(new Long(124));
+        intermittentSale2.setName("Sale2");
         intermittentSale2.setFromDayTime(LocalDateTime.now());
         intermittentSale2.setDuration(120);
         intermittentSale2.setMonday(true);
@@ -302,6 +313,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // intermittent sale 3
         IntermittentSale intermittentSale3 = new IntermittentSale();
         intermittentSale3.setIdentity(new Long(125));
+        intermittentSale3.setName("Sale3");
         intermittentSale3.setFromDayTime(LocalDateTime.now());
         intermittentSale3.setDuration(120);
         intermittentSale3.setMonday(true);
