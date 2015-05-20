@@ -78,7 +78,7 @@ class DBOrderDAO implements DAO<Order> {
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             if(order.getInvoice() == null){
-                stmt.setNull(1, Types.VARCHAR);
+                stmt.setNull(1, Types.BIGINT);
             }else {
                 stmt.setLong(1, order.getInvoice().getIdentity());
             }

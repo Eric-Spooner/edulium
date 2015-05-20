@@ -103,10 +103,7 @@ class DBMenuDAO implements DAO<Menu> {
             LOGGER.error("deleting menu failed", e);
             throw new DAOException("deleting menu failed", e);
         }
-        menu.setEntries(new LinkedList<>());
-        updateMenuAssoc(menu);
         generateHistoryMenu(menu);
-
     }
 
     @Override
@@ -122,30 +119,25 @@ class DBMenuDAO implements DAO<Menu> {
         //Check if the user also wants to search for MenuEntries
         if (menu.getEntries() != null && menu.getEntries().size() > 0) {
             //at first find the MenuEntries, which have been given in the menu
-            List<Long> list = new LinkedList<>();
-            for (MenuEntry entry : menu.getEntries()) {
-                List<MenuEntry> innerList = menuEntryDAO.find(entry);
-                for (MenuEntry newEntry : innerList) {
-                    list.add(newEntry.getIdentity());
-                }
-            }
-            String queryByMenuEntry =
-                    "SELECT m.ID, m.name FROM (Menu m JOIN MenuAssoc ma ON m.id  = ma.menu_id) WHERE " +
-                            "m.deleted = false AND ma.disabled = false AND " +
+            final String queryByMenuEntry =
+                    "SELECT m.ID, m.name FROM Menu m WHERE " +
+                            "m.deleted = false AND " +
                             "m.ID = ISNULL(?, ID) AND " +
                             "m.name = ISNULL(?, name) AND " +
+                            "EXISTS (SELECT 1 FROM MenuAssoc ma WHERE " +
+                            "ma.menu_ID = m.ID AND "+
                             "ma.menuEntry_ID in (" +
-                            list.stream().map(m -> "?").collect(Collectors.joining(",")) +
-                            ") " +
+                            menu.getEntries().stream().map(m -> "?").collect(Collectors.joining(",")) +
+                            ") AND ma.disabled = false)" +
                             "Group By m.ID";
-
-            objects.clear();
 
             try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryByMenuEntry)) {
                 stmt.setObject(1, menu.getIdentity());
                 stmt.setObject(2, menu.getName());
-                for (int i = 0; i < list.size(); i++) {
-                    stmt.setLong(i + 3, list.get(i));
+                int i = 3;
+                for (MenuEntry entry:menu.getEntries()){
+                    stmt.setLong(i, entry.getIdentity());
+                    i++;
                 }
 
                 ResultSet result = stmt.executeQuery();
@@ -157,7 +149,7 @@ class DBMenuDAO implements DAO<Menu> {
                 throw new DAOException("searching for menu entries failed", e);
             }
         } else { //Only search for the name and/or the id
-            String query = "SELECT * FROM Menu WHERE " +
+            final String query = "SELECT * FROM Menu WHERE " +
                     "ID = ISNULL(?, ID) AND " +
                     "name = ISNULL(?, name) AND " +
                     "deleted = false";
@@ -229,31 +221,42 @@ class DBMenuDAO implements DAO<Menu> {
         menu.setIdentity(result.getLong("ID"));
         menu.setName(result.getString("name"));
         /*Get the MenuEntries over MenuAssoc*/
-        List<MenuEntry> menuEntries = new LinkedList<>();
+        menu.setEntries(getResultMenuEntries(menu));
+        return menu;
+    }
+
+    /**
+     * This funktion is used to get the menu entries of the given menu from the database
+     * @param menu the menu, the menu Enries should be given back
+     * @return
+     */
+    private List<MenuEntry> getResultMenuEntries(Menu menu) throws DAOException, SQLException{
+        List<MenuEntry> entries = new LinkedList<>();
+
         String query = "SELECT * FROM MenuAssoc WHERE " +
                 "menu_ID = ? AND " +
                 "disabled = false";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setObject(1, result.getLong("ID"));
+            stmt.setObject(1, menu.getIdentity());
 
             ResultSet resultEntries = stmt.executeQuery();
             while (resultEntries.next()) {
                 MenuEntry entry = MenuEntry.withIdentity(resultEntries.getLong("menuEntry_ID"));
-                menuEntries.add(menuEntryDAO.find(entry).get(0));
+                List<MenuEntry> find = menuEntryDAO.find(entry);
+                if(find.size()>0){
+                    entries.add(menuEntryDAO.find(entry).get(0));
+                }else {
+                    LOGGER.error("searching for menu entries failed because given ID is not in the Database");
+                    throw new DAOException("searching for menu entries failed because given ID is not in the Database");
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("searching for menu entries failed", e);
             throw new DAOException("searching for menu entries failed", e);
         }
-
-        if (menuEntries.size() > 0) {
-            menu.setEntries(menuEntries);
-        } else {
-            throw new DAOException("there is no menu Entry for the searched menu");
-        }
-
-        return menu;
+        return entries;
     }
+
     /**
      * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed
@@ -285,10 +288,9 @@ class DBMenuDAO implements DAO<Menu> {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryGetChangeNr)) {
             stmt.setLong(1, menu.getIdentity());          // dataset id
             ResultSet result = stmt.executeQuery();
-            while (result.next()) {
+            if (result.next()) {
                 resultNr = result.getLong(1);
-            }
-            if (resultNr == -1) {
+            }else {
                 LOGGER.error("getting changeNr failed");
                 throw new DAOException("getting changeNr failed");
             }
@@ -363,24 +365,34 @@ class DBMenuDAO implements DAO<Menu> {
         menu.setIdentity(result.getLong("ID"));
         menu.setName(result.getString("name"));
         /*Get the MenuEntries over MenuAssocHistory*/
+        menu.setEntries(getResultHistoryMenuEntries(menu, changeNr));
+        return menu;
+    }
+
+    private List<MenuEntry> getResultHistoryMenuEntries(Menu menu, Long changeNr) throws DAOException, SQLException {
         List<MenuEntry> menuEntries = new LinkedList<>();
         String query = "SELECT * FROM MenuAssocHistory WHERE " +
                 "menu_ID = ? AND changeNr = ? AND disabled = false";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setObject(1, result.getLong("ID"));
+            stmt.setObject(1, menu.getIdentity());
             stmt.setLong(2, changeNr);
 
             ResultSet resultEntries = stmt.executeQuery();
             while (resultEntries.next()) {
                 MenuEntry entry = MenuEntry.withIdentity(resultEntries.getLong("menuEntry_ID"));
-                menuEntries.add(menuEntryDAO.find(entry).get(0));
+                List<MenuEntry> find = menuEntryDAO.find(entry);
+                if(find.size()>0){
+                    menuEntries.add(menuEntryDAO.find(entry).get(0));
+                }else {
+                    LOGGER.error("searching for menu entries failed because given ID is not in the Database");
+                    throw new DAOException("searching for menu entries failed because given ID is not in the Database");
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("searching for menu entries failed", e);
             throw new DAOException("searching for menu entries failed", e);
         }
-        menu.setEntries(menuEntries);
-        return menu;
+        return menuEntries;
     }
 
 
