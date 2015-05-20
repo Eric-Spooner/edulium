@@ -48,8 +48,8 @@ public class DialogTaxRateController implements Initializable{
         thisStage.close();
     }
 
-    public void buttonCancleClick(ActionEvent actionEvent) {
-        LOGGER.info("Dialog Tax Rate Cancle Button clicked");
+    public void buttonCancelClick(ActionEvent actionEvent) {
+        LOGGER.info("Dialog Tax Rate Cancel Button clicked");
         thisStage.close();
     }
 }

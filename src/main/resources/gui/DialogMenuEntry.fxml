@@ -10,7 +10,7 @@
    <children>
       <Text layoutX="14.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name: " />
       <Button layoutX="359.0" layoutY="324.0" mnemonicParsing="false" text="OK"  onAction="#buttonOKClick"/>
-      <Button layoutX="288.0" layoutY="324.0" mnemonicParsing="false" text="Cancle"  onAction="#buttonCancleClick"/>
+      <Button layoutX="288.0" layoutY="324.0" mnemonicParsing="false" onAction="#buttonCancelClick" text="Cancel"/>
       <TextField layoutX="140.0" layoutY="21.0" prefHeight="31.0" prefWidth="260.0" />
       <TextField layoutX="140.0" layoutY="57.0" prefHeight="31.0" prefWidth="260.0" />
       <Text layoutX="17.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Price: " />
