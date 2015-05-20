@@ -7,7 +7,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.impl.MenuServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

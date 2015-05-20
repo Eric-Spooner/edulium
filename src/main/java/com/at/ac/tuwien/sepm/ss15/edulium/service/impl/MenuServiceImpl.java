@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Implementation of the MenuService
  */
-public class MenuServiceImpl implements MenuService {
+class MenuServiceImpl implements MenuService {
     private static final Logger LOGGER = LogManager.getLogger(MenuServiceImpl.class);
 
     @Autowired
