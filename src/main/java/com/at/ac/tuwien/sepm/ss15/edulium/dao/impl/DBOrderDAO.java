@@ -163,9 +163,14 @@ class DBOrderDAO implements DAO<Order> {
                 stmt.setObject(6, order.getInvoice().getIdentity());
                 stmt.setObject(7, order.getInvoice().getIdentity());
             }
-            stmt.setObject(8, order.getTable() == null ? null : order.getTable().getSection() == null ?
-                    null : order.getTable().getSection().getIdentity());
-            stmt.setObject(9, order.getTable() == null ? null : order.getTable().getNumber());
+            if (order.getTable() == null) {
+                stmt.setNull(8, Types.VARCHAR);
+                stmt.setNull(9, Types.VARCHAR);
+            } else {
+                Table table = order.getTable();
+                stmt.setObject(9, table.getSection() == null ? null : table.getSection().getIdentity());
+                stmt.setLong(8, table.getNumber());
+            }
             stmt.setObject(10, order.getMenuEntry() == null ? null : order.getMenuEntry().getIdentity());
 
             ResultSet result = stmt.executeQuery();

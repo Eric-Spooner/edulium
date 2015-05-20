@@ -128,8 +128,7 @@ class DBMenuDAO implements DAO<Menu> {
                             "ma.menu_ID = m.ID AND "+
                             "ma.menuEntry_ID in (" +
                             menu.getEntries().stream().map(m -> "?").collect(Collectors.joining(",")) +
-                            ") AND ma.disabled = false)" +
-                            "Group By m.ID";
+                            ") AND ma.disabled = false)";
 
             try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryByMenuEntry)) {
                 stmt.setObject(1, menu.getIdentity());
