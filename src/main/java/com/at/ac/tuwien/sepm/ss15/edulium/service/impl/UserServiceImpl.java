@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Implementation of the UserService interface
  */
-public class UserServiceImpl implements UserService {
+class UserServiceImpl implements UserService {
     private static final Logger LOGGER = LogManager.getLogger(UserServiceImpl.class);
 
     @Autowired

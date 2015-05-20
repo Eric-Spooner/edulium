@@ -5,7 +5,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.impl.UserServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -37,8 +36,8 @@ public class TestUserService extends AbstractServiceTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        ReflectionTestUtils.setField(this.<UserServiceImpl>getTargetObject(userService), "userDAO", userDAO);
-        ReflectionTestUtils.setField(this.<UserServiceImpl>getTargetObject(userService), "userValidator", userValidator);
+        ReflectionTestUtils.setField(getTargetObject(userService), "userDAO", userDAO);
+        ReflectionTestUtils.setField(getTargetObject(userService), "userValidator", userValidator);
     }
 
     @Test
