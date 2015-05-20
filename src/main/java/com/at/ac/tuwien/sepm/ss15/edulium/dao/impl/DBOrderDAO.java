@@ -15,6 +15,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the Order DAO interface
@@ -230,6 +231,42 @@ class DBOrderDAO implements DAO<Order> {
         return history;
     }
 
+    @Override
+    public List<Order> populate(List<Order> orders) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + orders);
+
+        if (orders == null || orders.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (Order order : orders) {
+            validator.validateIdentity(order);
+        }
+
+        final String query = "SELECT * FROM RestaurantOrder WHERE ID IN (" +
+                orders.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<Order> populatedOrders = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (Order order : orders) {
+                stmt.setLong(index++, order.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedOrders.add(parseResult(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating orders failed", e);
+            throw new DAOException("Populating orders failed", e);
+        }
+
+        return populatedOrders;
+    }
 
     /**
      * Generates an Order History enter for the given order
