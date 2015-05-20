@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Implementation of the UserDetailsService Interface (Spring security)
  */
-class UserDetailsServiceImpl implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private DAO<User> userDAO;
 

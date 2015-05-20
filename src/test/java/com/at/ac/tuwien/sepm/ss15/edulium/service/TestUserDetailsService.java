@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.impl.UserDetailsServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -33,9 +34,9 @@ public class TestUserDetailsService extends AbstractServiceTest {
     private DAO<User> userDAO;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        ReflectionTestUtils.setField(userDetailsService, "userDAO", userDAO);
+        ReflectionTestUtils.setField(this.<UserDetailsServiceImpl>getTargetObject(userDetailsService), "userDAO", userDAO);
     }
 
     @Test
