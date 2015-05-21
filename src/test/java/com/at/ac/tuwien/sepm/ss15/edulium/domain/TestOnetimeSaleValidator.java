@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 /**
  * Unit Test for the TestOnetimeSaleValidator validator
  */
-//TODO: complete
 public class TestOnetimeSaleValidator extends AbstractDomainTest {
     @Autowired
     private Validator<OnetimeSale> saleValidator;
@@ -65,6 +64,19 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
     public void testValidateForCreate_nullObjectShouldThrow() throws ValidationException {
         // GIVEN
         OnetimeSale onetimeSale = null;
+
+        // WHEN
+        saleValidator.validateForCreate(onetimeSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_fromTimeAfterToTimeShouldThrow() throws ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("Sale");
+        onetimeSale.setFromTime(LocalDateTime.parse("2015-05-06"));
+        onetimeSale.setToTime(LocalDateTime.parse("2015-05-03"));
 
         // WHEN
         saleValidator.validateForCreate(onetimeSale);
@@ -125,6 +137,19 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         saleValidator.validateForUpdate(onetimeSale);
     }
 
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_fromTimeAfterToTimeShouldThrow() throws ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("Sale");
+        onetimeSale.setFromTime(LocalDateTime.parse("2015-05-06"));
+        onetimeSale.setToTime(LocalDateTime.parse("2015-05-03"));
+
+        // WHEN
+        saleValidator.validateForUpdate(onetimeSale);
+    }
+
     @Test
     public void testValidateForDelete_shouldAcceptOnetimeSale() throws ValidationException {
         // GIVEN
@@ -180,6 +205,18 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         saleValidator.validateForDelete(onetimeSale);
     }
 
+    @Test(expected = ValidationException.class)
+    public void testValidateForDelete_fromTimeAfterToTimeShouldThrow() throws ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("Sale");
+        onetimeSale.setFromTime(LocalDateTime.parse("2015-05-06"));
+        onetimeSale.setToTime(LocalDateTime.parse("2015-05-03"));
+
+        // WHEN
+        saleValidator.validateForDelete(onetimeSale);
+    }
 
     @Test
     public void testValidateIdentity_shouldAcceptSale() throws ValidationException {
@@ -231,6 +268,19 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
     public void testValidateIdentity_nullObjectShouldThrow() throws ValidationException {
         // GIVEN
         OnetimeSale onetimeSale = null;
+
+        // WHEN
+        saleValidator.validateIdentity(onetimeSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateIdentity_fromTimeAfterToTimeShouldThrow() throws ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("Sale");
+        onetimeSale.setFromTime(LocalDateTime.parse("2015-05-06"));
+        onetimeSale.setToTime(LocalDateTime.parse("2015-05-03"));
 
         // WHEN
         saleValidator.validateIdentity(onetimeSale);
