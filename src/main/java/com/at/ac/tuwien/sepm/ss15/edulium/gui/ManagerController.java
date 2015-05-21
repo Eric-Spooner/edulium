@@ -155,8 +155,11 @@ public class ManagerController implements Initializable {
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
+            showMenus(menuService.getAllMenus());
         }catch (IOException e){
             LOGGER.error("Add Menu Button Click did not work");
+        }catch (Exception e){
+            LOGGER.error("Loading the Menus failed" + e);
         }
     }
 
@@ -184,6 +187,18 @@ public class ManagerController implements Initializable {
     }
 
     public void buttonMenuRemoveClicked(ActionEvent actionEvent) {
+        try {
+            LOGGER.info("Delete Menu Button Click");
+            if(tableViewMenu.getSelectionModel().getSelectedItem() == null){
+                ManagerController.showErrorDialog
+                        ("Error", "Input Validation Error", "You have to select a Menu to Delete");
+                return;
+            }
+            menuService.removeMenu(tableViewMenu.getSelectionModel().getSelectedItem());
+            showMenus(menuService.getAllMenus());
+        }catch (Exception e){
+            LOGGER.error("Loading the Menus failed" + e);
+        }
     }
 
     public void buttonMenuAddClicked(ActionEvent actionEvent){
@@ -199,27 +214,49 @@ public class ManagerController implements Initializable {
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
+            showMenus(menuService.getAllMenus());
         }catch (IOException e){
             LOGGER.error("Add Menu Button Click did not work");
+        }catch (Exception e){
+            LOGGER.error("Loading the Menus failed" + e);
         }
     }
 
     public void buttonMenuEntryRemoveClicked(ActionEvent actionEvent) {
+        try {
+            LOGGER.info("Delete MenuEntry Button Click");
+            if(tableViewMenuEntry.getSelectionModel().getSelectedItem() == null){
+                ManagerController.showErrorDialog
+                        ("Error", "Input Validation Error", "You have to select a MenuEntry to Delete");
+                return;
+            }
+            menuService.removeMenuEntry(tableViewMenuEntry.getSelectionModel().getSelectedItem());
+            showMenuEntries(menuService.getAllMenuEntries());
+        }catch (Exception e){
+            LOGGER.error("Loading the Menus Entries failed" + e);
+        }
     }
 
     public void buttonMenuEntrySearchClicked(ActionEvent actionEvent) {
         try {
             LOGGER.info("Search MenuEntry Button Click");
             Stage stage = new Stage();
+            DialogMenuEntryController.resetDialog();
             DialogMenuEntryController.setThisStage(stage);
             DialogMenuEntryController.setMenuService(menuService);
+            DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search MenuEntry");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
+            if(DialogMenuEntryController.getMenuEntry() != null){
+                showMenuEntries(menuService.findMenuEntry(DialogMenuEntryController.getMenuEntry()));
+            }
         }catch (IOException e){
             LOGGER.error("Search MenuEntry Button Click did not work");
+        }catch (Exception e){
+            LOGGER.error("Loading the Menus Entries failed" + e);
         }
     }
 
@@ -227,15 +264,18 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Update MenuEntry Button Click");
             Stage stage = new Stage();
+            DialogMenuEntryController.resetDialog();
             DialogMenuEntryController.setThisStage(stage);
             DialogMenuEntryController.setMenuService(menuService);
+            DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.UPDATE);
             stage.setTitle("Update MenuEntry");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
-        }catch (IOException e){
-            LOGGER.error("Update MenuEntry Button Click did not work");
+            showMenuEntries(menuService.getAllMenuEntries());
+        }catch (Exception e){
+            LOGGER.error("Loading the Menus Entries failed" + e);
         }
     }
 
@@ -243,17 +283,23 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Add MenuEntry Button Click");
             Stage stage = new Stage();
+            DialogMenuEntryController.resetDialog();
             DialogMenuEntryController.setThisStage(stage);
             DialogMenuEntryController.setMenuService(menuService);
+            DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Insert MenuEntry");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
-        }catch (IOException e){
-            LOGGER.error("Add MenuEntry Button Click did not work");
+            showMenuEntries(menuService.getAllMenuEntries());
+        }catch (Exception e){
+            LOGGER.error("Loading the Menus Entries failed" + e);
         }
     }
+
+
+
 
     public void buttonMenuCategoryRemoveClicked(ActionEvent actionEvent) {
     }

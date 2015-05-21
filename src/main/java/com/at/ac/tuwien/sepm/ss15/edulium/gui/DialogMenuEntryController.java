@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -61,7 +62,7 @@ public class DialogMenuEntryController implements Initializable{
         LOGGER.info("Initialize Dialog MenuEntry");
         try {
             if(menuEntry == null){
-                MenuEntry menuEntryInit = new MenuEntry();
+                menuEntry = new MenuEntry();
             }
             dropMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
             textFieldName.setText(menuEntry.getName());
@@ -74,6 +75,7 @@ public class DialogMenuEntryController implements Initializable{
 
     public void buttonOKClick(ActionEvent actionEvent) {
         LOGGER.info("Dialog MenuEntry OK Button clicked");
+        BigDecimal price = null;
         switch (DialogMenuEntryController.dialogEnumeration){
             case ADD:
             case UPDATE:
@@ -87,6 +89,15 @@ public class DialogMenuEntryController implements Initializable{
                             ("Error", "Input Validation Error", "You have to insert a Price");
                     return;
                 }
+
+                try {
+                    price = BigDecimal.valueOf(Double.parseDouble(textFieldPrice.getText()));
+                } catch (NumberFormatException e) {
+                    ManagerController.showErrorDialog("Error", "Input Validation Error", "Price must be a number");
+                    LOGGER.info("Dialog MenuEntry Price must be number " + e);
+                    return;
+                }
+
                 if(textFieldDesription.getText() == null || textFieldDesription.getText().equals("")){
                     ManagerController.showErrorDialog
                             ("Error", "Input Validation Error", "You have to insert a Description");
@@ -97,7 +108,42 @@ public class DialogMenuEntryController implements Initializable{
                             ("Error", "Input Validation Error", "You have to select a Category");
                     return;
                 }
+                if(dropTaxRate.getSelectionModel().getSelectedItem() == null){
+                    ManagerController.showErrorDialog
+                            ("Error", "Input Validation Error", "You have to select a TaxRate");
+                    return;
+                }
                 break;
+            case SEARCH:
+                if(textFieldPrice.getText() != null && !textFieldPrice.getText().equals("")) {
+                    try {
+                        price = BigDecimal.valueOf(Double.parseDouble(textFieldPrice.getText()));
+                    } catch (NumberFormatException e) {
+                        ManagerController.showErrorDialog("Error", "Input Validation Error", "Price must be a number");
+                        LOGGER.info("Dialog MenuEntry Price must be number " + e);
+                        return;
+                    }
+                }
+        }
+
+        menuEntry.setPrice(price);
+        menuEntry.setCategory(dropMenuCategory.getSelectionModel().getSelectedItem());
+        menuEntry.setTaxRate(dropTaxRate.getSelectionModel().getSelectedItem());
+        menuEntry.setName(textFieldName.getText());
+        menuEntry.setDescription(textFieldDesription.getText());
+        menuEntry.setAvailable(checkAvailible.isSelected());
+        try {
+            switch (DialogMenuEntryController.dialogEnumeration){
+                case ADD:
+                    menuService.addMenuEntry(menuEntry);
+                    break;
+                case UPDATE:
+                    menuService.updateMenuEntry(menuEntry);
+                    break;
+            }
+        }catch (Exception e){
+            LOGGER.error("Updating the menuEntry in The Daabase Failed " + e);
+            return;
         }
         thisStage.close();
     }
@@ -107,7 +153,7 @@ public class DialogMenuEntryController implements Initializable{
         thisStage.close();
     }
 
-    public void resetDialog(){
+    public static void resetDialog(){
         DialogMenuEntryController.setMenuEntry(new MenuEntry());
     }
 }
