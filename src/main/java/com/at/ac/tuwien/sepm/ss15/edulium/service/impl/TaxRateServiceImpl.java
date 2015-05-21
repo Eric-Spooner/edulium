@@ -1,9 +1,11 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.TaxRateService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -11,6 +13,9 @@ import java.util.List;
  * implementation of the taxRateService
  */
 public class TaxRateServiceImpl implements TaxRateService {
+    @Autowired
+    private DAO<TaxRate> taxRateDAO;
+
     @Override
     public void addTaxRate(TaxRate taxRate) throws ServiceException, ValidationException {
 
