@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public interface TaxRateService {
      * @throws ServiceException if an error processing the request ocurred
      * @throws ValidationException if the data is invalid
      */
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     void addTaxRate(TaxRate taxRate) throws ServiceException, ValidationException;
 
     /**
@@ -24,6 +26,7 @@ public interface TaxRateService {
      * @throws ServiceException if an error processing the request ocurred
      * @throws ValidationException if the data is invalid
      */
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     void updateTaxRate(TaxRate taxRate) throws ServiceException, ValidationException;
 
     /**
@@ -32,6 +35,7 @@ public interface TaxRateService {
      * @throws ServiceException if an error processing the request ocurred
      * @throws ValidationException if the data is invalid
      */
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     void removeTaxRate(TaxRate taxRate) throws ServiceException, ValidationException;
 
     /**
