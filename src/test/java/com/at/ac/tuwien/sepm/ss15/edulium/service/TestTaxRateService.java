@@ -36,8 +36,8 @@ public class TestTaxRateService extends AbstractServiceTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        ReflectionTestUtils.setField(getTargetObject(taxRateDAO), "taxRateDAO", taxRateDAO);
-        ReflectionTestUtils.setField(getTargetObject(taxRateValidator), "taxRateValidator", taxRateValidator);
+        ReflectionTestUtils.setField(getTargetObject(taxRateService), "taxRateDAO", taxRateDAO);
+        ReflectionTestUtils.setField(getTargetObject(taxRateService), "taxRateValidator", taxRateValidator);
     }
 
     @Test
