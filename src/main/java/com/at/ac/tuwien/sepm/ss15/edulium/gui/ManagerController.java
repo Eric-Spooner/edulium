@@ -157,6 +157,7 @@ public class ManagerController implements Initializable {
             stage.setScene(scene);
             stage.showAndWait();
             showMenus(menuService.getAllMenus());
+            DialogMenuController.resetDialog();
         }catch (IOException e){
             LOGGER.error("Add Menu Button Click did not work");
         }catch (Exception e){
@@ -182,6 +183,7 @@ public class ManagerController implements Initializable {
             }else {
                 showMenus(menuService.getAllMenus());
             }
+            DialogMenuController.resetDialog();
         }catch (IOException e){
             LOGGER.error("Search Menu Button Click did not work" + e);
         }catch (ServiceException e){
@@ -350,6 +352,7 @@ public class ManagerController implements Initializable {
             } else {
                 showMenuCategories(menuService.getAllMenuCategories());
             }
+            DialogMenuCategoryController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Search MenuCategory Button Click did not work");
         }
@@ -374,6 +377,7 @@ public class ManagerController implements Initializable {
             stage.setScene(scene);
             stage.showAndWait();
             showMenuCategories(menuService.getAllMenuCategories());
+            DialogMenuCategoryController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Update MenuCategory Button Click did not work" + e);
         }
@@ -392,6 +396,7 @@ public class ManagerController implements Initializable {
             stage.setScene(scene);
             stage.showAndWait();
             showMenuCategories(menuService.getAllMenuCategories());
+            DialogMenuCategoryController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Add MenuCategory Button Click did not work" + e);
         }
