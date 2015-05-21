@@ -14,7 +14,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the Order DAO interface
@@ -175,7 +177,11 @@ class DBOrderDAO implements DAO<Order> {
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                objects.add(parseResult(result));
+                try {
+                    objects.add(parseResult(result));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("searching for menu entries failed", e);
@@ -196,7 +202,11 @@ class DBOrderDAO implements DAO<Order> {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                objects.add(parseResult(result));
+                try {
+                    objects.add(parseResult(result));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("searching for all entries failed", e);
@@ -230,6 +240,42 @@ class DBOrderDAO implements DAO<Order> {
         return history;
     }
 
+    @Override
+    public List<Order> populate(List<Order> orders) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + orders);
+
+        if (orders == null || orders.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (Order order : orders) {
+            validator.validateIdentity(order);
+        }
+
+        final String query = "SELECT * FROM RestaurantOrder WHERE ID IN (" +
+                orders.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<Order> populatedOrders = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (Order order : orders) {
+                stmt.setLong(index++, order.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedOrders.add(parseResult(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating orders failed", e);
+            throw new DAOException("Populating orders failed", e);
+        }
+
+        return populatedOrders;
+    }
 
     /**
      * Generates an Order History enter for the given order
@@ -256,7 +302,7 @@ class DBOrderDAO implements DAO<Order> {
         }
     }
 
-    private Order parseResult(ResultSet result) throws DAOException, SQLException {
+    private Order parseResult(ResultSet result) throws DAOException, ValidationException, SQLException {
         Order order = new Order();
         order.setIdentity(result.getLong("ID"));
         order.setAdditionalInformation(result.getString("info"));
@@ -264,7 +310,7 @@ class DBOrderDAO implements DAO<Order> {
         order.setTax(result.getBigDecimal("tax"));
         order.setTime(result.getTimestamp("orderTime").toLocalDateTime());
 
-        final List<MenuEntry> menuEntries = menuEntryDAO.find(MenuEntry.withIdentity(result.getLong("menuEntry_ID")));
+        final List<MenuEntry> menuEntries = menuEntryDAO.populate(Arrays.asList(MenuEntry.withIdentity(result.getLong("menuEntry_ID"))));
         if (menuEntries.size() != 1) {
             LOGGER.error("retrieving MenuEntry failed");
             throw new DAOException("retrieving MenuEntry failed");
@@ -272,7 +318,7 @@ class DBOrderDAO implements DAO<Order> {
         order.setMenuEntry(menuEntries.get(0));
 
         Section section = Section.withIdentity(result.getLong("table_section"));
-        final List<Table> tables = tableDAO.find(Table.withIdentity(section, result.getLong("table_number")));
+        final List<Table> tables = tableDAO.populate(Arrays.asList(Table.withIdentity(section, result.getLong("table_number"))));
         if (tables.size() != 1) {
             LOGGER.error("retrieving Table failed");
             throw new DAOException("retrieving Table failed");
@@ -280,7 +326,7 @@ class DBOrderDAO implements DAO<Order> {
         order.setTable(tables.get(0));
 
         if (result.getObject("invoice_ID") != null) {
-            final List<Invoice> invoices = invoiceDAO.find(Invoice.withIdentity(result.getLong("invoice_ID")));
+            final List<Invoice> invoices = invoiceDAO.populate(Arrays.asList(Invoice.withIdentity(result.getLong("invoice_ID"))));
             if (invoices.size() != 1) {
                 LOGGER.error("retrieving Invoice failed");
                 throw new DAOException("retrieving Invoice failed");
@@ -297,9 +343,9 @@ class DBOrderDAO implements DAO<Order> {
          * @throws SQLException if an error accessing the database occurred
          * @throws DAOException if an error retrieving the user ocurred
          */
-    private History<Order> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
+    private History<Order> parseHistoryEntry(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             LOGGER.error("user not found");
             throw new DAOException("user not found");
