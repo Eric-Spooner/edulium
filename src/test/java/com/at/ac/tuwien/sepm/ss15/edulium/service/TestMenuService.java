@@ -55,6 +55,17 @@ public class TestMenuService extends AbstractServiceTest {
         ReflectionTestUtils.setField(getTargetObject(menuService), "menuValidator", menuValidator);
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testAddMenuEntry_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        MenuEntry entry = new MenuEntry();
+        Mockito.doThrow(new DAOException("")).when(menuEntryDAO).create(entry);
+
+        // WHEN
+        menuService.addMenuEntry(entry);
+    }
+
     @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testAddMenuEntry_WithoutPermissionShouldNotAdd() throws ValidationException, DAOException, ServiceException {
@@ -93,6 +104,17 @@ public class TestMenuService extends AbstractServiceTest {
         Mockito.verify(menuEntryDAO, never()).create(entry);
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testUpdateMenuEntry_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        MenuEntry entry = new MenuEntry();
+        Mockito.doThrow(new DAOException("")).when(menuEntryDAO).update(entry);
+
+        // WHEN
+        menuService.updateMenuEntry(entry);
+    }
+
     @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateMenuEntry_WithoutPermissionShouldNotUpdate() throws ValidationException, DAOException, ServiceException {
@@ -129,6 +151,17 @@ public class TestMenuService extends AbstractServiceTest {
         // WHEN
         menuService.updateMenuEntry(entry);
         Mockito.verify(menuEntryDAO, never()).update(entry);
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testRemoveMenuEntry_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        MenuEntry entry = new MenuEntry();
+        Mockito.doThrow(new DAOException("")).when(menuEntryDAO).delete(entry);
+
+        // WHEN
+        menuService.removeMenuEntry(entry);
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -171,6 +204,17 @@ public class TestMenuService extends AbstractServiceTest {
         Mockito.verify(menuEntryDAO, never()).delete(entry);
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testFindMenuEntry_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        MenuEntry entry = new MenuEntry();
+        Mockito.doThrow(new DAOException("")).when(menuEntryDAO).find(entry);
+
+        // WHEN
+        menuService.findMenuEntry(entry);
+    }
+
     @Test
     public void testFindMenuEntry_shouldReturnEntries() throws DAOException, ServiceException {
         // PREPARE
@@ -183,6 +227,16 @@ public class TestMenuService extends AbstractServiceTest {
         // THEN
         assertEquals(1, entries.size());
         assertTrue(entries.contains(entry));
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testGetAllMenuEntries_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Mockito.doThrow(new DAOException("")).when(menuEntryDAO).getAll();
+
+        // WHEN
+        menuService.getAllMenuEntries();
     }
 
     @Test
@@ -201,6 +255,17 @@ public class TestMenuService extends AbstractServiceTest {
         assertTrue(entries.contains(entry1));
         assertTrue(entries.contains(entry2));
         assertTrue(entries.contains(entry3));
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testAddMenuCategory_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        MenuCategory category = new MenuCategory();
+        Mockito.doThrow(new DAOException("")).when(menuCategoryDAO).create(category);
+
+        // WHEN
+        menuService.addMenuCategory(category);
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -241,6 +306,17 @@ public class TestMenuService extends AbstractServiceTest {
         Mockito.verify(menuCategoryDAO, never()).create(category);
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testUpdateMenuCategory_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        MenuCategory category = new MenuCategory();
+        Mockito.doThrow(new DAOException("")).when(menuCategoryDAO).update(category);
+
+        // WHEN
+        menuService.updateMenuCategory(category);
+    }
+
     @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateMenuCategory_WithoutPermissionShouldNotUpdate() throws ValidationException, DAOException, ServiceException {
@@ -277,6 +353,17 @@ public class TestMenuService extends AbstractServiceTest {
         // WHEN
         menuService.updateMenuCategory(category);
         Mockito.verify(menuCategoryDAO, never()).update(category);
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testRemoveMenuCategory_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        MenuCategory category = new MenuCategory();
+        Mockito.doThrow(new DAOException("")).when(menuCategoryDAO).delete(category);
+
+        // WHEN
+        menuService.removeMenuCategory(category);
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -319,6 +406,17 @@ public class TestMenuService extends AbstractServiceTest {
         Mockito.verify(menuCategoryDAO, never()).delete(category);
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testFindMenuCategory_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        MenuCategory category = new MenuCategory();
+        Mockito.doThrow(new DAOException("")).when(menuCategoryDAO).find(category);
+
+        // WHEN
+        menuService.findMenuCategory(category);
+    }
+
     @Test
     public void testFindMenuCategory_shouldReturnEntries() throws DAOException, ServiceException {
         // PREPARE
@@ -333,8 +431,18 @@ public class TestMenuService extends AbstractServiceTest {
         assertTrue(entries.contains(category));
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testGetAllMenuCategories_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Mockito.doThrow(new DAOException("")).when(menuCategoryDAO).getAll();
+
+        // WHEN
+        menuService.getAllMenuCategories();
+    }
+
     @Test
-    public void testFindGetAllMenuCategories_shouldReturnEntries() throws DAOException, ServiceException {
+    public void testGetAllMenuCategories_shouldReturnEntries() throws DAOException, ServiceException {
         // PREPARE
         MenuCategory category1 = new MenuCategory();
         MenuCategory category2 = new MenuCategory();
@@ -349,6 +457,17 @@ public class TestMenuService extends AbstractServiceTest {
         assertTrue(entries.contains(category1));
         assertTrue(entries.contains(category2));
         assertTrue(entries.contains(category3));
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testAddMenu_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Menu menu = new Menu();
+        Mockito.doThrow(new DAOException("")).when(menuDAO).create(menu);
+
+        // WHEN
+        menuService.addMenu(menu);
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -379,7 +498,7 @@ public class TestMenuService extends AbstractServiceTest {
 
     @Test(expected = ValidationException.class)
     @WithMockUser(username = "servicetester", roles={"MANAGER"})
-    public void testAddMenuy_shouldNotAddInvalidMenu() throws ValidationException, DAOException, ServiceException {
+    public void testAddMenu_shouldNotAddInvalidMenu() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         Menu menu = new Menu();
         Mockito.doThrow(new ValidationException("")).when(menuValidator).validateForCreate(menu);
@@ -387,6 +506,68 @@ public class TestMenuService extends AbstractServiceTest {
         // WHEN
         menuService.addMenu(menu);
         Mockito.verify(menuDAO, never()).create(menu);
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testUpdateMenu_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Menu menu = new Menu();
+        Mockito.doThrow(new DAOException("")).when(menuDAO).update(menu);
+
+        // WHEN
+        menuService.updateMenu(menu);
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
+    public void testUpdateMenu_WithoutPermissionShouldFail() throws ValidationException, DAOException, ServiceException {
+        // PREPARE
+        Menu menu = new Menu();
+
+        // WHEN
+        menuService.updateMenu(menu);
+
+        // THEN
+        Mockito.verify(menuDAO, never()).update(menu);
+    }
+
+    @Test
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testUpdateMenu_shouldUpdate() throws ValidationException, DAOException, ServiceException {
+        // PREPARE
+        Menu menu = new Menu();
+
+        // WHEN
+        menuService.updateMenu(menu);
+
+        // THEN
+        Mockito.verify(menuDAO).update(menu);
+    }
+
+    @Test(expected = ValidationException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testUpdateMenu_ObjectWithInvalidIdentityShouldNotRemove() throws ValidationException, DAOException, ServiceException {
+        // PREPARE
+        Menu menu = new Menu();
+        Mockito.doThrow(new ValidationException("")).when(menuValidator).validateForUpdate(menu);
+
+        // WHEN
+        menuService.updateMenu(menu);
+
+        // THEN
+        Mockito.verify(menuDAO, never()).update(menu);
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testRemoveMenu_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Menu menu = new Menu();
+        Mockito.doThrow(new DAOException("")).when(menuDAO).delete(menu);
+
+        // WHEN
+        menuService.removeMenu(menu);
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -429,6 +610,17 @@ public class TestMenuService extends AbstractServiceTest {
         Mockito.verify(menuDAO, never()).delete(menu);
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testFindMenu_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Menu menu = new Menu();
+        Mockito.doThrow(new DAOException("")).when(menuDAO).find(menu);
+
+        // WHEN
+        menuService.findMenu(menu);
+    }
+
     @Test
     public void testFindMenu_shouldReturnEntries() throws DAOException, ServiceException {
         // PREPARE
@@ -441,6 +633,16 @@ public class TestMenuService extends AbstractServiceTest {
         // THEN
         assertEquals(1, entries.size());
         assertTrue(entries.contains(menu));
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testGetAllMenues_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Mockito.doThrow(new DAOException("")).when(menuDAO).getAll();
+
+        // WHEN
+        menuService.getAllMenus();
     }
 
     @Test
