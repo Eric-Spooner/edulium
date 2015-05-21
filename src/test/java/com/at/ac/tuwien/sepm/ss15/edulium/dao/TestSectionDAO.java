@@ -12,7 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit Test for the SectionDAO
@@ -400,5 +405,128 @@ public class TestSectionDAO extends AbstractDAOTest {
         Assert.assertEquals(user, entry.getUser());
         Assert.assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
         Assert.assertTrue(entry.isDeleted());
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // section 1
+        Section section1 = new Section();
+        section1.setName("section1");
+
+        sectionDAO.create(section1);
+        assertEquals(1, sectionDAO.find(section1).size());
+
+        // section 2
+        Section section2 = new Section();
+        section2.setName("section2");
+
+        sectionDAO.create(section2);
+        assertEquals(1, sectionDAO.find(section2).size());
+
+        // section 3
+        Section section3 = new Section();
+        section3.setName("section3");
+
+        sectionDAO.create(section3);
+        assertEquals(1, sectionDAO.find(section3).size());
+
+        // GIVEN
+        Section sectionId1 = Section.withIdentity(section1.getIdentity());
+        Section sectionId2 = Section.withIdentity(section2.getIdentity());
+        Section sectionId3 = Section.withIdentity(section3.getIdentity());
+        List<Section> sectionIds = Arrays.asList(sectionId1, sectionId2, sectionId3);
+
+        // WHEN
+        List<Section> result = sectionDAO.populate(sectionIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(section1));
+        assertTrue(result.contains(section2));
+        assertTrue(result.contains(section3));
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjectsOfDeletedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // section 1
+        Section section1 = new Section();
+        section1.setName("section1");
+
+        sectionDAO.create(section1);
+        assertEquals(1, sectionDAO.find(section1).size());
+        sectionDAO.delete(section1);
+        assertEquals(0, sectionDAO.find(section1).size());
+
+        // section 2
+        Section section2 = new Section();
+        section2.setName("section2");
+
+        sectionDAO.create(section2);
+        assertEquals(1, sectionDAO.find(section2).size());
+        sectionDAO.delete(section2);
+        assertEquals(0, sectionDAO.find(section2).size());
+
+        // section 3
+        Section section3 = new Section();
+        section3.setName("section3");
+
+        sectionDAO.create(section3);
+        assertEquals(1, sectionDAO.find(section3).size());
+        sectionDAO.delete(section3);
+        assertEquals(0, sectionDAO.find(section3).size());
+
+        // GIVEN
+        Section sectionId1 = Section.withIdentity(section1.getIdentity());
+        Section sectionId2 = Section.withIdentity(section2.getIdentity());
+        Section sectionId3 = Section.withIdentity(section3.getIdentity());
+        List<Section> sectionIds = Arrays.asList(sectionId1, sectionId2, sectionId3);
+
+        // WHEN
+        List<Section> result = sectionDAO.populate(sectionIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(section1));
+        assertTrue(result.contains(section2));
+        assertTrue(result.contains(section3));
+    }
+
+    @Test
+    public void testPopulate_nullListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<Section> result = sectionDAO.populate(null);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testPopulate_emptyListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<Section> result = sectionDAO.populate(Arrays.asList());
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithInvalidObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<Section> invalidSections = Arrays.asList(new Section());
+
+        // WHEN
+        List<Section> result = sectionDAO.populate(invalidSections);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<Section> invalidSections = new ArrayList<>();
+        invalidSections.add(null);
+
+        // WHEN
+        List<Section> result = sectionDAO.populate(invalidSections);
     }
 }

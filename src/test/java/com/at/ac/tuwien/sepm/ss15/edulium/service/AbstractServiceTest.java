@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser(username="servicetester")
 @Transactional
 public abstract class AbstractServiceTest {
-
     protected <T> T getTargetObject(Object proxy) throws Exception {
         if (AopUtils.isJdkDynamicProxy(proxy)) {
             return (T) ((Advised) proxy).getTargetSource().getTarget();
@@ -24,5 +23,4 @@ public abstract class AbstractServiceTest {
             return (T) proxy;
         }
     }
-
 }
