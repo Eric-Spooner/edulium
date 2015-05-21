@@ -317,6 +317,7 @@ CREATE TABLE IF NOT EXISTS RestaurantOrder (
     brutto DECIMAL(20, 2),
     tax DECIMAL(3, 2),
     info TEXT,
+    state INT,
     canceled BOOLEAN DEFAULT FALSE,
     FOREIGN KEY(table_section, table_number) REFERENCES RestaurantTable(section_ID, number)
 );
