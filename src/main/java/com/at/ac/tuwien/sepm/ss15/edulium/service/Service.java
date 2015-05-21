@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Generic Service interface
  */
-@Component
+@org.springframework.stereotype.Service
 @PreAuthorize("isAuthenticated()")
 @Transactional(propagation = Propagation.REQUIRED)
 public interface Service {

@@ -19,7 +19,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Database implementation of the DAO interface for Invoice objects
@@ -149,9 +151,12 @@ class DBInvoiceDAO implements DAO<Invoice> {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                results.add(parseResult(rs));
+                try {
+                    results.add(parseResult(rs));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + rs + "' failed", e);
+                }
             }
-            rs.close();
         } catch (SQLException e) {
             LOGGER.error("Failed to retrieve data from the database", e);
             throw new DAOException("Failed to retrieve data from the database", e);
@@ -173,9 +178,12 @@ class DBInvoiceDAO implements DAO<Invoice> {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                results.add(parseResult(rs));
+                try {
+                    results.add(parseResult(rs));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + rs + "' failed", e);
+                }
             }
-            rs.close();
         } catch (SQLException e) {
             LOGGER.error("Failed to retreive all invoice entries from the database", e);
             throw new DAOException("Failed to retreive all invoice entries from the database", e);
@@ -213,6 +221,43 @@ class DBInvoiceDAO implements DAO<Invoice> {
         return history;
     }
 
+    @Override
+    public List<Invoice> populate(List<Invoice> invoices) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + invoices);
+
+        if (invoices == null || invoices.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (Invoice invoice : invoices) {
+            invoiceValidator.validateIdentity(invoice);
+        }
+
+        final String query = "SELECT * FROM Invoice WHERE ID IN (" +
+                invoices.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<Invoice> populatedInvoices = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (Invoice invoice : invoices) {
+                stmt.setLong(index++, invoice.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedInvoices.add(parseResult(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating invoices failed", e);
+            throw new DAOException("Populating invoices failed", e);
+        }
+
+        return populatedInvoices;
+    }
+
     /**
      * Generates a historic event in the InvoiceHistory table
      * @param invoice The updated dataset
@@ -244,8 +289,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
      * @throws DAOException If an error, while retrieving the invoice data, occurs
      * @throws SQLException If an error, while accessing database results, occurs
      */
-    private Invoice parseResult(ResultSet rs) throws DAOException, SQLException {
-        List<User> creator = userDAO.find(User.withIdentity(rs.getString("user_ID")));
+    private Invoice parseResult(ResultSet rs) throws DAOException, ValidationException, SQLException {
+        List<User> creator = userDAO.populate(Arrays.asList(User.withIdentity(rs.getString("user_ID"))));
         if (creator.size() != 1) {
             LOGGER.error("Retrieving creator failed");
             throw new DAOException("Retrieving creator failed");
@@ -267,8 +312,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
      * @throws DAOException Thrown in case an error occurs when accessing the database
      * @throws SQLException Thrown in case an error occurs when accessing the database result
      */
-    private History<Invoice> parseHistoryResult(ResultSet rs) throws DAOException, SQLException {
-        List<User> user = userDAO.find(User.withIdentity(rs.getString("changeUser")));
+    private History<Invoice> parseHistoryResult(ResultSet rs) throws DAOException, ValidationException, SQLException {
+        List<User> user = userDAO.populate(Arrays.asList(User.withIdentity(rs.getString("changeUser"))));
         if (user.size() != 1) {
             LOGGER.error("User not found");
             throw new DAOException("User not found");

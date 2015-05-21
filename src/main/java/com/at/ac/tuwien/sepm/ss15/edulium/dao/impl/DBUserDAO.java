@@ -14,8 +14,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the UserDAO interface
@@ -174,6 +176,43 @@ class DBUserDAO implements DAO<User> {
         return history;
     }
 
+    @Override
+    public List<User> populate(List<User> users) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + users);
+
+        if (users == null || users.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (User user : users) {
+            validator.validateIdentity(user);
+        }
+
+        final String query = "SELECT * FROM RestaurantUser WHERE ID IN (" +
+                users.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<User> populatedUsers = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (User user : users) {
+                stmt.setString(index++, user.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedUsers.add(userFromResultSet(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating users failed", e);
+            throw new DAOException("Populating users failed", e);
+        }
+
+        return populatedUsers;
+    }
+
     /**
      * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed the changes
@@ -221,9 +260,9 @@ class DBUserDAO implements DAO<User> {
      * @throws SQLException if an error accessing the database occurred
      * @throws DAOException if an error retrieving the user ocurred
      */
-    private History<User> historyFromResultSet(ResultSet result) throws DAOException, SQLException {
+    private History<User> historyFromResultSet(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = find(User.withIdentity(result.getString("changeUser")));
+        List<User> storedUsers = populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             LOGGER.error("user not found");
             throw new DAOException("user not found");

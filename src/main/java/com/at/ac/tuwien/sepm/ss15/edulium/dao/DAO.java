@@ -67,4 +67,13 @@ public interface DAO<T> {
      *         not valid for this action
      */
     List<History<T>> getHistory(T object) throws DAOException, ValidationException;
+
+    /**
+     * populates the given list of objects (ignores if the object is marked as deleted)
+     * @param objects A list of objects which should be fully populated (all objects must have a valid identity)
+     * @return fully populated list of objects
+     * @throws DAOException if the data couldn't be retrieved
+     * @throws ValidationException if not all objects have a valid identity
+     */
+    List<T> populate(List<T> objects) throws DAOException, ValidationException;
 }
