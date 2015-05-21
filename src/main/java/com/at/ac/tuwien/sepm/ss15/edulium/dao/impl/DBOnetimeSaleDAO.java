@@ -17,6 +17,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the OnetimeSaleDAO interface
@@ -179,6 +180,45 @@ public class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
 
         return history;
     }
+
+
+    @Override
+    public List<OnetimeSale> populate(List<OnetimeSale> onetimeSales) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + onetimeSales);
+
+        if (onetimeSales == null || onetimeSales.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (OnetimeSale onetimeSale : onetimeSales) {
+            validator.validateIdentity(onetimeSale);
+        }
+
+        final String query = "SELECT * FROM RestaurantOnetimeSale WHERE ID IN (" +
+                onetimeSales.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<OnetimeSale> populatedOnetimeSales = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (OnetimeSale onetimeSale : onetimeSales) {
+                stmt.setLong(index++, onetimeSale.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedOnetimeSales.add(onetimeSaleFromResultSet(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating onetimeSales failed", e);
+            throw new DAOException("Populating onetimeSales failed", e);
+        }
+
+        return populatedOnetimeSales;
+    }
+
 
     /**
      * writes the changes of the dataset into the database

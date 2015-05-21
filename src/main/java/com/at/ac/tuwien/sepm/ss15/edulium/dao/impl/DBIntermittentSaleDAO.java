@@ -16,6 +16,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the IntermittentSaleDAO interface
@@ -210,6 +211,45 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
 
         return history;
     }
+
+
+    @Override
+    public List<IntermittentSale> populate(List<IntermittentSale> intermittentSales) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + intermittentSales);
+
+        if (intermittentSales == null || intermittentSales.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (IntermittentSale order : intermittentSales) {
+            validator.validateIdentity(order);
+        }
+
+        final String query = "SELECT * FROM IntermittentSale WHERE ID IN (" +
+                intermittentSales.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<IntermittentSale> populatedIntermittentSales = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (IntermittentSale intermittentSale : intermittentSales) {
+                stmt.setLong(index++, intermittentSale.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedIntermittentSales.add(intermittentSaleFromResultSet(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating intermittentSales failed", e);
+            throw new DAOException("Populating intermittentSales failed", e);
+        }
+
+        return populatedIntermittentSales;
+    }
+
 
     /**
      * writes the changes of the dataset into the database
