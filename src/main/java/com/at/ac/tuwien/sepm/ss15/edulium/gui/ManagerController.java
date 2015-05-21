@@ -24,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -106,8 +107,6 @@ public class ManagerController implements Initializable {
             tableColMenuId.setCellValueFactory(new PropertyValueFactory<Menu, Long>("identity"));
             tableColMenuName.setCellValueFactory(new PropertyValueFactory<Menu, String>("name"));
             tableColMenuEntries.setCellValueFactory(new PropertyValueFactory<Menu, List<MenuEntry>>("entries"));
-
-
         }catch (Exception e){
             LOGGER.error("Initialize Manager View Fail" + e);
         }
@@ -129,8 +128,16 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Update Menu Button Click");
             Stage stage = new Stage();
+            if(tableViewMenu.getSelectionModel().getSelectedItem() == null){
+                ManagerController.showErrorDialog
+                        ("Error", "Input Validation Error", "You have to select a Menu to Update");
+                return;
+            }
+            DialogMenuController.resetDialog();
             DialogMenuController.setThisStage(stage);
             DialogMenuController.setMenuService(menuService);
+            DialogMenuController.setDialogEnumeration(DialogEnumeration.UPDATE);
+            DialogMenuController.setMenu(tableViewMenu.getSelectionModel().getSelectedItem());
             stage.setTitle("Update Menu");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
             Scene scene = new Scene(myPane);
@@ -145,8 +152,10 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Search Menu Button Click");
             Stage stage = new Stage();
+            DialogMenuController.resetDialog();
             DialogMenuController.setThisStage(stage);
             DialogMenuController.setMenuService(menuService);
+            DialogMenuController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search Menu");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
             Scene scene = new Scene(myPane);
@@ -164,8 +173,10 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Add Menu Button Click");
             Stage stage = new Stage();
+            DialogMenuController.resetDialog();
             DialogMenuController.setThisStage(stage);
             DialogMenuController.setMenuService(menuService);
+            DialogMenuController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Add Menu");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
             Scene scene = new Scene(myPane);
