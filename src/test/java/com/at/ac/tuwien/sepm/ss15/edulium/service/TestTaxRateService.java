@@ -67,6 +67,17 @@ public class TestTaxRateService extends AbstractServiceTest {
         Mockito.verify(taxRateDAO, never()).create(taxRate);
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testAddTaxRate_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        TaxRate taxRate = new TaxRate();
+        Mockito.doThrow(new DAOException("")).when(taxRateDAO).create(taxRate);
+
+        // WHEN
+        taxRateService.addTaxRate(taxRate);
+    }
+
     @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testAddTaxRate_withoutPermissionShouldFail() throws ServiceException, ValidationException, DAOException {
@@ -105,6 +116,17 @@ public class TestTaxRateService extends AbstractServiceTest {
 
         // THEN
         Mockito.verify(taxRateDAO, never()).update(taxRate);
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testUpdateTaxRate_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        TaxRate taxRate = new TaxRate();
+        Mockito.doThrow(new DAOException("")).when(taxRateDAO).update(taxRate);
+
+        // WHEN
+        taxRateService.updateTaxRate(taxRate);
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -147,6 +169,17 @@ public class TestTaxRateService extends AbstractServiceTest {
         Mockito.verify(taxRateDAO, never()).delete(taxRate);
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testRemoveTaxRate_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        TaxRate taxRate = new TaxRate();
+        Mockito.doThrow(new DAOException("")).when(taxRateDAO).delete(taxRate);
+
+        // WHEN
+        taxRateService.removeTaxRate(taxRate);
+    }
+
     @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testRemoveTaxRate_withoutPermissionShouldFail() throws ServiceException, ValidationException, DAOException {
@@ -176,6 +209,17 @@ public class TestTaxRateService extends AbstractServiceTest {
 
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testFindTaxRate_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        TaxRate taxRate = new TaxRate();
+        Mockito.doThrow(new DAOException("")).when(taxRateDAO).find(taxRate);
+
+        // WHEN
+        taxRateService.findTaxRate(taxRate);
+    }
+
     @Test
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testGetAllTaxRates_shouldReturnObjects() throws ServiceException, ValidationException, DAOException {
@@ -193,5 +237,15 @@ public class TestTaxRateService extends AbstractServiceTest {
         assertTrue(taxRates.contains(taxRate1));
         assertTrue(taxRates.contains(taxRate2));
         assertTrue(taxRates.contains(taxRate3));
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testGetAllTaxRates_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Mockito.doThrow(new DAOException("")).when(taxRateDAO).getAll();
+
+        // WHEN
+        taxRateService.getAllTaxRates();
     }
 }
