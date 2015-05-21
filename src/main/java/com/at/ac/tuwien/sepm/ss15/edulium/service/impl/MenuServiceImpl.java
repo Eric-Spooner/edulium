@@ -13,14 +13,13 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.annotation.Secured;
 
 import java.util.List;
 
 /**
  * Implementation of the MenuService
  */
-public class MenuServiceImpl implements MenuService {
+class MenuServiceImpl implements MenuService {
     private static final Logger LOGGER = LogManager.getLogger(MenuServiceImpl.class);
 
     @Autowired
@@ -35,22 +34,6 @@ public class MenuServiceImpl implements MenuService {
     private Validator<MenuCategory> menuCategoryValidator;
     @Autowired
     private Validator<Menu> menuValidator;
-
-    @Autowired
-    public MenuServiceImpl(DAO<MenuEntry> menuEntryDAO, DAO<MenuCategory> menuCategoryDAO, DAO<Menu> menuDAO) {
-        this.menuEntryDAO = menuEntryDAO;
-        this.menuCategoryDAO = menuCategoryDAO;
-        this.menuDAO = menuDAO;
-    }
-
-    @Autowired
-    public void setValidators(Validator<MenuEntry> menuEntryValidator,
-                              Validator<MenuCategory> menuCategoryValidator,
-                              Validator<Menu> menuValidator) {
-        this.menuEntryValidator = menuEntryValidator;
-        this.menuCategoryValidator = menuCategoryValidator;
-        this.menuValidator = menuValidator;
-    }
 
     @Override
     public void addMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException {

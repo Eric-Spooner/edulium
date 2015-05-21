@@ -5,6 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -18,8 +19,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the MenuEntry object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    //FIXME:
-    //@Secured({"MANAGER"})
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     void addMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException;
 
     /**
@@ -28,8 +28,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the MenuEntry object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    //FIXME:
-    //@Secured({"MANAGER"})
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     void updateMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException;
 
     /**
@@ -38,8 +37,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the MenuEntry object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    //FIXME:
-    //@Secured({"MANAGER"})
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     void removeMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException;
 
     /**
@@ -63,8 +61,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the MenuCategory object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    //FIXME:
-    //@Secured({"MANAGER"})
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     void addMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException;
 
     /**
@@ -73,8 +70,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the MenuCategory object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    //FIXME:
-    //@Secured({"MANAGER"})
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     void updateMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException;
 
     /**
@@ -83,8 +79,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the MenuCategory object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    //FIXME:
-    //@Secured({"MANAGER"})
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     void removeMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException;
 
     /**
@@ -108,8 +103,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the menu object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    //FIXME:
-    //@Secured({"MANAGER"})
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     void addMenu(Menu menu) throws ValidationException, ServiceException;
 
     /**
@@ -118,8 +112,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the Menu object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    //FIXME:
-    //@Secured({"MANAGER"})
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     void updateMenu(Menu menu) throws ValidationException, ServiceException;
 
     /**
@@ -128,8 +121,7 @@ public interface MenuService extends Service {
      * @throws ValidationException if the menu object is not valid
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    //FIXME:
-    //@Secured({"MANAGER"})
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     void removeMenu(Menu menu) throws ValidationException, ServiceException;
 
     /**
