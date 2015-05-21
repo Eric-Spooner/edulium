@@ -107,43 +107,46 @@ public class DialogMenuController implements Initializable{
 
     public void buttonOKClick(ActionEvent actionEvent) {
         LOGGER.info("Dialog Menu OK Button clicked");
-        if(textFieldName.getText().equals("")  &&
+        if((textFieldName.getText() == null || textFieldName.getText().equals(""))  &&
                 DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH){
             ManagerController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
-        }else {
-            menu.setName(textFieldName.getText());
-            if(DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH){
-                if (menu.getEntries().size() == 0) {
-                    ManagerController.showErrorDialog
-                            ("Error", "Input Validation Error", "There hast to be at least one Menu Entry");
-                    return;
-                }
-            }
-            try {
-                switch (DialogMenuController.dialogEnumeration) {
-                    case ADD:
-                        menuService.addMenu(menu);
-                        break;
-                    case UPDATE:
-                        menuService.updateMenu(menu);
-                        break;
-                }
-                thisStage.close();
-            }catch (Exception e){
+            return;
+        }
+
+        menu.setName(textFieldName.getText());
+        if(DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH){
+            if (menu.getEntries().size() == 0) {
                 ManagerController.showErrorDialog
-                        ("Error", "Menu Service Error", "The Service was unable to handle the required Menu action");
-                LOGGER.error("The Service was unable to handle the required Menu action " + e);
+                        ("Error", "Input Validation Error", "There hast to be at least one Menu Entry");
+                return;
             }
         }
+        try {
+            switch (DialogMenuController.dialogEnumeration) {
+                case ADD:
+                    menuService.addMenu(menu);
+                    break;
+                case UPDATE:
+                    menuService.updateMenu(menu);
+                    break;
+            }
+        }catch (Exception e){
+            ManagerController.showErrorDialog
+                    ("Error", "Menu Service Error", "The Service was unable to handle the required Menu action");
+            LOGGER.error("The Service was unable to handle the required Menu action " + e);
+            return;
+        }
+        thisStage.close();
     }
 
     public void buttonCancelClick(ActionEvent actionEvent) {
         LOGGER.info("Dialog Menu Cancel Button clicked");
+        resetDialog();
         thisStage.close();
     }
 
     public void buttonAddClick(ActionEvent actionEvent) {
-        if(textFieldPrice.getText().equals("") &&
+        if((textFieldPrice.getText() == null || textFieldPrice.getText().equals("")) &&
                 DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH){
             switch (DialogMenuController.dialogEnumeration) {
                 case UPDATE:
@@ -159,20 +162,21 @@ public class DialogMenuController implements Initializable{
         }
 
         try {
+            MenuEntry menuEntry = tableViewData.getSelectionModel().getSelectedItem();
             BigDecimal price = null;
             switch (DialogMenuController.dialogEnumeration) {
                 case UPDATE:
                 case ADD:
                     price = BigDecimal.valueOf(Double.parseDouble(textFieldPrice.getText()));
+                    menuEntry.setPrice(price);
                     break;
                 case SEARCH:
                     if (!textFieldPrice.getText().equals("")) {
                         price = BigDecimal.valueOf(Double.parseDouble(textFieldPrice.getText()));
+                        menuEntry.setPrice(price);
                     }
                     break;
             }
-            MenuEntry menuEntry = tableViewData.getSelectionModel().getSelectedItem();
-            menuEntry.setPrice(price);
             List<MenuEntry> list = menu.getEntries();
             list.add(menuEntry);
             menu.setEntries(list);

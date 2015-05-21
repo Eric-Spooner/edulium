@@ -5,6 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -92,24 +93,35 @@ public class ManagerController implements Initializable {
             tableColTaxRateID.setCellValueFactory(new PropertyValueFactory<TaxRate, Long>("identity"));
             tableColTaxRateValue.setCellValueFactory(new PropertyValueFactory<TaxRate, BigDecimal>("value"));
 
+            showMenuCategories(menuService.getAllMenuCategories());
             tableViewMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
             tableColMenuCategoryID.setCellValueFactory(new PropertyValueFactory<MenuCategory, Long>("identity"));
             tableColMenuCategoryName.setCellValueFactory(new PropertyValueFactory<MenuCategory, String>("name"));
 
-            tableViewMenuEntry.setItems(observableArrayList(menuService.getAllMenuEntries()));
+            showMenuEntries(menuService.getAllMenuEntries());
             tableColMenuEntryId.setCellValueFactory(new PropertyValueFactory<MenuEntry, Long>("identity"));
             tableColMenuEntryName.setCellValueFactory(new PropertyValueFactory<MenuEntry, String>("name"));
             tableColMenuEntryPrice.setCellValueFactory(new PropertyValueFactory<MenuEntry, BigDecimal>("price"));
             tableColMenuEntryCategory.setCellValueFactory(new PropertyValueFactory<MenuEntry, MenuCategory>("category"));
             tableColMenuEntryTaxRate.setCellValueFactory(new PropertyValueFactory<MenuEntry, TaxRate>("taxRate"));
 
-            tableViewMenu.setItems(observableArrayList(menuService.getAllMenus()));
+            showMenus(menuService.getAllMenus());
             tableColMenuId.setCellValueFactory(new PropertyValueFactory<Menu, Long>("identity"));
             tableColMenuName.setCellValueFactory(new PropertyValueFactory<Menu, String>("name"));
             tableColMenuEntries.setCellValueFactory(new PropertyValueFactory<Menu, List<MenuEntry>>("entries"));
         }catch (Exception e){
             LOGGER.error("Initialize Manager View Fail" + e);
         }
+    }
+
+    private void showMenuCategories(List<MenuCategory> menuCategories) {
+        tableViewMenuCategory.setItems(observableArrayList(menuCategories));
+    }
+    private void showMenus(List<Menu> menus) {
+        tableViewMenu.setItems(observableArrayList(menus));
+    }
+    private void showMenuEntries(List<MenuEntry> menuEntries) {
+        tableViewMenuEntry.setItems(observableArrayList(menuEntries));
     }
 
     public void buttonEmployeesAddClicked(ActionEvent actionEvent) {
@@ -161,8 +173,13 @@ public class ManagerController implements Initializable {
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
+            if(DialogMenuController.getMenu() != null){
+                showMenus(menuService.findMenu(DialogMenuController.getMenu()));
+            }
         }catch (IOException e){
-            LOGGER.error("Search Menu Button Click did not work");
+            LOGGER.error("Search Menu Button Click did not work" + e);
+        }catch (ServiceException e){
+            LOGGER.error("Menu Service finding Menus did not work" + e);
         }
     }
 
