@@ -208,7 +208,7 @@ public class DialogMenuController implements Initializable{
      * this function is used to rest the static members of the class
      */
     public static void resetDialog(){
-        DialogMenuController.setMenu(new Menu());
+        DialogMenuController.setMenu(null);
     }
 
     private void refreshView(){

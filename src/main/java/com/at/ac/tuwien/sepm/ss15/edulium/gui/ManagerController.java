@@ -6,6 +6,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.TaxRateService;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -44,6 +45,7 @@ public class ManagerController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(ManagerController.class);
 
     private MenuService menuService;
+    private TaxRateService taxRateService;
 
     @FXML
     private TableView<TaxRate> tableViewTaxRate;
@@ -88,8 +90,9 @@ public class ManagerController implements Initializable {
         try {
             ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Service.xml");
             menuService = context.getBean("menuService", MenuService.class);
+            taxRateService = context.getBean("taxRateService",  TaxRateService.class);
 
-            //tableViewTaxRate.setItems(observableArrayList(menuService.get));
+            showTaxRate(taxRateService.getAllTaxRates());
             tableColTaxRateID.setCellValueFactory(new PropertyValueFactory<TaxRate, Long>("identity"));
             tableColTaxRateValue.setCellValueFactory(new PropertyValueFactory<TaxRate, BigDecimal>("value"));
 
@@ -113,7 +116,9 @@ public class ManagerController implements Initializable {
             LOGGER.error("Initialize Manager View Fail" + e);
         }
     }
-
+    private void showTaxRate(List<TaxRate> taxRates) {
+        tableViewTaxRate.setItems(observableArrayList(taxRates));
+    }
     private void showMenuCategories(List<MenuCategory> menuCategories) {
         tableViewMenuCategory.setItems(observableArrayList(menuCategories));
     }
@@ -178,6 +183,8 @@ public class ManagerController implements Initializable {
             stage.showAndWait();
             if(DialogMenuController.getMenu() != null){
                 showMenus(menuService.findMenu(DialogMenuController.getMenu()));
+            }else {
+                showMenus(menuService.getAllMenus());
             }
         }catch (IOException e){
             LOGGER.error("Search Menu Button Click did not work" + e);
@@ -244,6 +251,7 @@ public class ManagerController implements Initializable {
             DialogMenuEntryController.resetDialog();
             DialogMenuEntryController.setThisStage(stage);
             DialogMenuEntryController.setMenuService(menuService);
+            DialogMenuEntryController.setTaxRateService(taxRateService);
             DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search MenuEntry");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
@@ -252,7 +260,10 @@ public class ManagerController implements Initializable {
             stage.showAndWait();
             if(DialogMenuEntryController.getMenuEntry() != null){
                 showMenuEntries(menuService.findMenuEntry(DialogMenuEntryController.getMenuEntry()));
+            }else {
+                showMenuEntries(menuService.getAllMenuEntries());
             }
+            DialogMenuEntryController.resetDialog();
         }catch (IOException e){
             LOGGER.error("Search MenuEntry Button Click did not work");
         }catch (Exception e){
@@ -264,16 +275,24 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Update MenuEntry Button Click");
             Stage stage = new Stage();
+            if(tableViewMenuEntry.getSelectionModel().getSelectedItem() == null){
+                ManagerController.showErrorDialog
+                        ("Error", "Input Validation Error", "You have to select a MenuEntry to Update");
+                return;
+            }
             DialogMenuEntryController.resetDialog();
             DialogMenuEntryController.setThisStage(stage);
             DialogMenuEntryController.setMenuService(menuService);
+            DialogMenuEntryController.setTaxRateService(taxRateService);
             DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.UPDATE);
+            DialogMenuEntryController.setMenuEntry(tableViewMenuEntry.getSelectionModel().getSelectedItem());
             stage.setTitle("Update MenuEntry");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
             showMenuEntries(menuService.getAllMenuEntries());
+            DialogMenuEntryController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Loading the Menus Entries failed" + e);
         }
@@ -286,6 +305,7 @@ public class ManagerController implements Initializable {
             DialogMenuEntryController.resetDialog();
             DialogMenuEntryController.setThisStage(stage);
             DialogMenuEntryController.setMenuService(menuService);
+            DialogMenuEntryController.setTaxRateService(taxRateService);
             DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Insert MenuEntry");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
@@ -293,6 +313,7 @@ public class ManagerController implements Initializable {
             stage.setScene(scene);
             stage.showAndWait();
             showMenuEntries(menuService.getAllMenuEntries());
+            DialogMenuEntryController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Loading the Menus Entries failed" + e);
         }
@@ -302,6 +323,18 @@ public class ManagerController implements Initializable {
 
 
     public void buttonMenuCategoryRemoveClicked(ActionEvent actionEvent) {
+        try {
+            LOGGER.info("Delete MenuCategory Button Click");
+            if(tableViewMenuCategory.getSelectionModel().getSelectedItem() == null){
+                ManagerController.showErrorDialog
+                        ("Error", "Input Validation Error", "You have to select a Menu Category to Delete");
+                return;
+            }
+            menuService.removeMenuCategory(tableViewMenuCategory.getSelectionModel().getSelectedItem());
+            showMenuCategories(menuService.getAllMenuCategories());
+        }catch (Exception e){
+            LOGGER.error("Loading the Menus Categories failed" + e);
+        }
     }
 
     public void buttonMenuCategorySearchClicked(ActionEvent actionEvent) {
@@ -310,12 +343,18 @@ public class ManagerController implements Initializable {
             Stage stage = new Stage();
             DialogMenuCategoryController.setThisStage(stage);
             DialogMenuCategoryController.setMenuService(menuService);
+            DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search Menu Category");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
-        }catch (IOException e){
+            if (DialogMenuCategoryController.getMenuCategory() != null) {
+                showMenuCategories(menuService.findMenuCategory(DialogMenuCategoryController.getMenuCategory()));
+            } else {
+                showMenuCategories(menuService.getAllMenuCategories());
+            }
+        }catch (Exception e){
             LOGGER.error("Search MenuCategory Button Click did not work");
         }
     }
@@ -324,14 +363,21 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Update MenuCategory Button Click");
             Stage stage = new Stage();
+            if(tableViewMenuCategory.getSelectionModel().getSelectedItem() == null){
+                ManagerController.showErrorDialog
+                        ("Error", "Input Validation Error", "You have to select a MenuCategory to Update");
+                return;
+            }
             DialogMenuCategoryController.setThisStage(stage);
             DialogMenuCategoryController.setMenuService(menuService);
+            DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.UPDATE);
+            DialogMenuCategoryController.setMenuCategory(tableViewMenuCategory.getSelectionModel().getSelectedItem());
             stage.setTitle("Update Menu Category");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
-            tableViewMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
+            showMenuCategories(menuService.getAllMenuCategories());
         }catch (Exception e){
             LOGGER.error("Update MenuCategory Button Click did not work" + e);
         }
@@ -343,18 +389,31 @@ public class ManagerController implements Initializable {
             Stage stage = new Stage();
             DialogMenuCategoryController.setThisStage(stage);
             DialogMenuCategoryController.setMenuService(menuService);
+            DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Insert Menu Category");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
-            tableViewMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
+            showMenuCategories(menuService.getAllMenuCategories());
         }catch (Exception e){
             LOGGER.error("Add MenuCategory Button Click did not work" + e);
         }
     }
 
     public void buttonTaxRateRemoveClicked(ActionEvent actionEvent) {
+        try {
+            LOGGER.info("Delete TaxRate Button Click");
+            if(tableViewTaxRate.getSelectionModel().getSelectedItem() == null){
+                ManagerController.showErrorDialog
+                        ("Error", "Input Validation Error", "You have to select a Tax Rate to Delete");
+                return;
+            }
+            taxRateService.removeTaxRate(tableViewTaxRate.getSelectionModel().getSelectedItem());
+            showTaxRate(taxRateService.getAllTaxRates());
+        }catch (Exception e){
+            LOGGER.error("Loading the taxRates failed" + e);
+        }
     }
 
     public void buttonTaxRateSearchClicked(ActionEvent actionEvent) {
@@ -362,13 +421,23 @@ public class ManagerController implements Initializable {
             LOGGER.info("Search TaxRate Button Click");
             Stage stage = new Stage();
             DialogTaxRateController.setThisStage(stage);
+            DialogTaxRateController.setDialogEnumeration(DialogEnumeration.SEARCH);
+            DialogTaxRateController.setTaxRateService(taxRateService);
             stage.setTitle("Search Tax Rate");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogTaxRate.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
+            if(DialogTaxRateController.getTaxRate() != null){
+                showTaxRate(taxRateService.findTaxRate(DialogTaxRateController.getTaxRate()));
+            } else {
+                showTaxRate(taxRateService.getAllTaxRates());
+            }
+            DialogTaxRateController.resetDialog();
         }catch (IOException e){
             LOGGER.error("Search TaxRate Button Click did not work");
+        }catch (Exception e){
+            LOGGER.error("Load all TaxRates did not work " + e);
         }
     }
 
@@ -376,14 +445,26 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Update TaxRate Button Click");
             Stage stage = new Stage();
+            if(tableViewTaxRate.getSelectionModel().getSelectedItem() == null){
+                ManagerController.showErrorDialog
+                        ("Error", "Input Validation Error", "You have to select a TaxRate to Update");
+                return;
+            }
             DialogTaxRateController.setThisStage(stage);
+            DialogTaxRateController.setDialogEnumeration(DialogEnumeration.UPDATE);
+            DialogTaxRateController.setTaxRateService(taxRateService);
+            DialogTaxRateController.setTaxRate(tableViewTaxRate.getSelectionModel().getSelectedItem() );
             stage.setTitle("Update Tax Rate");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogTaxRate.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
+            showTaxRate(taxRateService.getAllTaxRates());
+            DialogTaxRateController.resetDialog();
         }catch (IOException e){
             LOGGER.error("Update TaxRate Button Click did not work");
+        }catch (Exception e){
+            LOGGER.error("Load all TaxRates did not work " + e);
         }
     }
 
@@ -392,13 +473,19 @@ public class ManagerController implements Initializable {
             LOGGER.info("Add TaxRate Button Click");
             Stage stage = new Stage();
             DialogTaxRateController.setThisStage(stage);
+            DialogTaxRateController.setDialogEnumeration(DialogEnumeration.ADD);
+            DialogTaxRateController.setTaxRateService(taxRateService);
             stage.setTitle("Insert Tax Rate");
             Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogTaxRate.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
+            showTaxRate(taxRateService.getAllTaxRates());
+            DialogTaxRateController.resetDialog();
         }catch (IOException e){
             LOGGER.error("Add TaxRate Button Click did not work");
+        }catch (Exception e){
+            LOGGER.error("Load all TaxRates did not work " + e);
         }
     }
 
@@ -409,5 +496,38 @@ public class ManagerController implements Initializable {
         alert.setContentText(content);
 
         alert.showAndWait();
+    }
+
+    public void buttonShowAllTaxRateClicked(ActionEvent actionEvent) {
+
+        try {
+            showTaxRate(taxRateService.getAllTaxRates());
+        } catch (Exception e){
+            LOGGER.error("Loading All TaxRates failed" + e);
+        }
+    }
+
+    public void buttonShowAllMenuCategoryClicked(ActionEvent actionEvent) {
+        try {
+            showMenuCategories(menuService.getAllMenuCategories());
+        } catch (Exception e){
+            LOGGER.error("Loading All Menu Categories failed" + e);
+        }
+    }
+
+    public void buttonShowAllMenuEntryClicked(ActionEvent actionEvent) {
+        try {
+            showMenuEntries(menuService.getAllMenuEntries());
+        } catch (Exception e){
+            LOGGER.error("Loading All Menu Entries failed" + e);
+        }
+    }
+
+    public void buttonShowAllMenuClicked(ActionEvent actionEvent) {
+        try {
+            showMenus(menuService.getAllMenus());
+        } catch (Exception e){
+            LOGGER.error("Loading All Menu failed" + e);
+        }
     }
 }

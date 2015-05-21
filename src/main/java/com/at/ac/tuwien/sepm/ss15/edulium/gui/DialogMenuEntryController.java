@@ -5,6 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.TaxRateService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -27,9 +28,14 @@ public class DialogMenuEntryController implements Initializable{
 
     private static Stage thisStage;
     private static MenuService menuService;
+    private static TaxRateService taxRateService;
     private static MenuEntry menuEntry;
     private static DialogEnumeration dialogEnumeration;
 
+
+    public static void setTaxRateService(TaxRateService taxRateService) {
+        DialogMenuEntryController.taxRateService = taxRateService;
+    }
     public static void setThisStage(Stage thisStage) {
         DialogMenuEntryController.thisStage = thisStage;
     }
@@ -64,9 +70,17 @@ public class DialogMenuEntryController implements Initializable{
             if(menuEntry == null){
                 menuEntry = new MenuEntry();
             }
+            dropTaxRate.setItems(observableArrayList(taxRateService.getAllTaxRates()));
+            if (menuEntry.getTaxRate() != null){
+                dropTaxRate.getSelectionModel().select(menuEntry.getTaxRate());
+            }
             dropMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
+            if (menuEntry.getCategory() != null){
+               dropMenuCategory.getSelectionModel().select(menuEntry.getCategory());
+            }
             textFieldName.setText(menuEntry.getName());
             textFieldPrice.setText(menuEntry.getPrice().toString());
+            textFieldDesription.setText(menuEntry.getDescription().toString());
             checkAvailible.setSelected(menuEntry.getAvailable());
         }catch (Exception e){
             LOGGER.error("Init Menu Entry crashed " + e);
@@ -125,7 +139,6 @@ public class DialogMenuEntryController implements Initializable{
                     }
                 }
         }
-
         menuEntry.setPrice(price);
         menuEntry.setCategory(dropMenuCategory.getSelectionModel().getSelectedItem());
         menuEntry.setTaxRate(dropTaxRate.getSelectionModel().getSelectedItem());
@@ -154,7 +167,7 @@ public class DialogMenuEntryController implements Initializable{
     }
 
     public static void resetDialog(){
-        DialogMenuEntryController.setMenuEntry(new MenuEntry());
+        DialogMenuEntryController.setMenuEntry(null);
     }
 }
 
