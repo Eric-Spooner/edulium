@@ -37,7 +37,7 @@ class MenuServiceImpl implements MenuService {
 
     @Override
     public void addMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException {
-        LOGGER.debug("Entering addMenuEntry with parameters: " + menuEntry);
+        LOGGER.debug("Entering addMenuEntry with parameter: " + menuEntry);
 
         menuEntryValidator.validateForCreate(menuEntry);
 
@@ -51,7 +51,7 @@ class MenuServiceImpl implements MenuService {
 
     @Override
     public void updateMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException {
-        LOGGER.debug("Entering updateMenuEntry with parameters: " + menuEntry);
+        LOGGER.debug("Entering updateMenuEntry with parameter: " + menuEntry);
 
         menuEntryValidator.validateForUpdate(menuEntry);
 
@@ -65,7 +65,7 @@ class MenuServiceImpl implements MenuService {
 
     @Override
     public void removeMenuEntry(MenuEntry menuEntry) throws ValidationException, ServiceException {
-        LOGGER.debug("Entering removeMenuEntry with parameters: " + menuEntry);
+        LOGGER.debug("Entering removeMenuEntry with parameter: " + menuEntry);
 
         menuEntryValidator.validateForDelete(menuEntry);
 
@@ -79,7 +79,7 @@ class MenuServiceImpl implements MenuService {
 
     @Override
     public List<MenuEntry> findMenuEntry(MenuEntry matcher) throws ServiceException {
-        LOGGER.debug("Entering findMenuEntry with parameters: " + matcher);
+        LOGGER.debug("Entering findMenuEntry with parameter: " + matcher);
 
         try {
             return menuEntryDAO.find(matcher);
@@ -103,7 +103,7 @@ class MenuServiceImpl implements MenuService {
 
     @Override
     public void addMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException {
-        LOGGER.debug("Entering addMenuCategory with parameters: " + menuCategory);
+        LOGGER.debug("Entering addMenuCategory with parameter: " + menuCategory);
 
         menuCategoryValidator.validateForCreate(menuCategory);
 
@@ -117,7 +117,7 @@ class MenuServiceImpl implements MenuService {
 
     @Override
     public void updateMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException {
-        LOGGER.debug("Entering updateMenuCategory with parameters: " + menuCategory);
+        LOGGER.debug("Entering updateMenuCategory with parameter: " + menuCategory);
 
         menuCategoryValidator.validateForUpdate(menuCategory);
 
@@ -131,7 +131,7 @@ class MenuServiceImpl implements MenuService {
 
     @Override
     public void removeMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException {
-        LOGGER.debug("Entering removeMenuCategory with parameters: " + menuCategory);
+        LOGGER.debug("Entering removeMenuCategory with parameter: " + menuCategory);
 
         menuCategoryValidator.validateForDelete(menuCategory);
 
@@ -145,7 +145,7 @@ class MenuServiceImpl implements MenuService {
 
     @Override
     public List<MenuCategory> findMenuCategory(MenuCategory matcher) throws ServiceException {
-        LOGGER.debug("Entering findMenuCategory with parameters: " + matcher);
+        LOGGER.debug("Entering findMenuCategory with parameter: " + matcher);
 
         try {
             return menuCategoryDAO.find(matcher);
@@ -169,7 +169,7 @@ class MenuServiceImpl implements MenuService {
 
     @Override
     public void addMenu(Menu menu) throws ValidationException, ServiceException {
-        LOGGER.debug("Entering addMenu with parameters: " + menu);
+        LOGGER.debug("Entering addMenu with parameter: " + menu);
 
         menuValidator.validateForCreate(menu);
 
@@ -183,7 +183,7 @@ class MenuServiceImpl implements MenuService {
 
     @Override
     public void updateMenu(Menu menu) throws ValidationException, ServiceException {
-        LOGGER.debug("Entering updateMenu with parameters: " + menu);
+        LOGGER.debug("Entering updateMenu with parameter: " + menu);
 
         menuValidator.validateForUpdate(menu);
 
@@ -197,7 +197,7 @@ class MenuServiceImpl implements MenuService {
 
     @Override
     public void removeMenu(Menu menu) throws ValidationException, ServiceException {
-        LOGGER.debug("Entering removeMenu with parameters: " + menu);
+        LOGGER.debug("Entering removeMenu with parameter: " + menu);
 
         menuValidator.validateForDelete(menu);
 
@@ -211,7 +211,7 @@ class MenuServiceImpl implements MenuService {
 
     @Override
     public List<Menu> findMenu(Menu matcher) throws ServiceException {
-        LOGGER.debug("Entering removeMenu with parameters: " + matcher);
+        LOGGER.debug("Entering removeMenu with parameter: " + matcher);
 
         try {
             return menuDAO.find(matcher);

@@ -21,7 +21,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the MenuEntry DAO interface
@@ -160,7 +162,11 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                objects.add(parseResult(result));
+                try {
+                    objects.add(parseResult(result));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("searching for menu entries failed", e);
@@ -181,7 +187,11 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                objects.add(parseResult(result));
+                try {
+                    objects.add(parseResult(result));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("searching for all entries failed", e);
@@ -215,6 +225,43 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
         return history;
     }
 
+    @Override
+    public List<MenuEntry> populate(List<MenuEntry> menuEntries) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + menuEntries);
+
+        if (menuEntries == null || menuEntries.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (MenuEntry menuEntry : menuEntries) {
+            validator.validateIdentity(menuEntry);
+        }
+
+        final String query = "SELECT * FROM MenuEntry WHERE ID IN (" +
+                menuEntries.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<MenuEntry> populatedMenuEntries = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (MenuEntry menuEntry : menuEntries) {
+                stmt.setLong(index++, menuEntry.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedMenuEntries.add(parseResult(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating menu entries failed", e);
+            throw new DAOException("Populating menu entries failed", e);
+        }
+
+        return populatedMenuEntries;
+    }
+
     private void generateHistory(MenuEntry menuEntry) throws DAOException {
         LOGGER.debug("entering generateHistory with parameters " + menuEntry);
 
@@ -242,14 +289,14 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
      * @throws SQLException if an error accessing the database occurred
      * @throws DAOException if an error retrieving the taxRate/category occurred
      */
-    private MenuEntry parseResult(ResultSet result) throws DAOException, SQLException {
-        List<TaxRate> taxRates = taxRateDAO.find(TaxRate.withIdentity(result.getLong("taxRate_ID")));
+    private MenuEntry parseResult(ResultSet result) throws DAOException, ValidationException, SQLException {
+        List<TaxRate> taxRates = taxRateDAO.populate(Arrays.asList(TaxRate.withIdentity(result.getLong("taxRate_ID"))));
         if (taxRates.size() != 1) {
             LOGGER.error("retrieving taxRate failed");
             throw new DAOException("retrieving taxRate failed");
         }
 
-        List<MenuCategory> categories = menuCategoryDAO.find(MenuCategory.withIdentity(result.getLong("category_ID")));
+        List<MenuCategory> categories = menuCategoryDAO.populate(Arrays.asList(MenuCategory.withIdentity(result.getLong("category_ID"))));
         if (categories.size() != 1) {
             LOGGER.error("retrieving category failed");
             throw new DAOException("retrieving category failed");
@@ -274,9 +321,9 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
      * @throws SQLException if an error accessing the database occurred
      * @throws DAOException if an error retrieving the user ocurred
      */
-    private History<MenuEntry> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
+    private History<MenuEntry> parseHistoryEntry(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             LOGGER.error("user not found");
             throw new DAOException("user not found");

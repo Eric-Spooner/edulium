@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -506,4 +508,120 @@ public class TestOrderDAO extends AbstractDAOTest {
         assertEquals(1, objects.size());
     }
 
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // order 1
+        Order order1 = createOrder(BigDecimal.valueOf(500),"Order Information1", BigDecimal.valueOf(0.2), LocalDateTime.now());
+
+        orderDAO.create(order1);
+        assertEquals(1, orderDAO.find(order1).size());
+
+        // order 2
+        Order order2 = createOrder(BigDecimal.valueOf(1000),"Order Information2", BigDecimal.valueOf(0.2), LocalDateTime.now());
+
+        orderDAO.create(order2);
+        assertEquals(1, orderDAO.find(order2).size());
+
+        // order 3
+        Order order3 = createOrder(BigDecimal.valueOf(500), "Order Information3", BigDecimal.valueOf(0.2), LocalDateTime.now());
+
+        orderDAO.create(order3);
+        assertEquals(1, orderDAO.find(order3).size());
+
+        // GIVEN
+        Order orderId1 = Order.withIdentity(order1.getIdentity());
+        Order orderId2 = Order.withIdentity(order2.getIdentity());
+        Order orderId3 = Order.withIdentity(order3.getIdentity());
+        List<Order> orderIds = Arrays.asList(orderId1, orderId2, orderId3);
+
+        // WHEN
+        List<Order> result = orderDAO.populate(orderIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(order1));
+        assertTrue(result.contains(order2));
+        assertTrue(result.contains(order3));
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjectsOfDeletedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // order 1
+        Order order1 = createOrder(BigDecimal.valueOf(500),"Order Information1", BigDecimal.valueOf(0.2), LocalDateTime.now());
+
+        orderDAO.create(order1);
+        assertEquals(1, orderDAO.find(order1).size());
+        orderDAO.delete(order1);
+        assertEquals(0, orderDAO.find(order1).size());
+
+        // order 2
+        Order order2 = createOrder(BigDecimal.valueOf(1000),"Order Information2", BigDecimal.valueOf(0.2), LocalDateTime.now());
+
+        orderDAO.create(order2);
+        assertEquals(1, orderDAO.find(order2).size());
+        orderDAO.delete(order2);
+        assertEquals(0, orderDAO.find(order2).size());
+
+        // order 3
+        Order order3 = createOrder(BigDecimal.valueOf(500), "Order Information3", BigDecimal.valueOf(0.2), LocalDateTime.now());
+
+        orderDAO.create(order3);
+        assertEquals(1, orderDAO.find(order3).size());
+        orderDAO.delete(order3);
+        assertEquals(0, orderDAO.find(order3).size());
+
+        // GIVEN
+        Order orderId1 = Order.withIdentity(order1.getIdentity());
+        Order orderId2 = Order.withIdentity(order2.getIdentity());
+        Order orderId3 = Order.withIdentity(order3.getIdentity());
+        List<Order> orderIds = Arrays.asList(orderId1, orderId2, orderId3);
+
+        // WHEN
+        List<Order> result = orderDAO.populate(orderIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(order1));
+        assertTrue(result.contains(order2));
+        assertTrue(result.contains(order3));
+    }
+
+    @Test
+    public void testPopulate_nullListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<Order> result = orderDAO.populate(null);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testPopulate_emptyListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<Order> result = orderDAO.populate(Arrays.asList());
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithInvalidObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<Order> invalidOrders = Arrays.asList(new Order());
+
+        // WHEN
+        List<Order> result = orderDAO.populate(invalidOrders);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<Order> invalidOrders = new ArrayList<>();
+        invalidOrders.add(null);
+
+        // WHEN
+        List<Order> result = orderDAO.populate(invalidOrders);
+    }
 }
