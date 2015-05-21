@@ -43,15 +43,13 @@ public interface TaxRateService {
      * match the paramter of the matcher object
      * @param matcher matcher
      * @throws ServiceException if an error processing the request ocurred
-     * @throws ValidationException if the data is invalid
      */
-    List<TaxRate> findTaxRate(TaxRate matcher) throws ServiceException, ValidationException;
+    List<TaxRate> findTaxRate(TaxRate matcher) throws ServiceException;
 
     /**
      * returns all taxRates from the underlying datasource
      * @throws ServiceException if an error processing the request ocurred
-     * @throws ValidationException if the data is invalid
      */
-    List<TaxRate> getAllTaxRates() throws ServiceException, ValidationException;
+    List<TaxRate> getAllTaxRates() throws ServiceException;
 
 }
