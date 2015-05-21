@@ -9,6 +9,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
@@ -28,6 +29,7 @@ class DBUserDAO implements DAO<User> {
     @Autowired
     private Validator<User> validator;
 
+    @PreAuthorize("isAuthenticated()")
     @Override
     public void create(User user) throws DAOException, ValidationException {
         LOGGER.debug("Entering create with parameters: " + user);
@@ -50,6 +52,7 @@ class DBUserDAO implements DAO<User> {
         generateHistory(user);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @Override
     public void update(User user) throws DAOException, ValidationException {
         LOGGER.debug("Entering update with parameters: " + user);
@@ -75,6 +78,7 @@ class DBUserDAO implements DAO<User> {
         generateHistory(user);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @Override
     public void delete(User user) throws DAOException, ValidationException {
         LOGGER.debug("Entering delete with parameters: " + user);

@@ -10,6 +10,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
@@ -23,6 +24,7 @@ import java.util.List;
 /**
  * H2 Database Implementation of the TaxRate DAO interface
  */
+@PreAuthorize("isAuthenticated()")
 class DBTaxRateDAO implements DAO<TaxRate> {
     private static final Logger LOGGER = LogManager.getLogger(DBTaxRateDAO.class);
 
