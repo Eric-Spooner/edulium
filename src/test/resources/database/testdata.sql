@@ -1,2 +1,2 @@
-INSERT INTO RestaurantUser (ID, name, userRole) VALUES ('daotester', 'DAO Testuser', 'admin');
-INSERT INTO RestaurantUser (ID, name, userRole) VALUES ('servicetester', 'Service Testuser', 'manager');
+MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('daotester', 'DAO Testuser', 'admin');
+MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('servicetester', 'Service Testuser', 'manager');
