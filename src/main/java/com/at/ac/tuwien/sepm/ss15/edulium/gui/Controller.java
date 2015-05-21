@@ -42,13 +42,12 @@ public class Controller implements Initializable {
     @FXML
     private ScrollPane scrollPaneLeft;
     private int MARGIN = 20;
-    private List<Room> rooms;
     private double scaleX = 1.0;
     private double scaleY = 1.0;
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
-        rooms = new ArrayList<Room>();
+        /*rooms = new ArrayList<Room>();
         Room room1 = new Room("Garten");
         room1.add(new Table(1, 20, 20, 40, 40));
         room1.add(new Table(2, 80, 20, 40, 40));
@@ -79,13 +78,13 @@ public class Controller implements Initializable {
         room2.getTables().get(1).setOccupied(true);
         room2.getTables().get(2).setOccupied(true);
         room2.getTables().get(5).setOccupied(true);
-
+*/
         drawCanvas();
 
         tablesCanvas.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent t) {
-                int roomOffset = 0;
+               /* int roomOffset = 0;
                 for (Room room : rooms) {
                     if (t.getY() <= (roomOffset + room.getHeight() + MARGIN)*scaleY) {
                         Table table = room.getTable((int)((t.getX())/scaleX) - MARGIN, (int) ((t.getY() - roomOffset)/scaleY) - MARGIN);
@@ -95,7 +94,7 @@ public class Controller implements Initializable {
                         return;
                     }
                     roomOffset += (room.getHeight() + 2 * MARGIN)*scaleY;
-                }
+                }*/
             }
         });
 
@@ -150,7 +149,7 @@ public class Controller implements Initializable {
         double scaleText = Math.min(scaleX, scaleY);
 
         int roomOffset = 0;
-        for(Room room : rooms) {
+        /*for(Room room : rooms) {
             tablesCanvas.setHeight(tablesCanvas.getHeight()+(room.getHeight()+2*MARGIN)*scaleY);
             gc.strokeRoundRect(MARGIN*scaleX, (roomOffset+MARGIN)*scaleY, (room.getWidth()+MARGIN)*scaleX, (room.getHeight()+MARGIN)*scaleY, 10, 10);
             gc.setFont(new Font(gc.getFont().getName(), 20*scaleText));
@@ -165,6 +164,6 @@ public class Controller implements Initializable {
                 gc.fillText(String.valueOf(table.getId()), (table.getX()+1.5*MARGIN)*scaleX, (table.getY()+roomOffset+2.5*MARGIN)*scaleY);
             }
             roomOffset += room.getHeight()+2*MARGIN;
-        }
+        }*/
     }
 }
