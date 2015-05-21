@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -961,5 +963,152 @@ public class TestTableDAO extends AbstractDAOTest {
         tableDAO.create(table); // readd
         // THEN
         Assert.assertEquals(1, tableDAO.find(table).size());
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        Table table1 = new Table();
+        table1.setSeats(3);
+        table1.setColumn(14);
+        table1.setRow(5);
+        table1.setNumber((long) 1);
+        table1.setUser(user2);
+        table1.setSection(section3);
+
+        tableDAO.create(table1);
+        assertEquals(1, tableDAO.find(table1).size());
+
+        Table table2 = new Table();
+        table2.setSeats(13);
+        table2.setColumn(14);
+        table2.setRow(15);
+        table2.setNumber((long) 1);
+        table2.setUser(user2);
+        table2.setSection(section2);
+
+        tableDAO.create(table2);
+        assertEquals(1, tableDAO.find(table2).size());
+
+        Table table3 = new Table();
+        table3.setSeats(3);
+        table3.setColumn(24);
+        table3.setRow(15);
+        table3.setNumber((long) 3);
+        table3.setUser(user3);
+        table3.setSection(section3);
+
+        tableDAO.create(table3);
+        assertEquals(1, tableDAO.find(table3).size());
+
+        // GIVEN
+        Table tableId1 = Table.withIdentity(table1.getSection(), table1.getNumber());
+        Table tableId2 = Table.withIdentity(table2.getSection(), table2.getNumber());
+        Table tableId3 = Table.withIdentity(table3.getSection(), table3.getNumber());
+        List<Table> tableIds = Arrays.asList(tableId1, tableId2, tableId3);
+
+        // WHEN
+        List<Table> result = tableDAO.populate(tableIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(table1));
+        assertTrue(result.contains(table2));
+        assertTrue(result.contains(table3));
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjectsOfDeletedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        Table table1 = new Table();
+        table1.setSeats(3);
+        table1.setColumn(14);
+        table1.setRow(5);
+        table1.setNumber((long) 1);
+        table1.setUser(user2);
+        table1.setSection(section3);
+
+        tableDAO.create(table1);
+        assertEquals(1, tableDAO.find(table1).size());
+        tableDAO.delete(table1);
+        assertEquals(0, tableDAO.find(table1).size());
+
+        Table table2 = new Table();
+        table2.setSeats(13);
+        table2.setColumn(14);
+        table2.setRow(15);
+        table2.setNumber((long) 1);
+        table2.setUser(user2);
+        table2.setSection(section2);
+
+        tableDAO.create(table2);
+        assertEquals(1, tableDAO.find(table2).size());
+        tableDAO.delete(table2);
+        assertEquals(0, tableDAO.find(table2).size());
+
+        Table table3 = new Table();
+        table3.setSeats(3);
+        table3.setColumn(24);
+        table3.setRow(15);
+        table3.setNumber((long) 3);
+        table3.setUser(user3);
+        table3.setSection(section3);
+
+        tableDAO.create(table3);
+        assertEquals(1, tableDAO.find(table3).size());
+        tableDAO.delete(table3);
+        assertEquals(0, tableDAO.find(table3).size());
+
+        // GIVEN
+        Table tableId1 = Table.withIdentity(table1.getSection(), table1.getNumber());
+        Table tableId2 = Table.withIdentity(table2.getSection(), table2.getNumber());
+        Table tableId3 = Table.withIdentity(table3.getSection(), table3.getNumber());
+        List<Table> tableIds = Arrays.asList(tableId1, tableId2, tableId3);
+
+        // WHEN
+        List<Table> result = tableDAO.populate(tableIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(table1));
+        assertTrue(result.contains(table2));
+        assertTrue(result.contains(table3));
+    }
+
+    @Test
+    public void testPopulate_nullListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<Table> result = tableDAO.populate(null);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testPopulate_emptyListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<Table> result = tableDAO.populate(Arrays.asList());
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithInvalidObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<Table> invalidTables = Arrays.asList(new Table());
+
+        // WHEN
+        List<Table> result = tableDAO.populate(invalidTables);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<Table> invalidTables = new ArrayList<>();
+        invalidTables.add(null);
+
+        // WHEN
+        List<Table> result = tableDAO.populate(invalidTables);
     }
 }
