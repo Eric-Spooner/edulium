@@ -80,7 +80,7 @@ public class DialogMenuEntryController implements Initializable{
             }
             textFieldName.setText(menuEntry.getName());
             textFieldPrice.setText(menuEntry.getPrice().toString());
-            textFieldDesription.setText(menuEntry.getDescription().toString());
+            textFieldDesription.setText(menuEntry.getDescription());
             checkAvailible.setSelected(menuEntry.getAvailable());
         }catch (Exception e){
             LOGGER.error("Init Menu Entry crashed " + e);
@@ -142,9 +142,15 @@ public class DialogMenuEntryController implements Initializable{
         menuEntry.setPrice(price);
         menuEntry.setCategory(dropMenuCategory.getSelectionModel().getSelectedItem());
         menuEntry.setTaxRate(dropTaxRate.getSelectionModel().getSelectedItem());
-        menuEntry.setName(textFieldName.getText());
-        menuEntry.setDescription(textFieldDesription.getText());
         menuEntry.setAvailable(checkAvailible.isSelected());
+        if(DialogMenuEntryController.dialogEnumeration == DialogEnumeration.SEARCH){
+            if(! textFieldDesription.getText().isEmpty()) menuEntry.setDescription(textFieldDesription.getText());
+            if(! textFieldName.getText().isEmpty()) menuEntry.setName(textFieldName.getText());
+        }else {
+            menuEntry.setName(textFieldName.getText());
+            menuEntry.setDescription(textFieldDesription.getText());
+        }
+
         try {
             switch (DialogMenuEntryController.dialogEnumeration){
                 case ADD:

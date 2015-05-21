@@ -161,6 +161,7 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
             stmt.setObject(7, category == null ? null : category.getIdentity());
 
             ResultSet result = stmt.executeQuery();
+            LOGGER.info(stmt.toString());
             while (result.next()) {
                 try {
                     objects.add(parseResult(result));
