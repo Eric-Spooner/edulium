@@ -16,6 +16,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
@@ -523,6 +524,20 @@ public class ManagerController implements Initializable {
             showMenus(menuService.getAllMenus());
         } catch (Exception e){
             LOGGER.error("Loading All Menu failed" + e);
+        }
+    }
+
+    public void buttonTableOverview(ActionEvent actionEvent) {
+        try {
+            LOGGER.info("Add TaxRate Button Click");
+            Stage stage = new Stage();
+            stage.setTitle("TablesOverview");
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/TablesOverview.fxml"));
+            Scene scene = new Scene(myPane);
+            stage.setScene(scene);
+            stage.showAndWait();
+        } catch (IOException e) {
+            LOGGER.error("Unable to Load Tables Overview" + e);
         }
     }
 }

@@ -25,20 +25,8 @@ public class Main extends Application {
         Authentication result = authenticationManager.authenticate(request);
         SecurityContextHolder.getContext().setAuthentication(result);
 
-        /*
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/gui/TablesOverview.fxml"));
-        fxmlLoader.setController(new Controller());
-        Parent root = (Parent)fxmlLoader.load();
-        Controller controller = fxmlLoader.<Controller>getController();
-        primaryStage.setTitle("TablesOverview");
-        primaryStage.setScene(new Scene(root));
-        primaryStage.show();
-        controller.setupListeners();
-        */
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/gui/Manager.fxml"));
-        //fxmlLoader.setController(new ManagerController());
         Parent root = (Parent)fxmlLoader.load();
-       // ManagerController managerController = fxmlLoader.<ManagerController>getController();
         primaryStage.setTitle("Manager View");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
