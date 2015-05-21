@@ -1,5 +1,9 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -42,11 +46,34 @@ public class Controller implements Initializable {
     @FXML
     private ScrollPane scrollPaneLeft;
     private int MARGIN = 20;
+    private int TABLE_SIZE = 40;
     private double scaleX = 1.0;
     private double scaleY = 1.0;
+    private static InteriorService interiorService;
+
+    public static void setInteriorService(InteriorService interiorService) {
+        Controller.interiorService = interiorService;
+    }
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
+        Section section1 = new Section();
+        section1.setIdentity((long)1);
+        section1.setName("Garten");
+        Table table1 = new Table();
+        table1.setSection(section1);
+        table1.setRow(1);
+        table1.setColumn(1);
+        table1.setNumber((long)1);
+        table1.setSeats(4);
+
+        try {
+            interiorService.addSection(section1);
+            interiorService.addTable(table1);
+        } catch (ServiceException e) {
+
+        }
+
         /*rooms = new ArrayList<Room>();
         Room room1 = new Room("Garten");
         room1.add(new Table(1, 20, 20, 40, 40));
@@ -84,17 +111,21 @@ public class Controller implements Initializable {
         tablesCanvas.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent t) {
-               /* int roomOffset = 0;
-                for (Room room : rooms) {
-                    if (t.getY() <= (roomOffset + room.getHeight() + MARGIN)*scaleY) {
-                        Table table = room.getTable((int)((t.getX())/scaleX) - MARGIN, (int) ((t.getY() - roomOffset)/scaleY) - MARGIN);
-                        if (table != null) {
-                            tableIdLabel.setText(String.valueOf(table.getId()));
+                int roomOffset = 0;
+                try {
+                    for (Section section : interiorService.getAllSections()) {
+                        if (t.getY() <= (roomOffset + getHeight(section) + MARGIN) * scaleY) {
+                            Table table = getTable(section, (int) ((t.getX()) / scaleX) - MARGIN, (int) ((t.getY() - roomOffset) / scaleY) - MARGIN);
+                            if (table != null) {
+                                tableIdLabel.setText(String.valueOf(table.getNumber()));
+                            }
+                            return;
                         }
-                        return;
+                        roomOffset += (getHeight(section) + 2 * MARGIN) * scaleY;
                     }
-                    roomOffset += (room.getHeight() + 2 * MARGIN)*scaleY;
-                }*/
+                } catch(ServiceException e) {
+
+                }
             }
         });
 
@@ -141,6 +172,41 @@ public class Controller implements Initializable {
 
     }
 
+    private int getHeight(Section section) throws ServiceException {
+        int max = -1;
+        Table matcher = new Table();
+        matcher.setSection(section);
+        for(Table table : interiorService.findTables(matcher)) {
+            if(table.getRow()*TABLE_SIZE+TABLE_SIZE > max) {
+                max = table.getRow()*TABLE_SIZE+TABLE_SIZE;
+            }
+        }
+        return max;
+    }
+
+    private int getWidth(Section section) throws ServiceException {
+        int max = -1;
+        Table matcher = new Table();
+        matcher.setSection(section);
+        for(Table table : interiorService.findTables(matcher)) {
+            if(table.getColumn()*TABLE_SIZE+TABLE_SIZE > max) {
+                max = table.getColumn()*TABLE_SIZE+TABLE_SIZE;
+            }
+        }
+        return max;
+    }
+
+    public Table getTable(Section section, int x, int y) throws ServiceException {
+        Table matcher = new Table();
+        matcher.setSection(section);
+        for(Table table : interiorService.findTables(matcher)) {
+            if(table.getColumn()*TABLE_SIZE <= x && table.getColumn()*TABLE_SIZE+TABLE_SIZE >= x
+                    &&table.getRow()*TABLE_SIZE <= y && table.getRow()*TABLE_SIZE+TABLE_SIZE >= y)
+                return table;
+        }
+        return null;
+    }
+
     private void drawCanvas() {
         tablesCanvas.setHeight(MARGIN);
         GraphicsContext gc = tablesCanvas.getGraphicsContext2D();
@@ -149,21 +215,27 @@ public class Controller implements Initializable {
         double scaleText = Math.min(scaleX, scaleY);
 
         int roomOffset = 0;
-        /*for(Room room : rooms) {
-            tablesCanvas.setHeight(tablesCanvas.getHeight()+(room.getHeight()+2*MARGIN)*scaleY);
-            gc.strokeRoundRect(MARGIN*scaleX, (roomOffset+MARGIN)*scaleY, (room.getWidth()+MARGIN)*scaleX, (room.getHeight()+MARGIN)*scaleY, 10, 10);
-            gc.setFont(new Font(gc.getFont().getName(), 20*scaleText));
-            gc.fillText(room.getName() + ":", MARGIN*scaleX, (roomOffset+MARGIN-2)*scaleY);
-            for(Table table : room.getTables()) {
-                gc.strokeRoundRect((table.getX() + MARGIN)*scaleX, (roomOffset + MARGIN + table.getY())*scaleY, table.getWidth()*scaleX, table.getHeight()*scaleY, 2, 2);
-                if(table.isOccupied()) {
+        try {
+            for (Section section : interiorService.getAllSections()) {
+                tablesCanvas.setHeight(tablesCanvas.getHeight() + (getHeight(section) + 2 * MARGIN) * scaleY);
+                gc.strokeRoundRect(MARGIN * scaleX, (roomOffset + MARGIN) * scaleY, (getWidth(section) + MARGIN) * scaleX, (getHeight(section) + MARGIN) * scaleY, 10, 10);
+                gc.setFont(new Font(gc.getFont().getName(), 20 * scaleText));
+                gc.fillText(section.getName() + ":", MARGIN * scaleX, (roomOffset + MARGIN - 2) * scaleY);
+                Table matcher = new Table();
+                matcher.setSection(section);
+                for (Table table : interiorService.findTables(matcher)) {
+                    gc.strokeRoundRect((table.getColumn()*TABLE_SIZE+ MARGIN) * scaleX, (roomOffset + MARGIN + table.getRow()*TABLE_SIZE) * scaleY, TABLE_SIZE * scaleX, TABLE_SIZE * scaleY, 2, 2);
+                /*if(table.isOccupied()) {
                     gc.setFill(Color.ORANGERED);
                     gc.fillRoundRect((table.getX() + MARGIN)*scaleX, (roomOffset + MARGIN + table.getY())*scaleY, table.getWidth()*scaleX, table.getHeight()*scaleY, 2, 2);
                     gc.setFill(Color.BLACK);
+                }*/
+                    gc.fillText(String.valueOf(table.getNumber()), (table.getColumn()*TABLE_SIZE + 1.5 * MARGIN) * scaleX, (table.getRow()*TABLE_SIZE + roomOffset + 2.5 * MARGIN) * scaleY);
                 }
-                gc.fillText(String.valueOf(table.getId()), (table.getX()+1.5*MARGIN)*scaleX, (table.getY()+roomOffset+2.5*MARGIN)*scaleY);
+                roomOffset += getHeight(section) + 2 * MARGIN;
             }
-            roomOffset += room.getHeight()+2*MARGIN;
-        }*/
+        } catch(ServiceException e) {
+
+        }
     }
 }

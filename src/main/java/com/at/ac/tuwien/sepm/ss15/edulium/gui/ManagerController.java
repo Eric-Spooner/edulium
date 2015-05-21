@@ -4,6 +4,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.TaxRateService;
@@ -11,6 +12,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
@@ -42,6 +44,7 @@ public class ManagerController implements Initializable {
 
     private MenuService menuService;
     private TaxRateService taxRateService;
+    private InteriorService interiorService;
 
     @FXML
     private TableView<TaxRate> tableViewTaxRate;
@@ -87,6 +90,7 @@ public class ManagerController implements Initializable {
             ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Service.xml");
             menuService = context.getBean("menuService", MenuService.class);
             taxRateService = context.getBean("taxRateService",  TaxRateService.class);
+            interiorService = context.getBean("interiorService", InteriorService.class);
 
             showTaxRate(taxRateService.getAllTaxRates());
             tableColTaxRateID.setCellValueFactory(new PropertyValueFactory<TaxRate, Long>("identity"));
@@ -536,6 +540,7 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Add TaxRate Button Click");
             Stage stage = new Stage();
+            Controller.setInteriorService(interiorService);
             stage.setTitle("TablesOverview");
             AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/TablesOverview.fxml"));
             Scene scene = new Scene(myPane);
