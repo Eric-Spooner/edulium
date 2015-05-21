@@ -10,10 +10,9 @@ import java.time.LocalDateTime;
 /**
  * Unit Test for the TestIntermittentSaleValidator validator
  */
-//TODO: complete
 public class TestIntermittentSaleValidator extends AbstractDomainTest {
     @Autowired
-    private Validator<IntermittentSale> saleValidator;
+    private Validator<IntermittentSale> intermittentSaleValidator;
 
     @Test
     public void testValidateForCreate_shouldAcceptIntermittentSale() throws ValidationException {
@@ -33,7 +32,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setSunday(false);
 
         // WHEN
-        saleValidator.validateForCreate(intermittentSale);
+        intermittentSaleValidator.validateForCreate(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -53,7 +52,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setSunday(false);
 
         // WHEN
-        saleValidator.validateForCreate(intermittentSale);
+        intermittentSaleValidator.validateForCreate(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -63,7 +62,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setIdentity(new Long(123));
 
         // WHEN
-        saleValidator.validateForCreate(intermittentSale);
+        intermittentSaleValidator.validateForCreate(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -74,7 +73,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setName("");
 
         // WHEN
-        saleValidator.validateForCreate(intermittentSale);
+        intermittentSaleValidator.validateForCreate(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -95,7 +94,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setSunday(false);
 
         // WHEN
-        saleValidator.validateForCreate(intermittentSale);
+        intermittentSaleValidator.validateForCreate(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -104,7 +103,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         IntermittentSale intermittentSale = null;
 
         // WHEN
-        saleValidator.validateForCreate(intermittentSale);
+        intermittentSaleValidator.validateForCreate(intermittentSale);
     }
 
     @Test
@@ -125,7 +124,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setSunday(false);
 
         // WHEN
-        saleValidator.validateForUpdate(intermittentSale);
+        intermittentSaleValidator.validateForUpdate(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -145,7 +144,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setSunday(false);
 
         // WHEN
-        saleValidator.validateForUpdate(intermittentSale);
+        intermittentSaleValidator.validateForUpdate(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -155,7 +154,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setIdentity(new Long(123));
 
         // WHEN
-        saleValidator.validateForUpdate(intermittentSale);
+        intermittentSaleValidator.validateForUpdate(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -166,7 +165,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setName("");
 
         // WHEN
-        saleValidator.validateForUpdate(intermittentSale);
+        intermittentSaleValidator.validateForUpdate(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -187,7 +186,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setSunday(false);
 
         // WHEN
-        saleValidator.validateForUpdate(intermittentSale);
+        intermittentSaleValidator.validateForUpdate(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -196,7 +195,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         IntermittentSale intermittentSale = null;
 
         // WHEN
-        saleValidator.validateForUpdate(intermittentSale);
+        intermittentSaleValidator.validateForUpdate(intermittentSale);
     }
 
     @Test
@@ -217,7 +216,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setSunday(false);
 
         // WHEN
-        saleValidator.validateForDelete(intermittentSale);
+        intermittentSaleValidator.validateForDelete(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -237,7 +236,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setSunday(false);
 
         // WHEN
-        saleValidator.validateForDelete(intermittentSale);
+        intermittentSaleValidator.validateForDelete(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -247,7 +246,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setIdentity(new Long(123));
 
         // WHEN
-        saleValidator.validateForDelete(intermittentSale);
+        intermittentSaleValidator.validateForDelete(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -258,7 +257,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setName("");
 
         // WHEN
-        saleValidator.validateForDelete(intermittentSale);
+        intermittentSaleValidator.validateForDelete(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -267,7 +266,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         IntermittentSale intermittentSale = null;
 
         // WHEN
-        saleValidator.validateForDelete(intermittentSale);
+        intermittentSaleValidator.validateForDelete(intermittentSale);
     }
 
 
@@ -290,7 +289,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
 
 
         // WHEN
-        saleValidator.validateIdentity(intermittentSale);
+        intermittentSaleValidator.validateIdentity(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -311,7 +310,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
 
 
         // WHEN
-        saleValidator.validateIdentity(intermittentSale);
+        intermittentSaleValidator.validateIdentity(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -321,7 +320,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setIdentity(new Long(123));
 
         // WHEN
-        saleValidator.validateIdentity(intermittentSale);
+        intermittentSaleValidator.validateIdentity(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -332,7 +331,7 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setName("");
 
         // WHEN
-        saleValidator.validateIdentity(intermittentSale);
+        intermittentSaleValidator.validateIdentity(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -352,9 +351,8 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setSaturday(false);
         intermittentSale.setSunday(false);
 
-
         // WHEN
-        saleValidator.validateIdentity(intermittentSale);
+        intermittentSaleValidator.validateIdentity(intermittentSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -363,6 +361,6 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         IntermittentSale intermittentSale = null;
 
         // WHEN
-        saleValidator.validateIdentity(intermittentSale);
+        intermittentSaleValidator.validateIdentity(intermittentSale);
     }
 }

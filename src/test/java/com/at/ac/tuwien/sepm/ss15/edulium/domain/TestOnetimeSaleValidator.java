@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  */
 public class TestOnetimeSaleValidator extends AbstractDomainTest {
     @Autowired
-    private Validator<OnetimeSale> saleValidator;
+    private Validator<OnetimeSale> onetimeSaleValidator;
 
     @Test
     public void testValidateForCreate_shouldAcceptOnetimeSale() throws ValidationException {
@@ -24,7 +24,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.now());
 
         // WHEN
-        saleValidator.validateForCreate(onetimeSale);
+        onetimeSaleValidator.validateForCreate(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -36,7 +36,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.now());
 
         // WHEN
-        saleValidator.validateForCreate(onetimeSale);
+        onetimeSaleValidator.validateForCreate(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -46,7 +46,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setIdentity(new Long(123));
 
         // WHEN
-        saleValidator.validateForCreate(onetimeSale);
+        onetimeSaleValidator.validateForCreate(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -57,7 +57,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setName("");
 
         // WHEN
-        saleValidator.validateForCreate(onetimeSale);
+        onetimeSaleValidator.validateForCreate(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -66,7 +66,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         OnetimeSale onetimeSale = null;
 
         // WHEN
-        saleValidator.validateForCreate(onetimeSale);
+        onetimeSaleValidator.validateForCreate(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -79,7 +79,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.parse("2015-05-03"));
 
         // WHEN
-        saleValidator.validateForCreate(onetimeSale);
+        onetimeSaleValidator.validateForCreate(onetimeSale);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.now());
 
         // WHEN
-        saleValidator.validateForUpdate(onetimeSale);
+        onetimeSaleValidator.validateForUpdate(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -104,7 +104,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.now());
 
         // WHEN
-        saleValidator.validateForUpdate(onetimeSale);
+        onetimeSaleValidator.validateForUpdate(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -114,7 +114,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setIdentity(new Long(123));
 
         // WHEN
-        saleValidator.validateForUpdate(onetimeSale);
+        onetimeSaleValidator.validateForUpdate(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -125,7 +125,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setName("");
 
         // WHEN
-        saleValidator.validateForUpdate(onetimeSale);
+        onetimeSaleValidator.validateForUpdate(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -134,7 +134,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         OnetimeSale onetimeSale = null;
 
         // WHEN
-        saleValidator.validateForUpdate(onetimeSale);
+        onetimeSaleValidator.validateForUpdate(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -147,7 +147,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.parse("2015-05-03"));
 
         // WHEN
-        saleValidator.validateForUpdate(onetimeSale);
+        onetimeSaleValidator.validateForUpdate(onetimeSale);
     }
 
     @Test
@@ -160,7 +160,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.now());
 
         // WHEN
-        saleValidator.validateForDelete(onetimeSale);
+        onetimeSaleValidator.validateForDelete(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -172,7 +172,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.now());
 
         // WHEN
-        saleValidator.validateForDelete(onetimeSale);
+        onetimeSaleValidator.validateForDelete(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -182,7 +182,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setIdentity(new Long(123));
 
         // WHEN
-        saleValidator.validateForDelete(onetimeSale);
+        onetimeSaleValidator.validateForDelete(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -193,7 +193,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setName("");
 
         // WHEN
-        saleValidator.validateForDelete(onetimeSale);
+        onetimeSaleValidator.validateForDelete(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -202,7 +202,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         OnetimeSale onetimeSale = null;
 
         // WHEN
-        saleValidator.validateForDelete(onetimeSale);
+        onetimeSaleValidator.validateForDelete(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -215,7 +215,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.parse("2015-05-03"));
 
         // WHEN
-        saleValidator.validateForDelete(onetimeSale);
+        onetimeSaleValidator.validateForDelete(onetimeSale);
     }
 
     @Test
@@ -228,7 +228,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.now());
 
         // WHEN
-        saleValidator.validateIdentity(onetimeSale);
+        onetimeSaleValidator.validateIdentity(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -240,7 +240,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.now());
 
         // WHEN
-        saleValidator.validateIdentity(onetimeSale);
+        onetimeSaleValidator.validateIdentity(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -250,7 +250,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setIdentity(new Long(123));
 
         // WHEN
-        saleValidator.validateIdentity(onetimeSale);
+        onetimeSaleValidator.validateIdentity(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -261,7 +261,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setName("");
 
         // WHEN
-        saleValidator.validateIdentity(onetimeSale);
+        onetimeSaleValidator.validateIdentity(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -270,7 +270,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         OnetimeSale onetimeSale = null;
 
         // WHEN
-        saleValidator.validateIdentity(onetimeSale);
+        onetimeSaleValidator.validateIdentity(onetimeSale);
     }
 
     @Test(expected = ValidationException.class)
@@ -283,6 +283,6 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.parse("2015-05-03"));
 
         // WHEN
-        saleValidator.validateIdentity(onetimeSale);
+        onetimeSaleValidator.validateIdentity(onetimeSale);
     }
 }
