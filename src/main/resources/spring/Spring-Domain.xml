@@ -15,5 +15,7 @@
     <import resource="domain/Spring-TaxRateValidator.xml" />
     <import resource="domain/Spring-ReservationValidator.xml" />
     <import resource="domain/Spring-MenuEntryValidator.xml" />
+    <import resource="domain/Spring-MenuValidator.xml" />
+    <import resource="domain/Spring-OrderValidator.xml" />
 
 </beans>
