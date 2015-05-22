@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.ManagerController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
