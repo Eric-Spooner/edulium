@@ -89,7 +89,7 @@ public class Controller implements Initializable {
         table3.setSeats(4);
 
         Section section2 = new Section();
-        section2.setIdentity((long)1);
+        section2.setIdentity((long)2);
         section2.setName("Bar");
         Table table4 = new Table();
         table4.setSection(section2);
@@ -99,16 +99,54 @@ public class Controller implements Initializable {
         table4.setSeats(4);
         Table table5 = new Table();
         table5.setSection(section2);
-        table5.setRow(0);
+        table5.setRow(5);
         table5.setColumn(5);
         table5.setNumber((long)5);
         table5.setSeats(4);
         Table table6 = new Table();
         table6.setSection(section2);
         table6.setRow(0);
-        table6.setColumn(30);
+        table6.setColumn(10);
         table6.setNumber((long)6);
         table6.setSeats(4);
+
+        Section section3 = new Section();
+        section3.setIdentity((long)3);
+        section3.setName("Saal");
+        Table table7 = new Table();
+        table7.setSection(section3);
+        table7.setRow(0);
+        table7.setColumn(0);
+        table7.setNumber((long)4);
+        table7.setSeats(4);
+        Table table8 = new Table();
+        table8.setSection(section3);
+        table8.setRow(5);
+        table8.setColumn(5);
+        table8.setNumber((long)5);
+        table8.setSeats(4);
+        Table table9 = new Table();
+        table9.setSection(section3);
+        table9.setRow(5);
+        table9.setColumn(10);
+        table9.setNumber((long)6);
+        table9.setSeats(4);
+
+        Section section4 = new Section();
+        section4.setIdentity((long) 4);
+        section4.setName("Gang");
+        Table table10 = new Table();
+        table10.setSection(section4);
+        table10.setRow(0);
+        table10.setColumn(0);
+        table10.setNumber((long)4);
+        table10.setSeats(4);
+        Table table11 = new Table();
+        table11.setSection(section4);
+        table11.setRow(5);
+        table11.setColumn(5);
+        table11.setNumber((long)5);
+        table11.setSeats(4);
 
         try {
             interiorService.addSection(section1);
@@ -119,8 +157,15 @@ public class Controller implements Initializable {
             interiorService.addTable(table4);
             interiorService.addTable(table5);
             interiorService.addTable(table6);
+            interiorService.addSection(section3);
+            interiorService.addTable(table7);
+            interiorService.addTable(table8);
+            interiorService.addTable(table9);
+            interiorService.addSection(section4);
+            interiorService.addTable(table10);
+            interiorService.addTable(table11);
         } catch (ServiceException e) {
-
+            //TODO alert
         }
 
         drawCanvas();
@@ -139,21 +184,6 @@ public class Controller implements Initializable {
                     }
 
                 }
-                /*int roomOffset = 0;
-                try {
-                    for (Section section : interiorService.getAllSections()) {
-                        if (t.getY() <= (roomOffset + getHeight(section) + MARGIN) * scaleY) {
-                            Table table = getTable(section, (int) ((t.getX()) / scaleX) - 2*MARGIN, (int) ((t.getY() - roomOffset) / scaleY) - 2*MARGIN);
-                            if (table != null) {
-                                tableIdLabel.setText(String.valueOf(table.getNumber()));
-                            }
-                            return;
-                        }
-                        roomOffset += (getHeight(section) + 2 * MARGIN) * scaleY;
-                    }
-                } catch(ServiceException e) {
-
-                }*/
             }
         });
 
@@ -273,6 +303,7 @@ public class Controller implements Initializable {
         double scaleText = scaleY;
         boolean firstSection = true;
         Section prevSection = null;
+        int rowHeight = 0;
         int x = CANVAS_PADDING;
         int y = CANVAS_PADDING;
         tablesCanvas.setWidth(anchorLeft.getWidth()-60);
@@ -284,11 +315,12 @@ public class Controller implements Initializable {
                 if(firstSection) {
                     firstSection = false;
                 } else {
-                    if(x+calculateWidth(prevSection)*scaleX+CANVAS_PADDING+calculateWidth(section)*scaleX < tablesCanvas.getWidth()) {
+                    if(x*scaleX+calculateWidth(prevSection)*scaleX+SECTION_PADDING*scaleX+CANVAS_PADDING+calculateWidth(section)*scaleX < tablesCanvas.getWidth()) {
                         x += calculateWidth(prevSection)+SECTION_PADDING*scaleX;
                     } else {
                         x = CANVAS_PADDING;
-                        y += calculateHeight(prevSection)+SECTION_OFFSET*scaleY;
+                        y += rowHeight+SECTION_OFFSET*scaleY;
+                        rowHeight = 0;
                     }
                 }
 
@@ -303,40 +335,11 @@ public class Controller implements Initializable {
                     rects.add(rect);
                     gc.fillText(String.valueOf(table.getNumber()), ((x+SECTION_PADDING)+(table.getColumn()*FACT)+TABLE_SIZE/4)*scaleX, ((y+SECTION_PADDING)+(table.getRow()*FACT)+TABLE_SIZE/1.5)*scaleY);
                 }
+                rowHeight = Math.max(rowHeight, calculateHeight(section));
                 prevSection = section;
             }
         } catch(ServiceException e) {
             //TODO Alert
         }
-
-        /*tablesCanvas.setHeight(MARGIN);
-        GraphicsContext gc = tablesCanvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, tablesCanvas.getWidth(), tablesCanvas.getHeight());
-
-        double scaleText = scaleY; //Math.min(scaleX, scaleY);
-
-        int roomOffset = 0;
-        try {
-            for (Section section : interiorService.getAllSections()) {
-                tablesCanvas.setHeight(tablesCanvas.getHeight() + (getHeight(section) + 2 * MARGIN) * scaleY);
-                gc.strokeRoundRect(MARGIN * scaleX, (roomOffset + MARGIN) * scaleY, (getWidth(section) + MARGIN) * scaleX, (getHeight(section) + MARGIN) * scaleY, 10, 10);
-                gc.setFont(new Font(gc.getFont().getName(), 20 * scaleText));
-                gc.fillText(section.getName() + ":", MARGIN * scaleX, (roomOffset + MARGIN - 2) * scaleY);
-                Table matcher = new Table();
-                matcher.setSection(section);
-                for (Table table : interiorService.findTables(matcher)) {
-                    gc.strokeRoundRect((table.getColumn()*TABLE_SIZE+2*MARGIN) * scaleX, (roomOffset + 2*MARGIN + table.getRow()*TABLE_SIZE) * scaleY, TABLE_SIZE * scaleX, TABLE_SIZE * scaleY, 2, 2);
-                if(table.isOccupied()) {
-                    gc.setFill(Color.ORANGERED);
-                    gc.fillRoundRect((table.getX() + MARGIN)*scaleX, (roomOffset + MARGIN + table.getY())*scaleY, table.getWidth()*scaleX, table.getHeight()*scaleY, 2, 2);
-                    gc.setFill(Color.BLACK);
-                }
-                    gc.fillText(String.valueOf(table.getNumber()), (table.getColumn()*TABLE_SIZE + 2.5 * MARGIN) * scaleX, (table.getRow()*TABLE_SIZE + roomOffset + 3.5 * MARGIN) * scaleY);
-                }
-                roomOffset += getHeight(section) + 2 * MARGIN;
-            }
-        } catch(ServiceException e) {
-
-        }*/
     }
 }
