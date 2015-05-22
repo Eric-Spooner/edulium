@@ -46,11 +46,13 @@ public class Controller implements Initializable {
     private AnchorPane anchorRight;
     @FXML
     private ScrollPane scrollPaneLeft;
-    //private int MARGIN = 20;
-    //private int TABLE_SIZE = 40;
+
+    private static InteriorService interiorService;
+
+    private ArrayList<Rect> rects = new ArrayList<Rect>();
     private double scaleX = 1.0;
     private double scaleY = 1.0;
-    private static InteriorService interiorService;
+
     private final int FACT = 10;
     private final int CANVAS_PADDING = 20;
     private final int TABLE_SIZE = 40;
@@ -121,43 +123,22 @@ public class Controller implements Initializable {
 
         }
 
-        /*rooms = new ArrayList<Room>();
-        Room room1 = new Room("Garten");
-        room1.add(new Table(1, 20, 20, 40, 40));
-        room1.add(new Table(2, 80, 20, 40, 40));
-        room1.add(new Table(3, 20, 80, 40, 40));
-        room1.add(new Table(4, 80, 80, 40, 40));
-        room1.add(new Table(5, 140, 20, 40, 40));
-        rooms.add(room1);
-        Room room2 = new Room("Bar");
-        room2.add(new Table(6, 20, 20, 40, 40));
-        room2.add(new Table(7, 80, 20, 40, 40));
-        room2.add(new Table(8, 140, 20, 40, 40));
-        room2.add(new Table(9, 140, 80, 40, 40));
-        room2.add(new Table(10, 200, 20, 40, 40));
-        room2.add(new Table(11, 140, 140, 40, 40));
-        rooms.add(room2);
-        Room room3 = new Room("Gang");
-        room3.add(new Table(12, 20, 20, 40, 40));
-        room3.add(new Table(13, 20, 80, 40, 40));
-        room3.add(new Table(14, 20, 140, 40, 40));
-        room3.add(new Table(15, 20, 200, 40, 40));
-        room3.add(new Table(16, 20, 260, 40, 40));
-        room3.add(new Table(17, 20, 320, 40, 40));
-        rooms.add(room3);
-
-        //Occupy random tables
-        room1.getTables().get(3).setOccupied(true);
-        room1.getTables().get(4).setOccupied(true);
-        room2.getTables().get(1).setOccupied(true);
-        room2.getTables().get(2).setOccupied(true);
-        room2.getTables().get(5).setOccupied(true);
-*/
         drawCanvas();
 
         tablesCanvas.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent t) {
+                for(Rect rect : rects) {
+                    try {
+                        Table clickedTable = rect.getTable(t.getX(), t.getY());
+                        if(clickedTable != null) {
+                            tableIdLabel.setText(String.valueOf(clickedTable.getNumber()));
+                        }
+                    } catch(ServiceException e) {
+                        //TODO alert
+                    }
+
+                }
                 /*int roomOffset = 0;
                 try {
                     for (Section section : interiorService.getAllSections()) {
@@ -221,41 +202,6 @@ public class Controller implements Initializable {
 
     }
 
-    /*private int getHeight(Section section) throws ServiceException {
-        int max = -1;
-        Table matcher = new Table();
-        matcher.setSection(section);
-        for(Table table : interiorService.findTables(matcher)) {
-            if(table.getRow()*TABLE_SIZE+TABLE_SIZE > max) {
-                max = table.getRow()*TABLE_SIZE+TABLE_SIZE;
-            }
-        }
-        return max;
-    }
-
-    private int getWidth(Section section) throws ServiceException {
-        int max = -1;
-        Table matcher = new Table();
-        matcher.setSection(section);
-        for(Table table : interiorService.findTables(matcher)) {
-            if(table.getColumn()*TABLE_SIZE+TABLE_SIZE > max) {
-                max = table.getColumn()*TABLE_SIZE+TABLE_SIZE;
-            }
-        }
-        return max;
-    }
-
-    public Table getTable(Section section, int x, int y) throws ServiceException {
-        Table matcher = new Table();
-        matcher.setSection(section);
-        for(Table table : interiorService.findTables(matcher)) {
-            if(table.getColumn()*TABLE_SIZE <= x && table.getColumn()*TABLE_SIZE+TABLE_SIZE >= x
-                    &&table.getRow()*TABLE_SIZE <= y && table.getRow()*TABLE_SIZE+TABLE_SIZE >= y)
-                return table;
-        }
-        return null;
-    }*/
-
     private int calculateWidth(Section section) throws ServiceException {
         int max = -1;
         Table matcher = new Table();
@@ -278,6 +224,48 @@ public class Controller implements Initializable {
             }
         }
         return max*FACT + TABLE_SIZE + 2*SECTION_PADDING;
+    }
+
+    private class Rect {
+        private double x, y, w, h;
+        private Section section;
+        private long number;
+
+        public Rect(double x, double y, double w, double h, Section section, long number) {
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.h = h;
+            this.section = section;
+            this.number = number;
+        }
+
+        public double getX() {
+            return x;
+        }
+
+        public double getY() {
+            return y;
+        }
+
+        public double getW() {
+            return w;
+        }
+
+        public double getH() {
+            return h;
+        }
+
+        public Table getTable(double x, double y) throws ServiceException {
+            if(x >= this.x && x <= this.x+this.w && y >= this.y && y <= this.y+this.h) {
+                Table matcher = new Table();
+                matcher.setNumber(number);
+                matcher.setSection(section);
+                return interiorService.findTables(matcher).get(0);
+            }
+
+            return null;
+        }
     }
 
     private void drawCanvas() {
@@ -310,7 +298,9 @@ public class Controller implements Initializable {
                 Table matcher = new Table();
                 matcher.setSection(section);
                 for (Table table : interiorService.findTables(matcher)) {
-                    gc.strokeRoundRect(((x+SECTION_PADDING)+(table.getColumn()*FACT))*scaleX, ((y+SECTION_PADDING)+(table.getRow()*FACT))*scaleY, TABLE_SIZE*scaleX, TABLE_SIZE*scaleY, 2, 2);
+                    Rect rect = new Rect(((x+SECTION_PADDING)+(table.getColumn()*FACT))*scaleX, ((y+SECTION_PADDING)+(table.getRow()*FACT))*scaleY, TABLE_SIZE*scaleX, TABLE_SIZE*scaleY, section, table.getNumber());
+                    gc.strokeRoundRect(rect.getX(), rect.getY(), rect.getW(), rect.getH(), 2, 2);
+                    rects.add(rect);
                     gc.fillText(String.valueOf(table.getNumber()), ((x+SECTION_PADDING)+(table.getColumn()*FACT)+TABLE_SIZE/4)*scaleX, ((y+SECTION_PADDING)+(table.getRow()*FACT)+TABLE_SIZE/1.5)*scaleY);
                 }
                 prevSection = section;
