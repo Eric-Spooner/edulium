@@ -315,7 +315,7 @@ public class Controller implements Initializable {
                 if(firstSection) {
                     firstSection = false;
                 } else {
-                    if(x*scaleX+calculateWidth(prevSection)*scaleX+SECTION_PADDING*scaleX+CANVAS_PADDING+calculateWidth(section)*scaleX < tablesCanvas.getWidth()) {
+                    if(x*scaleX+calculateWidth(prevSection)*scaleX+SECTION_PADDING*scaleX+CANVAS_PADDING*scaleX+calculateWidth(section)*scaleX < tablesCanvas.getWidth()) {
                         x += calculateWidth(prevSection)+SECTION_PADDING*scaleX;
                     } else {
                         x = CANVAS_PADDING;
@@ -324,6 +324,7 @@ public class Controller implements Initializable {
                     }
                 }
 
+                tablesCanvas.setHeight(y+calculateHeight(section)*scaleY+CANVAS_PADDING);
                 gc.strokeRoundRect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY, 10, 10);
                 gc.setFont(new Font(gc.getFont().getName(), 20 * scaleText));
                 gc.fillText(section.getName() + ":", x*scaleX, (y-TEXT_BORDER_BOTTOM)*scaleY);
