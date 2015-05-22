@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.canvas.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
@@ -31,7 +32,16 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#buttonTableOverview" text="Table Overview" />
+                        <Button layoutX="489.0" layoutY="332.0" mnemonicParsing="false" onAction="#buttonTableOverview" text="Table Overview" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+                        <ScrollPane fx:id="scrollPaneLeft" prefHeight="371.0" prefWidth="474.0" vbarPolicy="ALWAYS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="126.0" AnchorPane.topAnchor="0.0">
+                           <content>
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="370.0" prefWidth="472.0">
+                                 <children>
+                                    <Canvas fx:id="tablesCanvas" height="356.0" layoutX="14.0" layoutY="14.0" width="432.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="26.0" AnchorPane.topAnchor="14.0" />
+                                 </children>
+                              </AnchorPane>
+                           </content>
+                        </ScrollPane>
                      </children></AnchorPane>
             </content>
           </Tab>
