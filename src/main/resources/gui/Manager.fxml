@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.ManagerController">
+   <children>
+      <TabPane prefHeight="400.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <tabs>
+          <Tab text="Employees">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TableView layoutX="14.0" layoutY="14.0" prefHeight="343.0" prefWidth="451.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="14.0">
+                          <columns>
+                            <TableColumn fx:id="employeeId" prefWidth="138.0" text="ID" />
+                            <TableColumn fx:id="employeeName" prefWidth="190.0" text="Name" />
+                              <TableColumn fx:id="employeeRole" prefWidth="137.0" text="Role" />
+                          </columns>
+                        </TableView>
+                        <Button fx:id="buttonAdd" layoutX="534.0" layoutY="14.0" mnemonicParsing="false" onAction="#buttonEmployeesAddClicked" prefWidth="92.0" text="Add..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
+                        <Button fx:id="buttonUpdate" layoutX="494.0" layoutY="47.0" mnemonicParsing="false" onAction="#buttonEmployeesUpdateClicked" prefWidth="92.0" text="Update..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="49.0" />
+                        <Button fx:id="buttonSearch" layoutX="494.0" layoutY="89.0" mnemonicParsing="false" onAction="#buttonEmployeesSearchClicked" prefWidth="92.0" text="Search..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="84.0" />
+                        <Button fx:id="buttonRemove" layoutX="494.0" layoutY="130.0" mnemonicParsing="false" onAction="#buttonEmployeesRemoveClicked" prefWidth="92.0" text="Remove" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="119.0" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Rooms">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#buttonTableOverview" text="Table Overview" />
+                     </children></AnchorPane>
+            </content>
+          </Tab>
+            <Tab text="Menu">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="buttonMenuRemove" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuRemoveClicked" prefWidth="92.0" text="Remove" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="119.0" />
+                        <Button fx:id="buttonMenuSearch" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuSearchClicked" prefWidth="92.0" text="Search..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="84.0" />
+                        <Button fx:id="buttonMenuUpdate" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuUpdateClicked" prefWidth="92.0" text="Update..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="49.0" />
+                        <Button fx:id="buttonMenuAdd" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuAddClicked" prefWidth="92.0" text="Add..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
+                        <TableView fx:id="tableViewMenu" layoutX="14.0" layoutY="14.0" prefHeight="343.0" prefWidth="451.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="14.0">
+                           <columns>
+                              <TableColumn fx:id="tableColMenuId" prefWidth="95.0" text="ID" />
+                              <TableColumn fx:id="tableColMenuName" prefWidth="143.0" text="Name" />
+                              <TableColumn fx:id="tableColMenuEntries" prefWidth="227.0" text="Entries" />
+                           </columns>
+                        </TableView>
+                        <Button fx:id="buttonShowAll" layoutX="494.0" layoutY="156.0" mnemonicParsing="false" onAction="#buttonShowAllMenuClicked" prefWidth="92.0" text="Show All" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="154.0" />
+                     </children></AnchorPane>
+               </content>
+            </Tab>
+            <Tab text="Menu Entry">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="buttonMenuEntryRemove" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuEntryRemoveClicked" prefWidth="92.0" text="Remove" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="119.0" />
+                        <Button fx:id="buttonMenuEntrySearch" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuEntrySearchClicked" prefWidth="92.0" text="Search..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="84.0" />
+                        <Button fx:id="buttonMenuEntryUpdate" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuEntryUpdateClicked" prefWidth="92.0" text="Update..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="49.0" />
+                        <Button fx:id="buttonMenuEntryAdd" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuEntryAddClicked" prefWidth="92.0" text="Add..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
+                        <TableView fx:id="tableViewMenuEntry" layoutX="14.0" layoutY="14.0" prefHeight="343.0" prefWidth="451.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="14.0">
+                           <columns>
+                              <TableColumn fx:id="tableColMenuEntryId" prefWidth="40.0" text="ID" />
+                              <TableColumn fx:id="tableColMenuEntryName" prefWidth="94.0" text="Name" />
+                              <TableColumn fx:id="tableColMenuEntryPrice" prefWidth="92.0" text="Price" />
+                              <TableColumn fx:id="tableColMenuEntryCategory" prefWidth="144.0" text="Category" />
+                              <TableColumn fx:id="tableColMenuEntryTaxRate" prefWidth="95.0" text="TaxRate" />
+                           </columns>
+                        </TableView>
+                        <Button fx:id="buttonShowAllMenuEntry" layoutX="494.0" layoutY="157.0" mnemonicParsing="false" onAction="#buttonShowAllMenuEntryClicked" prefWidth="92.0" text="Show All" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="154.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+            <Tab text="Menu Category">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="buttonMenuCategoryRemove" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuCategoryRemoveClicked" prefWidth="92.0" text="Remove" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="119.0" />
+                        <Button fx:id="buttonMenuCategorySearch" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuCategorySearchClicked" prefWidth="92.0" text="Search..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="84.0" />
+                        <Button fx:id="buttonMenuCategoryUpdate" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuCategoryUpdateClicked" prefWidth="92.0" text="Update..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="49.0" />
+                        <Button fx:id="buttonMenuCategoryAdd" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuCategoryAddClicked" prefWidth="92.0" text="Add..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
+                        <TableView fx:id="tableViewMenuCategory" layoutX="14.0" layoutY="14.0" prefHeight="343.0" prefWidth="451.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="14.0">
+                           <columns>
+                              <TableColumn fx:id="tableColMenuCategoryID" prefWidth="59.0" text="ID" />
+                              <TableColumn fx:id="tableColMenuCategoryName" prefWidth="179.0" text="Name" />
+                           </columns>
+                        </TableView>
+                        <Button fx:id="buttonShowAllMenuCategory" mnemonicParsing="false" onAction="#buttonShowAllMenuCategoryClicked" prefWidth="92.0" text="Show All" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="154.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+            <Tab text="Tax Rate">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="buttonTaxRateRemove" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonTaxRateRemoveClicked" prefWidth="92.0" text="Remove" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="119.0" />
+                        <Button fx:id="buttonTaxRateSearch" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonTaxRateSearchClicked" prefWidth="92.0" text="Search..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="84.0" />
+                        <Button fx:id="buttonTaxRateUpdate" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonTaxRateUpdateClicked" prefWidth="92.0" text="Update..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="49.0" />
+                        <Button fx:id="buttonTaxRateAdd" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonTaxRateAddClicked" prefWidth="92.0" text="Add..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
+                        <TableView fx:id="tableViewTaxRate" layoutX="14.0" layoutY="14.0" prefHeight="343.0" prefWidth="451.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="14.0">
+                           <columns>
+                              <TableColumn fx:id="tableColTaxRateID" prefWidth="59.0" text="ID" />
+                              <TableColumn fx:id="tableColTaxRateValue" prefWidth="179.0" text="Value" />
+                           </columns>
+                        </TableView>
+                        <Button fx:id="buttonShowAllTaxRate" mnemonicParsing="false" onAction="#buttonShowAllTaxRateClicked" prefWidth="92.0" text="Show All" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="154.0" />
+                     </children>
+                  </AnchorPane>
+               </content>
+            </Tab>
+            <Tab text="Statistics">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</AnchorPane>
