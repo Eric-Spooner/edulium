@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.AddSectionController">
+   <children>
+      <ScrollPane layoutX="14.0" layoutY="14.0" prefHeight="576.0" prefWidth="663.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="124.0" AnchorPane.topAnchor="14.0">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Canvas fx:id="canvas" height="576.0" width="662.0" />
+               </children></AnchorPane>
+        </content>
+      </ScrollPane>
+      <Button layoutX="696.0" layoutY="91.0" mnemonicParsing="false" onAction="#addTableButtonClicked" prefHeight="25.0" prefWidth="103.0" text="Add Table..." AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="91.0" />
+      <TextField fx:id="seatsTF" layoutX="745.0" layoutY="53.0" prefHeight="25.0" prefWidth="47.0" />
+      <Label layoutX="686.0" layoutY="57.0" text="Seats:" />
+      <Label layoutX="686.0" layoutY="21.0" text="Number:" />
+      <TextField fx:id="numberTF" layoutX="745.0" layoutY="17.0" prefHeight="25.0" prefWidth="47.0" />
+      <Label layoutX="688.0" layoutY="505.0" text="Section name:" />
+      <TextField fx:id="nameTF" layoutX="688.0" layoutY="522.0" prefHeight="25.0" prefWidth="103.0" />
+      <Button layoutX="691.0" layoutY="555.0" mnemonicParsing="false" onAction="#createButtonClicked" prefHeight="25.0" prefWidth="103.0" text="Create" AnchorPane.rightAnchor="9.0" />
+   </children>
+</AnchorPane>

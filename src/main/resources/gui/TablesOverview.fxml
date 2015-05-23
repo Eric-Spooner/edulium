@@ -21,7 +21,7 @@
                   </Button>
                   <ScrollPane fx:id="scrollPaneLeft" layoutY="66.0" prefHeight="532.0" prefWidth="550.0" vbarPolicy="ALWAYS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="66.0">
                     <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="532.0" prefWidth="551.0">
+                      <AnchorPane fx:id="tableAnchor" minHeight="0.0" minWidth="0.0" prefHeight="532.0" prefWidth="551.0">
                            <children>
                               <Canvas fx:id="tablesCanvas" height="516.0" width="502.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="35.0" AnchorPane.topAnchor="65.0" />
                            </children>
