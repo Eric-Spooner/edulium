@@ -247,6 +247,10 @@ public class ManagerController implements Initializable {
                         if(clickedTable != null) {
                             System.out.println((String.valueOf(clickedTable.getNumber()) + " clicked"));
                         }
+                        Section clickedSection = rect.getSection(t.getX(), t.getY());
+                        if(clickedSection != null) {
+                            System.out.println((String.valueOf(clickedSection.getName()) + " clicked"));
+                        }
                     } catch(ServiceException e) {
                         showErrorDialog("Error", "Error", e.getMessage());
                     }
@@ -706,7 +710,6 @@ public class ManagerController implements Initializable {
                 scaleX = newSceneWidth.doubleValue()/550.0;
                 scaleX = Math.min(scaleX, 2.0);
                 scaleX = Math.max(scaleX, 0.5);
-                System.out.println(scaleX);
                 drawCanvas();
             }
         });
@@ -781,14 +784,19 @@ public class ManagerController implements Initializable {
 
                 tablesCanvas.setHeight(y+calculateHeight(section)*scaleY+CANVAS_PADDING);
                 gc.strokeRoundRect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY, 10, 10);
+                Rect rectSection = new Rect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY, interiorService);
+                rectSection.setIdentity(section.getIdentity());
+                rects.add(rectSection);
                 gc.setFont(new Font(gc.getFont().getName(), 20 * scaleText));
                 gc.fillText(section.getName() + ":", x*scaleX, (y-TEXT_BORDER_BOTTOM)*scaleY);
                 Table matcher = new Table();
                 matcher.setSection(section);
                 for (Table table : interiorService.findTables(matcher)) {
-                    Rect rect = new Rect(((x+SECTION_PADDING)+(table.getColumn()*FACT))*scaleX, ((y+SECTION_PADDING)+(table.getRow()*FACT))*scaleY, TABLE_SIZE*scaleX, TABLE_SIZE*scaleY, section, table.getNumber(), interiorService);
-                    gc.strokeRoundRect(rect.getX(), rect.getY(), rect.getW(), rect.getH(), 2, 2);
-                    rects.add(rect);
+                    Rect rectTable = new Rect(((x+SECTION_PADDING)+(table.getColumn()*FACT))*scaleX, ((y+SECTION_PADDING)+(table.getRow()*FACT))*scaleY, TABLE_SIZE*scaleX, TABLE_SIZE*scaleY, interiorService);
+                    rectTable.setNumber(table.getNumber());
+                    rectTable.setSection(section);
+                    gc.strokeRoundRect(rectTable.getX(), rectTable.getY(), rectTable.getW(), rectTable.getH(), 2, 2);
+                    rects.add(rectTable);
                     gc.fillText(String.valueOf(table.getNumber()), ((x+SECTION_PADDING)+(table.getColumn()*FACT)+TABLE_SIZE/4)*scaleX, ((y+SECTION_PADDING)+(table.getRow()*FACT)+TABLE_SIZE/1.5)*scaleY);
                 }
                 rowHeight = Math.max(rowHeight, calculateHeight(section));
