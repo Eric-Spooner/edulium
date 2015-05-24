@@ -24,6 +24,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
@@ -97,6 +98,7 @@ public class ManagerController implements Initializable {
     private ArrayList<Rect> rects = new ArrayList<Rect>();
     private double scaleX = 1.0;
     private double scaleY = 1.0;
+    private long clickedSectionId = -1;
 
     private final int FACT = 10;
     private final int CANVAS_PADDING = 20;
@@ -241,6 +243,7 @@ public class ManagerController implements Initializable {
         tablesCanvas.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent t) {
+                boolean noSectionClicked = true;
                 for(Rect rect : rects) {
                     try {
                         Table clickedTable = rect.getTable(t.getX(), t.getY());
@@ -249,13 +252,17 @@ public class ManagerController implements Initializable {
                         }
                         Section clickedSection = rect.getSection(t.getX(), t.getY());
                         if(clickedSection != null) {
-                            System.out.println((String.valueOf(clickedSection.getName()) + " clicked"));
+                            noSectionClicked = false;
+                            clickedSectionId = clickedSection.getIdentity();
+                            System.out.println((String.valueOf(clickedSection.getName()) + " clicked" + clickedSection.getIdentity()));
                         }
                     } catch(ServiceException e) {
                         showErrorDialog("Error", "Error", e.getMessage());
                     }
-
                 }
+                if(noSectionClicked)
+                    clickedSectionId = -1;
+                drawCanvas();
             }
         });
 
@@ -783,7 +790,10 @@ public class ManagerController implements Initializable {
                 }
 
                 tablesCanvas.setHeight(y+calculateHeight(section)*scaleY+CANVAS_PADDING);
+                if(section.getIdentity().equals(Long.valueOf(clickedSectionId)))
+                    gc.setStroke(Color.RED);
                 gc.strokeRoundRect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY, 10, 10);
+                gc.setStroke(Color.BLACK);
                 Rect rectSection = new Rect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY, interiorService);
                 rectSection.setIdentity(section.getIdentity());
                 rects.add(rectSection);
