@@ -18,7 +18,7 @@
                </children></AnchorPane>
         </content>
       </ScrollPane>
-      <Button layoutX="696.0" layoutY="91.0" mnemonicParsing="false" onAction="#addTableButtonClicked" prefHeight="25.0" prefWidth="103.0" text="Add Table..." AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="91.0" />
+      <Button layoutX="696.0" layoutY="91.0" mnemonicParsing="false" onAction="#addTableButtonClicked" prefHeight="25.0" prefWidth="103.0" text="Add Table" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="91.0" />
       <TextField fx:id="seatsTF" layoutX="745.0" layoutY="53.0" prefHeight="25.0" prefWidth="47.0" AnchorPane.rightAnchor="8.0" AnchorPane.topAnchor="53.0" />
       <Label layoutX="686.0" layoutY="57.0" text="Seats:" AnchorPane.rightAnchor="83.0" AnchorPane.topAnchor="57.0" />
       <Label layoutX="686.0" layoutY="21.0" text="Number:" AnchorPane.rightAnchor="67.0" AnchorPane.topAnchor="21.0" />
@@ -28,5 +28,6 @@
       <Button layoutX="691.0" layoutY="555.0" mnemonicParsing="false" onAction="#createButtonClicked" prefHeight="25.0" prefWidth="103.0" text="Create" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="9.0" />
       <Button layoutX="688.0" layoutY="124.0" mnemonicParsing="false" onAction="#moveTableButtonClicked" prefHeight="25.0" prefWidth="103.0" text="Move Table" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="124.0" />
       <Button layoutX="688.0" layoutY="162.0" mnemonicParsing="false" onAction="#removeTableButtonClicked" prefHeight="25.0" prefWidth="103.0" text="Remove Table" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="157.0" />
+      <Button layoutX="688.0" layoutY="195.0" mnemonicParsing="false" onAction="#updateTableButtonClicked" prefHeight="25.0" prefWidth="103.0" text="Update Table" AnchorPane.rightAnchor="9.0" AnchorPane.topAnchor="190.0" />
    </children>
 </AnchorPane>

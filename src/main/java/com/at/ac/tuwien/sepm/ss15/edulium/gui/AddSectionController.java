@@ -50,6 +50,7 @@ public class AddSectionController implements Initializable {
     private boolean createTable = false;
     private boolean moveTable = false;
     private boolean removeTable = false;
+    private boolean updateTable = false;
     private final int FACT = 10;
     private final int CANVAS_PADDING = 20;
     private final int TABLE_SIZE = 40;
@@ -123,6 +124,18 @@ public class AddSectionController implements Initializable {
                     if(deleteRect != null)
                         rects.remove(deleteRect);
                     drawCanvas();
+                } else if(updateTable) {
+                    try {
+                        Stage stage = new Stage();
+                        UpdateTableController.setThisStage(stage);
+                        stage.setTitle("");
+                        AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/UpdateTable.fxml"));
+                        Scene scene = new Scene(myPane);
+                        stage.setScene(scene);
+                        stage.showAndWait();
+                    } catch (IOException e) {
+                        LOGGER.error("Unable to Load Update table" + e);
+                    }
                 }
             }
         });
@@ -179,6 +192,7 @@ public class AddSectionController implements Initializable {
         createTable = true;
         moveTable = false;
         removeTable = false;
+        updateTable = false;
     }
 
     public void moveTableButtonClicked(ActionEvent event) {
@@ -186,11 +200,21 @@ public class AddSectionController implements Initializable {
         moveTable = true;
         createTable = false;
         removeTable = false;
+        updateTable = false;
     }
 
     public void removeTableButtonClicked(ActionEvent event) {
         drawCanvas();
         removeTable = true;
+        moveTable = false;
+        createTable = false;
+        updateTable = false;
+    }
+
+    public void updateTableButtonClicked(ActionEvent event) {
+        drawCanvas();
+        updateTable = true;
+        removeTable = false;
         moveTable = false;
         createTable = false;
     }
