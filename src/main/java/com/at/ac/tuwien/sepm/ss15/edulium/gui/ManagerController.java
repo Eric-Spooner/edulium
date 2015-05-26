@@ -706,8 +706,12 @@ public class ManagerController implements Initializable {
             stage.setScene(scene);
             stage.showAndWait();
         } catch (IOException e) {
-            LOGGER.error("Unable to Load Tables Overview" + e);
+            LOGGER.error("Unable to Load Add Section" + e);
         }
+    }
+
+    public void buttonEditSectionClicked(ActionEvent actionEvent) {
+
     }
 
     public void setupListeners() {
@@ -789,7 +793,7 @@ public class ManagerController implements Initializable {
                     }
                 }
 
-                tablesCanvas.setHeight(y+calculateHeight(section)*scaleY+CANVAS_PADDING);
+                tablesCanvas.setHeight(y + calculateHeight(section)*scaleY+CANVAS_PADDING);
                 if(section.getIdentity().equals(Long.valueOf(clickedSectionId)))
                     gc.setStroke(Color.RED);
                 gc.strokeRoundRect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY, 10, 10);

@@ -42,6 +42,7 @@
                               </AnchorPane>
                            </content>
                         </ScrollPane>
+                        <Button layoutX="498.0" layoutY="51.0" mnemonicParsing="false" onAction="#buttonEditSectionClicked" prefHeight="25.0" prefWidth="89.0" text="Edit Section..." AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="51.0" />
                      </children></AnchorPane>
             </content>
           </Tab>

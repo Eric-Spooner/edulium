@@ -94,7 +94,7 @@ public class AddSectionController implements Initializable {
                         alert.showAndWait();
                     } else {
                         GraphicsContext gc = canvas.getGraphicsContext2D();
-                        Rect rect = new Rect(((((int) t.getX()) - TABLE_SIZE / 2) / FACT) * FACT, ((((int) t.getY()) - TABLE_SIZE / 2) / FACT) * FACT, TABLE_SIZE, TABLE_SIZE, interiorService);
+                        Rect rect = new Rect(Math.max(((((int) t.getX()) - TABLE_SIZE / 2) / FACT) * FACT, 0), Math.max(((((int) t.getY()) - TABLE_SIZE / 2) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
                         rect.setNumber(Long.valueOf(numberTF.getText()));
                         rect.setSeats(Integer.valueOf(seatsTF.getText()));
                         gc.strokeRoundRect(rect.getX(), rect.getY(), rect.getW(), rect.getH(), 2, 2);
@@ -122,7 +122,7 @@ public class AddSectionController implements Initializable {
                     drawCanvas();
                     GraphicsContext gc = canvas.getGraphicsContext2D();
                     gc.setStroke(Color.GRAY);
-                    gc.strokeRoundRect(((((int)t.getX())-TABLE_SIZE/2)/FACT)*FACT, ((((int)t.getY())-TABLE_SIZE/2)/FACT)*FACT, TABLE_SIZE, TABLE_SIZE, 2, 2);
+                    gc.strokeRoundRect(Math.max(((((int)t.getX())-TABLE_SIZE/2)/FACT)*FACT, 0), Math.max(((((int)t.getY())-TABLE_SIZE/2)/FACT)*FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
                     gc.setStroke(Color.BLACK);
                 }
             }
@@ -138,11 +138,13 @@ public class AddSectionController implements Initializable {
                         }
                     }
 
-                    Rect movedRect = new Rect(((((int) t.getX()) - TABLE_SIZE / 2) / FACT) * FACT, ((((int) t.getY()) - TABLE_SIZE / 2) / FACT) * FACT, TABLE_SIZE, TABLE_SIZE, interiorService);
-                    movedRect.setNumber(movingRect.getNumber());
-                    rects.remove(movingRect);
-                    rects.add(movedRect);
-                    drawCanvas();
+                    if(movingRect != null) {
+                        Rect movedRect = new Rect(Math.max(((((int) t.getX()) - TABLE_SIZE / 2) / FACT) * FACT, 0), Math.max(((((int) t.getY()) - TABLE_SIZE / 2) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
+                        movedRect.setNumber(movingRect.getNumber());
+                        rects.remove(movingRect);
+                        rects.add(movedRect);
+                        drawCanvas();
+                    }
                 }
             }
         });
@@ -161,18 +163,21 @@ public class AddSectionController implements Initializable {
     }
 
     public void addTableButtonClicked(ActionEvent event) {
+        drawCanvas();
         createTable = true;
         moveTable = false;
         removeTable = false;
     }
 
     public void moveTableButtonClicked(ActionEvent event) {
+        drawCanvas();
         moveTable = true;
         createTable = false;
         removeTable = false;
     }
 
     public void removeTableButtonClicked(ActionEvent event) {
+        drawCanvas();
         removeTable = true;
         moveTable = false;
         createTable = false;
