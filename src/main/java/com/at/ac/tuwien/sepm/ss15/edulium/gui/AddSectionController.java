@@ -93,13 +93,25 @@ public class AddSectionController implements Initializable {
                         alert.setContentText("Please insert the number of seats for the table!");
                         alert.showAndWait();
                     } else {
+                        boolean intersectsWithExistingTable = false;
+
                         GraphicsContext gc = canvas.getGraphicsContext2D();
                         Rect rect = new Rect(Math.max(((((int) t.getX()) - TABLE_SIZE / 2) / FACT) * FACT, 0), Math.max(((((int) t.getY()) - TABLE_SIZE / 2) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
-                        rect.setNumber(Long.valueOf(numberTF.getText()));
-                        rect.setSeats(Integer.valueOf(seatsTF.getText()));
-                        gc.strokeRoundRect(rect.getX(), rect.getY(), rect.getW(), rect.getH(), 2, 2);
-                        numberTF.setText(String.valueOf(Integer.valueOf(numberTF.getText()) + 1));
-                        rects.add(rect);
+                        for (Rect iteratingRect : rects) {
+                            if (iteratingRect.getRect(rect.getX()+1, rect.getY()+1) != null ||
+                                    iteratingRect.getRect(rect.getX()+TABLE_SIZE-1, rect.getY()+1) != null ||
+                                    iteratingRect.getRect(rect.getX()+1, rect.getY()+TABLE_SIZE-1) != null ||
+                                    iteratingRect.getRect(rect.getX()+TABLE_SIZE-1, rect.getY()+TABLE_SIZE-1) != null) {
+                                intersectsWithExistingTable = true;
+                            }
+                        }
+                        if(!intersectsWithExistingTable) {
+                            rect.setNumber(Long.valueOf(numberTF.getText()));
+                            rect.setSeats(Integer.valueOf(seatsTF.getText()));
+                            gc.strokeRoundRect(rect.getX(), rect.getY(), rect.getW(), rect.getH(), 2, 2);
+                            numberTF.setText(String.valueOf(Integer.valueOf(numberTF.getText()) + 1));
+                            rects.add(rect);
+                        }
                     }
                 } else if(removeTable) {
                     Rect deleteRect = null;
