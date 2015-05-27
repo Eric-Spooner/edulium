@@ -80,73 +80,81 @@ public class AddSectionController implements Initializable {
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent t) {
-                if(createTable) {
-                    if(numberTF.getText().isEmpty()) {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Error");
-                        alert.setHeaderText("Number missing");
-                        alert.setContentText("Please insert a number for the table!");
-                        alert.showAndWait();
-                    } else if(seatsTF.getText().isEmpty()) {
-                        Alert alert = new Alert(Alert.AlertType.ERROR);
-                        alert.setTitle("Error");
-                        alert.setHeaderText("Seats missing");
-                        alert.setContentText("Please insert the number of seats for the table!");
-                        alert.showAndWait();
-                    } else {
-                        boolean intersectsWithExistingTable = false;
-                        GraphicsContext gc = canvas.getGraphicsContext2D();
+                try {
+                    if (createTable) {
+                        if (numberTF.getText().isEmpty()) {
+                            showErrorDialog("Error", "Number missing", "Please insert a number for the table!");
+                        } else if (Long.valueOf(numberTF.getText()) < 1) {
+                            showErrorDialog("Error", "Number invalid", "The table number must be >= 1!");
+                        } else if (seatsTF.getText().isEmpty()) {
+                            showErrorDialog("Error", "Seats missing", "Please insert the number of seats for the table!");
+                        } else if (Integer.valueOf(seatsTF.getText()) < 0) {
+                            showErrorDialog("Error", "Seats invalid", "The number of seats must be >= 0!");
+                        } else {
+                            boolean intersectsWithExistingTable = false;
+                            GraphicsContext gc = canvas.getGraphicsContext2D();
 
-                        for (Rect iteratingRect : rects) {
-                            if(iteratingRect.getNumber() == Long.valueOf(numberTF.getText())) {
-                                Alert alert = new Alert(Alert.AlertType.ERROR);
-                                alert.setTitle("Error");
-                                alert.setHeaderText("Number already used");
-                                alert.setContentText("The table number is already used in this section!");
-                                alert.showAndWait();
-                                return;
+                            for (Rect iteratingRect : rects) {
+                                if (iteratingRect.getNumber() == Long.valueOf(numberTF.getText())) {
+                                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                                    alert.setTitle("Error");
+                                    alert.setHeaderText("Number already used");
+                                    alert.setContentText("The table number is already used in this section!");
+                                    alert.showAndWait();
+                                    return;
+                                }
+                            }
+
+                            Rect rect = new Rect(Math.max(((((int) t.getX()) - TABLE_SIZE / 2) / FACT) * FACT, 0), Math.max(((((int) t.getY()) - TABLE_SIZE / 2) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
+                            for (Rect iteratingRect : rects) {
+                                if (iteratingRect.getRect(rect.getX() + 1, rect.getY() + 1) != null ||
+                                        iteratingRect.getRect(rect.getX() + TABLE_SIZE - 1, rect.getY() + 1) != null ||
+                                        iteratingRect.getRect(rect.getX() + 1, rect.getY() + TABLE_SIZE - 1) != null ||
+                                        iteratingRect.getRect(rect.getX() + TABLE_SIZE - 1, rect.getY() + TABLE_SIZE - 1) != null) {
+                                    intersectsWithExistingTable = true;
+                                }
+                            }
+                            if (!intersectsWithExistingTable) {
+                                rect.setNumber(Long.valueOf(numberTF.getText()));
+                                rect.setSeats(Integer.valueOf(seatsTF.getText()));
+                                gc.strokeRoundRect(rect.getX(), rect.getY(), rect.getW(), rect.getH(), 2, 2);
+                                numberTF.setText(String.valueOf(Integer.valueOf(numberTF.getText()) + 1));
+                                rects.add(rect);
                             }
                         }
-
-                        Rect rect = new Rect(Math.max(((((int) t.getX()) - TABLE_SIZE / 2) / FACT) * FACT, 0), Math.max(((((int) t.getY()) - TABLE_SIZE / 2) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
-                        for (Rect iteratingRect : rects) {
-                            if (iteratingRect.getRect(rect.getX()+1, rect.getY()+1) != null ||
-                                    iteratingRect.getRect(rect.getX()+TABLE_SIZE-1, rect.getY()+1) != null ||
-                                    iteratingRect.getRect(rect.getX()+1, rect.getY()+TABLE_SIZE-1) != null ||
-                                    iteratingRect.getRect(rect.getX()+TABLE_SIZE-1, rect.getY()+TABLE_SIZE-1) != null) {
-                                intersectsWithExistingTable = true;
+                    } else if (removeTable) {
+                        Rect deleteRect = null;
+                        for (Rect rect : rects) {
+                            if (rect.getRect(t.getX(), t.getY()) != null) {
+                                deleteRect = rect;
                             }
                         }
-                        if(!intersectsWithExistingTable) {
-                            rect.setNumber(Long.valueOf(numberTF.getText()));
-                            rect.setSeats(Integer.valueOf(seatsTF.getText()));
-                            gc.strokeRoundRect(rect.getX(), rect.getY(), rect.getW(), rect.getH(), 2, 2);
-                            numberTF.setText(String.valueOf(Integer.valueOf(numberTF.getText()) + 1));
-                            rects.add(rect);
+                        if (deleteRect != null)
+                            rects.remove(deleteRect);
+                        drawCanvas();
+                    } else if (updateTable) {
+                        for (Rect rect : rects) {
+                            if (rect.getRect(t.getX(), t.getY()) != null) {
+                                try {
+                                    Stage stage = new Stage();
+                                    UpdateTableController.setThisStage(stage);
+                                    UpdateTableController.setRects(rects);
+                                    UpdateTableController.setClickedRect(rect);
+                                    UpdateTableController.setInteriorService(interiorService);
+                                    UpdateTableController.setUpdateCanvas(new UpdateCanvas());
+                                    stage.setTitle("");
+                                    AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/UpdateTable.fxml"));
+                                    Scene scene = new Scene(myPane);
+                                    stage.setScene(scene);
+                                    stage.showAndWait();
+                                } catch (IOException e) {
+                                    LOGGER.error("Unable to Load Update table" + e);
+                                }
+                            }
                         }
                     }
-                } else if(removeTable) {
-                    Rect deleteRect = null;
-                    for (Rect rect : rects) {
-                        if (rect.getRect(t.getX(), t.getY()) != null) {
-                            deleteRect = rect;
-                        }
-                    }
-                    if(deleteRect != null)
-                        rects.remove(deleteRect);
-                    drawCanvas();
-                } else if(updateTable) {
-                    try {
-                        Stage stage = new Stage();
-                        UpdateTableController.setThisStage(stage);
-                        stage.setTitle("");
-                        AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/UpdateTable.fxml"));
-                        Scene scene = new Scene(myPane);
-                        stage.setScene(scene);
-                        stage.showAndWait();
-                    } catch (IOException e) {
-                        LOGGER.error("Unable to Load Update table" + e);
-                    }
+                } catch(NumberFormatException e) {
+                    showErrorDialog("Error", "Invalid value", "Only valid numbers are allowed!");
                 }
             }
         });
@@ -232,11 +240,7 @@ public class AddSectionController implements Initializable {
 
     public void createButtonClicked(ActionEvent event) {
         if(nameTF.getText().isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Name missing");
-            alert.setContentText("Please insert a name for the section!");
-            alert.showAndWait();
+            showErrorDialog("Error", "Name missing", "Please insert a name for the section!");
         } else {
             try {
                 Section section = new Section();
@@ -255,11 +259,7 @@ public class AddSectionController implements Initializable {
                 updateCanvas.update();
                 thisStage.close();
             } catch(ServiceException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Error");
-                alert.setContentText(e.getMessage());
-                alert.showAndWait();
+                showErrorDialog("Error", "Database problem", "Could not access database!");
             }
         }
     }
@@ -272,5 +272,21 @@ public class AddSectionController implements Initializable {
             gc.strokeRoundRect(rect.getX(), rect.getY(), rect.getW(), rect.getH(), 2, 2);
             gc.fillText(String.valueOf(rect.getNumber()), rect.getX()+TABLE_SIZE/4, rect.getY()+TABLE_SIZE/1.5);
         }
+    }
+
+    //TODO think of a better solution
+    public class UpdateCanvas {
+        public void update() {
+            drawCanvas();
+        }
+    }
+
+    public static void showErrorDialog(String title, String head, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(head);
+        alert.setContentText(content);
+
+        alert.showAndWait();
     }
 }
