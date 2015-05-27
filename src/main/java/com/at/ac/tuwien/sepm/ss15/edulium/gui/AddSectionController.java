@@ -95,8 +95,19 @@ public class AddSectionController implements Initializable {
                         alert.showAndWait();
                     } else {
                         boolean intersectsWithExistingTable = false;
-
                         GraphicsContext gc = canvas.getGraphicsContext2D();
+
+                        for (Rect iteratingRect : rects) {
+                            if(iteratingRect.getNumber() == Long.valueOf(numberTF.getText())) {
+                                Alert alert = new Alert(Alert.AlertType.ERROR);
+                                alert.setTitle("Error");
+                                alert.setHeaderText("Number already used");
+                                alert.setContentText("The table number is already used in this section!");
+                                alert.showAndWait();
+                                return;
+                            }
+                        }
+
                         Rect rect = new Rect(Math.max(((((int) t.getX()) - TABLE_SIZE / 2) / FACT) * FACT, 0), Math.max(((((int) t.getY()) - TABLE_SIZE / 2) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
                         for (Rect iteratingRect : rects) {
                             if (iteratingRect.getRect(rect.getX()+1, rect.getY()+1) != null ||
