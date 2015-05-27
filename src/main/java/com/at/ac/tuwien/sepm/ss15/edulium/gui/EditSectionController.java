@@ -1,13 +1,9 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.TaxRateService;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -16,36 +12,28 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
 
-import javax.xml.soap.Text;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.ResourceBundle;
-
-import static javafx.collections.FXCollections.observableArrayList;
 
 /**
  * Controller used for the Manager View
  */
 @Component
-public class AddSectionController implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(AddSectionController.class);
+public class EditSectionController implements Initializable {
+    private static final Logger LOGGER = LogManager.getLogger(EditSectionController.class);
 
     private boolean createTable = false;
     private boolean moveTable = false;
@@ -58,6 +46,8 @@ public class AddSectionController implements Initializable {
     private static ManagerController.UpdateCanvas updateCanvas;
     private static ArrayList<Rect> rects = new ArrayList<Rect>();
     private Rect movingRect;
+    private static String sectionName;
+    private static Long sectionId;
 
     @FXML
     private Canvas canvas;
@@ -66,13 +56,13 @@ public class AddSectionController implements Initializable {
     @FXML
     private TextField numberTF;
     @FXML
-    private TextField nameTF;
+    private Label sectionNameLb;
 
     @Override
     public void initialize(URL location, ResourceBundle resources){
-        rects.clear();
         seatsTF.setText("6");
         numberTF.setText("1");
+        sectionNameLb.setText(sectionName);
         drawCanvas();
 
         canvas.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
@@ -139,7 +129,7 @@ public class AddSectionController implements Initializable {
                                     UpdateTableController.setThisStage(stage);
                                     UpdateTableController.setRects(rects);
                                     UpdateTableController.setClickedRect(rect);
-                                    UpdateTableController.setAddUpdateCanvas(new UpdateCanvas());
+                                    UpdateTableController.setEditUpdateCanvas(new UpdateCanvas());
                                     stage.setTitle("");
                                     AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/UpdateTable.fxml"));
                                     Scene scene = new Scene(myPane);
@@ -193,15 +183,38 @@ public class AddSectionController implements Initializable {
     }
 
     public static void setInteriorService(InteriorService interiorService) {
-        AddSectionController.interiorService = interiorService;
+        EditSectionController.interiorService = interiorService;
     }
 
     public static void setThisStage(Stage thisStage) {
-        AddSectionController.thisStage = thisStage;
+        EditSectionController.thisStage = thisStage;
     }
 
     public static void setUpdateCanvas(ManagerController.UpdateCanvas updateCanvas) {
-        AddSectionController.updateCanvas = updateCanvas;
+        EditSectionController.updateCanvas = updateCanvas;
+    }
+
+    // Only called in editing mode, initalizes tables on the canvas
+    public static void initTables(Long sectionId) {
+        rects.clear();
+        EditSectionController.sectionId = sectionId;
+        Section sectionMatcher = new Section();
+        sectionMatcher.setIdentity(sectionId);
+
+        try {
+            Section section = interiorService.findSections(sectionMatcher).get(0);
+            sectionName = section.getName();
+            Table tableMatcher = new Table();
+            tableMatcher.setSection(section);
+            for(Table table : interiorService.findTables(tableMatcher)) {
+                Rect rect = new Rect(table.getColumn()*FACT, table.getRow()*FACT, TABLE_SIZE, TABLE_SIZE, interiorService);
+                rect.setNumber(table.getNumber());
+                rect.setSeats(table.getSeats());
+                rects.add(rect);
+            }
+        } catch(ServiceException e) {
+            showErrorDialog("Error", "Database problem", "Could not access database!");
+        }
     }
 
     public void addTableButtonClicked(ActionEvent event) {
@@ -236,35 +249,32 @@ public class AddSectionController implements Initializable {
         createTable = false;
     }
 
-    public void createButtonClicked(ActionEvent event) {
-        if(nameTF.getText().isEmpty()) {
-            showErrorDialog("Error", "Name missing", "Please insert a name for the section!");
-        } else {
-            try {
-                Section section = new Section();
-                section.setName(nameTF.getText());
-                //generate unused section id
-                Long sectionId = 1L;
-                for(Section iteratingSection : interiorService.getAllSections()) {
-                    if(iteratingSection.getIdentity().equals(sectionId))
-                        sectionId = iteratingSection.getIdentity()+1;
-                }
-                section.setIdentity(sectionId);
-                interiorService.addSection(section);
-                for (Rect rect : rects) {
-                    Table table = new Table();
-                    table.setSeats(rect.getSeats());
-                    table.setNumber(rect.getNumber());
-                    table.setSection(section);
-                    table.setColumn((int) (rect.getX() / FACT));
-                    table.setRow((int)(rect.getY()/FACT));
-                    interiorService.addTable(table);
-                }
-                updateCanvas.update();
-                thisStage.close();
-            } catch(ServiceException e) {
-                showErrorDialog("Error", "Database problem", "Could not access database!");
+    public void saveButtonClicked(ActionEvent event) {
+        try {
+            Section sectionMatcher = new Section();
+            sectionMatcher.setIdentity(sectionId);
+            Section section = interiorService.findSections(sectionMatcher).get(0);
+
+            // Remove all tables in this section and add changed/unchanged tables
+            Table tableMatcher = new Table();
+            tableMatcher.setSection(section);
+            for(Table removeTable : interiorService.findTables(tableMatcher)) {
+                interiorService.deleteTable(removeTable);
             }
+
+            for (Rect rect : rects) {
+                Table table = new Table();
+                table.setSeats(rect.getSeats());
+                table.setNumber(rect.getNumber());
+                table.setSection(section);
+                table.setColumn((int) (rect.getX() / FACT));
+                table.setRow((int)(rect.getY()/FACT));
+                interiorService.addTable(table);
+            }
+            updateCanvas.update();
+            thisStage.close();
+        } catch(ServiceException e) {
+            showErrorDialog("Error", "Database problem", "Could not access database!");
         }
     }
 

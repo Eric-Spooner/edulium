@@ -711,7 +711,24 @@ public class ManagerController implements Initializable {
     }
 
     public void buttonEditSectionClicked(ActionEvent actionEvent) {
-
+        if(clickedSectionId != -1) {
+            drawCanvas();
+            try {
+                LOGGER.info("Edit Section Button Click");
+                Stage stage = new Stage();
+                EditSectionController.setInteriorService(interiorService);
+                EditSectionController.setThisStage(stage);
+                EditSectionController.setUpdateCanvas(new UpdateCanvas());
+                EditSectionController.initTables(clickedSectionId);
+                stage.setTitle("Edit Section");
+                AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/EditSection.fxml"));
+                Scene scene = new Scene(myPane);
+                stage.setScene(scene);
+                stage.showAndWait();
+            } catch (IOException e) {
+                LOGGER.error("Unable to Load Edit Section" + e);
+            }
+        }
     }
 
     public void setupListeners() {
@@ -793,7 +810,8 @@ public class ManagerController implements Initializable {
                     }
                 }
 
-                tablesCanvas.setHeight(y*scaleY + calculateHeight(section)*scaleY+CANVAS_PADDING*scaleY);
+                if(tablesCanvas.getHeight() < y*scaleY + calculateHeight(section)*scaleY+CANVAS_PADDING*scaleY)
+                    tablesCanvas.setHeight(y*scaleY + calculateHeight(section)*scaleY+CANVAS_PADDING*scaleY);
                 if(section.getIdentity().equals(Long.valueOf(clickedSectionId)))
                     gc.setStroke(Color.RED);
                 gc.strokeRoundRect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY, 10, 10);

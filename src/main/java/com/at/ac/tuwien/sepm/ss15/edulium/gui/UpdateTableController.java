@@ -50,8 +50,8 @@ public class UpdateTableController implements Initializable {
     private static Stage thisStage;
     private static ArrayList<Rect> rects = new ArrayList<Rect>();
     private static Rect clickedRect;
-    private static InteriorService interiorService;
-    private static AddSectionController.UpdateCanvas updateCanvas;
+    private static AddSectionController.UpdateCanvas updateAddCanvas;
+    private static EditSectionController.UpdateCanvas updateEditCanvas;
 
     @FXML
     private TextField numberTF;
@@ -76,12 +76,12 @@ public class UpdateTableController implements Initializable {
         UpdateTableController.clickedRect = rect;
     }
 
-    public static void setInteriorService(InteriorService interiorService) {
-        UpdateTableController.interiorService = interiorService;
+    public static void setAddUpdateCanvas(AddSectionController.UpdateCanvas updateCanvas) {
+        UpdateTableController.updateAddCanvas = updateCanvas;
     }
 
-    public static void setUpdateCanvas(AddSectionController.UpdateCanvas updateCanvas) {
-        UpdateTableController.updateCanvas = updateCanvas;
+    public static void setEditUpdateCanvas(EditSectionController.UpdateCanvas updateCanvas) {
+        UpdateTableController.updateEditCanvas = updateCanvas;
     }
 
     public void cancelButtonClicked(ActionEvent actionEvent) {
@@ -99,9 +99,22 @@ public class UpdateTableController implements Initializable {
             } else if (Integer.valueOf(seatsTF.getText()) < 0) {
                 showErrorDialog("Error", "Seats invalid", "The number of seats must be >= 0!");
             } else {
+                //Check if table number is not used in this section
+                for (Rect iteratingRect : rects) {
+                    if (iteratingRect.getNumber() == Long.valueOf(numberTF.getText())) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Number already used");
+                        alert.setContentText("The table number is already used in this section!");
+                        alert.showAndWait();
+                        return;
+                    }
+                }
+
                 clickedRect.setNumber(Long.valueOf(numberTF.getText()));
                 clickedRect.setSeats(Integer.valueOf(seatsTF.getText()));
-                updateCanvas.update();
+                if(updateAddCanvas != null) updateAddCanvas.update();
+                else if(updateEditCanvas != null) updateEditCanvas.update();
                 thisStage.close();
             }
         } catch(NumberFormatException e) {
