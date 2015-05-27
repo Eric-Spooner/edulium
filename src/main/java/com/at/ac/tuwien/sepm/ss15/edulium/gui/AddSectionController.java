@@ -245,7 +245,13 @@ public class AddSectionController implements Initializable {
             try {
                 Section section = new Section();
                 section.setName(nameTF.getText());
-                section.setIdentity((long) 10);  //TODO auto generate id
+                //generate unused section id
+                Long sectionId = 1L;
+                for(Section iteratingSection : interiorService.getAllSections()) {
+                    if(iteratingSection.getIdentity().equals(sectionId))
+                        sectionId = iteratingSection.getIdentity()+1;
+                }
+                section.setIdentity(sectionId);
                 interiorService.addSection(section);
                 for (Rect rect : rects) {
                     Table table = new Table();

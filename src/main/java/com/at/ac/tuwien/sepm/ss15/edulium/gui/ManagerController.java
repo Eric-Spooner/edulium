@@ -793,7 +793,7 @@ public class ManagerController implements Initializable {
                     }
                 }
 
-                tablesCanvas.setHeight(y + calculateHeight(section)*scaleY+CANVAS_PADDING);
+                tablesCanvas.setHeight(y*scaleY + calculateHeight(section)*scaleY+CANVAS_PADDING*scaleY);
                 if(section.getIdentity().equals(Long.valueOf(clickedSectionId)))
                     gc.setStroke(Color.RED);
                 gc.strokeRoundRect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY, 10, 10);
