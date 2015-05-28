@@ -45,7 +45,7 @@ import static javafx.collections.FXCollections.observableArrayList;
  */
 @Component
 public class UpdateTableController implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(AddSectionController.class);
+    private static final Logger LOGGER = LogManager.getLogger(UpdateTableController.class);
 
     private static Stage thisStage;
     private static ArrayList<Rect> rects = new ArrayList<Rect>();
@@ -60,6 +60,7 @@ public class UpdateTableController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        LOGGER.info("Initializing Update Table Controller");
         numberTF.setText(String.valueOf(clickedRect.getNumber()));
         seatsTF.setText(String.valueOf(clickedRect.getSeats()));
     }
@@ -85,10 +86,12 @@ public class UpdateTableController implements Initializable {
     }
 
     public void cancelButtonClicked(ActionEvent actionEvent) {
+        LOGGER.info("Cancel Update Table Button Click");
         thisStage.close();
     }
 
     public void updateButtonClicked(ActionEvent actionEvent) {
+        LOGGER.info("Update Table Button Click");
         try {
             if (numberTF.getText().isEmpty()) {
                 showErrorDialog("Error", "Number missing", "Please insert a number for the table!");

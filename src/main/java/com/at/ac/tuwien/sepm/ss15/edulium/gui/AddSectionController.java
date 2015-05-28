@@ -70,6 +70,7 @@ public class AddSectionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources){
+        LOGGER.info("Initializing Add Section Controller");
         rects.clear();
         seatsTF.setText("6");
         numberTF.setText("1");
@@ -205,6 +206,7 @@ public class AddSectionController implements Initializable {
     }
 
     public void addTableButtonClicked(ActionEvent event) {
+        LOGGER.info("Add Table Button Click");
         drawCanvas();
         createTable = true;
         moveTable = false;
@@ -213,6 +215,7 @@ public class AddSectionController implements Initializable {
     }
 
     public void moveTableButtonClicked(ActionEvent event) {
+        LOGGER.info("Move Table Button Click");
         drawCanvas();
         moveTable = true;
         createTable = false;
@@ -221,6 +224,7 @@ public class AddSectionController implements Initializable {
     }
 
     public void removeTableButtonClicked(ActionEvent event) {
+        LOGGER.info("Remove Table Button Click");
         drawCanvas();
         removeTable = true;
         moveTable = false;
@@ -229,6 +233,7 @@ public class AddSectionController implements Initializable {
     }
 
     public void updateTableButtonClicked(ActionEvent event) {
+        LOGGER.info("Update Table Button Click");
         drawCanvas();
         updateTable = true;
         removeTable = false;
@@ -237,6 +242,7 @@ public class AddSectionController implements Initializable {
     }
 
     public void createButtonClicked(ActionEvent event) {
+        LOGGER.info("Create Section Button Click");
         if(nameTF.getText().isEmpty()) {
             showErrorDialog("Error", "Name missing", "Please insert a name for the section!");
         } else {

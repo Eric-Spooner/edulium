@@ -60,6 +60,7 @@ public class EditSectionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources){
+        LOGGER.info("Initializing Edit Section Controller");
         seatsTF.setText("6");
         numberTF.setText("1");
         sectionNameLb.setText(sectionName);
@@ -218,6 +219,7 @@ public class EditSectionController implements Initializable {
     }
 
     public void addTableButtonClicked(ActionEvent event) {
+        LOGGER.info("Add Table Button Click");
         drawCanvas();
         createTable = true;
         moveTable = false;
@@ -226,6 +228,7 @@ public class EditSectionController implements Initializable {
     }
 
     public void moveTableButtonClicked(ActionEvent event) {
+        LOGGER.info("Move Table Button Click");
         drawCanvas();
         moveTable = true;
         createTable = false;
@@ -234,6 +237,7 @@ public class EditSectionController implements Initializable {
     }
 
     public void removeTableButtonClicked(ActionEvent event) {
+        LOGGER.info("Remove Table Button Click");
         drawCanvas();
         removeTable = true;
         moveTable = false;
@@ -242,6 +246,7 @@ public class EditSectionController implements Initializable {
     }
 
     public void updateTableButtonClicked(ActionEvent event) {
+        LOGGER.info("Update Table Button Click");
         drawCanvas();
         updateTable = true;
         removeTable = false;
@@ -250,6 +255,7 @@ public class EditSectionController implements Initializable {
     }
 
     public void saveButtonClicked(ActionEvent event) {
+        LOGGER.info("Save Section Button Click");
         try {
             Section sectionMatcher = new Section();
             sectionMatcher.setIdentity(sectionId);

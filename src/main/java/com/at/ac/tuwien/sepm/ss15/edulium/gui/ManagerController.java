@@ -692,9 +692,9 @@ public class ManagerController implements Initializable {
     }
 
     public void buttonAddSectionClicked(ActionEvent actionEvent) {
+        LOGGER.info("Add Section Button Click");
         drawCanvas();
         try {
-            LOGGER.info("Add Section Button Click");
             Stage stage = new Stage();
             AddSectionController.setInteriorService(interiorService);
             AddSectionController.setThisStage(stage);
@@ -710,10 +710,10 @@ public class ManagerController implements Initializable {
     }
 
     public void buttonEditSectionClicked(ActionEvent actionEvent) {
+        LOGGER.info("Edit Section Button Click");
         if(clickedSectionId != -1) {
             drawCanvas();
             try {
-                LOGGER.info("Edit Section Button Click");
                 Stage stage = new Stage();
                 EditSectionController.setInteriorService(interiorService);
                 EditSectionController.setThisStage(stage);
@@ -731,6 +731,7 @@ public class ManagerController implements Initializable {
     }
 
     public void buttonRemoveSectionClicked(ActionEvent event) {
+        LOGGER.info("Remove Section Button Click");
         if(clickedSectionId != -1) {
             try {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
