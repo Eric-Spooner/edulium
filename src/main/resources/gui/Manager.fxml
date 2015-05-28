@@ -32,7 +32,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Button layoutX="498.0" layoutY="14.0" mnemonicParsing="false" onAction="#buttonAddSectionClicked" text="Add Section..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
+                        <Button layoutX="498.0" layoutY="14.0" mnemonicParsing="false" onAction="#buttonAddSectionClicked" prefHeight="25.0" prefWidth="89.0" text="Add..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
                         <ScrollPane fx:id="scrollPaneLeft" prefHeight="371.0" prefWidth="474.0" vbarPolicy="ALWAYS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="126.0" AnchorPane.topAnchor="0.0">
                            <content>
                               <AnchorPane fx:id="tableAnchor" minHeight="0.0" minWidth="0.0" prefHeight="370.0" prefWidth="472.0">
@@ -42,7 +42,8 @@
                               </AnchorPane>
                            </content>
                         </ScrollPane>
-                        <Button layoutX="498.0" layoutY="51.0" mnemonicParsing="false" onAction="#buttonEditSectionClicked" prefHeight="25.0" prefWidth="89.0" text="Edit Section..." AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="51.0" />
+                        <Button layoutX="498.0" layoutY="51.0" mnemonicParsing="false" onAction="#buttonEditSectionClicked" prefHeight="25.0" prefWidth="89.0" text="Edit..." AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="51.0" />
+                        <Button layoutX="498.0" layoutY="89.0" mnemonicParsing="false" onAction="#buttonRemoveSectionClicked" prefHeight="25.0" prefWidth="89.0" text="Remove" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="88.0" />
                      </children></AnchorPane>
             </content>
           </Tab>

@@ -1,6 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
@@ -16,10 +17,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -38,6 +36,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import static javafx.collections.FXCollections.observableArrayList;
@@ -729,6 +728,38 @@ public class ManagerController implements Initializable {
                 LOGGER.error("Unable to Load Edit Section" + e);
             }
         }
+    }
+
+    public void buttonRemoveSectionClicked(ActionEvent event) {
+        if(clickedSectionId != -1) {
+            try {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Remove Section?");
+                alert.setHeaderText("Remove Section?");
+                alert.setContentText("Do you really want to remove the selected Section and all the tables inside?");
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK) {
+                    Section sectionMatcher = new Section();
+                    sectionMatcher.setIdentity(clickedSectionId);
+                    Section section = interiorService.findSections(sectionMatcher).get(0);
+                    Table tableMatcher = new Table();
+                    tableMatcher.setSection(section);
+                    ArrayList<Table> deleteTables = new ArrayList<>();
+                    for(Table table : interiorService.findTables(tableMatcher)) {
+                        deleteTables.add(table);    // Avoid deleting while iterating
+                    }
+                    for(Table table : deleteTables) {
+                        interiorService.deleteTable(table);
+                    }
+                    interiorService.deleteSection(section);
+                    clickedSectionId = -1;
+                }
+            } catch (ServiceException e) {
+                LOGGER.error("Unable to remove section");
+            }
+        }
+        drawCanvas();
     }
 
     public void setupListeners() {
