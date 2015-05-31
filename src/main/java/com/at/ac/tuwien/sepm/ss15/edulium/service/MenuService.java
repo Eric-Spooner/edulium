@@ -64,6 +64,7 @@ public interface MenuService extends Service {
      *         not valid for this action
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     List<History<MenuEntry>> getMenuEntryHistory(MenuEntry entry) throws ValidationException, ServiceException;
 
     /**
@@ -115,6 +116,7 @@ public interface MenuService extends Service {
      *         not valid for this action
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     List<History<MenuCategory>> getMenuCategoryHistory(MenuCategory category) throws ValidationException, ServiceException;
 
     /**
@@ -167,5 +169,6 @@ public interface MenuService extends Service {
      *         not valid for this action
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     List<History<Menu>> getMenuHistory(Menu menu) throws ValidationException, ServiceException;
 }
