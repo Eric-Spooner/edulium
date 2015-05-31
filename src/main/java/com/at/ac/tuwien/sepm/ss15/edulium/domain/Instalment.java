@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * Domain object representing an installment
+ * Domain object representing an instalment
  */
-public class Installment {
+public class Instalment {
     Long identity;
     LocalDateTime time;
     String paymentInfo;
@@ -14,27 +14,27 @@ public class Installment {
     BigDecimal amount;
 
     /**
-     * Creates a new installment object and assigns the given identity to it
-     * @param identity The identity of the installment
-     * @return New installment object with the provided identity
+     * Creates a new instalment object and assigns the given identity to it
+     * @param identity The identity of the instalment
+     * @return New instalment object with the provided identity
      */
-    public static Installment withIdentity(Long identity) {
-        Installment installment = new Installment();
-        installment.setIdentity(identity);
-        return installment;
+    public static Instalment withIdentity(Long identity) {
+        Instalment instalment = new Instalment();
+        instalment.setIdentity(identity);
+        return instalment;
     }
 
     /**
-     * @return Returns the unique identity of the installment (can be null)
+     * @return Returns the unique identity of the instalment (can be null)
      */
     public Long getIdentity() {
         return identity;
     }
 
     /**
-     * Sets the unique identity of the installment object.
+     * Sets the unique identity of the instalment object.
      * @param identity The unique identity we want to assign to the
-     *                 installment object.
+     *                 instalment object.
      */
     public void setIdentity(Long identity) {
         this.identity = identity;
@@ -49,7 +49,7 @@ public class Installment {
 
     /**
      * @param time The time we want to assign to the payment being made in this
-     *             installment.
+     *             instalment.
      */
     public void setTime(LocalDateTime time) {
         this.time = time;
@@ -99,7 +99,7 @@ public class Installment {
 
     @Override
     public String toString() {
-        return "Installment{" +
+        return "Instalment{" +
                 "identity=" + identity +
                 ", time=" + time +
                 ", paymentInfo=" + paymentInfo +
@@ -113,7 +113,7 @@ public class Installment {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Installment that = (Installment) o;
+        Instalment that = (Instalment) o;
 
         if (identity != null ? !identity.equals(that.identity) : that.identity != null) return false;
         if (time != null ? !time.equals(that.time) : that.time != null) return false;
