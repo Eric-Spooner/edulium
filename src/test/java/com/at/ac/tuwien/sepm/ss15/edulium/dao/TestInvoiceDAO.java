@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -345,5 +347,140 @@ public class TestInvoiceDAO extends AbstractDAOTest {
 
         // WHEN
         invoiceDAO.getHistory(invoice);
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // tax rate 1
+        Invoice invoice1 = new Invoice();
+        invoice1.setTime(LocalDateTime.now());
+        invoice1.setGross(new BigDecimal("11.0"));
+        invoice1.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice1);
+        assertEquals(1, invoiceDAO.find(invoice1).size());
+
+        // tax rate 2
+        Invoice invoice2 = new Invoice();
+        invoice2.setTime(LocalDateTime.now());
+        invoice2.setGross(new BigDecimal("12.0"));
+        invoice2.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice2);
+        assertEquals(1, invoiceDAO.find(invoice2).size());
+
+        // tax rate 3
+        Invoice invoice3 = new Invoice();
+        invoice3.setTime(LocalDateTime.now());
+        invoice3.setGross(new BigDecimal("13.0"));
+        invoice3.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice3);
+        assertEquals(1, invoiceDAO.find(invoice3).size());
+
+        // GIVEN
+        Invoice invoiceId1 = Invoice.withIdentity(invoice1.getIdentity());
+        Invoice invoiceId2 = Invoice.withIdentity(invoice2.getIdentity());
+        Invoice invoiceId3 = Invoice.withIdentity(invoice3.getIdentity());
+        List<Invoice> invoiceIds = Arrays.asList(invoiceId1, invoiceId2, invoiceId3);
+
+        // WHEN
+        List<Invoice> result = invoiceDAO.populate(invoiceIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(invoice1));
+        assertTrue(result.contains(invoice2));
+        assertTrue(result.contains(invoice3));
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjectsOfDeletedObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // tax rate 1
+        Invoice invoice1 = new Invoice();
+        invoice1.setTime(LocalDateTime.now());
+        invoice1.setGross(new BigDecimal("11.0"));
+        invoice1.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice1);
+        assertEquals(1, invoiceDAO.find(invoice1).size());
+        invoiceDAO.delete(invoice1);
+        assertEquals(0, invoiceDAO.find(invoice1).size());
+
+        // tax rate 2
+        Invoice invoice2 = new Invoice();
+        invoice2.setTime(LocalDateTime.now());
+        invoice2.setGross(new BigDecimal("12.0"));
+        invoice2.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice2);
+        assertEquals(1, invoiceDAO.find(invoice2).size());
+        invoiceDAO.delete(invoice2);
+        assertEquals(0, invoiceDAO.find(invoice2).size());
+
+        // tax rate 3
+        Invoice invoice3 = new Invoice();
+        invoice3.setTime(LocalDateTime.now());
+        invoice3.setGross(new BigDecimal("13.0"));
+        invoice3.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice3);
+        assertEquals(1, invoiceDAO.find(invoice3).size());
+        invoiceDAO.delete(invoice3);
+        assertEquals(0, invoiceDAO.find(invoice3).size());
+
+        // GIVEN
+        Invoice invoiceId1 = Invoice.withIdentity(invoice1.getIdentity());
+        Invoice invoiceId2 = Invoice.withIdentity(invoice2.getIdentity());
+        Invoice invoiceId3 = Invoice.withIdentity(invoice3.getIdentity());
+        List<Invoice> invoiceIds = Arrays.asList(invoiceId1, invoiceId2, invoiceId3);
+
+        // WHEN
+        List<Invoice> result = invoiceDAO.populate(invoiceIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(invoice1));
+        assertTrue(result.contains(invoice2));
+        assertTrue(result.contains(invoice3));
+    }
+
+    @Test
+    public void testPopulate_nullListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<Invoice> result = invoiceDAO.populate(null);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testPopulate_emptyListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // WHEN
+        List<Invoice> result = invoiceDAO.populate(Arrays.asList());
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithInvalidObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<Invoice> invalidInvoices = Arrays.asList(new Invoice());
+
+        // WHEN
+        List<Invoice> result = invoiceDAO.populate(invalidInvoices);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<Invoice> invalidInvoices = new ArrayList<>();
+        invalidInvoices.add(null);
+
+        // WHEN
+        List<Invoice> result = invoiceDAO.populate(invalidInvoices);
     }
 }

@@ -1,1 +1,0 @@
-INSERT INTO RestaurantUser (ID, name, userRole) VALUES ('daotester', 'DAO Testuser', 'admin');

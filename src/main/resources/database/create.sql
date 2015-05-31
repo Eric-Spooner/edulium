@@ -74,8 +74,8 @@ CREATE TABLE IF NOT EXISTS RestaurantTable (
 );
 
 CREATE TABLE IF NOT EXISTS TableHistory (
-    section_ID BIGINT REFERENCES RestaurantSection(ID),
-    number BIGINT REFERENCES RestaurantTable(number),
+    section_ID BIGINT,
+    number BIGINT,
     seats INT,
     tableRow INT,
     tableColumn INT,
@@ -84,6 +84,7 @@ CREATE TABLE IF NOT EXISTS TableHistory (
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
+    FOREIGN KEY(section_ID, number) REFERENCES RestaurantTable(section_ID, number),
     PRIMARY KEY(section_ID, number, changeNr)
 );
 
@@ -92,8 +93,8 @@ CREATE TABLE IF NOT EXISTS Reservation (
     reservationTime TIMESTAMP,
     name VARCHAR(100),
     quantity INT,
-    duration INT,
-    closed BOOLEAN DEFAULT FALSE
+    duration BIGINT,
+    deleted BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS ReservationHistory (
@@ -101,8 +102,8 @@ CREATE TABLE IF NOT EXISTS ReservationHistory (
     reservationTime TIMESTAMP,
     name VARCHAR(100),
     quantity INT,
-    duration INT,
-    closed BOOLEAN,
+    duration BIGINT,
+    deleted BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
@@ -110,20 +111,24 @@ CREATE TABLE IF NOT EXISTS ReservationHistory (
 );
 
 CREATE TABLE IF NOT EXISTS ReservationAssoc (
-    table_number BIGINT REFERENCES RestaurantTable(number),
     reservation_ID BIGINT REFERENCES Reservation(ID),
+    table_section BIGINT,
+    table_number BIGINT,
     disabled BOOLEAN DEFAULT FALSE,
-    PRIMARY KEY(table_number, reservation_ID)
+    FOREIGN KEY(table_section, table_number) REFERENCES RestaurantTable(section_ID, number),
+    PRIMARY KEY(table_section, table_number, reservation_ID)
 );
 
 CREATE TABLE IF NOT EXISTS ReservationAssocHistory (
-    table_number BIGINT REFERENCES RestaurantTable(number),
-    reservation_ID BIGINT REFERENCES Reservation(ID),
+    reservation_ID BIGINT,
+    table_section BIGINT,
+    table_number BIGINT,
     disabled BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(table_number, reservation_ID, changeNr)
+    FOREIGN KEY(table_section, table_number, reservation_ID) REFERENCES ReservationAssoc(table_section, table_number, reservation_ID),
+    PRIMARY KEY(table_section, table_number, reservation_ID, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS MenuCategory (
@@ -305,19 +310,22 @@ CREATE TABLE IF NOT EXISTS MenuAssocHistory (
 CREATE TABLE IF NOT EXISTS RestaurantOrder (
     ID IDENTITY,
     invoice_ID BIGINT REFERENCES Invoice(ID),
-    table_number BIGINT REFERENCES RestaurantTable(number),
+    table_section BIGINT,
+    table_number BIGINT,
     menuEntry_ID BIGINT REFERENCES MenuEntry(ID),
     orderTime TIMESTAMP,
     brutto DECIMAL(20, 2),
     tax DECIMAL(3, 2),
     info TEXT,
-    canceled BOOLEAN DEFAULT FALSE
+    canceled BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY(table_section, table_number) REFERENCES RestaurantTable(section_ID, number)
 );
 
 CREATE TABLE IF NOT EXISTS RestaurantOrderHistory (
     ID BIGINT REFERENCES RestaurantOrder(ID),
     invoice_ID BIGINT REFERENCES Invoice(ID),
-    table_number BIGINT REFERENCES RestaurantTable(number),
+    table_section BIGINT,
+    table_number BIGINT,
     menuEntry_ID BIGINT REFERENCES MenuEntry(ID),
     orderTime TIMESTAMP,
     brutto DECIMAL(20, 2),
@@ -327,5 +335,6 @@ CREATE TABLE IF NOT EXISTS RestaurantOrderHistory (
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
+    FOREIGN KEY(table_section, table_number) REFERENCES RestaurantTable(section_ID, number),
     PRIMARY KEY(ID, changeNr)
 );
