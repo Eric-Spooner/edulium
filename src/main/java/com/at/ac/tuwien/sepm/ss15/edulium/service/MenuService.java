@@ -1,8 +1,10 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -56,6 +58,15 @@ public interface MenuService extends Service {
     List<MenuEntry> getAllMenuEntries() throws ServiceException;
 
     /**
+     * @param entry object to get the history for
+     * @return returns the history of changes for the object
+     * @throws ValidationException if the MenuEntry object parameters are
+     *         not valid for this action
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    List<History<MenuEntry>> getMenuEntryHistory(MenuEntry entry) throws ValidationException, ServiceException;
+
+    /**
      * adds a MenuCategory to the underlying datasource
      * @param menuCategory MenuCategory to add
      * @throws ValidationException if the MenuCategory object is not valid
@@ -96,6 +107,15 @@ public interface MenuService extends Service {
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
     List<MenuCategory> getAllMenuCategories() throws ServiceException;
+
+    /**
+     * @param category object to get the history for
+     * @return returns the history of changes for the object
+     * @throws ValidationException if the MenuCategory object parameters are
+     *         not valid for this action
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    List<History<MenuCategory>> getMenuCategoryHistory(MenuCategory category) throws ValidationException, ServiceException;
 
     /**
      * adds a menu to the underlying datasource
@@ -139,4 +159,13 @@ public interface MenuService extends Service {
      */
     List<Menu> getAllMenus() throws ServiceException;
 
+
+    /**
+     * @param menu object to get the history for
+     * @return returns the history of changes for the object
+     * @throws ValidationException if the Menu object parameters are
+     *         not valid for this action
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    List<History<Menu>> getMenuHistory(Menu menu) throws ValidationException, ServiceException;
 }
