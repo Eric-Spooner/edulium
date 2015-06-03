@@ -25,6 +25,12 @@ public interface OrderService extends Service {
 
     /**
      * updates a order object in the underlying datasource
+     * @condition: Only in state QUEUED it is allowed to update the additional info
+     *             it is only allowed to set the state in the given "direction"
+     *             QUEUED -> IN_PROGRESS -> READY_FOR_DELIVERY -> DELIVERED
+     *             it is allowed to skip steps
+     *             it is not allowed to change the time of an order
+     *             it is not allowed to change the MenuEntry of the order
      * @param order order to update
      * @throws ServiceException if an error processing the request ocurred
      * @throws ValidationException if the data is invalid
