@@ -1,7 +1,9 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -32,12 +34,13 @@ public interface OrderService extends Service {
 
     /**
      * deletes an order object from the underlying datasource
+     * @pre: the order has to be in the state QUEUED
      * @param order order to remove
      * @throws ServiceException if an error processing the request ocurred
      * @throws ValidationException if the data is invalid
      */
     @PreAuthorize("hasRole('ROLE_WAITER')")
-    void removeOrder(Order order) throws ServiceException, ValidationException;
+    void cancelOrder(Order order) throws ServiceException, ValidationException;
 
     /**
      * returns all taxRates from the underlying datasource which paramters
@@ -60,5 +63,33 @@ public interface OrderService extends Service {
      * @throws ServiceException if an error processing the request ocurred
      */
     @PreAuthorize("hasRole('ROLE_MANAGER')")
-    List<Order> getOrderHistory(Order template) throws ServiceException;
+    List<History<Order>> getOrderHistory(Order template) throws ServiceException;
+
+    /**
+     * returns all Orders, which have to be cooked
+     * @return List of MenuEntries, which should be cooked
+     * @throws ServiceException
+     */
+    @PreAuthorize("hasRole('ROLE_COOK')")
+    List<Order> getAllOrdersToCook() throws ServiceException;
+
+    /**
+     * cook uses this function, to set the state of the order
+     * @pre: the state of the order has to be QUEUED
+     * @post: the state of the order hast to be IN_PROGRESS OR READY_FOR_DELIVERY,
+     * @param: order order
+     * @throws ServiceException
+     */
+    @PreAuthorize("hasRole('ROLE_COOK')")
+    void setStateCook(Order order) throws ServiceException;
+
+    /**
+     * waiter uses this function, to set the state of the order
+     * @pre: the state of the order has to be READY_FOR_DELIVERY
+     * @post: the state of the order hast to be DELIVERED
+     * @param order order
+     * @throws ServiceException
+     */
+    @PreAuthorize("hasRole('ROLE_WAITER')")
+    void setStateWaiter(Order order) throws ServiceException;
 }

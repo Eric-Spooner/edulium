@@ -1,6 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
@@ -8,7 +9,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import java.util.List;
 
 /**
- * Created by - on 03.06.2015.
+ * implementation of the Order Service
  */
 public class OrderServiceImpl implements OrderService {
     @Override
@@ -22,7 +23,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void removeOrder(Order order) throws ServiceException, ValidationException {
+    public void cancelOrder(Order order) throws ServiceException, ValidationException {
 
     }
 
@@ -37,7 +38,22 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getOrderHistory(Order template) throws ServiceException {
+    public List<History<Order>> getOrderHistory(Order template) throws ServiceException {
         return null;
+    }
+
+    @Override
+    public List<Order> getAllOrdersToCook() throws ServiceException {
+        return null;
+    }
+
+    @Override
+    public void setStateCook(Order order) throws ServiceException {
+
+    }
+
+    @Override
+    public void setStateWaiter(Order order) throws ServiceException {
+
     }
 }
