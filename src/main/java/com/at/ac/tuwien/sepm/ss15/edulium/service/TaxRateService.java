@@ -17,7 +17,7 @@ public interface TaxRateService extends Service {
      * @throws ServiceException if an error processing the request ocurred
      * @throws ValidationException if the data is invalid
      */
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @PreAuthorize("hasRole('MANAGER')")
     void addTaxRate(TaxRate taxRate) throws ServiceException, ValidationException;
 
     /**
@@ -26,7 +26,7 @@ public interface TaxRateService extends Service {
      * @throws ServiceException if an error processing the request ocurred
      * @throws ValidationException if the data is invalid
      */
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @PreAuthorize("hasRole('MANAGER')")
     void updateTaxRate(TaxRate taxRate) throws ServiceException, ValidationException;
 
     /**
@@ -35,7 +35,7 @@ public interface TaxRateService extends Service {
      * @throws ServiceException if an error processing the request ocurred
      * @throws ValidationException if the data is invalid
      */
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @PreAuthorize("hasRole('MANAGER')")
     void removeTaxRate(TaxRate taxRate) throws ServiceException, ValidationException;
 
     /**
@@ -59,6 +59,6 @@ public interface TaxRateService extends Service {
      *         not valid for this action
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @PreAuthorize("hasRole('MANAGER')")
     List<History<TaxRate>> getTaxRateHistory(TaxRate taxRate) throws ValidationException, ServiceException;
 }
