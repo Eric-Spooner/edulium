@@ -49,7 +49,7 @@ public interface OrderService extends Service {
     void cancelOrder(Order order) throws ServiceException, ValidationException;
 
     /**
-     * returns all taxRates from the underlying datasource which paramters
+     * returns all orders from the underlying datasource which paramters
      * match the paramter of the matcher object
      * @param template template used for finding Orders
      * @throws ServiceException if an error processing the request ocurred
@@ -57,7 +57,7 @@ public interface OrderService extends Service {
     List<Order> findOrder(Order template) throws ServiceException;
 
     /**
-     * returns all taxRates from the underlying datasource
+     * returns all orders from the underlying datasource
      * @throws ServiceException if an error processing the request ocurred
      */
     List<Order> getAllOrders() throws ServiceException;

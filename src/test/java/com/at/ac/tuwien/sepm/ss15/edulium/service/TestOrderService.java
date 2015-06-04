@@ -372,7 +372,7 @@ public class TestOrderService extends AbstractServiceTest {
         order1.setState(Order.State.IN_PROGRESS);
 
         // WHEN
-        orderService.markAsInProgress(order1);
+        orderService.markAsReadyForDelivery(order1);
 
         // THEN
         Mockito.verify(orderDAO).update(order1);
@@ -386,7 +386,7 @@ public class TestOrderService extends AbstractServiceTest {
         order1.setState(Order.State.READY_FOR_DELIVERY);
 
         // WHEN
-        orderService.markAsInProgress(order1);
+        orderService.markAsReadyForDelivery(order1);
 
         // THEN
         Mockito.verify(orderDAO).update(order1);
@@ -400,7 +400,7 @@ public class TestOrderService extends AbstractServiceTest {
         order1.setState(Order.State.IN_PROGRESS);
 
         // WHEN
-        orderService.markAsInProgress(order1);
+        orderService.markAsReadyForDelivery(order1);
 
         // THEN
         Mockito.verify(orderDAO).update(order1);
@@ -415,7 +415,7 @@ public class TestOrderService extends AbstractServiceTest {
         order1.setState(Order.State.READY_FOR_DELIVERY);
 
         // WHEN
-        orderService.markAsInProgress(order1);
+        orderService.markAsDelivered(order1);
 
         // THEN
         Mockito.verify(orderDAO).update(order1);
@@ -429,7 +429,7 @@ public class TestOrderService extends AbstractServiceTest {
         order1.setState(Order.State.DELIVERED);
 
         // WHEN
-        orderService.markAsInProgress(order1);
+        orderService.markAsDelivered(order1);
 
         // THEN
         Mockito.verify(orderDAO).update(order1);
@@ -443,7 +443,7 @@ public class TestOrderService extends AbstractServiceTest {
         order1.setState(Order.State.READY_FOR_DELIVERY);
 
         // WHEN
-        orderService.markAsInProgress(order1);
+        orderService.markAsDelivered(order1);
 
         // THEN
         Mockito.verify(orderDAO).update(order1);
