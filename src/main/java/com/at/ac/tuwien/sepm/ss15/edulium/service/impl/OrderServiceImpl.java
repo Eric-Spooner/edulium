@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * implementation of the Order Service
  */
-public class OrderServiceImpl implements OrderService {
+class OrderServiceImpl implements OrderService {
     @Override
     public void addOrder(Order order) throws ServiceException, ValidationException {
 
@@ -48,8 +48,19 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void setStateOfOrder(Order order) throws ServiceException {
+    public void markAsInProgress(Order order) throws ServiceException {
 
     }
+
+    @Override
+    public void markAsReadyForDelivery(Order order) throws ServiceException {
+
+    }
+
+    @Override
+    public void markAsDelivered(Order order) throws ServiceException {
+
+    }
+
 
 }
