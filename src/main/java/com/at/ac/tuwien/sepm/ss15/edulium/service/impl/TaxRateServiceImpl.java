@@ -66,7 +66,7 @@ public class TaxRateServiceImpl implements TaxRateService {
     }
 
     @Override
-    public List<TaxRate> findTaxRate(TaxRate matcher) throws ServiceException, ValidationException {
+    public List<TaxRate> findTaxRate(TaxRate matcher) throws ServiceException {
         LOGGER.debug("Entering findTaxRate with parameter: " + matcher);
 
         try {
@@ -78,7 +78,7 @@ public class TaxRateServiceImpl implements TaxRateService {
     }
 
     @Override
-    public List<TaxRate> getAllTaxRates() throws ServiceException, ValidationException {
+    public List<TaxRate> getAllTaxRates() throws ServiceException {
         LOGGER.debug("Entering getAllTaxRates");
 
         try {
