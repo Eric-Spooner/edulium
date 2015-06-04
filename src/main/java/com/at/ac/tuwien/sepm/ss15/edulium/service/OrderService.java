@@ -1,6 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
@@ -54,7 +55,7 @@ public interface OrderService extends Service {
      * @param template template used for finding Orders
      * @throws ServiceException if an error processing the request ocurred
      */
-    List<Order> findOrder(Order template) throws ServiceException;
+    List<Order> findOrder(Order template) throws ServiceException, ValidationException;
 
     /**
      * returns all orders from the underlying datasource
@@ -68,16 +69,16 @@ public interface OrderService extends Service {
      * @param template template used for finding Orders
      * @throws ServiceException if an error processing the request ocurred
      */
-    @PreAuthorize("hasRole('SERVICE')")
-    List<History<Order>> getOrderHistory(Order template) throws ServiceException;
+    @PreAuthorize("hasRole('MANAGER')")
+    List<History<Order>> getOrderHistory(Order template) throws ServiceException, ValidationException;
 
     /**
      * returns all Orders, which have to be cooked
      * @return List of MenuEntries, which should be cooked
      * @throws ServiceException
      */
-    @PreAuthorize("hasRole('COOK')")
-    List<Order> getAllOrdersToCook() throws ServiceException;
+    @PreAuthorize("hasAnyRole('COOK','SERVICE')")
+    public List<Order> getAllOrdersToPrepare(List<MenuCategory> menuCategories) throws ServiceException, ValidationException;
 
     /**
      * Cook uses this function, to set the state of the order to IN_PROGRESS
@@ -87,7 +88,7 @@ public interface OrderService extends Service {
      * @throws ServiceException
      */
     @PreAuthorize("hasRole('COOK')")
-    void markAsInProgress(Order order) throws ServiceException;
+    void markAsInProgress(Order order) throws ServiceException, ValidationException;
 
     /**
      * Cook uses this function, to set the state of the order to READY_FOR_DELIVERY
@@ -97,17 +98,17 @@ public interface OrderService extends Service {
      * @throws ServiceException
      */
     @PreAuthorize("hasRole('COOK')")
-    void markAsReadyForDelivery(Order order) throws ServiceException;
+    void markAsReadyForDelivery(Order order) throws ServiceException, ValidationException;
 
 
     /**
      * Service uses this function, to set the state of the order to READY_FOR_DELIVERY
-     * @pre: The state of the order has to be READY_FOR_DELIVERY
+     * @pre: The state of the order has to be READY_FOR_DELIVERY or QUEUED
      * @post: The state of the order is DELIVERED
      * @param order order
      * @throws ServiceException
      */
     @PreAuthorize("hasRole('SERVICE')")
-    void markAsDelivered(Order order) throws ServiceException;
+    void markAsDelivered(Order order) throws ServiceException, ValidationException;
 
 }

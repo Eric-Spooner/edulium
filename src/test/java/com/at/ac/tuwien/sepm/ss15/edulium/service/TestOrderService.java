@@ -2,11 +2,11 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import org.h2.command.dml.Update;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -15,9 +15,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.parsing.QualifierEntry;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.config.authentication.UserServiceBeanDefinitionParser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -33,9 +35,80 @@ public class TestOrderService extends AbstractServiceTest {
     @Autowired
     OrderService orderService;
     @Mock
-    DAO<Order> orderDAO;
+    private DAO<Order> orderDAO;
     @Mock
     Validator<Order> orderValidator;
+
+
+    @Autowired
+    private DAO<MenuEntry> menuEntryDAO;
+    @Autowired
+    private DAO<Table> tableDAO;
+    @Autowired
+    private DAO<MenuCategory> menuCategoryDAO;
+    @Autowired
+    private DAO<Section> sectionDAO;
+    @Autowired
+    private DAO<User> userDAO;
+    @Autowired
+    private DAO<TaxRate> taxRateDAO;
+
+
+    private Order createOrder(BigDecimal brutto, String info, BigDecimal tax,  LocalDateTime time, Order.State state)
+            throws ValidationException, DAOException, ServiceException {
+
+        MenuCategory menuCategory = new MenuCategory();
+        menuCategory.setName("cat");
+        menuCategoryDAO.create(menuCategory);
+
+        TaxRate taxRate = new TaxRate();
+        taxRate.setValue(BigDecimal.valueOf(0.5));
+        taxRateDAO.create(taxRate);
+
+        User user = User.withIdentity("username");
+        int i = 0;
+        while(userDAO.find(user).size()>0){
+            user = User.withIdentity("username" + i);
+            i++;
+        }
+        user.setRole("role");
+        user.setName("name");
+        userDAO.create(user);
+
+        Section section = new Section();
+        section.setName("Garden");
+        sectionDAO.create(section);
+
+        Table table = new Table();
+        table.setColumn(4);
+        table.setRow(3);
+        table.setSeats(5);
+        table.setNumber(1L);
+        table.setSection(section);
+        table.setUser(user);
+        tableDAO.create(table);
+
+        MenuEntry entry = new MenuEntry();
+        entry.setAvailable(true);
+        entry.setName("Entry");
+        entry.setDescription("Desc");
+        entry.setPrice(BigDecimal.valueOf(50.0));
+        entry.setCategory(menuCategory);
+        entry.setTaxRate(taxRate);
+        menuEntryDAO.create(entry);
+
+        Order order = new Order();
+        order.setTable(table);
+        order.setMenuEntry(entry);
+        order.setBrutto(brutto);
+        order.setTax(tax);
+        order.setAdditionalInformation(info);
+        order.setTime(time);
+        order.setState(state);
+
+        return order;
+    }
+
 
     @Before
     public void setUp() throws Exception {
@@ -48,7 +121,8 @@ public class TestOrderService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testAddOrder_shouldAdd() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = new Order();
+        Order order = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.QUEUED);
 
         // WHEN
         orderService.addOrder(order);
@@ -86,7 +160,8 @@ public class TestOrderService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"COOK"})
     public void testAddOrder_withoutPermissionShouldFail() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = new Order();
+        Order order  =  createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.QUEUED);
 
         // WHEN
         orderService.addOrder(order);
@@ -99,9 +174,12 @@ public class TestOrderService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateOrder_shouldUpdate() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = new Order();
+        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.QUEUED);
+        orderService.addOrder(order);
 
         // WHEN
+        order.setAdditionalInformation("hallo");
         orderService.updateOrder(order);
 
         // THEN
@@ -129,7 +207,7 @@ public class TestOrderService extends AbstractServiceTest {
         Order order  = new Order();
         Mockito.doThrow(new DAOException("")).when(orderDAO).update(order);
 
-        // WHEN
+        // Then
         orderService.updateOrder(order);
     }
 
@@ -137,9 +215,12 @@ public class TestOrderService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"COOK"})
     public void testUpdateOrder_withoutPermissionShouldFail() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = new Order();
+        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.QUEUED);
+        orderService.addOrder(order);
 
         // WHEN
+        order.setState(Order.State.IN_PROGRESS);
         orderService.updateOrder(order);
 
         // THEN
@@ -150,8 +231,8 @@ public class TestOrderService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateOrder_stateNotInQueueAndUpdateAddInfo() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = new Order();
-        order.setState(Order.State.IN_PROGRESS);
+        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.IN_PROGRESS);
         orderService.addOrder(order);
 
         // WHEN
@@ -165,11 +246,12 @@ public class TestOrderService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateOrder_menuEntryIsNotAllowedToBeUpdated() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = new Order();
+        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.IN_PROGRESS);
         orderService.addOrder(order);
 
         // WHEN
-        order.setMenuEntry(new MenuEntry());
+        order.setMenuEntry(MenuEntry.withIdentity(1));
 
         // THEN
         orderService.updateOrder(order);
@@ -179,7 +261,8 @@ public class TestOrderService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateOrder_timeIsNotAllowedToBeUpdated() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = new Order();
+        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.IN_PROGRESS);
         orderService.addOrder(order);
 
         // WHEN
@@ -193,7 +276,9 @@ public class TestOrderService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testCancelOrder_shouldRemove() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = new Order();
+        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.QUEUED);
+        orderService.addOrder(order);
 
         // WHEN
         orderService.cancelOrder(order);
@@ -303,27 +388,6 @@ public class TestOrderService extends AbstractServiceTest {
 
     @Test
     @WithMockUser(username = "servicetester", roles={"COOK"})
-    public void testGetAllOrdersToCook_shouldReturnObjects() throws ServiceException, ValidationException, DAOException {
-        // PREPARE
-        Order order1 = new Order();
-        order1.setState(Order.State.QUEUED);
-        Order order2 = new Order();
-        order2.setState(Order.State.QUEUED);
-        Order order3 = new Order();
-        order3.setState(Order.State.DELIVERED);
-        Mockito.when(orderDAO.getAll()).thenReturn(Arrays.asList(order1, order2, order3));
-
-        // WHEN
-        List<Order> orders = orderService.getAllOrdersToCook();
-
-        // THEN
-        assertEquals(2, orders.size());
-        assertTrue(orders.contains(order1));
-        assertTrue(orders.contains(order2));
-    }
-
-    @Test
-    @WithMockUser(username = "servicetester", roles={"COOK"})
     public void testMarkAsInProgress_shouldWork() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Order order1 = new Order();
@@ -408,7 +472,7 @@ public class TestOrderService extends AbstractServiceTest {
 
 
     @Test
-    @WithMockUser(username = "servicetester", roles={"WAITER"})
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testMarkAsDelivered_shouldWork() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Order order1 = new Order();
@@ -422,7 +486,7 @@ public class TestOrderService extends AbstractServiceTest {
     }
 
     @Test(expected = ServiceException.class)
-    @WithMockUser(username = "servicetester", roles={"WAITER"})
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testMarkAsDelivered_shouldThrowServiceException() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Order order1 = new Order();
