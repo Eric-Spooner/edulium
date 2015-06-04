@@ -54,6 +54,11 @@ class OrderServiceImpl implements OrderService {
             throw new ServiceException("The order, you would like to update does not exist");
         }else {
             Order preOrder = preOrders.get(1);
+            //if the order already had an invoice it is not allowed to be changed
+            if(preOrder.getInvoice() != null){
+                LOGGER.error("It is not allowed to change an order with invoice");
+                throw new ServiceException("It is not allowed to change an order with invoice");
+            }
             //Check which parameter have changed
             //Menu Entry and Time are not allowed to be changed
             if (!preOrder.getMenuEntry().equals(order.getMenuEntry())) {

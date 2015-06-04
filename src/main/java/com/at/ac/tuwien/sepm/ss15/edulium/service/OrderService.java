@@ -26,6 +26,7 @@ public interface OrderService extends Service {
 
     /**
      * updates a order object in the underlying datasource
+     * @pre: The order must not have an Invoice
      * @condition: Only in state QUEUED it is allowed to update the additional info
      *             it is only allowed to set the state in the given "direction"
      *             QUEUED -> IN_PROGRESS -> READY_FOR_DELIVERY -> DELIVERED
