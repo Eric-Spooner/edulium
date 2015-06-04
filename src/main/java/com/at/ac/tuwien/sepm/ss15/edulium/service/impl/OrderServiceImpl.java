@@ -48,12 +48,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void setStateCook(Order order) throws ServiceException {
+    public void setStateOfOrder(Order order) throws ServiceException {
 
     }
 
-    @Override
-    public void setStateWaiter(Order order) throws ServiceException {
-
-    }
 }

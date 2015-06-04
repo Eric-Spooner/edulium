@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
@@ -16,6 +17,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -80,7 +82,7 @@ public class TestOrderService extends AbstractServiceTest {
     }
 
     @Test(expected = AccessDeniedException.class)
-    @WithMockUser(username = "servicetester", roles={"WAITER"})
+    @WithMockUser(username = "servicetester", roles={"COOK"})
     public void testAddOrder_withoutPermissionShouldFail() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Order order  = new Order();
@@ -131,7 +133,7 @@ public class TestOrderService extends AbstractServiceTest {
     }
 
     @Test(expected = AccessDeniedException.class)
-    @WithMockUser(username = "servicetester", roles={"WAITER"})
+    @WithMockUser(username = "servicetester", roles={"COOK"})
     public void testUpdateOrder_withoutPermissionShouldFail() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Order order  = new Order();
@@ -143,9 +145,52 @@ public class TestOrderService extends AbstractServiceTest {
         Mockito.verify(orderDAO, never()).update(order);
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"WAITER"})
+    public void testUpdateOrder_stateNotInQueueAndUpdateAddInfo() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Order order  = new Order();
+        order.setState(Order.State.IN_PROGRESS);
+        orderService.addOrder(order);
+
+        // WHEN
+        order.setAdditionalInformation("Info");
+
+        // THEN
+        orderService.updateOrder(order);
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"WAITER"})
+    public void testUpdateOrder_menuEntryIsNotAllowedToBeUpdated() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Order order  = new Order();
+        orderService.addOrder(order);
+
+        // WHEN
+        order.setMenuEntry(new MenuEntry());
+
+        // THEN
+        orderService.updateOrder(order);
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"WAITER"})
+    public void testUpdateOrder_timeIsNotAllowedToBeUpdated() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Order order  = new Order();
+        orderService.addOrder(order);
+
+        // WHEN
+        order.setTime(LocalDateTime.now());
+
+        // THEN
+        orderService.updateOrder(order);
+    }
+
     @Test
     @WithMockUser(username = "servicetester", roles={"WAITER"})
-    public void testCancleOrder_shouldRemove() throws ServiceException, ValidationException, DAOException {
+    public void testCancelOrder_shouldRemove() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Order order  = new Order();
 
@@ -158,7 +203,7 @@ public class TestOrderService extends AbstractServiceTest {
 
     @Test(expected = ValidationException.class)
     @WithMockUser(username = "servicetester", roles={"WAITER"})
-    public void testCancleOrder_withInvalidObjectShouldFail() throws ServiceException, ValidationException, DAOException {
+    public void testCancelOrder_withInvalidObjectShouldFail() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Order order  = new Order();
         Mockito.doThrow(new ValidationException("")).when(orderValidator).validateForDelete(order);
@@ -172,7 +217,7 @@ public class TestOrderService extends AbstractServiceTest {
 
     @Test(expected = ServiceException.class)
     @WithMockUser(username = "servicetester", roles={"WAITER"})
-    public void testCancleOrder_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+    public void testCancelOrder_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Order order  = new Order();
         Mockito.doThrow(new DAOException("")).when(orderDAO).delete(order);
@@ -182,8 +227,8 @@ public class TestOrderService extends AbstractServiceTest {
     }
 
     @Test(expected = AccessDeniedException.class)
-    @WithMockUser(username = "servicetester", roles={"WAITER"})
-    public void testCancleOrder_withoutPermissionShouldFail() throws ServiceException, ValidationException, DAOException {
+    @WithMockUser(username = "servicetester", roles={"COOK"})
+    public void testCancelOrder_withoutPermissionShouldFail() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Order order  = new Order();
 
@@ -287,9 +332,9 @@ public class TestOrderService extends AbstractServiceTest {
 
         // WHEN
         order1.setState(Order.State.IN_PROGRESS);
-        orderService.setStateCook(order1);
+        orderService.setStateOfOrder(order1);
         order2.setState(Order.State.READY_FOR_DELIVERY);
-        orderService.setStateCook(order2);
+        orderService.setStateOfOrder(order2);
 
         // THEN
         Mockito.verify(orderDAO).update(order1);
@@ -305,7 +350,7 @@ public class TestOrderService extends AbstractServiceTest {
 
         // WHEN
         order1.setState(Order.State.IN_PROGRESS);
-        orderService.setStateCook(order1);
+        orderService.setStateOfOrder(order1);
 
         // THEN
         Mockito.verify(orderDAO).update(order1);
@@ -320,7 +365,7 @@ public class TestOrderService extends AbstractServiceTest {
 
         // WHEN
         order1.setState(Order.State.DELIVERED);
-        orderService.setStateWaiter(order1);
+        orderService.setStateOfOrder(order1);
 
         // THEN
         Mockito.verify(orderDAO).update(order1);
@@ -335,7 +380,7 @@ public class TestOrderService extends AbstractServiceTest {
 
         // WHEN
         order1.setState(Order.State.IN_PROGRESS);
-        orderService.setStateWaiter(order1);
+        orderService.setStateOfOrder(order1);
 
         // THEN
         Mockito.verify(orderDAO).update(order1);

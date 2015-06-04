@@ -20,7 +20,7 @@ public interface OrderService extends Service {
      * @throws ServiceException if an error processing the request ocurred
      * @throws ValidationException if the data is invalid
      */
-    @PreAuthorize("hasRole('ROLE_WAITER')")
+    @PreAuthorize("hasRole('ROLE_SERVICE')")
     void addOrder(Order order) throws ServiceException, ValidationException;
 
     /**
@@ -35,7 +35,7 @@ public interface OrderService extends Service {
      * @throws ServiceException if an error processing the request ocurred
      * @throws ValidationException if the data is invalid
      */
-    @PreAuthorize("hasRole('ROLE_WAITER')")
+    @PreAuthorize("hasRole('ROLE_SERVICE')")
     void updateOrder(Order order) throws ServiceException, ValidationException;
 
     /**
@@ -45,7 +45,7 @@ public interface OrderService extends Service {
      * @throws ServiceException if an error processing the request ocurred
      * @throws ValidationException if the data is invalid
      */
-    @PreAuthorize("hasRole('ROLE_WAITER')")
+    @PreAuthorize("hasRole('ROLE_SERVICE')")
     void cancelOrder(Order order) throws ServiceException, ValidationException;
 
     /**
@@ -68,7 +68,7 @@ public interface OrderService extends Service {
      * @param template template used for finding Orders
      * @throws ServiceException if an error processing the request ocurred
      */
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @PreAuthorize("hasRole('ROLE_SERVICE')")
     List<History<Order>> getOrderHistory(Order template) throws ServiceException;
 
     /**
@@ -80,22 +80,13 @@ public interface OrderService extends Service {
     List<Order> getAllOrdersToCook() throws ServiceException;
 
     /**
-     * cook uses this function, to set the state of the order
-     * @pre: the state of the order has to be QUEUED
-     * @post: the state of the order hast to be IN_PROGRESS OR READY_FOR_DELIVERY,
-     * @param: order order
-     * @throws ServiceException
-     */
-    @PreAuthorize("hasRole('ROLE_COOK')")
-    void setStateCook(Order order) throws ServiceException;
-
-    /**
-     * waiter uses this function, to set the state of the order
-     * @pre: the state of the order has to be READY_FOR_DELIVERY
-     * @post: the state of the order hast to be DELIVERED
+     * Service or Cook uses this function, to set the state of the order
+     * @post: it is only allowed to set the state in the given "direction"
+     *        QUEUED -> IN_PROGRESS -> READY_FOR_DELIVERY -> DELIVERED
+     *        it is allowed to skip steps
      * @param order order
      * @throws ServiceException
      */
-    @PreAuthorize("hasRole('ROLE_WAITER')")
-    void setStateWaiter(Order order) throws ServiceException;
+    @PreAuthorize("hasAnyRole('ROLE_SERVICE','ROLE_COOK')")
+    void setStateOfOrder(Order order) throws ServiceException;
 }
