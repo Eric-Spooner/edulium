@@ -4,6 +4,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.TestTaxRateDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.junit.Before;
@@ -247,5 +248,58 @@ public class TestTaxRateService extends AbstractServiceTest {
 
         // WHEN
         taxRateService.getAllTaxRates();
+    }
+
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testGetTaxRateHistory_shouldReturn() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        TaxRate taxRate = new TaxRate();
+        History<TaxRate> history = new History<>();
+        history.setData(taxRate);
+
+        Mockito.when(taxRateDAO.getHistory(taxRate)).thenReturn(Arrays.asList(history));
+
+        // WHEN
+        List<History<TaxRate>> changes = taxRateService.getTaxRateHistory(taxRate);
+
+        // THEN
+        assertEquals(1, changes.size());
+        assertTrue(changes.contains(history));
+        Mockito.verify(taxRateDAO).getHistory(taxRate);
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testGetTaxRateHistory_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        TaxRate taxRate = new TaxRate();
+        Mockito.doThrow(new DAOException("")).when(taxRateDAO).getHistory(taxRate);
+
+        // WHEN
+        taxRateService.getTaxRateHistory(taxRate);
+    }
+
+    @Test(expected = ValidationException.class)
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testGetTaxRateHistory_onValidationExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        TaxRate taxRate = new TaxRate();
+        Mockito.doThrow(new ValidationException("")).when(taxRateValidator).validateIdentity(taxRate);
+
+        // WHEN
+        taxRateService.getTaxRateHistory(taxRate);
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
+    public void testGetTaxRateHistory_WithoutPermissionShouldFail() throws ValidationException, DAOException, ServiceException {
+        // PREPARE
+        TaxRate taxRate = new TaxRate();
+
+        // WHEN
+        taxRateService.getTaxRateHistory(taxRate);
+
+        // THEN
+        Mockito.verify(taxRateDAO, never()).getHistory(taxRate);
     }
 }

@@ -58,6 +58,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setTime(LocalDateTime.now());
         order.setInvoice(Invoice.withIdentity(1));
         order.setAdditionalInformation("");
+        order.setState(Order.State.QUEUED);
 
         // WHEN
         orderValidator.validateForCreate(order);
@@ -90,6 +91,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setTax(BigDecimal.valueOf(0));
         order.setTime(LocalDateTime.now());
         order.setInvoice(Invoice.withIdentity(1));
+        order.setState(Order.State.QUEUED);
 
         // WHEN
         orderValidator.validateForCreate(order);
@@ -105,6 +107,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
         order.setInvoice(Invoice.withIdentity(1));
+        order.setState(Order.State.QUEUED);
 
         // WHEN
         orderValidator.validateForCreate(order);
@@ -120,6 +123,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
         order.setInvoice(Invoice.withIdentity(1));
+        order.setState(Order.State.QUEUED);
 
         // WHEN
         orderValidator.validateForCreate(order);
@@ -135,6 +139,23 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
         order.setInvoice(Invoice.withIdentity(1));
+        order.setState(Order.State.QUEUED);
+
+        // WHEN
+        orderValidator.validateForCreate(order);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_OrderWithoutStateShouldThrow() throws ValidationException {
+        // GIVEN
+        Order order = new Order();
+        order.setTable(createTable(1, 2, 3));
+        order.setMenuEntry(createMenuEntry("name", "desc", "cat", 50, 0.02, true));
+        order.setBrutto(BigDecimal.valueOf(1));
+        order.setTax(BigDecimal.valueOf(1));
+        order.setTime(LocalDateTime.now());
+        order.setInvoice(Invoice.withIdentity(1));
+        order.setAdditionalInformation("");
 
         // WHEN
         orderValidator.validateForCreate(order);
@@ -150,6 +171,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setTax(BigDecimal.valueOf(0));
         order.setAdditionalInformation("Info");
         order.setInvoice(Invoice.withIdentity(1));
+        order.setState(Order.State.QUEUED);
 
         // WHEN
         orderValidator.validateForCreate(order);
@@ -166,6 +188,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
+        order.setState(Order.State.QUEUED);
 
         // WHEN
         orderValidator.validateForCreate(order);
@@ -182,6 +205,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
+        order.setState(Order.State.QUEUED);
 
         // WHEN
         orderValidator.validateForCreate(order);
@@ -199,6 +223,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
+        order.setState(Order.State.QUEUED);
 
         // WHEN
         orderValidator.validateForCreate(order);
@@ -216,6 +241,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
+        order.setState(Order.State.QUEUED);
 
         // WHEN
         orderValidator.validateForCreate(order);
@@ -233,6 +259,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
+        order.setState(Order.State.QUEUED);
 
         // WHEN
         orderValidator.validateForCreate(order);
@@ -250,6 +277,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
         order.setInvoice(Invoice.withIdentity(1));
+        order.setState(Order.State.IN_PROGRESS);
 
         // WHEN
         orderValidator.validateForUpdate(order);
@@ -263,6 +291,24 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setMenuEntry(createMenuEntry("name", "desc", "cat", 50, 0.02, true));
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(BigDecimal.valueOf(0));
+        order.setTime(LocalDateTime.now());
+        order.setAdditionalInformation("Info");
+        order.setInvoice(Invoice.withIdentity(1));
+        order.setState(Order.State.IN_PROGRESS);
+
+        // WHEN
+        orderValidator.validateForUpdate(order);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_OrderWithoutStateShouldThrow() throws ValidationException {
+        // GIVEN
+        Order order =  Order.withIdentity(3);
+        order.setIdentity((long) 1);
+        order.setTable(createTable(1, 2, 3));
+        order.setMenuEntry(createMenuEntry("name", "desc", "cat", 50, 0.02, true));
+        order.setBrutto(BigDecimal.valueOf(1));
+        order.setTax(BigDecimal.valueOf(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
         order.setInvoice(Invoice.withIdentity(1));
@@ -291,6 +337,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
+        order.setState(Order.State.IN_PROGRESS);
 
         // WHEN
         orderValidator.validateForUpdate(order);
@@ -307,6 +354,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
+        order.setState(Order.State.IN_PROGRESS);
 
         // WHEN
         orderValidator.validateForUpdate(order);
@@ -324,6 +372,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
+        order.setState(Order.State.IN_PROGRESS);
 
         // WHEN
         orderValidator.validateForUpdate(order);
@@ -341,6 +390,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
+        order.setState(Order.State.IN_PROGRESS);
 
         // WHEN
         orderValidator.validateForUpdate(order);
