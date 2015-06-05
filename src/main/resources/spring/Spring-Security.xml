@@ -9,4 +9,8 @@
 
     <security:global-method-security pre-post-annotations="enabled" />
 
+    <security:authentication-manager>
+        <security:authentication-provider user-service-ref="userDetailsService" />
+    </security:authentication-manager>
+
 </beans>

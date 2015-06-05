@@ -10,6 +10,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 /**
  * Database implementation of the DAO interface for Invoice objects
  */
+@PreAuthorize("isAuthenticated()")
 class DBInvoiceDAO implements DAO<Invoice> {
 
     private static final Logger LOGGER = LogManager.getLogger(DBInvoiceDAO.class);
