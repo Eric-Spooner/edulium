@@ -117,7 +117,7 @@ public class TestUserService extends AbstractServiceTest {
 
     @Test
     @WithMockUser(username = "servicetester", roles={"MANAGER"})
-    public void testUpdateUser_invalidUserShouldCallDaoUpdate() throws ServiceException, ValidationException, DAOException {
+    public void testUpdateUser_invalidUserShouldNotCallDaoUpdate() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         User user = new User();
         Mockito.doThrow(new ValidationException("invalid user test")).when(userValidator).validateForUpdate(user);
@@ -127,7 +127,7 @@ public class TestUserService extends AbstractServiceTest {
             userService.updateUser(user);
 
             fail("A ValidationException should have been thrown");
-        } catch (AccessDeniedException e) {
+        } catch (ValidationException e) {
         }
 
         // THEN
@@ -188,7 +188,7 @@ public class TestUserService extends AbstractServiceTest {
             userService.deleteUser(user);
 
             fail("A ValidationException should have been thrown");
-        } catch (AccessDeniedException e) {
+        } catch (ValidationException e) {
         }
 
         // THEN
