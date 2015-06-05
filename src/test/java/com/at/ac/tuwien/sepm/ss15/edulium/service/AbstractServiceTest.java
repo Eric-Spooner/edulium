@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Base class for all Service Tests which loads the service context configuration.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:spring/Spring-Service.xml")
+@ContextConfiguration("classpath:spring/Spring-Edulium.xml")
 @WithMockUser(username="servicetester")
 @Transactional
 public abstract class AbstractServiceTest {
