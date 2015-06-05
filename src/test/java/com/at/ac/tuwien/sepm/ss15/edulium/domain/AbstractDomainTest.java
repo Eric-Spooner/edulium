@@ -8,6 +8,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * Base class for all Domain Tests which loads the domain context configuration.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:spring/Spring-Domain.xml")
+@ContextConfiguration("classpath:spring/Spring-Edulium.xml")
 public abstract class AbstractDomainTest {
 }

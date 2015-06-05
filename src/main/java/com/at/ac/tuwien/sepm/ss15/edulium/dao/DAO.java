@@ -13,7 +13,6 @@ import java.util.List;
  * Generic DAO interface
  */
 @Repository
-@PreAuthorize("isAuthenticated()")
 @Transactional(propagation = Propagation.MANDATORY)
 public interface DAO<T> {
 
@@ -63,7 +62,7 @@ public interface DAO<T> {
      * @param object object to get the history for
      * @return returns the history of changes for the object
      * @throws DAOException if the data couldn't be retrieved
-     * @throws ValidationException if the menuCategory object parameters are
+     * @throws ValidationException if the object parameters are
      *         not valid for this action
      */
     List<History<T>> getHistory(T object) throws DAOException, ValidationException;

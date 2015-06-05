@@ -12,6 +12,7 @@ public class Instalment {
     String paymentInfo;
     String type;
     BigDecimal amount;
+    Invoice invoice;
 
     /**
      * Creates a new instalment object and assigns the given identity to it
@@ -97,6 +98,20 @@ public class Instalment {
         this.amount = amount;
     }
 
+    /**
+     * @return Returns the Invoice that it was assigned to (can be null)
+     */
+    public Invoice getInvoice() {
+        return invoice;
+    }
+
+    /**
+     * @param invoice The assigned invoice object
+     */
+    public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
+    }
+
     @Override
     public String toString() {
         return "Instalment{" +
@@ -119,6 +134,8 @@ public class Instalment {
         if (time != null ? !time.equals(that.time) : that.time != null) return false;
         if (paymentInfo != null ? !paymentInfo.equals(that.paymentInfo) : that.paymentInfo != null) return false;
         if (type != null ? !type.equals(that.type) : that.type != null) return false;
-        return !(amount != null ? amount.compareTo(that.amount) != 0 : that.amount != null);
+        if (amount != null ? amount.compareTo(that.amount) != 0 : that.amount != null) return false;
+        return !(invoice != null ? !invoice.equals(that.invoice) : that.invoice != null);
+
     }
 }

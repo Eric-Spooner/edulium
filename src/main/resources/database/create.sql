@@ -317,6 +317,7 @@ CREATE TABLE IF NOT EXISTS RestaurantOrder (
     brutto DECIMAL(20, 2),
     tax DECIMAL(3, 2),
     info TEXT,
+    state VARCHAR(20),
     canceled BOOLEAN DEFAULT FALSE,
     FOREIGN KEY(table_section, table_number) REFERENCES RestaurantTable(section_ID, number)
 );
@@ -331,6 +332,7 @@ CREATE TABLE IF NOT EXISTS RestaurantOrderHistory (
     brutto DECIMAL(20, 2),
     tax DECIMAL(3, 2),
     info TEXT,
+    state VARCHAR(20),
     canceled BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
