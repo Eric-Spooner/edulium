@@ -9,6 +9,8 @@
     <import resource="Spring-DataSource.xml" />
 
     <!-- Validator beans -->
+    <import resource="domain/Spring-IntermittentSaleValidator.xml" />
+    <import resource="domain/Spring-OneTimeSaleValidator.xml" />
     <import resource="domain/Spring-MenuCategoryValidator.xml" />
     <import resource="domain/Spring-TableValidator.xml" />
     <import resource="domain/Spring-SectionValidator.xml" />
@@ -21,6 +23,8 @@
     <import resource="domain/Spring-OrderValidator.xml" />
 
     <!-- DAO beans -->
+    <import resource="dao/Spring-IntermittentSaleDAO.xml" />
+    <import resource="dao/Spring-OnetimeSaleDAO.xml" />
     <import resource="dao/Spring-MenuCategoryDAO.xml" />
     <import resource="dao/Spring-SectionDAO.xml" />
     <import resource="dao/Spring-TableDAO.xml" />

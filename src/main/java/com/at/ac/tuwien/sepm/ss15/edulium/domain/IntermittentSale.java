@@ -199,24 +199,26 @@ public class IntermittentSale extends Sale {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof IntermittentSale)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
-        IntermittentSale iSale = (IntermittentSale) o;
+        IntermittentSale that = (IntermittentSale) o;
 
-        if (identity != null ? !identity.equals(iSale.identity) : iSale.identity != null) return false;
-        if (name != null ? !name.equals(iSale.name) : iSale.name != null) return false;
-        if (entries != null ? !entries.containsAll(iSale.entries) : iSale.entries != null) return false;
-        if (monday != null ? !monday.equals(iSale.monday) : iSale.monday != null) return false;
-        if (tuesday != null ? !tuesday.equals(iSale.tuesday) : iSale.tuesday != null) return false;
-        if (wednesday != null ? !wednesday.equals(iSale.wednesday) : iSale.wednesday != null) return false;
-        if (thursday != null ? !thursday.equals(iSale.thursday) : iSale.thursday != null) return false;
-        if (friday != null ? !friday.equals(iSale.friday) : iSale.friday != null) return false;
-        if (saturday != null ? !saturday.equals(iSale.saturday) : iSale.saturday != null) return false;
-        if (sunday != null ? !sunday.equals(iSale.sunday) : iSale.sunday != null) return false;
-        if (fromDayTime != null ? !fromDayTime.equals(iSale.fromDayTime) : iSale.fromDayTime != null) return false;
-        if (duration != null ? !duration.equals(iSale.duration) : iSale.duration != null) return false;
-        return !(enabled != null ? !enabled.equals(iSale.enabled) : iSale.enabled != null);
+        if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
+        if (enabled != null ? !enabled.equals(that.enabled) : that.enabled != null) return false;
+        if (friday != null ? !friday.equals(that.friday) : that.friday != null) return false;
+        if (fromDayTime != null ? !fromDayTime.equals(that.fromDayTime) : that.fromDayTime != null) return false;
+        if (monday != null ? !monday.equals(that.monday) : that.monday != null) return false;
+        if (saturday != null ? !saturday.equals(that.saturday) : that.saturday != null) return false;
+        if (sunday != null ? !sunday.equals(that.sunday) : that.sunday != null) return false;
+        if (thursday != null ? !thursday.equals(that.thursday) : that.thursday != null) return false;
+        if (tuesday != null ? !tuesday.equals(that.tuesday) : that.tuesday != null) return false;
+        if (wednesday != null ? !wednesday.equals(that.wednesday) : that.wednesday != null) return false;
+        if (entries != null ? !entries.equals(that.entries) : that.entries != null) return false;
+        if (identity != null ? !identity.equals(that.identity) : that.identity != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
 
+        return true;
     }
 
     @Override

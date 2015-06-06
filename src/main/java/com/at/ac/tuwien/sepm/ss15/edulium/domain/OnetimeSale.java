@@ -62,16 +62,17 @@ public class OnetimeSale extends Sale {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof OnetimeSale)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        OnetimeSale onetimeSale = (OnetimeSale) o;
+        OnetimeSale that = (OnetimeSale) o;
 
-        if (identity != null ? !identity.equals(onetimeSale.identity) : onetimeSale.identity != null) return false;
-        if (name != null ? !name.equals(onetimeSale.name) : onetimeSale.name != null) return false;
-        if (entries != null ? !entries.containsAll(onetimeSale.entries) : onetimeSale.entries != null) return false;
-        if (fromTime != null ? !fromTime.equals(onetimeSale.fromTime) : onetimeSale.fromTime != null) return false;
-        return !(toTime != null ? !toTime.equals(onetimeSale.toTime) : onetimeSale.toTime != null);
+        if (fromTime != null ? !fromTime.equals(that.fromTime) : that.fromTime != null) return false;
+        if (toTime != null ? !toTime.equals(that.toTime) : that.toTime != null) return false;
+        if (entries != null ? !entries.equals(that.entries) : that.entries != null) return false;
+        if (identity != null ? !identity.equals(that.identity) : that.identity != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
 
+        return true;
     }
 
     @Override
