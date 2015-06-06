@@ -56,6 +56,12 @@ public class IntermittentSaleValidator implements Validator<IntermittentSale> {
         if (intermittentSale.getName().isEmpty()) {
             throw new ValidationException("name must not be empty");
         }
+        if (intermittentSale.getEntries() == null){
+            throw new ValidationException("Menu entries not be null");
+        }
+        if (intermittentSale.getEntries().size() == 0){
+            throw new ValidationException("There should be at least one menu entry");
+        }
         if (intermittentSale.getFromDayTime() == null) {
             throw new ValidationException("FromDayTime must not be null");
         }

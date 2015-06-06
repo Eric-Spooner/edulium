@@ -55,6 +55,12 @@ public class OnetimeSaleValidator implements Validator<OnetimeSale> {
         if (onetimeSale.getName().isEmpty()) {
             throw new ValidationException("name must not be empty");
         }
+        if (onetimeSale.getEntries() == null){
+            throw new ValidationException("Menu entries not be null");
+        }
+        if (onetimeSale.getEntries().size() == 0){
+            throw new ValidationException("There should be at least one menu entry");
+        }
         if (onetimeSale.getFromTime() == null) {
             throw new ValidationException("FromTime must not be null");
         }
