@@ -22,7 +22,7 @@ import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.never;
 
 /**
- * Created by constantin on 06.06.15.
+ * Unit Test of the SaleService interface
  */
 public class TestSaleService extends AbstractServiceTest {
     @Autowired
