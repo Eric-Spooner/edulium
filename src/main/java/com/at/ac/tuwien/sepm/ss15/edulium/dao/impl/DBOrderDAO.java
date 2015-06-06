@@ -9,6 +9,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 /**
  * H2 Database Implementation of the Order DAO interface
  */
+@PreAuthorize("isAuthenticated()")
 class DBOrderDAO implements DAO<Order> {
     private static final Logger LOGGER = LogManager.getLogger(DBOrderDAO.class);
 
@@ -43,7 +45,7 @@ class DBOrderDAO implements DAO<Order> {
         LOGGER.debug("entering create with parameters " + order);
         validator.validateForCreate(order);
         final String query = "INSERT INTO RestaurantOrder (invoice_ID, table_section, table_number, menuEntry_ID, " +
-                "orderTime, brutto, tax, info) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "orderTime, brutto, tax, info, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             Invoice invoice = order.getInvoice();
             stmt.setObject(1, invoice == null ? null : invoice.getIdentity());
@@ -54,6 +56,7 @@ class DBOrderDAO implements DAO<Order> {
             stmt.setBigDecimal(6, order.getBrutto());
             stmt.setBigDecimal(7, order.getTax());
             stmt.setString(8, order.getAdditionalInformation());
+            stmt.setString(9, order.getState().toString());
             stmt.executeUpdate();
 
             ResultSet key = stmt.getGeneratedKeys();
@@ -75,7 +78,7 @@ class DBOrderDAO implements DAO<Order> {
         validator.validateForUpdate(order);
 
         final String query = "UPDATE RestaurantOrder SET invoice_ID = ?, table_section = ?, table_number = ?," +
-                " menuEntry_ID = ?, orderTime = ?, brutto = ?, tax = ?, info = ? WHERE ID = ?";
+                " menuEntry_ID = ?, orderTime = ?, brutto = ?, tax = ?, info = ?, state = ? WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             if(order.getInvoice() == null){
@@ -90,7 +93,8 @@ class DBOrderDAO implements DAO<Order> {
             stmt.setBigDecimal(6, order.getBrutto());
             stmt.setBigDecimal(7, order.getTax());
             stmt.setString(8, order.getAdditionalInformation());
-            stmt.setLong(9, order.getIdentity());
+            stmt.setString(9, order.getState().toString());
+            stmt.setLong(10, order.getIdentity());
             stmt.executeUpdate();
 
 
@@ -147,6 +151,7 @@ class DBOrderDAO implements DAO<Order> {
                 "table_section = ISNULL(?, table_section) AND " +
                 "table_number = ISNULL(?, table_number) AND " +
                 "menuEntry_ID = ISNULL(?, menuEntry_ID) AND " +
+                "state = ISNULL(?, state) AND " +
                 "canceled = false";
 
         final List<Order> objects = new ArrayList<>();
@@ -174,6 +179,7 @@ class DBOrderDAO implements DAO<Order> {
                 stmt.setLong(9, table.getNumber());
             }
             stmt.setObject(10, order.getMenuEntry() == null ? null : order.getMenuEntry().getIdentity());
+            stmt.setObject(11, order.getState() == null ? null : order.getState().toString());
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
@@ -309,6 +315,7 @@ class DBOrderDAO implements DAO<Order> {
         order.setBrutto(result.getBigDecimal("brutto"));
         order.setTax(result.getBigDecimal("tax"));
         order.setTime(result.getTimestamp("orderTime").toLocalDateTime());
+        order.setState(Order.State.valueOf(result.getString("state")));
 
         final List<MenuEntry> menuEntries = menuEntryDAO.populate(Arrays.asList(MenuEntry.withIdentity(result.getLong("menuEntry_ID"))));
         if (menuEntries.size() != 1) {

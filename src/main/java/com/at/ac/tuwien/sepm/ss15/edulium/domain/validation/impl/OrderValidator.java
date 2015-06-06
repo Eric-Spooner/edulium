@@ -79,8 +79,12 @@ class OrderValidator implements Validator<Order> {
         if(order.getTime() == null) {
             throw new ValidationException("Time must not be null");
         }
+
+        if (order.getState() == null) {
+            throw new ValidationException("State must not be null");
+        }
+
         menuEntryValidator.validateForUpdate(order.getMenuEntry());
         tableValidator.validateForUpdate(order.getTable());
-
     }
 }

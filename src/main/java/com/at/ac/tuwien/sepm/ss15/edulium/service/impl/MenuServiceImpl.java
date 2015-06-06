@@ -5,6 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl.MenuCategoryValidator;
@@ -102,6 +103,20 @@ class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    public List<History<MenuEntry>> getMenuEntryHistory(MenuEntry entry) throws ValidationException, ServiceException {
+        LOGGER.debug("Entering getMenuEntryHistory with parameter: " + entry);
+
+        menuEntryValidator.validateIdentity(entry);
+
+        try {
+            return menuEntryDAO.getHistory(entry);
+        } catch (DAOException e) {
+            LOGGER.error("An Error has occurred in the data access object", e);
+            throw new ServiceException("An Error has occurred in the data access object", e);
+        }
+    }
+
+    @Override
     public void addMenuCategory(MenuCategory menuCategory) throws ValidationException, ServiceException {
         LOGGER.debug("Entering addMenuCategory with parameter: " + menuCategory);
 
@@ -168,6 +183,20 @@ class MenuServiceImpl implements MenuService {
     }
 
     @Override
+    public List<History<MenuCategory>> getMenuCategoryHistory(MenuCategory category) throws ValidationException, ServiceException {
+        LOGGER.debug("Entering getMenuCategoryHistory with parameter: " + category);
+
+        menuCategoryValidator.validateIdentity(category);
+
+        try {
+            return menuCategoryDAO.getHistory(category);
+        } catch (DAOException e) {
+            LOGGER.error("An Error has occurred in the data access object", e);
+            throw new ServiceException("An Error has occurred in the data access object", e);
+        }
+    }
+
+    @Override
     public void addMenu(Menu menu) throws ValidationException, ServiceException {
         LOGGER.debug("Entering addMenu with parameter: " + menu);
 
@@ -227,6 +256,20 @@ class MenuServiceImpl implements MenuService {
 
         try {
             return menuDAO.getAll();
+        } catch (DAOException e) {
+            LOGGER.error("An Error has occurred in the data access object", e);
+            throw new ServiceException("An Error has occurred in the data access object", e);
+        }
+    }
+
+    @Override
+    public List<History<Menu>> getMenuHistory(Menu menu) throws ValidationException, ServiceException {
+        LOGGER.debug("Entering getMenuHistory with parameter: " + menu);
+
+        menuValidator.validateIdentity(menu);
+
+        try {
+            return menuDAO.getHistory(menu);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
             throw new ServiceException("An Error has occurred in the data access object", e);
