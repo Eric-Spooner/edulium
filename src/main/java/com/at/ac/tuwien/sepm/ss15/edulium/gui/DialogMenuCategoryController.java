@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
  * Controller for the TaxRate Dialog
  */
 public class DialogMenuCategoryController implements Initializable{
-    private static final Logger LOGGER = LogManager.getLogger(DialogTaxRateController.class);
+    private static final Logger LOGGER = LogManager.getLogger(DialogMenuCategoryController.class);
 
     private static MenuService menuService;
     private static Stage thisStage;

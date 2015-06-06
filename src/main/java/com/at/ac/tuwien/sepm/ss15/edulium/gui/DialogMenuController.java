@@ -28,7 +28,7 @@ import static javafx.collections.FXCollections.observableArrayList;
  * Controller for the TaxRate Dialog
  */
 public class DialogMenuController implements Initializable{
-    private static final Logger LOGGER = LogManager.getLogger(DialogTaxRateController.class);
+    private static final Logger LOGGER = LogManager.getLogger(DialogMenuController.class);
 
     private static Stage thisStage;
     private static MenuService menuService;
