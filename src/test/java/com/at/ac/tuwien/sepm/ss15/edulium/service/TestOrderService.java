@@ -51,16 +51,15 @@ public class TestOrderService extends AbstractServiceTest {
     private TaxRateService taxRateService;
 
 
-    @WithMockUser(username = "servicetester", roles={"MANAGER"})
-    private Order createOrder(BigDecimal brutto, String info, BigDecimal tax,  LocalDateTime time, Order.State state)
-            throws ValidationException, DAOException, ServiceException {
-
+    @Before
+    @WithMockUser(username = "tester", roles={"MANAGER"})
+    public void makeDBEntries() throws Exception{
         MenuCategory menuCategory = new MenuCategory();
-        menuCategory.setName("cat");
+        menuCategory.setName("cat1");
         menuService.addMenuCategory(menuCategory);
 
         TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(0.5));
+        taxRate.setValue(BigDecimal.valueOf(0.2));
         taxRateService.addTaxRate(taxRate);
 
         User user = User.withIdentity("username");
@@ -95,24 +94,28 @@ public class TestOrderService extends AbstractServiceTest {
         entry.setTaxRate(taxRate);
         menuService.addMenuEntry(entry);
 
-        Order order = new Order();
-        order.setTable(table);
-        order.setMenuEntry(entry);
-        order.setBrutto(brutto);
-        order.setTax(tax);
-        order.setAdditionalInformation(info);
-        order.setTime(time);
-        order.setState(state);
-
-        return order;
     }
-
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(getTargetObject(orderService), "orderDAO", orderDAO);
         ReflectionTestUtils.setField(getTargetObject(orderService), "orderValidator", orderValidator);
+    }
+
+
+    private Order createOrder(BigDecimal value, String additionalInformation, BigDecimal taxRate, LocalDateTime time, Order.State state) throws ServiceException{
+
+        Order order = new Order();
+        order.setTable(interiorService.getAllTables().get(1));
+        order.setMenuEntry(menuService.getAllMenuEntries().get(1));
+        order.setBrutto(value);
+        order.setTax(taxRate);
+        order.setAdditionalInformation(additionalInformation);
+        order.setTime(time);
+        order.setState(state);
+
+        return order;
     }
 
     @Test
