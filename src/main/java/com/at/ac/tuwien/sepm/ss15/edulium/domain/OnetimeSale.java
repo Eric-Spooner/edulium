@@ -55,6 +55,7 @@ public class OnetimeSale extends Sale {
                 ", name=" + name +
                 ", fromTime=" + fromTime +
                 ", toTime=" + toTime +
+                ", entries=" + entries +
                 '}';
     }
 
@@ -67,6 +68,7 @@ public class OnetimeSale extends Sale {
 
         if (identity != null ? !identity.equals(onetimeSale.identity) : onetimeSale.identity != null) return false;
         if (name != null ? !name.equals(onetimeSale.name) : onetimeSale.name != null) return false;
+        if (entries != null ? !entries.containsAll(onetimeSale.entries) : onetimeSale.entries != null) return false;
         if (fromTime != null ? !fromTime.equals(onetimeSale.fromTime) : onetimeSale.fromTime != null) return false;
         return !(toTime != null ? !toTime.equals(onetimeSale.toTime) : onetimeSale.toTime != null);
 

@@ -192,6 +192,7 @@ public class IntermittentSale extends Sale {
                 ", fromDayTime=" + fromDayTime +
                 ", duration=" + duration +
                 ", enabled=" + enabled +
+                ", entries=" + entries +
                 '}';
     }
 
@@ -204,6 +205,7 @@ public class IntermittentSale extends Sale {
 
         if (identity != null ? !identity.equals(iSale.identity) : iSale.identity != null) return false;
         if (name != null ? !name.equals(iSale.name) : iSale.name != null) return false;
+        if (entries != null ? !entries.containsAll(iSale.entries) : iSale.entries != null) return false;
         if (monday != null ? !monday.equals(iSale.monday) : iSale.monday != null) return false;
         if (tuesday != null ? !tuesday.equals(iSale.tuesday) : iSale.tuesday != null) return false;
         if (wednesday != null ? !wednesday.equals(iSale.wednesday) : iSale.wednesday != null) return false;
