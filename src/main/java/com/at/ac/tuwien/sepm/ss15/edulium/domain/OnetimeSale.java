@@ -74,6 +74,12 @@ public class OnetimeSale extends Sale {
 
     @Override
     public boolean isAt(LocalDateTime time) {
-        return false; //TODO
+        if (fromTime.isAfter(time)) {
+            return false;
+        }
+        if (toTime.isBefore(time)) {
+            return false;
+        }
+        return true;
     }
 }

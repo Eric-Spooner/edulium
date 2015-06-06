@@ -1,5 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 
 /**
@@ -218,6 +219,31 @@ public class IntermittentSale extends Sale {
 
     @Override
     public boolean isAt(LocalDateTime time) {
-        return false; //TODO
+        // Same day of the week?
+        boolean dayMatch = false;
+        if (time.getDayOfWeek().equals(DayOfWeek.MONDAY) && this.monday!=null && this.monday == true) {
+            dayMatch = true;
+        } else if (time.getDayOfWeek().equals(DayOfWeek.TUESDAY) && this.tuesday!=null && this.tuesday == true) {
+            dayMatch = true;
+        } else if (time.getDayOfWeek().equals(DayOfWeek.WEDNESDAY) && this.wednesday!=null && this.wednesday == true) {
+            dayMatch = true;
+        } else if (time.getDayOfWeek().equals(DayOfWeek.THURSDAY) && this.thursday!=null && this.thursday == true) {
+            dayMatch = true;
+        } else if (time.getDayOfWeek().equals(DayOfWeek.FRIDAY) && this.friday!=null && this.friday == true) {
+            dayMatch = true;
+        } else if (time.getDayOfWeek().equals(DayOfWeek.SATURDAY) && this.saturday!=null && this.saturday == true) {
+            dayMatch = true;
+        } else if (time.getDayOfWeek().equals(DayOfWeek.SUNDAY) && this.sunday!=null && this.sunday == true) {
+            dayMatch = true;
+        }
+        if (!dayMatch) {
+            return false;
+        }
+        // Same day time?
+        // Count minutes since midnight
+        int timeMinutes = time.getHour()*60+time.getMinute();
+        int begin = this.fromDayTime.getHour()*60+this.fromDayTime.getMinute();
+        int end = begin+duration;
+        return (begin <= timeMinutes && timeMinutes <= end);
     }
 }
