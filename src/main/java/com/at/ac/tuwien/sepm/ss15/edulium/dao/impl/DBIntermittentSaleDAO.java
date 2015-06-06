@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
@@ -53,6 +54,7 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             throw new DAOException("Inserting sale into database failed", e);
         }
 
+        updateSaleAssoc(intermittentSale);
         generateSaleHistory(intermittentSale);
 
         //Save IntermittentSale
@@ -102,6 +104,7 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             throw new DAOException("Updating sale in database failed", e);
         }
 
+        updateSaleAssoc(intermittentSale);
         generateSaleHistory(intermittentSale);
 
         //Save IntermittentSale
@@ -429,5 +432,47 @@ public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
         result2.next();
         String name = result2.getString("name");
         intermittentSale.setName(name);
+    }
+
+    // ######################### SaleAssoc stuff #########################
+
+    /**
+     * This function is used, to update/create Sale Assoc Entries
+     * All SaleAssoc with the SaleID are disabled, the one, which are used are enabled again and the rest is added
+     * the parameters are used, to identify the Sale Assoc and to set the values
+     *
+     * @param sale Sale Is used to identify the SaleAssoc
+     */
+    private void updateSaleAssoc(Sale sale) throws DAOException {
+        // At first, look if the
+        // disable all SaleAssoc for now, the update sql query will re-enable all valid
+        // associations
+        final String queryDisableSaleAssoc = "UPDATE SaleAssoc SET disabled = true WHERE sale_ID = ?";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryDisableSaleAssoc)) {
+            stmt.setLong(1, sale.getIdentity());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("Disabling Sale-MenuEntry associations from database failed", e);
+            throw new DAOException("Disabling Sale-MenuEntry associations from database failed", e);
+        }
+
+        final String queryUpdateSaleAssoc =
+                "Merge INTO SaleAssoc (sale_ID, menuEntry_ID, salePrice, disabled) " +
+                        "KEY (sale_ID, menuEntry_ID) VALUES (?, ?, ?, false)";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryUpdateSaleAssoc)) {
+            for (MenuEntry entry : sale.getEntries().keySet()) {
+                stmt.setLong(1, sale.getIdentity());
+                stmt.setLong(2, entry.getIdentity());
+                stmt.setBigDecimal(3, sale.getEntries().get(entry));
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
+        } catch (SQLException e) {
+            LOGGER.error("updating saleAssoc in database failed", e);
+            throw new DAOException("updating saleAssoc in database failed", e);
+        }
     }
 }
