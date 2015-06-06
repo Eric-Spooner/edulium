@@ -6,6 +6,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.impl.InteriorServiceImpl;
 import org.h2.command.dml.Update;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,43 +42,40 @@ public class TestOrderService extends AbstractServiceTest {
 
 
     @Autowired
-    private DAO<MenuEntry> menuEntryDAO;
+    private MenuService menuService;
     @Autowired
-    private DAO<Table> tableDAO;
+    private InteriorService interiorService;
     @Autowired
-    private DAO<MenuCategory> menuCategoryDAO;
+    private UserService userService;
     @Autowired
-    private DAO<Section> sectionDAO;
-    @Autowired
-    private DAO<User> userDAO;
-    @Autowired
-    private DAO<TaxRate> taxRateDAO;
+    private TaxRateService taxRateService;
 
 
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     private Order createOrder(BigDecimal brutto, String info, BigDecimal tax,  LocalDateTime time, Order.State state)
             throws ValidationException, DAOException, ServiceException {
 
         MenuCategory menuCategory = new MenuCategory();
         menuCategory.setName("cat");
-        menuCategoryDAO.create(menuCategory);
+        menuService.addMenuCategory(menuCategory);
 
         TaxRate taxRate = new TaxRate();
         taxRate.setValue(BigDecimal.valueOf(0.5));
-        taxRateDAO.create(taxRate);
+        taxRateService.addTaxRate(taxRate);
 
         User user = User.withIdentity("username");
         int i = 0;
-        while(userDAO.find(user).size()>0){
+        while(userService.findUsers(user).size()>0){
             user = User.withIdentity("username" + i);
             i++;
         }
         user.setRole("role");
         user.setName("name");
-        userDAO.create(user);
+        userService.addUser(user);
 
         Section section = new Section();
         section.setName("Garden");
-        sectionDAO.create(section);
+        interiorService.addSection(section);
 
         Table table = new Table();
         table.setColumn(4);
@@ -86,7 +84,7 @@ public class TestOrderService extends AbstractServiceTest {
         table.setNumber(1L);
         table.setSection(section);
         table.setUser(user);
-        tableDAO.create(table);
+        interiorService.addTable(table);
 
         MenuEntry entry = new MenuEntry();
         entry.setAvailable(true);
@@ -95,7 +93,7 @@ public class TestOrderService extends AbstractServiceTest {
         entry.setPrice(BigDecimal.valueOf(50.0));
         entry.setCategory(menuCategory);
         entry.setTaxRate(taxRate);
-        menuEntryDAO.create(entry);
+        menuService.addMenuEntry(entry);
 
         Order order = new Order();
         order.setTable(table);
