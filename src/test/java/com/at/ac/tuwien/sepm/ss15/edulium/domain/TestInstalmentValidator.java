@@ -146,6 +146,7 @@ public class TestInstalmentValidator extends AbstractDomainTest {
         instalmentValidator.validateForUpdate(instalment);
     }
 
+    @Test(expected = ValidationException.class)
     public void testValidateForUpdate_shouldFailWithNullInstalment() throws ValidationException {
         instalmentValidator.validateForUpdate(null);
     }
