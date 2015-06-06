@@ -14,7 +14,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:spring/Spring-DAO.xml")
+@ContextConfiguration("classpath:spring/Spring-Edulium.xml")
 @WithMockUser(username="daotester")
 @Transactional
 public abstract class AbstractDAOTest {

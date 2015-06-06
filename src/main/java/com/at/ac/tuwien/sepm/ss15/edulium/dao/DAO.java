@@ -13,7 +13,6 @@ import java.util.List;
  * Generic DAO interface
  */
 @Repository
-@PreAuthorize("isAuthenticated()")
 @Transactional(propagation = Propagation.MANDATORY)
 public interface DAO<T> {
 
