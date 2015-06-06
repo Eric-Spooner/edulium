@@ -50,52 +50,6 @@ public class TestOrderService extends AbstractServiceTest {
     @Autowired
     private TaxRateService taxRateService;
 
-
-    @Before
-    @WithMockUser(username = "tester", roles={"MANAGER"})
-    public void makeDBEntries() throws Exception{
-        MenuCategory menuCategory = new MenuCategory();
-        menuCategory.setName("cat1");
-        menuService.addMenuCategory(menuCategory);
-
-        TaxRate taxRate = new TaxRate();
-        taxRate.setValue(BigDecimal.valueOf(0.2));
-        taxRateService.addTaxRate(taxRate);
-
-        User user = User.withIdentity("username");
-        int i = 0;
-        while(userService.findUsers(user).size()>0){
-            user = User.withIdentity("username" + i);
-            i++;
-        }
-        user.setRole("role");
-        user.setName("name");
-        userService.addUser(user);
-
-        Section section = new Section();
-        section.setName("Garden");
-        interiorService.addSection(section);
-
-        Table table = new Table();
-        table.setColumn(4);
-        table.setRow(3);
-        table.setSeats(5);
-        table.setNumber(1L);
-        table.setSection(section);
-        table.setUser(user);
-        interiorService.addTable(table);
-
-        MenuEntry entry = new MenuEntry();
-        entry.setAvailable(true);
-        entry.setName("Entry");
-        entry.setDescription("Desc");
-        entry.setPrice(BigDecimal.valueOf(50.0));
-        entry.setCategory(menuCategory);
-        entry.setTaxRate(taxRate);
-        menuService.addMenuEntry(entry);
-
-    }
-
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
