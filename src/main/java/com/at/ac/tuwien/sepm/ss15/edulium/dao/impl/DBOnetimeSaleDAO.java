@@ -349,30 +349,6 @@ public class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
 
     // ######################### Sale stuff #########################
 
-    public List<History<Sale>> getSaleHistory(Sale sale) throws DAOException, ValidationException {
-        LOGGER.debug("Entering getHistory with parameters: " + sale);
-
-        validator.validateIdentity((OnetimeSale)sale);
-
-        final String query = "SELECT * FROM SaleHistory WHERE ID = ? ORDER BY changeNr";
-
-        List<History<Sale>> history = new ArrayList<>();
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, sale.getIdentity());
-
-            ResultSet result = stmt.executeQuery();
-            while (result.next()) {
-                history.add(saleHistoryFromResultSet(result));
-            }
-        } catch (SQLException e) {
-            LOGGER.error("retrieving history failed", e);
-            throw new DAOException("retrieving history failed", e);
-        }
-
-        return history;
-    }
-
     /**
      * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed the changes
@@ -397,46 +373,6 @@ public class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
             LOGGER.error("generating history failed", e);
             throw new DAOException("generating history failed", e);
         }
-    }
-
-
-    /**
-     * converts the database query output into a sale object
-     * @param result database output
-     * @return Sale object with the data of the resultSet set
-     * @throws SQLException if an error accessing the database occurred
-     */
-    private Sale saleFromResultSet(ResultSet result) throws SQLException {
-        Sale sale = new IntermittentSale();
-        sale.setIdentity(result.getLong("ID"));
-        sale.setName(result.getString("name"));
-        return sale;
-    }
-
-    /**
-     * converts the database query output into a history entry object
-     * @param result database output
-     * @return History object with the data of the resultSet set
-     * @throws SQLException if an error accessing the database occurred
-     * @throws DAOException if an error retrieving the sale ocurred
-     */
-    private History<Sale> saleHistoryFromResultSet(ResultSet result) throws DAOException, SQLException {
-        // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
-        if (storedUsers.size() != 1) {
-            LOGGER.error("user not found");
-            throw new DAOException("user not found");
-        }
-
-        // create history entry
-        History<Sale> historyEntry = new History<>();
-        historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
-        historyEntry.setChangeNumber(result.getLong("changeNr"));
-        historyEntry.setDeleted(result.getBoolean("deleted"));
-        historyEntry.setUser(storedUsers.get(0));
-        historyEntry.setData(saleFromResultSet(result));
-
-        return historyEntry;
     }
 
     /**
