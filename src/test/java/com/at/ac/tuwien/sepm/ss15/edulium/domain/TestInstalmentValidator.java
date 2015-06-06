@@ -26,6 +26,11 @@ public class TestInstalmentValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void testValidateForCreate_shouldFailWithNullInstalment() throws ValidationException {
+        instalmentValidator.validateForCreate(null);
+    }
+
+    @Test(expected = ValidationException.class)
     public void testValidateForCreate_shouldFailWithNullInvoice() throws ValidationException {
         Instalment instalment = new Instalment();
         instalment.setTime(LocalDateTime.now());
@@ -139,6 +144,10 @@ public class TestInstalmentValidator extends AbstractDomainTest {
         instalment.setPaymentInfo("Payment info");
 
         instalmentValidator.validateForUpdate(instalment);
+    }
+
+    public void testValidateForUpdate_shouldFailWithNullInstalment() throws ValidationException {
+        instalmentValidator.validateForUpdate(null);
     }
 
     @Test(expected = ValidationException.class)
@@ -263,5 +272,25 @@ public class TestInstalmentValidator extends AbstractDomainTest {
         instalment.setAmount(new BigDecimal("22"));
 
         instalmentValidator.validateForUpdate(instalment);
+    }
+
+    @Test
+    public void testValidateForDelete_shouldAcceptInstalment() throws ValidationException {
+        Instalment instalment = new Instalment();
+        instalment.setIdentity(1L);
+
+        instalmentValidator.validateForDelete(instalment);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForDelete_shouldFailWithNullInstalment() throws ValidationException {
+        instalmentValidator.validateForDelete(null);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForDelete_shouldFailWithNullIdentity() throws ValidationException {
+        Instalment instalment = new Instalment();
+
+        instalmentValidator.validateForDelete(instalment);
     }
 }
