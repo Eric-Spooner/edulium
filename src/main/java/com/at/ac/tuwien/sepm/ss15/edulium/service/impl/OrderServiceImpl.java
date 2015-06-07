@@ -47,7 +47,7 @@ class OrderServiceImpl implements OrderService {
 
         orderValidator.validateForUpdate(order);
 
-        List<Order> preOrders = this.findOrder(Order.withIdentity(order.getIdentity()));
+        List<Order> preOrders = this.findOrder(order);
 
         if(preOrders.size()==0){
             LOGGER.error("The order, you would like to update does not exist");
