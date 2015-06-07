@@ -1,5 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 
 /**
@@ -191,33 +192,62 @@ public class IntermittentSale extends Sale {
                 ", fromDayTime=" + fromDayTime +
                 ", duration=" + duration +
                 ", enabled=" + enabled +
+                ", entries=" + entries +
                 '}';
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof IntermittentSale)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
-        IntermittentSale iSale = (IntermittentSale) o;
+        IntermittentSale that = (IntermittentSale) o;
 
-        if (identity != null ? !identity.equals(iSale.identity) : iSale.identity != null) return false;
-        if (name != null ? !name.equals(iSale.name) : iSale.name != null) return false;
-        if (monday != null ? !monday.equals(iSale.monday) : iSale.monday != null) return false;
-        if (tuesday != null ? !tuesday.equals(iSale.tuesday) : iSale.tuesday != null) return false;
-        if (wednesday != null ? !wednesday.equals(iSale.wednesday) : iSale.wednesday != null) return false;
-        if (thursday != null ? !thursday.equals(iSale.thursday) : iSale.thursday != null) return false;
-        if (friday != null ? !friday.equals(iSale.friday) : iSale.friday != null) return false;
-        if (saturday != null ? !saturday.equals(iSale.saturday) : iSale.saturday != null) return false;
-        if (sunday != null ? !sunday.equals(iSale.sunday) : iSale.sunday != null) return false;
-        if (fromDayTime != null ? !fromDayTime.equals(iSale.fromDayTime) : iSale.fromDayTime != null) return false;
-        if (duration != null ? !duration.equals(iSale.duration) : iSale.duration != null) return false;
-        return !(enabled != null ? !enabled.equals(iSale.enabled) : iSale.enabled != null);
+        if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
+        if (enabled != null ? !enabled.equals(that.enabled) : that.enabled != null) return false;
+        if (friday != null ? !friday.equals(that.friday) : that.friday != null) return false;
+        if (fromDayTime != null ? !fromDayTime.equals(that.fromDayTime) : that.fromDayTime != null) return false;
+        if (monday != null ? !monday.equals(that.monday) : that.monday != null) return false;
+        if (saturday != null ? !saturday.equals(that.saturday) : that.saturday != null) return false;
+        if (sunday != null ? !sunday.equals(that.sunday) : that.sunday != null) return false;
+        if (thursday != null ? !thursday.equals(that.thursday) : that.thursday != null) return false;
+        if (tuesday != null ? !tuesday.equals(that.tuesday) : that.tuesday != null) return false;
+        if (wednesday != null ? !wednesday.equals(that.wednesday) : that.wednesday != null) return false;
+        if (entries != null ? !entries.equals(that.entries) : that.entries != null) return false;
+        if (identity != null ? !identity.equals(that.identity) : that.identity != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
 
+        return true;
     }
 
     @Override
     public boolean isAt(LocalDateTime time) {
-        return false; //TODO
+        // Same day of the week?
+        boolean dayMatch = false;
+        if (time.getDayOfWeek().equals(DayOfWeek.MONDAY) && this.monday!=null && this.monday == true) {
+            dayMatch = true;
+        } else if (time.getDayOfWeek().equals(DayOfWeek.TUESDAY) && this.tuesday!=null && this.tuesday == true) {
+            dayMatch = true;
+        } else if (time.getDayOfWeek().equals(DayOfWeek.WEDNESDAY) && this.wednesday!=null && this.wednesday == true) {
+            dayMatch = true;
+        } else if (time.getDayOfWeek().equals(DayOfWeek.THURSDAY) && this.thursday!=null && this.thursday == true) {
+            dayMatch = true;
+        } else if (time.getDayOfWeek().equals(DayOfWeek.FRIDAY) && this.friday!=null && this.friday == true) {
+            dayMatch = true;
+        } else if (time.getDayOfWeek().equals(DayOfWeek.SATURDAY) && this.saturday!=null && this.saturday == true) {
+            dayMatch = true;
+        } else if (time.getDayOfWeek().equals(DayOfWeek.SUNDAY) && this.sunday!=null && this.sunday == true) {
+            dayMatch = true;
+        }
+        if (!dayMatch) {
+            return false;
+        }
+        // Same day time?
+        // Count minutes since midnight
+        int timeMinutes = time.getHour()*60+time.getMinute();
+        int begin = this.fromDayTime.getHour()*60+this.fromDayTime.getMinute();
+        int end = begin+duration;
+        return (begin <= timeMinutes && timeMinutes <= end);
     }
 }

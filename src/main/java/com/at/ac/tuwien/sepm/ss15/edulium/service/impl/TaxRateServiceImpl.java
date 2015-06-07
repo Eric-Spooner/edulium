@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
@@ -16,7 +17,7 @@ import java.util.List;
 /**
  * implementation of the taxRateService
  */
-public class TaxRateServiceImpl implements TaxRateService {
+class TaxRateServiceImpl implements TaxRateService {
     private static final Logger LOGGER = LogManager.getLogger(TaxRateServiceImpl.class);
     @Autowired
     private DAO<TaxRate> taxRateDAO;
@@ -86,6 +87,20 @@ public class TaxRateServiceImpl implements TaxRateService {
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
             throw new ServiceException("An Error has occurred in the data access object");
+        }
+    }
+
+    @Override
+    public List<History<TaxRate>> getTaxRateHistory(TaxRate taxRate) throws ValidationException, ServiceException {
+        LOGGER.debug("Entering getTaxRateHistory with parameter: " + taxRate);
+
+        taxRateValidator.validateIdentity(taxRate);
+
+        try {
+            return taxRateDAO.getHistory(taxRate);
+        } catch (DAOException e) {
+            LOGGER.error("An Error has occurred in the data access object", e);
+            throw new ServiceException("An Error has occurred in the data access object", e);
         }
     }
 }

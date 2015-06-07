@@ -2,9 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.OnetimeSale;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
@@ -39,6 +37,24 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
 
         validator.validateForCreate(onetimeSale);
 
+        //Create Sale
+        final String saleQuery = "INSERT INTO Sale (ID, name, deleted) VALUES (?, ?, ?)";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery)) {
+            stmt.setLong(1, onetimeSale.getIdentity());
+            stmt.setString(2, onetimeSale.getName());
+            stmt.setBoolean(3, false);
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("Inserting sale into database failed", e);
+            throw new DAOException("Inserting sale into database failed", e);
+        }
+
+        DBAbstractSaleDAO.updateSaleAssoc(onetimeSale, dataSource, LOGGER);
+        DBAbstractSaleDAO.generateSaleHistory(onetimeSale, dataSource, LOGGER);
+
+        //Create OnetimeSale
         final String query = "INSERT INTO OnetimeSale (sale_ID, fromTime, toTime) VALUES (?, ?, ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
@@ -61,6 +77,26 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
 
         validator.validateForUpdate(onetimeSale);
 
+        //Update Sale
+        final String saleQuery = "UPDATE Sale SET name = ? WHERE ID = ?";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery)) {
+            stmt.setString(1, onetimeSale.getName());
+            stmt.setLong(2, onetimeSale.getIdentity());
+
+            if (stmt.executeUpdate() == 0) {
+                LOGGER.error("Updating sale in database failed, sale not found");
+                throw new DAOException("Updating sale in database failed, sale not found");
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Updating sale in database failed", e);
+            throw new DAOException("Updating sale in database failed", e);
+        }
+
+        DBAbstractSaleDAO.updateSaleAssoc(onetimeSale, dataSource, LOGGER);
+        DBAbstractSaleDAO.generateSaleHistory(onetimeSale, dataSource, LOGGER);
+
+        //Update OnetimeSale
         final String query = "UPDATE OnetimeSale SET fromTime = ?, toTime = ? WHERE sale_ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
@@ -86,7 +122,25 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
 
         validator.validateForDelete(onetimeSale);
 
-        final String query = "UPDATE onetimeSale SET deleted = true WHERE sale_ID = ?";
+        //Delete Sale
+        final String saleQuery = "UPDATE Sale SET deleted = true WHERE ID = ?";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery)) {
+            stmt.setLong(1, onetimeSale.getIdentity());
+
+            if (stmt.executeUpdate() == 0) {
+                LOGGER.error("Deleting sale from database failed, sale not found");
+                throw new DAOException("Deleting sale from database failed, sale not found");
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Deleting sale from database failed", e);
+            throw new DAOException("Deleting sale from database failed", e);
+        }
+
+        DBAbstractSaleDAO.generateSaleHistory(onetimeSale, dataSource, LOGGER);
+
+        //Delete OnetimeSale
+        final String query = "UPDATE OnetimeSale SET deleted = true WHERE sale_ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, onetimeSale.getIdentity());
@@ -114,7 +168,8 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
         final String query = "SELECT * FROM OnetimeSale WHERE sale_ID = ISNULL(?, sale_ID)" +
                 " AND fromTime = ISNULL(?, fromTime)"+
                 " AND toTime = ISNULL(?, toTime)"+
-                " AND deleted = false";
+                " AND deleted = false" +
+                " AND EXISTS (SELECT * FROM Sale WHERE OnetimeSale.sale_ID = Sale.ID AND name = ISNULL(?, name))";
 
         final List<OnetimeSale> onetimeSales = new ArrayList<>();
 
@@ -122,10 +177,13 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
             stmt.setObject(1, onetimeSale.getIdentity());
             stmt.setObject(2, onetimeSale.getFromTime());
             stmt.setObject(3, onetimeSale.getToTime());
+            stmt.setObject(4, onetimeSale.getName());
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                onetimeSales.add(onetimeSaleFromResultSet(result));
+                OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
+                DBAbstractSaleDAO.addNameToSale(onetimeSaleFromResult, dataSource);
+                onetimeSales.add(onetimeSaleFromResult);
             }
         } catch (SQLException e) {
             LOGGER.error("Searching for onetimeSales failed", e);
@@ -146,7 +204,9 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                onetimeSales.add(onetimeSaleFromResultSet(result));
+                OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
+                DBAbstractSaleDAO.addNameToSale(onetimeSaleFromResult, dataSource);
+                onetimeSales.add(onetimeSaleFromResult);
             }
         } catch (SQLException e) {
             LOGGER.error("Searching for all onetimeSales failed", e);
@@ -181,7 +241,6 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
         return history;
     }
 
-
     @Override
     public List<OnetimeSale> populate(List<OnetimeSale> onetimeSales) throws DAOException, ValidationException {
         LOGGER.debug("Entering populate with parameters: " + onetimeSales);
@@ -194,7 +253,7 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
             validator.validateIdentity(onetimeSale);
         }
 
-        final String query = "SELECT * FROM RestaurantOnetimeSale WHERE ID IN (" +
+        final String query = "SELECT * FROM OnetimeSale WHERE ID IN (" +
                 onetimeSales.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
 
         final List<OnetimeSale> populatedOnetimeSales = new ArrayList<>();
@@ -209,7 +268,9 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                populatedOnetimeSales.add(onetimeSaleFromResultSet(result));
+                OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
+                DBAbstractSaleDAO.addNameToSale(onetimeSaleFromResult, dataSource);
+                populatedOnetimeSales.add(onetimeSaleFromResult);
             }
         } catch (SQLException e) {
             LOGGER.error("Populating onetimeSales failed", e);
@@ -218,7 +279,6 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
 
         return populatedOnetimeSales;
     }
-
 
     /**
      * writes the changes of the dataset into the database
@@ -285,227 +345,4 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
 
         return historyEntry;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-    @Override
-    public void create(Sale sale) throws DAOException, ValidationException {
-        LOGGER.debug("Entering create with parameters: " + sale);
-
-        validator.validateForCreate(sale);
-
-        final String query = "INSERT INTO Sale (ID, name, deleted) VALUES (?, ?, ?)";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, sale.getIdentity());
-            stmt.setString(2, sale.getName());
-            stmt.setBoolean(3, false);
-
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            LOGGER.error("Inserting sale into database failed", e);
-            throw new DAOException("Inserting sale into database failed", e);
-        }
-
-        generateHistory(sale);
-    }
-
-    @Override
-    public void update(Sale sale) throws DAOException, ValidationException {
-        LOGGER.debug("Entering update with parameters: " + sale);
-
-        validator.validateForUpdate(sale);
-
-        final String query = "UPDATE Sale SET name = ? WHERE ID = ?";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setString(1, sale.getName());
-            stmt.setLong(2, sale.getIdentity());
-
-            if (stmt.executeUpdate() == 0) {
-                LOGGER.error("Updating sale in database failed, sale not found");
-                throw new DAOException("Updating sale in database failed, sale not found");
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Updating sale in database failed", e);
-            throw new DAOException("Updating sale in database failed", e);
-        }
-
-        generateHistory(sale);
-    }
-
-    @Override
-    public void delete(Sale sale) throws DAOException, ValidationException {
-        LOGGER.debug("Entering delete with parameters: " + sale);
-
-        validator.validateForDelete(sale);
-
-        final String query = "UPDATE Sale SET deleted = true WHERE ID = ?";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, sale.getIdentity());
-
-            if (stmt.executeUpdate() == 0) {
-                LOGGER.error("Deleting sale from database failed, sale not found");
-                throw new DAOException("Deleting sale from database failed, sale not found");
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Deleting sale from database failed", e);
-            throw new DAOException("Deleting sale from database failed", e);
-        }
-
-        generateHistory(sale);
-    }
-
-    @Override
-    public List<Sale> find(Sale sale) throws DAOException {
-        LOGGER.debug("Entering find with parameters: " + sale);
-
-        if (sale == null) {
-            return new ArrayList<>();
-        }
-
-        final String query = "SELECT * FROM Sale WHERE ID = ISNULL(?, ID) AND name = ISNULL(?, name) " +
-                " AND deleted = false";
-
-        final List<Sale> sales = new ArrayList<>();
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setObject(1, sale.getIdentity());
-            stmt.setObject(2, sale.getName());
-
-            ResultSet result = stmt.executeQuery();
-            while (result.next()) {
-                sales.add(saleFromResultSet(result));
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Searching for sales failed", e);
-            throw new DAOException("Searching for sales failed", e);
-        }
-
-        return sales;
-    }
-
-    @Override
-    public List<Sale> getAll() throws DAOException {
-        LOGGER.debug("Entering getAll");
-
-        final String query = "SELECT * FROM Sale WHERE deleted = false";
-
-        final List<Sale> sales = new ArrayList<>();
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            ResultSet result = stmt.executeQuery();
-            while (result.next()) {
-                sales.add(saleFromResultSet(result));
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Searching for all sales failed", e);
-            throw new DAOException("Searching for all sales failed", e);
-        }
-
-        return sales;
-    }
-
-    @Override
-    public List<History<Sale>> getHistory(Sale sale) throws DAOException, ValidationException {
-        LOGGER.debug("Entering getHistory with parameters: " + sale);
-
-        validator.validateIdentity(sale);
-
-        final String query = "SELECT * FROM SaleHistory WHERE ID = ? ORDER BY changeNr";
-
-        List<History<Sale>> history = new ArrayList<>();
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, sale.getIdentity());
-
-            ResultSet result = stmt.executeQuery();
-            while (result.next()) {
-                history.add(historyFromResultSet(result));
-            }
-        } catch (SQLException e) {
-            LOGGER.error("retrieving history failed", e);
-            throw new DAOException("retrieving history failed", e);
-        }
-
-        return history;
-    }
-*/
-    /**
-     * writes the changes of the dataset into the database
-     * stores the time; number of the change and the user which executed the changes
-     * @param sale updated dataset
-     * @throws DAOException if an error accessing the database occurred
-     */
-    /*private void generateHistory(Sale sale) throws DAOException {
-        LOGGER.debug("Entering generateHistory with parameters: " + sale);
-
-        final String query = "INSERT INTO SaleHistory " +
-                "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
-                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM SaleHistory WHERE ID = ?) " +
-                "FROM Sale WHERE ID = ?)";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
-            stmt.setLong(2, sale.getIdentity());          // dataset id
-            stmt.setLong(3, sale.getIdentity());          // dataset id
-
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            LOGGER.error("generating history failed", e);
-            throw new DAOException("generating history failed", e);
-        }
-    }*/
-
-    /**
-     * converts the database query output into a sale object
-     * @param result database output
-     * @return Sale object with the data of the resultSet set
-     * @throws SQLException if an error accessing the database occurred
-     */
-    /*private Sale saleFromResultSet(ResultSet result) throws SQLException {
-        Sale sale = new Sale();
-        sale.setIdentity(result.getLong("ID"));
-        sale.setName(result.getString("name"));
-        return sale;
-    }*/
-
-    /**
-     * converts the database query output into a history entry object
-     * @param result database output
-     * @return History object with the data of the resultSet set
-     * @throws SQLException if an error accessing the database occurred
-     * @throws DAOException if an error retrieving the sale ocurred
-     */
-    /*private History<Sale> historyFromResultSet(ResultSet result) throws DAOException, SQLException {
-        // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
-        if (storedUsers.size() != 1) {
-            LOGGER.error("user not found");
-            throw new DAOException("user not found");
-        }
-
-        // create history entry
-        History<Sale> historyEntry = new History<>();
-        historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
-        historyEntry.setChangeNumber(result.getLong("changeNr"));
-        historyEntry.setDeleted(result.getBoolean("deleted"));
-        historyEntry.setUser(storedUsers.get(0));
-        historyEntry.setData(saleFromResultSet(result));
-
-        return historyEntry;
-    }*/
 }
