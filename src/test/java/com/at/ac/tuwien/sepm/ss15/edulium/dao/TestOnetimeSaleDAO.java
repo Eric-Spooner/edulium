@@ -1,11 +1,16 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.OnetimeSale;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Hashtable;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -16,15 +21,58 @@ import static org.junit.Assert.*;
 public class TestOnetimeSaleDAO extends AbstractDAOTest {
     @Autowired
     private DAO<OnetimeSale> onetimeSaleDAO;
+    @Autowired
+    private DAO<MenuCategory> menuCategoryDAO;
+    @Autowired
+    private DAO<TaxRate> taxRateDAO;
 
-    @Test
-    public void testCreate_shouldAddObject() throws DAOException, ValidationException {
-        // GIVEN
+    private MenuEntry createMenuEntry(String name, String description, String category, double price, double tax, boolean available)
+            throws ValidationException, DAOException {
+        MenuCategory menuCategory = new MenuCategory();
+        menuCategory.setName(name);
+        menuCategoryDAO.create(menuCategory);
+
+        TaxRate taxRate = new TaxRate();
+        taxRate.setValue(BigDecimal.valueOf(tax));
+        taxRateDAO.create(taxRate);
+
+        MenuEntry entry = new MenuEntry();
+        entry.setCategory(menuCategory);
+        entry.setTaxRate(taxRate);
+        entry.setName(name);
+        entry.setDescription(description);
+        entry.setPrice(BigDecimal.valueOf(price));
+        entry.setAvailable(available);
+
+        return entry;
+    }
+
+    private OnetimeSale createOnetimeSale(Long identity, String name, LocalDateTime fromTime, LocalDateTime toTime, Hashtable<MenuEntry, BigDecimal> entries) {
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
         onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
+        onetimeSale.setEntries(entries);
+        return onetimeSale;
+    }
+
+    private Hashtable<MenuEntry, BigDecimal> createRandomEntries() throws ValidationException, DAOException {
+        MenuEntry entry = createMenuEntry("entry", "desc", "cat", 20, 0.2, true);
+        BigDecimal bigDecimal = new BigDecimal(10);
+        Hashtable<MenuEntry, BigDecimal> hashtable = new Hashtable<>();
+        hashtable.put(entry, bigDecimal);
+        return hashtable;
+    }
+
+    private OnetimeSale createOnetimeSale(Long identity) throws ValidationException, DAOException {
+        return createOnetimeSale(identity, "Sale", LocalDateTime.now(), LocalDateTime.now(), createRandomEntries());
+    }
+
+    @Test
+    public void testCreate_shouldAddObject() throws DAOException, ValidationException {
+        // GIVEN
+        OnetimeSale onetimeSale = createOnetimeSale(new Long(123));
 
         // WHEN
         onetimeSaleDAO.create(onetimeSale);
@@ -40,21 +88,13 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     @Test(expected = DAOException.class)
     public void testCreate_addingTwoObjectsWithSameIdentityShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        OnetimeSale onetimeSale = new OnetimeSale();
-        onetimeSale.setIdentity(new Long(123));
-        onetimeSale.setName("Sale");
-        onetimeSale.setFromTime(LocalDateTime.now());
-        onetimeSale.setToTime(LocalDateTime.now());
+        OnetimeSale onetimeSale = createOnetimeSale(new Long(123));
 
         // WHEN
         onetimeSaleDAO.create(onetimeSale);
 
         // GIVEN
-        OnetimeSale onetimeSale2 = new OnetimeSale();
-        onetimeSale2.setIdentity(new Long(123));
-        onetimeSale.setName("Sale2");
-        onetimeSale2.setFromTime(LocalDateTime.now());
-        onetimeSale2.setToTime(LocalDateTime.now());
+        OnetimeSale onetimeSale2 = createOnetimeSale(new Long(123));
 
         // WHEN
         onetimeSaleDAO.create(onetimeSale2);
@@ -63,10 +103,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testCreate_addingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        OnetimeSale onetimeSale = new OnetimeSale();
-        onetimeSale.setName("Sale");
-        onetimeSale.setFromTime(LocalDateTime.now());
-        onetimeSale.setToTime(LocalDateTime.now());
+        OnetimeSale onetimeSale = createOnetimeSale(null);
 
         // WHEN
         onetimeSaleDAO.create(onetimeSale);
@@ -84,28 +121,21 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // PREPARE
-        OnetimeSale onetimeSale = new OnetimeSale();
-        onetimeSale.setIdentity(new Long(123));
-        onetimeSale.setName("Sale");
-        onetimeSale.setFromTime(LocalDateTime.now());
-        onetimeSale.setToTime(LocalDateTime.now());
+        OnetimeSale onetimeSale = createOnetimeSale(new Long(123));
 
         // check if user is stored
         onetimeSaleDAO.create(onetimeSale);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale).size());
 
         // GIVEN
-        OnetimeSale onetimeSale2 = new OnetimeSale();
-        onetimeSale2.setIdentity(new Long(123));
-        onetimeSale.setName("Sale2");
-        onetimeSale2.setFromTime(LocalDateTime.now());
-        onetimeSale2.setToTime(LocalDateTime.now());
+        OnetimeSale onetimeSale2 = createOnetimeSale(new Long(123));
+        onetimeSale2.setName("Sale2");
 
         // WHEN
         onetimeSaleDAO.update(onetimeSale2);
 
         // THEN
-        // check if the user has been updated;
+        // check if the sale has been updated;
         List<OnetimeSale> storedObjects = onetimeSaleDAO.find(onetimeSale2);
         assertEquals(1, storedObjects.size());
         assertEquals(onetimeSale2, storedObjects.get(0));
@@ -114,9 +144,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testUpdate_updatingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
        // GIVEN
-        OnetimeSale onetimeSale = new OnetimeSale();
-        onetimeSale.setFromTime(LocalDateTime.now());
-        onetimeSale.setToTime(LocalDateTime.now());
+        OnetimeSale onetimeSale = createOnetimeSale(null);
 
         // WHEN
         onetimeSaleDAO.update(onetimeSale);
@@ -135,7 +163,12 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     @Test(expected = DAOException.class)
     public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        OnetimeSale sale = new OnetimeSale();
+        OnetimeSale sale = null;
+        try {
+            sale = createOnetimeSale(null);
+        } catch (Exception e) {
+            fail("Exception occurred too early.");
+        }
 
         // search for a non-existing onetimesale identity
         try {
@@ -146,10 +179,6 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
             fail("DAOException should not occur while searching for a non-existing onetimesale identity");
         }
 
-        sale.setName("Sale");
-        sale.setFromTime(LocalDateTime.now());
-        sale.setToTime(LocalDateTime.now());
-
         // WHEN
         onetimeSaleDAO.update(sale);
     }
@@ -158,19 +187,14 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // PREPARE
         final int numberBefore = onetimeSaleDAO.getAll().size();
-        OnetimeSale onetimeSale = new OnetimeSale();
-        onetimeSale.setIdentity(new Long(123));
-        onetimeSale.setName("Sale");
-        onetimeSale.setFromTime(LocalDateTime.now());
-        onetimeSale.setToTime(LocalDateTime.now());
+        OnetimeSale onetimeSale =  createOnetimeSale(new Long(123));
 
-        // check if user is stored
+        // check if sale is stored
         onetimeSaleDAO.create(onetimeSale);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale).size());
 
         // GIVEN
-        OnetimeSale onetimeSale2 = new OnetimeSale();
-        onetimeSale2.setIdentity(onetimeSale.getIdentity());
+        OnetimeSale onetimeSale2 = createOnetimeSale(onetimeSale.getIdentity());
 
         // WHEN
         onetimeSaleDAO.delete(onetimeSale2);
@@ -194,7 +218,12 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     @Test(expected = DAOException.class)
     public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        OnetimeSale sale = new OnetimeSale();
+        OnetimeSale sale = null;
+        try {
+            sale = createOnetimeSale(null);
+        } catch (Exception e) {
+            fail("Exception occurred too early.");
+        }
 
         // search for a non-existing onetimesale identity
         try {
@@ -214,31 +243,19 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // Prepare
 
         // one time sale 1
-        OnetimeSale onetimeSale1 = new OnetimeSale();
-        onetimeSale1.setIdentity(new Long(123));
-        onetimeSale1.setName("Sale");
-        onetimeSale1.setFromTime(LocalDateTime.now());
-        onetimeSale1.setToTime(LocalDateTime.now());
+        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
 
         onetimeSaleDAO.create(onetimeSale1);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale1).size());
 
         // one time sale 2
-        OnetimeSale onetimeSale2 = new OnetimeSale();
-        onetimeSale2.setIdentity(new Long(124));
-        onetimeSale2.setName("Sale2");
-        onetimeSale2.setFromTime(LocalDateTime.now());
-        onetimeSale2.setToTime(LocalDateTime.now());
+        OnetimeSale onetimeSale2 =  createOnetimeSale(new Long(124));
 
         onetimeSaleDAO.create(onetimeSale2);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale2).size());
 
         // one time sale 3
-        OnetimeSale onetimeSale3 = new OnetimeSale();
-        onetimeSale3.setIdentity(new Long(125));
-        onetimeSale3.setName("Sale3");
-        onetimeSale3.setFromTime(LocalDateTime.now());
-        onetimeSale3.setToTime(LocalDateTime.now());
+        OnetimeSale onetimeSale3 =  createOnetimeSale(new Long(125));
 
         onetimeSaleDAO.create(onetimeSale3);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale3).size());
@@ -306,7 +323,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     @Test
     public void testGetHistory_notPersistentDataShouldReturnEmptyList() throws DAOException, ValidationException {
         // GIVEN
-        OnetimeSale sale = new OnetimeSale();
+        OnetimeSale sale =  createOnetimeSale(null);
 
         // search for a non-existing onetimesale identity
         try {
