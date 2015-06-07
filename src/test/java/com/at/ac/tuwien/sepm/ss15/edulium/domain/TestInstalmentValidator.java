@@ -294,4 +294,24 @@ public class TestInstalmentValidator extends AbstractDomainTest {
 
         instalmentValidator.validateForDelete(instalment);
     }
+
+    @Test
+    public void testValidateIdentity_shouldAcceptInstalment() throws ValidationException {
+        Instalment instalment = new Instalment();
+        instalment.setIdentity(1L);
+
+        instalmentValidator.validateIdentity(instalment);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateIdentity_shouldFailWithNullInstalment() throws ValidationException {
+        instalmentValidator.validateIdentity(null);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateIdentity_shouldFailWithNullIdentity() throws ValidationException {
+        Instalment instalment = new Instalment();
+
+        instalmentValidator.validateIdentity(instalment);
+    }
 }
