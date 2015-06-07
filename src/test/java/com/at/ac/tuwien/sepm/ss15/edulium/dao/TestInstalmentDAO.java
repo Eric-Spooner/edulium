@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -372,5 +374,152 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
         // WHEN/THEN
         instalmentDAO.getHistory(instalment);
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjects() throws ValidationException, DAOException {
+        // PREPARE
+        // Instalment 1
+        Instalment inst1 = new Instalment();
+        inst1.setInvoice(Invoice.withIdentity(1L));
+        inst1.setTime(LocalDateTime.now());
+        inst1.setType("CASH");
+        inst1.setAmount(new BigDecimal("22"));
+        inst1.setPaymentInfo("Payment info");
+
+        instalmentDAO.create(inst1);
+        assertEquals(1, instalmentDAO.find(inst1).size());
+
+        // Instalment 2
+        Instalment inst2 = new Instalment();
+        inst2.setInvoice(Invoice.withIdentity(1L));
+        inst2.setTime(LocalDateTime.now());
+        inst2.setType("CREDIT_CARD");
+        inst2.setAmount(new BigDecimal("19"));
+        inst2.setPaymentInfo("Payment info");
+
+        instalmentDAO.create(inst2);
+        assertEquals(1, instalmentDAO.find(inst2).size());
+
+        // Instalment 3
+        Instalment inst3 = new Instalment();
+        inst3.setInvoice(Invoice.withIdentity(1L));
+        inst3.setTime(LocalDateTime.now());
+        inst3.setType("CASH");
+        inst3.setAmount(new BigDecimal("13"));
+        inst3.setPaymentInfo("Payment info");
+
+        instalmentDAO.create(inst3);
+        assertEquals(1, instalmentDAO.find(inst3).size());
+
+        // GIVEN
+        Instalment instalmentId1 = Instalment.withIdentity(inst1.getIdentity());
+        Instalment instalmentId2 = Instalment.withIdentity(inst2.getIdentity());
+        Instalment instalmentId3 = Instalment.withIdentity(inst3.getIdentity());
+        List<Instalment> instalmentIds = Arrays.asList(instalmentId1, instalmentId2, instalmentId3);
+
+        // WHEN
+        List<Instalment> result = instalmentDAO.populate(instalmentIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(inst1));
+        assertTrue(result.contains(inst2));
+        assertTrue(result.contains(inst3));
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjectsOfDeletedObjects() throws ValidationException, DAOException {
+        // PREPARE
+        // Instalment 1
+        Instalment inst1 = new Instalment();
+        inst1.setInvoice(Invoice.withIdentity(1L));
+        inst1.setTime(LocalDateTime.now());
+        inst1.setType("CASH");
+        inst1.setAmount(new BigDecimal("22"));
+        inst1.setPaymentInfo("Payment info");
+
+        instalmentDAO.create(inst1);
+        assertEquals(1, instalmentDAO.find(inst1).size());
+        instalmentDAO.delete(inst1);
+        assertEquals(0, instalmentDAO.find(inst1).size());
+
+        // Instalment 2
+        Instalment inst2 = new Instalment();
+        inst2.setInvoice(Invoice.withIdentity(1L));
+        inst2.setTime(LocalDateTime.now());
+        inst2.setType("CREDIT_CARD");
+        inst2.setAmount(new BigDecimal("19"));
+        inst2.setPaymentInfo("Payment info");
+
+        instalmentDAO.create(inst2);
+        assertEquals(1, instalmentDAO.find(inst2).size());
+        instalmentDAO.delete(inst2);
+        assertEquals(0, instalmentDAO.find(inst2).size());
+
+        // Instalment 3
+        Instalment inst3 = new Instalment();
+        inst3.setInvoice(Invoice.withIdentity(1L));
+        inst3.setTime(LocalDateTime.now());
+        inst3.setType("CASH");
+        inst3.setAmount(new BigDecimal("13"));
+        inst3.setPaymentInfo("Payment info");
+
+        instalmentDAO.create(inst3);
+        assertEquals(1, instalmentDAO.find(inst3).size());
+        instalmentDAO.delete(inst3);
+        assertEquals(0, instalmentDAO.find(inst3).size());
+
+        // GIVEN
+        Instalment instalmentId1 = Instalment.withIdentity(inst1.getIdentity());
+        Instalment instalmentId2 = Instalment.withIdentity(inst2.getIdentity());
+        Instalment instalmentId3 = Instalment.withIdentity(inst3.getIdentity());
+        List<Instalment> instalmentIds = Arrays.asList(instalmentId1, instalmentId2, instalmentId3);
+
+        // WHEN
+        List<Instalment> result = instalmentDAO.populate(instalmentIds);
+
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(inst1));
+        assertTrue(result.contains(inst2));
+        assertTrue(result.contains(inst3));
+    }
+
+    @Test
+    public void testPopulate_nullListShouldReturnEmptyObjects() throws ValidationException, DAOException {
+        // WHEN
+        List<Instalment> instalmentList = instalmentDAO.populate(null);
+
+        // THEN
+        assertTrue(instalmentList.isEmpty());
+    }
+
+    @Test
+    public void testPopulate_emptyListShouldReturnEmptyObjects() throws ValidationException, DAOException {
+        // WHEN
+        List<Instalment> instalmentList = instalmentDAO.populate(Arrays.asList());
+
+        // THEN
+        assertTrue(instalmentList.isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithInvalidObjectsShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        List<Instalment> instalmentList = Arrays.asList(new Instalment());
+
+        // WHEN/THEN
+        List<Instalment> result = instalmentDAO.populate(instalmentList);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws ValidationException, DAOException {
+        // GIVEN
+        List<Instalment> invalidInstalments = new ArrayList<>();
+        invalidInstalments.add(null);
+
+        // WHEN/THEN
+        List<Instalment> result = instalmentDAO.populate(invalidInstalments);
     }
 }
