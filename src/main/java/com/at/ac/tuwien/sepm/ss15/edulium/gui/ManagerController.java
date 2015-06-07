@@ -101,12 +101,6 @@ public class ManagerController implements Initializable {
             tableColTaxRateID.setCellValueFactory(new PropertyValueFactory<TaxRate, Long>("identity"));
             tableColTaxRateValue.setCellValueFactory(new PropertyValueFactory<TaxRate, BigDecimal>("value"));
 
-            menuCategories = observableArrayList(menuService.getAllMenuCategories());
-            tableViewMenuCategory.setItems(menuCategories);
-            tableViewMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
-            tableColMenuCategoryID.setCellValueFactory(new PropertyValueFactory<MenuCategory, Long>("identity"));
-            tableColMenuCategoryName.setCellValueFactory(new PropertyValueFactory<MenuCategory, String>("name"));
-
             menuEntries = observableArrayList(menuService.getAllMenuEntries());
             tableViewMenuEntry.setItems(menuEntries);
             tableColMenuEntryId.setCellValueFactory(new PropertyValueFactory<MenuEntry, Long>("identity"));
@@ -114,6 +108,12 @@ public class ManagerController implements Initializable {
             tableColMenuEntryPrice.setCellValueFactory(new PropertyValueFactory<MenuEntry, BigDecimal>("price"));
             tableColMenuEntryCategory.setCellValueFactory(new PropertyValueFactory<MenuEntry, MenuCategory>("category"));
             tableColMenuEntryTaxRate.setCellValueFactory(new PropertyValueFactory<MenuEntry, TaxRate>("taxRate"));
+
+            menuCategories = observableArrayList(menuService.getAllMenuCategories());
+            tableViewMenuCategory.setItems(menuCategories);
+            tableViewMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
+            tableColMenuCategoryID.setCellValueFactory(new PropertyValueFactory<MenuCategory, Long>("identity"));
+            tableColMenuCategoryName.setCellValueFactory(new PropertyValueFactory<MenuCategory, String>("name"));
 
             menus = observableArrayList(menuService.getAllMenus());
             tableViewMenu.setItems(menus);
@@ -445,14 +445,14 @@ public class ManagerController implements Initializable {
             BigDecimal value = BigDecimal.valueOf(0.0);
             try {
                 value = BigDecimal.valueOf(Double.parseDouble(txtTaxRateValue.getText()));
+                TaxRate taxRate = new TaxRate();
+                taxRate.setValue(value);
+                taxRateService.addTaxRate(taxRate);
+                taxRates.setAll(taxRateService.getAllTaxRates());
             } catch (NumberFormatException e) {
                 ManagerController.showErrorDialog("Error", "Input Validation Error", "Value must be a number");
                 LOGGER.info("Tax Rate Value must be a number" + e);
             }
-            TaxRate taxRate = new TaxRate();
-            taxRate.setValue(value);
-            taxRateService.addTaxRate(taxRate);
-            taxRates.setAll(taxRateService.getAllTaxRates());
         }catch (Exception e){
             LOGGER.error("Update the taxRates failed" + e);
         }
