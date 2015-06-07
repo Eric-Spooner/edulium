@@ -24,9 +24,9 @@ public class Main extends Application {
         Authentication result = authenticationManager.authenticate(request);
         SecurityContextHolder.getContext().setAuthentication(result);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/gui/Manager.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/gui/Login.fxml"));
         Parent root = (Parent)fxmlLoader.load();
-        primaryStage.setTitle("Manager View");
+        primaryStage.setTitle("Login");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
