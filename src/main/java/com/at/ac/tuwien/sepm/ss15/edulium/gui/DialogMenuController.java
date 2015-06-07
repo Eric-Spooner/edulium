@@ -28,7 +28,7 @@ import static javafx.collections.FXCollections.observableArrayList;
  * Controller for the TaxRate Dialog
  */
 public class DialogMenuController implements Initializable{
-    private static final Logger LOGGER = LogManager.getLogger(DialogTaxRateController.class);
+    private static final Logger LOGGER = LogManager.getLogger(DialogMenuController.class);
 
     private static Stage thisStage;
     private static MenuService menuService;
@@ -91,7 +91,6 @@ public class DialogMenuController implements Initializable{
 
         if(menu == null){
             Menu menuForInit = new Menu();
-            menuForInit.setName("");
             menuForInit.setEntries(new LinkedList<>());
             DialogMenuController.setMenu(menuForInit);
         }
@@ -107,13 +106,16 @@ public class DialogMenuController implements Initializable{
 
     public void buttonOKClick(ActionEvent actionEvent) {
         LOGGER.info("Dialog Menu OK Button clicked");
-        if((textFieldName.getText() == null || textFieldName.getText().equals(""))  &&
-                DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH){
+        if ((textFieldName.getText() == null || textFieldName.getText().equals("")) &&
+                DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH) {
             ManagerController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
             return;
         }
-
-        menu.setName(textFieldName.getText());
+        if (DialogMenuController.dialogEnumeration == DialogEnumeration.SEARCH) {
+            if(!textFieldName.getText().isEmpty()) menu.setName(textFieldName.getText());
+        } else{
+            menu.setName(textFieldName.getText());
+        }
         if(DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH){
             if (menu.getEntries().size() == 0) {
                 ManagerController.showErrorDialog
@@ -215,7 +217,7 @@ public class DialogMenuController implements Initializable{
         try {
             tableViewInMenu.setItems(observableArrayList(menu.getEntries()));
             tableViewData.setItems(observableArrayList(menuService.getAllMenuEntries()));
-            textFieldName.setText(menu.getName());
+            if(menu.getName() != null) textFieldName.setText(menu.getName());
         }catch (Exception e){
             ManagerController.showErrorDialog
                     ("Error", "Refreshing View", "An Error occured during refreshing the View");

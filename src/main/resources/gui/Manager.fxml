@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.canvas.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
@@ -80,10 +81,11 @@
                               <TableColumn fx:id="tableColMenuEntryName" prefWidth="94.0" text="Name" />
                               <TableColumn fx:id="tableColMenuEntryPrice" prefWidth="92.0" text="Price" />
                               <TableColumn fx:id="tableColMenuEntryCategory" prefWidth="144.0" text="Category" />
-                              <TableColumn fx:id="tableColMenuEntryTaxRate" prefWidth="95.0" text="TaxRate" />
+                              <TableColumn fx:id="tableColMenuEntryAvailable" prefWidth="94.0" text="Availible" />
                            </columns>
                         </TableView>
-                        <Button fx:id="buttonShowAllMenuEntry" layoutX="494.0" layoutY="157.0" mnemonicParsing="false" onAction="#buttonShowAllMenuEntryClicked" prefWidth="92.0" text="Show All" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="154.0" />
+                        <Button fx:id="buttonShowAllMenuEntry" layoutX="494.0" layoutY="190.0" mnemonicParsing="false" onAction="#buttonShowAllMenuEntryClicked" prefWidth="92.0" text="Show All" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="190.0" />
+                        <Button fx:id="buttonMenuEntryRemove1" layoutX="494.0" layoutY="154.0" mnemonicParsing="false" onAction="#buttonMenuEntryAvailableClicked" prefWidth="92.0" text="Available" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="154.0" />
                      </children>
                   </AnchorPane>
                </content>
@@ -111,8 +113,7 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Button fx:id="buttonTaxRateRemove" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonTaxRateRemoveClicked" prefWidth="92.0" text="Remove" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="119.0" />
-                        <Button fx:id="buttonTaxRateSearch" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonTaxRateSearchClicked" prefWidth="92.0" text="Search..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="84.0" />
+                        <Button fx:id="buttonTaxRateRemove" layoutX="494.0" layoutY="85.0" mnemonicParsing="false" onAction="#buttonTaxRateRemoveClicked" prefWidth="92.0" text="Remove" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="85.0" />
                         <Button fx:id="buttonTaxRateUpdate" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonTaxRateUpdateClicked" prefWidth="92.0" text="Update..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="49.0" />
                         <Button fx:id="buttonTaxRateAdd" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonTaxRateAddClicked" prefWidth="92.0" text="Add..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
                         <TableView fx:id="tableViewTaxRate" layoutX="14.0" layoutY="14.0" prefHeight="343.0" prefWidth="451.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="14.0">
@@ -121,7 +122,8 @@
                               <TableColumn fx:id="tableColTaxRateValue" prefWidth="179.0" text="Value" />
                            </columns>
                         </TableView>
-                        <Button fx:id="buttonShowAllTaxRate" mnemonicParsing="false" onAction="#buttonShowAllTaxRateClicked" prefWidth="92.0" text="Show All" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="154.0" />
+                        <TextField fx:id="txtTaxRateValue" layoutX="494.0" layoutY="189.0" prefHeight="31.0" prefWidth="92.0" />
+                        <Text layoutX="494.0" layoutY="176.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Value" />
                      </children>
                   </AnchorPane>
                </content>
