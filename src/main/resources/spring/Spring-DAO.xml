@@ -18,6 +18,7 @@
     <import resource="dao/Spring-TaxRateDAO.xml" />
     <import resource="dao/Spring-MenuEntryDAO.xml" />
     <import resource="dao/Spring-ReservationDAO.xml" />
-    <import resource="dao/Spring-OneTimeSaleDAO.xml" />
+    <import resource="dao/Spring-IntermittentSaleDAO.xml" />
+    <import resource="dao/Spring-OnetimeSaleDAO.xml" />
 
 </beans>

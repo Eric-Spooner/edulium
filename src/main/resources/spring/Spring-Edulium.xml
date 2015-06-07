@@ -10,7 +10,7 @@
 
     <!-- Validator beans -->
     <import resource="domain/Spring-IntermittentSaleValidator.xml" />
-    <import resource="domain/Spring-OneTimeSaleValidator.xml" />
+    <import resource="domain/Spring-OnetimeSaleValidator.xml" />
     <import resource="domain/Spring-MenuCategoryValidator.xml" />
     <import resource="domain/Spring-TableValidator.xml" />
     <import resource="domain/Spring-SectionValidator.xml" />
