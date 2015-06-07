@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
@@ -14,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import sun.security.validator.ValidatorException;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -53,7 +55,7 @@ class OrderServiceImpl implements OrderService {
             LOGGER.error("The order, you would like to update does not exist");
             throw new ServiceException("The order, you would like to update does not exist");
         }else {
-            Order preOrder = preOrders.get(1);
+            Order preOrder = preOrders.get(0);
             //if the order already had an invoice it is not allowed to be changed
             if(preOrder.getInvoice() != null){
                 LOGGER.error("It is not allowed to change an order with invoice");
@@ -145,8 +147,25 @@ class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getAllOrdersToPrepare(List<MenuCategory> menuCategories) throws ServiceException, ValidationException {
-        return null;
+    public List<Order> getAllOrdersToPrepare(List<MenuCategory> menuCategories) throws
+            ServiceException, ValidationException {
+        LOGGER.debug("Entering getAllOrdersToPrepare with parameter " + menuCategories);
+
+        List<Order> retVal = new LinkedList<>();
+
+        if(menuCategories.isEmpty()){
+            return new LinkedList<>();
+        }
+
+        //Prepare dummy MenuEntries with the given Categories for finding purpose
+        for(MenuCategory category : menuCategories){
+            MenuEntry dummyEntry = new MenuEntry();
+            dummyEntry.setCategory(category);
+            Order dummyOrder = new Order();
+            dummyOrder.setMenuEntry(dummyEntry);
+            retVal.addAll(this.findOrder(dummyOrder));
+        }
+        return retVal;
     }
 
     @Override
