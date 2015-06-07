@@ -13,10 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -72,7 +69,7 @@ public class ManagerController implements Initializable {
     @FXML
     private TableColumn<MenuEntry, MenuCategory> tableColMenuEntryCategory;
     @FXML
-    private TableColumn<MenuEntry,TaxRate> tableColMenuEntryTaxRate;
+    private TableColumn<MenuEntry, Boolean> tableColMenuEntryAvailable;
 
     @FXML
     private TableView<Menu> tableViewMenu;
@@ -102,12 +99,13 @@ public class ManagerController implements Initializable {
             tableColTaxRateValue.setCellValueFactory(new PropertyValueFactory<TaxRate, BigDecimal>("value"));
 
             menuEntries = observableArrayList(menuService.getAllMenuEntries());
+            tableViewMenuEntry.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
             tableViewMenuEntry.setItems(menuEntries);
             tableColMenuEntryId.setCellValueFactory(new PropertyValueFactory<MenuEntry, Long>("identity"));
             tableColMenuEntryName.setCellValueFactory(new PropertyValueFactory<MenuEntry, String>("name"));
             tableColMenuEntryPrice.setCellValueFactory(new PropertyValueFactory<MenuEntry, BigDecimal>("price"));
             tableColMenuEntryCategory.setCellValueFactory(new PropertyValueFactory<MenuEntry, MenuCategory>("category"));
-            tableColMenuEntryTaxRate.setCellValueFactory(new PropertyValueFactory<MenuEntry, TaxRate>("taxRate"));
+            tableColMenuEntryAvailable.setCellValueFactory(new PropertyValueFactory<MenuEntry, Boolean>("available"));
 
             menuCategories = observableArrayList(menuService.getAllMenuCategories());
             tableViewMenuCategory.setItems(menuCategories);
@@ -277,6 +275,11 @@ public class ManagerController implements Initializable {
                         ("Error", "Input Validation Error", "You have to select a MenuEntry to Update");
                 return;
             }
+            if(tableViewMenuEntry.getSelectionModel().getSelectedItems().size() >1){
+                ManagerController.showErrorDialog
+                        ("Error", "Input Validation Error", "You have to select only one MenuEntry to Update");
+                return;
+            }
             DialogMenuEntryController.resetDialog();
             DialogMenuEntryController.setThisStage(stage);
             DialogMenuEntryController.setMenuService(menuService);
@@ -312,6 +315,24 @@ public class ManagerController implements Initializable {
             menuEntries.setAll(menuService.getAllMenuEntries());
             DialogMenuEntryController.resetDialog();
         }catch (Exception e){
+            LOGGER.error("Loading the Menus Entries failed" + e);
+        }
+    }
+
+    public void buttonMenuEntryAvailableClicked(ActionEvent actionEvent) {
+        try {
+            LOGGER.info("Update MenuEntry Button Click");
+            if (tableViewMenuEntry.getSelectionModel().getSelectedItem() == null) {
+                ManagerController.showErrorDialog
+                        ("Error", "Input Validation Error", "You have to select a MenuEntry to Update");
+                return;
+            }
+            for(MenuEntry menuEntry: tableViewMenuEntry.getSelectionModel().getSelectedItems()){
+                menuEntry.setAvailable(true);
+                menuService.updateMenuEntry(menuEntry);
+            }
+            menuEntries.setAll(menuService.getAllMenuEntries());
+        } catch (Exception e){
             LOGGER.error("Loading the Menus Entries failed" + e);
         }
     }
@@ -504,4 +525,6 @@ public class ManagerController implements Initializable {
             LOGGER.error("Unable to Load Tables Overview" + e);
         }
     }
+
+
 }
