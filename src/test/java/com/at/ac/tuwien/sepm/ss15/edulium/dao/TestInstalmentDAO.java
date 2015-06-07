@@ -4,7 +4,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Instalment;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import org.junit.Test;
+import org.junit.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -19,12 +19,22 @@ import static org.junit.Assert.*;
 public class TestInstalmentDAO extends AbstractDAOTest {
     @Autowired
     private DAO<Instalment> instalmentDAO;
+    @Autowired
+    private DAO<Invoice> invoiceDAO;
 
     @Test
     public void testCreate_shouldAddObject() throws ValidationException, DAOException {
+        // PREPARE
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice);
+
         // GIVEN
         Instalment instalment = new Instalment();
-        instalment.setInvoice(Invoice.withIdentity(1L));
+        instalment.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         instalment.setTime(LocalDateTime.now());
         instalment.setType("CASH");
         instalment.setAmount(new BigDecimal("22"));
@@ -61,9 +71,17 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
     @Test
     public void testUpdate_shouldUpdateObject() throws ValidationException, DAOException {
+        // PREPARE
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice);
+
         // GIVEN
         Instalment instalment = new Instalment();
-        instalment.setInvoice(Invoice.withIdentity(1L));
+        instalment.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         instalment.setTime(LocalDateTime.now());
         instalment.setType("CASH");
         instalment.setAmount(new BigDecimal("22"));
@@ -89,6 +107,14 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
     @Test(expected = DAOException.class)
     public void testUpdate_updatingNotPersistentObjectShouldFail() throws ValidationException, DAOException {
+        // PREPARE
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice);
+
         // GIVEN
         Long identity = 1L;
 
@@ -99,7 +125,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         // WHEN/THEN
         Instalment instalment = new Instalment();
         instalment.setIdentity(identity);
-        instalment.setInvoice(Invoice.withIdentity(1L));
+        instalment.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         instalment.setTime(LocalDateTime.now());
         instalment.setType("CASH");
         instalment.setAmount(new BigDecimal("22"));
@@ -110,9 +136,17 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
     @Test(expected = ValidationException.class)
     public void testUpdate_updatingObjectWithoutIdentityShouldFail() throws ValidationException, DAOException {
+        // PREPARE
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice);
+
         // GIVEN
         Instalment instalment = new Instalment();
-        instalment.setInvoice(Invoice.withIdentity(1L));
+        instalment.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         instalment.setTime(LocalDateTime.now());
         instalment.setType("CASH");
         instalment.setAmount(new BigDecimal("22"));
@@ -124,9 +158,17 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
     @Test
     public void testDelete_shouldDeleteObject() throws ValidationException, DAOException {
+        // PREPARE
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice);
+
         // GIVEN
         Instalment instalment = new Instalment();
-        instalment.setInvoice(Invoice.withIdentity(1L));
+        instalment.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         instalment.setTime(LocalDateTime.now());
         instalment.setType("CASH");
         instalment.setAmount(new BigDecimal("22"));
@@ -163,23 +205,31 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
     @Test
     public void testFind_shouldFindObjectsByIdentity() throws ValidationException, DAOException {
+        // PREPARE
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice);
+
         // GIVEN
         Instalment inst1 = new Instalment();
-        inst1.setInvoice(Invoice.withIdentity(1L));
+        inst1.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         inst1.setTime(LocalDateTime.now());
         inst1.setType("CASH");
         inst1.setAmount(new BigDecimal("22"));
         inst1.setPaymentInfo("Payment info");
 
         Instalment inst2 = new Instalment();
-        inst2.setInvoice(Invoice.withIdentity(1L));
+        inst2.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         inst2.setTime(LocalDateTime.now());
         inst2.setType("CREDIT_CARD");
         inst2.setAmount(new BigDecimal("19"));
         inst2.setPaymentInfo("Payment info");
 
         Instalment inst3 = new Instalment();
-        inst3.setInvoice(Invoice.withIdentity(1L));
+        inst3.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         inst3.setTime(LocalDateTime.now());
         inst3.setType("CASH");
         inst3.setAmount(new BigDecimal("13"));
@@ -229,12 +279,19 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
     @Test
     public void testFind_shouldFindObjectsWhenSearchingByInvoice() throws ValidationException, DAOException {
-        // GIVEN
+        // PREPARE
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(getCurrentUser());
 
-        Invoice invoice = Invoice.withIdentity(1L);
+        invoiceDAO.create(invoice);
+
+        // GIVEN
+        Invoice invoiceId = Invoice.withIdentity(invoice.getIdentity());
 
         Instalment instalment = new Instalment();
-        instalment.setInvoice(invoice);
+        instalment.setInvoice(invoiceId);
         instalment.setTime(LocalDateTime.now());
         instalment.setType("CASH");
         instalment.setAmount(new BigDecimal("22"));
@@ -244,7 +301,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
         // WHEN
         Instalment matcher = new Instalment();
-        matcher.setInvoice(invoice);
+        matcher.setInvoice(invoiceId);
         List<Instalment> instalmentList = instalmentDAO.find(matcher);
 
         // THEN
@@ -253,23 +310,31 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
     @Test
     public void testGetAll_shouldReturnAllObjects() throws ValidationException, DAOException {
+        // PREPARE
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice);
+
         // GIVEN
         Instalment inst1 = new Instalment();
-        inst1.setInvoice(Invoice.withIdentity(1L));
+        inst1.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         inst1.setTime(LocalDateTime.now());
         inst1.setType("CASH");
         inst1.setAmount(new BigDecimal("22"));
         inst1.setPaymentInfo("Payment info");
 
         Instalment inst2 = new Instalment();
-        inst2.setInvoice(Invoice.withIdentity(1L));
+        inst2.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         inst2.setTime(LocalDateTime.now());
         inst2.setType("CREDIT_CARD");
         inst2.setAmount(new BigDecimal("19"));
         inst2.setPaymentInfo("Payment info");
 
         Instalment inst3 = new Instalment();
-        inst3.setInvoice(Invoice.withIdentity(1L));
+        inst3.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         inst3.setTime(LocalDateTime.now());
         inst3.setType("CASH");
         inst3.setAmount(new BigDecimal("13"));
@@ -292,11 +357,19 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
     @Test
     public void testGetHistory_shouldReturnObject() throws ValidationException, DAOException {
+        // PREPARE
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice);
+
         // GIVEN
         // Create
         Instalment instalmentA = new Instalment();
         LocalDateTime createTime = LocalDateTime.now();
-        instalmentA.setInvoice(Invoice.withIdentity(1L));
+        instalmentA.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         instalmentA.setTime(createTime);
         instalmentA.setType("CASH");
         instalmentA.setAmount(new BigDecimal("22"));
@@ -306,7 +379,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         // Update
         Instalment instalmentB = Instalment.withIdentity(instalmentA.getIdentity());
         LocalDateTime updateTime = LocalDateTime.now();
-        instalmentB.setInvoice(Invoice.withIdentity(1L));
+        instalmentB.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         instalmentB.setTime(updateTime);
         instalmentB.setType("CASH");
         instalmentB.setAmount(new BigDecimal("20"));
@@ -380,9 +453,17 @@ public class TestInstalmentDAO extends AbstractDAOTest {
     @Test
     public void testPopulate_shouldReturnFullyPopulatedObjects() throws ValidationException, DAOException {
         // PREPARE
+        // Invoice
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice);
+
         // Instalment 1
         Instalment inst1 = new Instalment();
-        inst1.setInvoice(Invoice.withIdentity(1L));
+        inst1.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         inst1.setTime(LocalDateTime.now());
         inst1.setType("CASH");
         inst1.setAmount(new BigDecimal("22"));
@@ -393,7 +474,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
         // Instalment 2
         Instalment inst2 = new Instalment();
-        inst2.setInvoice(Invoice.withIdentity(1L));
+        inst2.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         inst2.setTime(LocalDateTime.now());
         inst2.setType("CREDIT_CARD");
         inst2.setAmount(new BigDecimal("19"));
@@ -404,7 +485,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
         // Instalment 3
         Instalment inst3 = new Instalment();
-        inst3.setInvoice(Invoice.withIdentity(1L));
+        inst3.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         inst3.setTime(LocalDateTime.now());
         inst3.setType("CASH");
         inst3.setAmount(new BigDecimal("13"));
@@ -432,9 +513,17 @@ public class TestInstalmentDAO extends AbstractDAOTest {
     @Test
     public void testPopulate_shouldReturnFullyPopulatedObjectsOfDeletedObjects() throws ValidationException, DAOException {
         // PREPARE
+        // Invoice
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(getCurrentUser());
+
+        invoiceDAO.create(invoice);
+
         // Instalment 1
         Instalment inst1 = new Instalment();
-        inst1.setInvoice(Invoice.withIdentity(1L));
+        inst1.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         inst1.setTime(LocalDateTime.now());
         inst1.setType("CASH");
         inst1.setAmount(new BigDecimal("22"));
@@ -447,7 +536,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
         // Instalment 2
         Instalment inst2 = new Instalment();
-        inst2.setInvoice(Invoice.withIdentity(1L));
+        inst2.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         inst2.setTime(LocalDateTime.now());
         inst2.setType("CREDIT_CARD");
         inst2.setAmount(new BigDecimal("19"));
@@ -460,7 +549,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
         // Instalment 3
         Instalment inst3 = new Instalment();
-        inst3.setInvoice(Invoice.withIdentity(1L));
+        inst3.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
         inst3.setTime(LocalDateTime.now());
         inst3.setType("CASH");
         inst3.setAmount(new BigDecimal("13"));
