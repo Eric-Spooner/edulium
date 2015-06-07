@@ -313,7 +313,8 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         List<Instalment> instalmentList = instalmentDAO.find(matcher);
 
         // THEN
-        assertFalse(instalmentList.isEmpty());
+        assertEquals(1, instalmentList.size());
+        assertEquals(instalment, instalmentList.get(0));
     }
 
     @Test
