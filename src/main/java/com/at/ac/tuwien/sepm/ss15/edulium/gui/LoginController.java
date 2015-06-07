@@ -103,8 +103,10 @@ public class LoginController implements Initializable {
                 }
                 buttons.add(button);
                 userGP.add(button, col, row);
-                if(col == 1) row++;
-                col = (col == 0) ? 1 : 0;
+                if(col == 2) row++;
+                //col = (col == 0) ? 1 : 0;
+                if(col++ == 2)
+                    col = 0;
             }
         } catch(ServiceException e) {
             System.out.println(e);
