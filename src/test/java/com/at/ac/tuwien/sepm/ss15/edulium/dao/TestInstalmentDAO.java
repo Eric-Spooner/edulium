@@ -118,8 +118,12 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         // GIVEN
         Long identity = 1L;
 
-        while (!instalmentDAO.find(Instalment.withIdentity(identity)).isEmpty()) {
-            identity++;
+        try {
+            while (!instalmentDAO.find(Instalment.withIdentity(identity)).isEmpty()) {
+                identity++;
+            }
+        } catch (DAOException e) {
+            fail();
         }
 
         // WHEN/THEN
@@ -190,13 +194,17 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         instalmentDAO.delete(null);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test(expected = DAOException.class)
     public void testDelete_deletingNotPersistentObjectShouldFail() throws ValidationException, DAOException {
         // GIVEN
         Long identity = 1L;
 
-        while (!instalmentDAO.find(Instalment.withIdentity(identity)).isEmpty()) {
-            identity++;
+        try {
+            while (!instalmentDAO.find(Instalment.withIdentity(identity)).isEmpty()) {
+                identity++;
+            }
+        } catch (DAOException e) {
+            fail();
         }
 
         // WHEN/THEN
@@ -427,8 +435,12 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         // GIVEN
         Long identity = 1L;
 
-        while (!instalmentDAO.find(Instalment.withIdentity(identity)).isEmpty()) {
-            identity++;
+        try {
+            while (!instalmentDAO.find(Instalment.withIdentity(identity)).isEmpty()) {
+                identity++;
+            }
+        } catch (DAOException e) {
+            fail();
         }
 
         // WHEN/THEN
