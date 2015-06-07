@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 /**
  * H2 Database Implementation of the IntermittentSaleDAO interface
  */
-public class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
+class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
     private static final Logger LOGGER = LogManager.getLogger(DBIntermittentSaleDAO.class);
 
     @Autowired

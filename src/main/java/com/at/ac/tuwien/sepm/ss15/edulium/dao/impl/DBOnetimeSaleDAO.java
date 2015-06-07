@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * H2 Database Implementation of the OnetimeSaleDAO interface
  */
-public class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
+class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
     private static final Logger LOGGER = LogManager.getLogger(DBOnetimeSaleDAO.class);
 
     @Autowired
