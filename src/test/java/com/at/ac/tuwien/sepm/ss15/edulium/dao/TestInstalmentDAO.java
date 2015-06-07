@@ -2,11 +2,13 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Instalment;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -283,5 +285,92 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         assertTrue(all.contains(inst1));
         assertTrue(all.contains(inst2));
         assertTrue(all.contains(inst3));
+    }
+
+    @Test
+    public void testGetHistory_shouldReturnObject() throws ValidationException, DAOException {
+        // GIVEN
+        // Create
+        Instalment instalmentA = new Instalment();
+        LocalDateTime createTime = LocalDateTime.now();
+        instalmentA.setInvoice(Invoice.withIdentity(1L));
+        instalmentA.setTime(createTime);
+        instalmentA.setType("CASH");
+        instalmentA.setAmount(new BigDecimal("22"));
+        instalmentA.setPaymentInfo("Payment info");
+        instalmentDAO.create(instalmentA);
+
+        // Update
+        Instalment instalmentB = Instalment.withIdentity(instalmentA.getIdentity());
+        LocalDateTime updateTime = LocalDateTime.now();
+        instalmentB.setInvoice(Invoice.withIdentity(1L));
+        instalmentB.setTime(updateTime);
+        instalmentB.setType("CASH");
+        instalmentB.setAmount(new BigDecimal("20"));
+        instalmentB.setPaymentInfo("Payment info");
+        instalmentDAO.update(instalmentB);
+
+        // Delete
+        LocalDateTime deleteTime = LocalDateTime.now();
+        instalmentDAO.delete(instalmentB);
+
+        // WHEN
+        List<History<Instalment>> history = instalmentDAO.getHistory(instalmentA);
+
+        // THEN
+        assertEquals(3, history.size());
+        History<Instalment> event;
+
+        // Create history inspection
+        event = history.get(0);
+        assertEquals(Long.valueOf(1), event.getChangeNumber());
+        assertEquals(instalmentA, event.getData());
+        assertEquals(getCurrentUser(), event.getUser());
+        assertTrue(Duration.between(createTime, event.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(event.isDeleted());
+
+        // Update history inspection
+        event = history.get(1);
+        assertEquals(Long.valueOf(2), event.getChangeNumber());
+        assertEquals(instalmentB, event.getData());
+        assertEquals(getCurrentUser(), event.getUser());
+        assertTrue(Duration.between(updateTime, event.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(event.isDeleted());
+
+        // Delete history inspection
+        event = history.get(2);
+        assertEquals(Long.valueOf(3), event.getChangeNumber());
+        assertEquals(instalmentB, event.getData());
+        assertEquals(getCurrentUser(), event.getUser());
+        assertTrue(Duration.between(deleteTime, event.getTimeOfChange()).getSeconds() < 1);
+        assertTrue(event.isDeleted());
+    }
+
+    @Test
+    public void testGetHistory_nonPersistentDataShouldReturnEmptyList() throws ValidationException, DAOException {
+        // GIVEN
+        Long identity = 1L;
+
+        while (!instalmentDAO.find(Instalment.withIdentity(identity)).isEmpty()) {
+            identity++;
+        }
+
+        // WHEN/THEN
+        assertTrue(instalmentDAO.getHistory(Instalment.withIdentity(identity)).isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_shouldFailWithNullObject() throws ValidationException, DAOException {
+        // WHEN/THEN
+        instalmentDAO.getHistory(null);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testGetHistory_shouldFailWithoutIdentity() throws ValidationException, DAOException {
+        // GIVEN
+        Instalment instalment = new Instalment();
+
+        // WHEN/THEN
+        instalmentDAO.getHistory(instalment);
     }
 }
