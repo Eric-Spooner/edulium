@@ -69,6 +69,7 @@ public class DialogMenuEntryController implements Initializable{
         try {
             if(menuEntry == null){
                 menuEntry = new MenuEntry();
+                menuEntry.setAvailable(true);
             }
             dropTaxRate.setItems(observableArrayList(taxRateService.getAllTaxRates()));
             if (menuEntry.getTaxRate() != null){
@@ -79,8 +80,12 @@ public class DialogMenuEntryController implements Initializable{
                dropMenuCategory.getSelectionModel().select(menuEntry.getCategory());
             }
             textFieldName.setText(menuEntry.getName());
-            textFieldPrice.setText(menuEntry.getPrice().toString());
-            textFieldDesription.setText(menuEntry.getDescription());
+            if(menuEntry.getPrice()!= null) {
+                textFieldPrice.setText(menuEntry.getPrice().toString());
+            }
+            if(menuEntry.getDescription() != null) {
+                textFieldDesription.setText(menuEntry.getDescription());
+            }
             checkAvailible.setSelected(menuEntry.getAvailable());
         }catch (Exception e){
             LOGGER.error("Init Menu Entry crashed " + e);
@@ -144,8 +149,8 @@ public class DialogMenuEntryController implements Initializable{
         menuEntry.setTaxRate(dropTaxRate.getSelectionModel().getSelectedItem());
         menuEntry.setAvailable(checkAvailible.isSelected());
         if(DialogMenuEntryController.dialogEnumeration == DialogEnumeration.SEARCH){
-            if(! textFieldDesription.getText().isEmpty()) menuEntry.setDescription(textFieldDesription.getText());
-            if(! textFieldName.getText().isEmpty()) menuEntry.setName(textFieldName.getText());
+            if(!textFieldDesription.getText().isEmpty()) menuEntry.setDescription(textFieldDesription.getText());
+            if(textFieldName.getText() != null) menuEntry.setName(textFieldName.getText());
         }else {
             menuEntry.setName(textFieldName.getText());
             menuEntry.setDescription(textFieldDesription.getText());
@@ -161,7 +166,7 @@ public class DialogMenuEntryController implements Initializable{
                     break;
             }
         }catch (Exception e){
-            LOGGER.error("Updating the menuEntry in The Daabase Failed " + e);
+            LOGGER.error("Updating the menuEntry in The Database Failed " + e);
             return;
         }
         thisStage.close();
