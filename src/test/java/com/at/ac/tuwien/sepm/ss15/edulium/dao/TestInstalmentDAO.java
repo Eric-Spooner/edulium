@@ -221,4 +221,67 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         // THEN
         assertTrue(results.isEmpty());
     }
+
+    @Test
+    public void testFind_shouldFindObjectsWhenSearchingByInvoice() throws ValidationException, DAOException {
+        // GIVEN
+
+        Invoice invoice = Invoice.withIdentity(1L);
+
+        Instalment instalment = new Instalment();
+        instalment.setInvoice(invoice);
+        instalment.setTime(LocalDateTime.now());
+        instalment.setType("CASH");
+        instalment.setAmount(new BigDecimal("22"));
+        instalment.setPaymentInfo("Payment info");
+
+        instalmentDAO.create(instalment);
+
+        // WHEN
+        Instalment matcher = new Instalment();
+        matcher.setInvoice(invoice);
+        List<Instalment> instalmentList = instalmentDAO.find(matcher);
+
+        // THEN
+        assertFalse(instalmentList.isEmpty());
+    }
+
+    @Test
+    public void testGetAll_shouldReturnAllObjects() throws ValidationException, DAOException {
+        // GIVEN
+        Instalment inst1 = new Instalment();
+        inst1.setInvoice(Invoice.withIdentity(1L));
+        inst1.setTime(LocalDateTime.now());
+        inst1.setType("CASH");
+        inst1.setAmount(new BigDecimal("22"));
+        inst1.setPaymentInfo("Payment info");
+
+        Instalment inst2 = new Instalment();
+        inst2.setInvoice(Invoice.withIdentity(1L));
+        inst2.setTime(LocalDateTime.now());
+        inst2.setType("CREDIT_CARD");
+        inst2.setAmount(new BigDecimal("19"));
+        inst2.setPaymentInfo("Payment info");
+
+        Instalment inst3 = new Instalment();
+        inst3.setInvoice(Invoice.withIdentity(1L));
+        inst3.setTime(LocalDateTime.now());
+        inst3.setType("CASH");
+        inst3.setAmount(new BigDecimal("13"));
+        inst3.setPaymentInfo("Payment info");
+
+        instalmentDAO.create(inst1);
+        instalmentDAO.create(inst2);
+        instalmentDAO.create(inst3);
+
+        // WHEN
+        List<Instalment> all = instalmentDAO.getAll();
+        assertNotNull(all);
+
+        // THEN
+        assertEquals(3, all.size());
+        assertTrue(all.contains(inst1));
+        assertTrue(all.contains(inst2));
+        assertTrue(all.contains(inst3));
+    }
 }
