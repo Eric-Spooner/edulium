@@ -23,18 +23,12 @@ public interface ReservationService extends Service {
     List<Table> getAllFreeTables(Reservation reservation) throws ServiceException, ValidationException;
 
     /**
-     * returns a list of tables which can be used for the reservation
-     * @param reservation reservation
-     * @return list of tables
-     * @throws ServiceException if an error in the service or persistence layer has occurred
-     * @throws ValidationException if the reservation object is not valid for this action
-     */
-    List<Table> getBestFittingTables(Reservation reservation) throws ServiceException, ValidationException;
-
-    /**
-     * adds the reservation to the underlying datasource
+     * adds the reservation to the underlying datasource;
+     * if the tables parameter of reservation is empty or null, this method automatically
+     * chooses tables for the reservation
      * @param reservation reservation to add
      * @throws ServiceException if an error in the service or persistence layer has occurred
+     *                          or no fitting tables could be found (if tables are assigned automatically)
      * @throws ValidationException if the reservation object is not valid for this action
      */
     @PreAuthorize("hasRole('SERVICE')")
@@ -56,7 +50,7 @@ public interface ReservationService extends Service {
      * @throws ValidationException if the data is invalid
      */
     @PreAuthorize("hasRole('SERVICE')")
-    void removeReservation(Reservation reservation) throws ServiceException, ValidationException;
+    void cancelReservation(Reservation reservation) throws ServiceException, ValidationException;
 
     /**
      * returns all reservations from the underlying datasource which paramters
