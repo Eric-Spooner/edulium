@@ -214,7 +214,8 @@ public class TestInstalmentDAO extends AbstractDAOTest {
     @Test
     public void testFind_shouldReturnEmptyListWhenSearchingNull() throws DAOException {
         // WHEN/THEN
-        instalmentDAO.find(null);
+        List<Instalment> result = instalmentDAO.find(null);
+        assertEquals(0, result.size());
     }
 
     @Test
