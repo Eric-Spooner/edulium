@@ -28,6 +28,7 @@
     <import resource="dao/Spring-UserDAO.xml" />
     <import resource="dao/Spring-OrderDAO.xml" />
     <import resource="dao/Spring-MenuDAO.xml" />
+    <import resource="dao/Spring-InstalmentDAO.xml" />
     <import resource="dao/Spring-InvoiceDAO.xml"/>
     <import resource="dao/Spring-TaxRateDAO.xml" />
     <import resource="dao/Spring-MenuEntryDAO.xml" />
