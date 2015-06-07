@@ -10,16 +10,20 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the section interface
  */
+@PreAuthorize("isAuthenticated()")
 class DBSectionDAO implements DAO<Section> {
     private static final Logger LOGGER = LogManager.getLogger(DBSectionDAO.class);
 
@@ -222,6 +226,43 @@ class DBSectionDAO implements DAO<Section> {
         return history;
     }
 
+    @Override
+    public List<Section> populate(List<Section> sections) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + sections);
+
+        if (sections == null || sections.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (Section section : sections) {
+            validator.validateIdentity(section);
+        }
+
+        final String query = "SELECT * FROM RestaurantSection WHERE ID IN (" +
+                sections.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<Section> populatedSections = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (Section section : sections) {
+                stmt.setLong(index++, section.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedSections.add(parseResult(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating sections failed", e);
+            throw new DAOException("Populating sections failed", e);
+        }
+
+        return populatedSections;
+    }
+
     /**
      * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed
@@ -272,9 +313,9 @@ class DBSectionDAO implements DAO<Section> {
      * @throws SQLException if an error accessing the database occurred
      * @throws DAOException if an error retrieving the user ocurred
      */
-    private History<Section> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
+    private History<Section> parseHistoryEntry(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             throw new DAOException("user not found");
         }

@@ -11,16 +11,20 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the TableDAO interface
  */
+@PreAuthorize("isAuthenticated()")
 class DBTableDAO implements DAO<Table> {
     private static final Logger LOGGER = LogManager.getLogger(DBTableDAO.class);
 
@@ -180,7 +184,11 @@ class DBTableDAO implements DAO<Table> {
 
             ResultSet result = stmt.getResultSet();
             while (result.next()) {
-                objects.add(parseResult(result));
+                try {
+                    objects.add(parseResult(result));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
             }
 
         } catch (SQLException e) {
@@ -207,7 +215,11 @@ class DBTableDAO implements DAO<Table> {
 
             ResultSet result = stmt.getResultSet();
             while (result.next()) {
-                objects.add(parseResult(result));
+                try {
+                    objects.add(parseResult(result));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
             }
 
         } catch (SQLException e) {
@@ -248,6 +260,44 @@ class DBTableDAO implements DAO<Table> {
         return history;
     }
 
+    @Override
+    public List<Table> populate(List<Table> tables) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + tables);
+
+        if (tables == null || tables.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (Table table : tables) {
+            validator.validateIdentity(table);
+        }
+
+        final String query = "SELECT * FROM RestaurantTable WHERE (section_ID, number) IN (" +
+                tables.stream().map(t -> "(?, ?)").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<Table> populatedTables = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (Table table : tables) {
+                stmt.setLong(index++, table.getSection().getIdentity());
+                stmt.setLong(index++, table.getNumber());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedTables.add(parseResult(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating tables failed", e);
+            throw new DAOException("Populating tables failed", e);
+        }
+
+        return populatedTables;
+    }
+
     /**
      * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed
@@ -283,23 +333,30 @@ class DBTableDAO implements DAO<Table> {
      * @return Table object with the data of the resultSet set
      * @throws SQLException if an error accessing the database occurred
      */
-    private Table parseResult(ResultSet result) throws SQLException, DAOException {
+    private Table parseResult(ResultSet result) throws SQLException, ValidationException, DAOException {
         Table table = new Table();
-        // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("user_ID")));
-        if (storedUsers.size() == 1) {
-            table.setUser(storedUsers.get(0));
-        }
-        // get section
-        List<Section> storedSections = sectionDAO.find(Section.withIdentity(Long.valueOf(result.getString("section_ID"))));
-        if (storedSections.size() != 1) {
-            throw new DAOException("section must not be null");
-        }
-        table.setSection(storedSections.get(0));
         table.setNumber(result.getLong("number"));
         table.setSeats(result.getInt("seats"));
         table.setRow(result.getInt("tableRow"));
         table.setColumn(result.getInt("tableColumn"));
+
+        // get user
+        final String userId = result.getString("user_ID");
+        if (userId != null) {  // optional
+            List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(userId)));
+            if (storedUsers.size() != 1) {
+                throw new DAOException("user not found");
+            }
+            table.setUser(storedUsers.get(0));
+        }
+
+        // get section
+        final long sectionId = result.getLong("section_ID");
+        List<Section> storedSections = sectionDAO.populate(Arrays.asList(Section.withIdentity(sectionId)));
+        if (storedSections.size() != 1) {
+            throw new DAOException("section not found");
+        }
+        table.setSection(storedSections.get(0));
 
         return table;
     }
@@ -312,9 +369,9 @@ class DBTableDAO implements DAO<Table> {
      * @throws SQLException if an error accessing the database occurred
      * @throws DAOException if an error retrieving the user ocurred
      */
-    private History<Table> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
+    private History<Table> parseHistoryEntry(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             throw new DAOException("user not found");
         }

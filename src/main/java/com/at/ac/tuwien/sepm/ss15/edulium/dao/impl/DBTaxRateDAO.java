@@ -10,6 +10,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
@@ -18,11 +19,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the TaxRate DAO interface
  */
+@PreAuthorize("isAuthenticated()")
 class DBTaxRateDAO implements DAO<TaxRate> {
     private static final Logger LOGGER = LogManager.getLogger(DBTaxRateDAO.class);
 
@@ -180,6 +184,43 @@ class DBTaxRateDAO implements DAO<TaxRate> {
         return taxRates;
     }
 
+    @Override
+    public List<TaxRate> populate(List<TaxRate> taxRates) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + taxRates);
+
+        if (taxRates == null || taxRates.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (TaxRate taxRate : taxRates) {
+            validator.validateIdentity(taxRate);
+        }
+
+        final String query = "SELECT * FROM TaxRate WHERE ID IN (" +
+                taxRates.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<TaxRate> populatedTaxRates = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (TaxRate taxRate : taxRates) {
+                stmt.setLong(index++, taxRate.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedTaxRates.add(taxRateFromResultSet(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating tax rates failed", e);
+            throw new DAOException("Populating tax rates failed", e);
+        }
+
+        return populatedTaxRates;
+    }
+
     /**
      * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed the changes
@@ -226,9 +267,9 @@ class DBTaxRateDAO implements DAO<TaxRate> {
      * @throws SQLException if an error accessing the database occurred
      * @throws DAOException if an error retrieving the user ocurred
      */
-    private History<TaxRate> historyFromResultSet(ResultSet result) throws DAOException, SQLException {
+    private History<TaxRate> historyFromResultSet(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             LOGGER.error("user not found");
             throw new DAOException("user not found");

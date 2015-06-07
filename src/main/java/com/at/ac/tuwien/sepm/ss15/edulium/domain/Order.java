@@ -15,7 +15,14 @@ public class Order {
     private Table table = null;
     private Invoice invoice = null;
     private MenuEntry menuEntry = null;
+    private State state = null;
 
+    public enum State {
+        QUEUED,
+        IN_PROGRESS,
+        READY_FOR_DELIVERY,
+        DELIVERED
+    }
 
     /**
      * The method is used to generate an Order with the given identity
@@ -157,6 +164,21 @@ public class Order {
         this.invoice = invoice;
     }
 
+    /*
+     * @return the state of the order
+     */
+    public State getState() {
+        return state;
+    }
+
+    /**
+     * sets the state of the order
+     * @param state
+     */
+    public void setState(State state) {
+        this.state = state;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -173,6 +195,7 @@ public class Order {
         if (table != null ? !table.equals(order.table) : order.table != null) return false;
         if (tax != null ? (tax.compareTo(order.getTax())!=0) : order.brutto != null) return false;
         if (time != null ? !time.equals(order.time) : order.time != null) return false;
+        if (state != null ? !state.equals(order.state) : order.state != null) return false;
 
         return true;
     }
@@ -188,6 +211,7 @@ public class Order {
                 ", table=" + table +
                 ", invoice=" + invoice +
                 ", menuEntry=" + menuEntry +
+                ", state=" + state +
                 '}';
     }
 }

@@ -11,16 +11,20 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * H2 Database Implementation of the MenuCategoryDAO interface
  */
+@PreAuthorize("isAuthenticated()")
 class DBMenuCategoryDAO implements DAO<MenuCategory> {
     private static final Logger LOGGER = LogManager.getLogger(DBMenuCategoryDAO.class);
 
@@ -171,6 +175,43 @@ class DBMenuCategoryDAO implements DAO<MenuCategory> {
         return history;
     }
 
+    @Override
+    public List<MenuCategory> populate(List<MenuCategory> menuCategories) throws DAOException, ValidationException {
+        LOGGER.debug("Entering populate with parameters: " + menuCategories);
+
+        if (menuCategories == null || menuCategories.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (MenuCategory menuCategory : menuCategories) {
+            validator.validateIdentity(menuCategory);
+        }
+
+        final String query = "SELECT * FROM MenuCategory WHERE ID IN (" +
+                menuCategories.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<MenuCategory> populatedMenuCategories = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (MenuCategory menuCategory : menuCategories) {
+                stmt.setLong(index++, menuCategory.getIdentity());
+            }
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                populatedMenuCategories.add(parseResult(result));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Populating menu categories failed", e);
+            throw new DAOException("Populating menu categories failed", e);
+        }
+
+        return populatedMenuCategories;
+    }
+
     /**
      * writes the changes of the dataset into the database
      * stores the time; number of the change and the user which executed
@@ -218,9 +259,9 @@ class DBMenuCategoryDAO implements DAO<MenuCategory> {
      * @throws SQLException if an error accessing the database occurred
      * @throws DAOException if an error retrieving the user ocurred
      */
-    private History<MenuCategory> parseHistoryEntry(ResultSet result) throws DAOException, SQLException {
+    private History<MenuCategory> parseHistoryEntry(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             LOGGER.error("user not found");
             throw new DAOException("user not found");
