@@ -111,7 +111,6 @@ public class ManagerController implements Initializable {
 
             menuCategories = observableArrayList(menuService.getAllMenuCategories());
             tableViewMenuCategory.setItems(menuCategories);
-            tableViewMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
             tableColMenuCategoryID.setCellValueFactory(new PropertyValueFactory<MenuCategory, Long>("identity"));
             tableColMenuCategoryName.setCellValueFactory(new PropertyValueFactory<MenuCategory, String>("name"));
 
