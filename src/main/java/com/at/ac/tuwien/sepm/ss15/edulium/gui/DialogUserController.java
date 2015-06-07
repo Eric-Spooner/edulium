@@ -1,0 +1,149 @@
+package com.at.ac.tuwien.sepm.ss15.edulium.gui;
+
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.TaxRateService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.math.BigDecimal;
+import java.net.URL;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import static javafx.collections.FXCollections.observableArrayList;
+
+/**
+ * Controller for the TaxRate Dialog
+ */
+public class DialogUserController implements Initializable{
+    private static final Logger LOGGER = LogManager.getLogger(DialogUserController.class);
+
+
+    private static Stage thisStage;
+    private static UserService userService;
+    private static User user;
+    private static DialogEnumeration dialogEnumeration;
+
+
+    @FXML
+    private TextField textFieldName;
+    @FXML
+    private TextField textFieldUsername;
+    @FXML
+    private ChoiceBox<String> dropRole;
+
+    public static User getUser() {
+        return user;
+    }
+    public static void setUser(User user) {
+        DialogUserController.user = user;
+    }
+    public static void setUserService(UserService userService) {
+        DialogUserController.userService = userService;
+    }
+
+    public static void setThisStage(Stage thisStage) {
+        DialogUserController.thisStage = thisStage;
+    }
+    public static void setDialogEnumeration(DialogEnumeration dialogEnumeration) {
+        DialogUserController.dialogEnumeration = dialogEnumeration;
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources){
+        LOGGER.info("Initialize Dialog MenuEntry");
+        try {
+            List<String> roles = new LinkedList<>();
+            roles.add("MANAGER");
+            roles.add("COOK");
+            roles.add("SERVICE");
+            dropRole.setItems(observableArrayList(roles));
+            if(user == null){
+                user = new User();
+            }
+            if(user.getName() != null){
+                textFieldName.setText(user.getName());
+            }
+            if (user.getIdentity() != null){
+                textFieldUsername.setText(user.getIdentity());
+            }
+            if (user.getRole() != null){
+                dropRole.getSelectionModel().select(user.getRole());
+            }
+        }catch (Exception e){
+            LOGGER.error("Init Menu Entry crashed " + e);
+        }
+    }
+
+    public void buttonOKClick(ActionEvent actionEvent) {
+        LOGGER.info("Dialog MenuEntry OK Button clicked");
+        switch (DialogUserController.dialogEnumeration){
+            case ADD:
+            case UPDATE:
+                if(textFieldUsername == null || textFieldUsername.getText().isEmpty()){
+                    ManagerController.showErrorDialog
+                            ("Error", "Input Validation Error", "You have to insert a Username");
+                    return;
+                }
+                if(textFieldName == null || textFieldName.getText().isEmpty()){
+                    ManagerController.showErrorDialog
+                        ("Error", "Input Validation Error", "You have to insert a Username");
+                    return;
+                }
+                if(dropRole.getSelectionModel().getSelectedItem() == null){
+                    ManagerController.showErrorDialog
+                            ("Error", "Input Validation Error", "You have to select a Role");
+                    return;
+                }
+                break;
+        }
+        if(textFieldName != null && !textFieldName.getText().isEmpty()){
+            user.setName(textFieldName.getText());
+        }
+        if(textFieldUsername != null && !textFieldUsername.getText().isEmpty()){
+            user.setIdentity(textFieldUsername.getText());
+        }
+        if(dropRole.getSelectionModel().getSelectedItem() != null){
+            user.setRole(dropRole.getSelectionModel().getSelectedItem());
+        }
+        try {
+            switch (DialogUserController.dialogEnumeration){
+                case ADD:
+                    userService.addUser(user);
+                    break;
+                case UPDATE:
+                    userService.updateUser(user);
+                    break;
+            }
+        }catch (Exception e){
+            LOGGER.error("Updating the User in The Database Failed " + e);
+            return;
+        }
+        thisStage.close();
+    }
+
+    public void buttonCancelClick(ActionEvent actionEvent) {
+        LOGGER.info("Dialog User Cancel Button clicked");
+        thisStage.close();
+    }
+
+    public static void resetDialog(){
+        DialogUserController.setUser(null);
+    }
+}
+

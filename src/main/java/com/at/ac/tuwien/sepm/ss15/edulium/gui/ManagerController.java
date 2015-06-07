@@ -3,10 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.TaxRateService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -52,6 +49,16 @@ public class ManagerController implements Initializable {
     private MenuService menuService;
     private TaxRateService taxRateService;
     private InteriorService interiorService;
+    private UserService userService;
+
+    @FXML
+    private TableView<User> tableViewEmployee;
+    @FXML
+    private TableColumn<User,String> employeeId;
+    @FXML
+    private TableColumn<User,String> employeeName;
+    @FXML
+    private TableColumn<User,String> employeeRole;
 
     @FXML
     private TableView<TaxRate> tableViewTaxRate;
@@ -113,6 +120,7 @@ public class ManagerController implements Initializable {
     private ObservableList<Menu> menus;
     private ObservableList<MenuEntry> menuEntries;
     private ObservableList<MenuCategory> menuCategories;
+    private ObservableList<User> users;
 
     @Override
     public void initialize(URL location, ResourceBundle resources){
@@ -121,6 +129,13 @@ public class ManagerController implements Initializable {
             menuService = context.getBean("menuService", MenuService.class);
             taxRateService = context.getBean("taxRateService",  TaxRateService.class);
             interiorService = context.getBean("interiorService",  InteriorService.class);
+            userService = context.getBean("userService",  UserService.class);
+
+            users = observableArrayList(userService.getAllUsers());
+            tableViewEmployee.setItems(users);
+            employeeId.setCellValueFactory(new PropertyValueFactory<User, String>("identity"));
+            employeeName.setCellValueFactory(new PropertyValueFactory<User, String>("name"));
+            employeeRole.setCellValueFactory(new PropertyValueFactory<User, String>("role"));
 
             taxRates = observableArrayList(taxRateService.getAllTaxRates());
             tableViewTaxRate.setItems(taxRates);
@@ -284,16 +299,96 @@ public class ManagerController implements Initializable {
         setupListeners();
     }
 
+
+
     public void buttonEmployeesAddClicked(ActionEvent actionEvent) {
+        try {
+            LOGGER.info("Add User Button Click");
+            Stage stage = new Stage();
+            DialogUserController.resetDialog();
+            DialogUserController.setThisStage(stage);
+            DialogUserController.setUserService(userService);
+            DialogUserController.setDialogEnumeration(DialogEnumeration.ADD);
+            stage.setTitle("Add Employee");
+            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogUser.fxml"));
+            Scene scene = new Scene(myPane);
+            stage.setScene(scene);
+            stage.showAndWait();
+            users.setAll(userService.getAllUsers());
+        }catch (IOException e){
+            LOGGER.error("Add User Button Click did not work");
+        }catch (Exception e){
+            LOGGER.error("Loading the Users failed" + e);
+        }
     }
 
     public void buttonEmployeesUpdateClicked(ActionEvent actionEvent) {
+        try {
+            LOGGER.info("Update User Button Click");
+            Stage stage = new Stage();
+            if(tableViewEmployee.getSelectionModel().getSelectedItem() == null){
+                ManagerController.showErrorDialog
+                        ("Error", "Input Validation Error", "You have to select a User to Update");
+                return;
+            }
+            DialogUserController.resetDialog();
+            DialogUserController.setThisStage(stage);
+            DialogUserController.setUserService(userService);
+            DialogUserController.setDialogEnumeration(DialogEnumeration.UPDATE);
+            DialogUserController.setUser(tableViewEmployee.getSelectionModel().getSelectedItem());
+            stage.setTitle("Update User");
+            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogUser.fxml"));
+            Scene scene = new Scene(myPane);
+            stage.setScene(scene);
+            stage.showAndWait();
+            users.setAll(userService.getAllUsers());
+            DialogMenuController.resetDialog();
+        }catch (IOException e){
+            LOGGER.error("Add User Button Click did not work");
+        }catch (Exception e){
+            LOGGER.error("Loading the User failed" + e);
+        }
     }
 
     public void buttonEmployeesSearchClicked(ActionEvent actionEvent) {
+        try {
+            LOGGER.info("Search User Button Click");
+            Stage stage = new Stage();
+            DialogUserController.resetDialog();
+            DialogUserController.setThisStage(stage);
+            DialogUserController.setUserService(userService);
+            DialogUserController.setDialogEnumeration(DialogEnumeration.SEARCH);
+            stage.setTitle("Search User");
+            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogUser.fxml"));
+            Scene scene = new Scene(myPane);
+            stage.setScene(scene);
+            stage.showAndWait();
+            if(DialogUserController.getUser() != null){
+                users.setAll(userService.findUsers(DialogUserController.getUser()));
+            }else {
+                users.setAll(userService.getAllUsers());
+            }
+            DialogMenuEntryController.resetDialog();
+        }catch (IOException e){
+            LOGGER.error("Search User Button Click did not work");
+        }catch (Exception e){
+            LOGGER.error("Loading the User Entries failed" + e);
+        }
     }
 
     public void buttonEmployeesRemoveClicked(ActionEvent actionEvent) {
+        try {
+            LOGGER.info("Delete User Button Click");
+            if(tableViewEmployee.getSelectionModel().getSelectedItem() == null){
+                ManagerController.showErrorDialog
+                        ("Error", "Input Validation Error", "You have to select a User to Delete");
+                return;
+            }
+            userService.deleteUser(tableViewEmployee.getSelectionModel().getSelectedItem());
+            users.setAll(userService.getAllUsers());
+        }catch (Exception e){
+            LOGGER.error("Loading the User Entries failed" + e);
+        }
     }
 
     public void buttonMenuUpdateClicked(ActionEvent actionEvent) {
@@ -674,6 +769,14 @@ public class ManagerController implements Initializable {
         }
     }
 
+    public void buttonEmployeesShowAll(ActionEvent actionEvent) {
+        try {
+            users.setAll(userService.getAllUsers());
+        } catch (Exception e){
+            LOGGER.error("Loading All Users failed" + e);
+        }
+    }
+
     public void buttonAddSectionClicked(ActionEvent actionEvent) {
         LOGGER.info("Add Section Button Click");
         drawCanvas();
@@ -791,6 +894,8 @@ public class ManagerController implements Initializable {
         }
         return max*FACT + TABLE_SIZE + 2*SECTION_PADDING;
     }
+
+
 
     //TODO think of a better solution
     public class UpdateCanvas {

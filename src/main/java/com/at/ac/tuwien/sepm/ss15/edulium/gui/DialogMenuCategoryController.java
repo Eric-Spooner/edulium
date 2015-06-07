@@ -59,12 +59,15 @@ public class DialogMenuCategoryController implements Initializable{
 
     public void buttonOKClick(ActionEvent actionEvent) {
         LOGGER.info("Dialog MenuCategory OK Button clicked");
-        if(textFieldName.getText().equals("") &&
-                DialogMenuCategoryController.dialogEnumeration != DialogEnumeration.SEARCH) {
-            ManagerController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
-            return;
+        switch (DialogMenuCategoryController.dialogEnumeration){
+            case ADD:
+            case UPDATE:
+                if(textFieldName != null || textFieldName.getText().equals("") &&
+                    DialogMenuCategoryController.dialogEnumeration != DialogEnumeration.SEARCH) {
+                ManagerController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
+                return;
+                }
         }
-
         try {
             menuCategory.setName(textFieldName.getText());
             switch (DialogMenuCategoryController.dialogEnumeration) {
