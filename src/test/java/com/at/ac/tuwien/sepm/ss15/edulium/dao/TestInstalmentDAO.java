@@ -156,4 +156,69 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         // WHEN/THEN
         instalmentDAO.delete(Instalment.withIdentity(identity));
     }
+
+    @Test
+    public void testFind_shouldFindObjectsByIdentity() throws ValidationException, DAOException {
+        // GIVEN
+        Instalment inst1 = new Instalment();
+        inst1.setInvoice(Invoice.withIdentity(1L));
+        inst1.setTime(LocalDateTime.now());
+        inst1.setType("CASH");
+        inst1.setAmount(new BigDecimal("22"));
+        inst1.setPaymentInfo("Payment info");
+
+        Instalment inst2 = new Instalment();
+        inst2.setInvoice(Invoice.withIdentity(1L));
+        inst2.setTime(LocalDateTime.now());
+        inst2.setType("CREDIT_CARD");
+        inst2.setAmount(new BigDecimal("19"));
+        inst2.setPaymentInfo("Payment info");
+
+        Instalment inst3 = new Instalment();
+        inst3.setInvoice(Invoice.withIdentity(1L));
+        inst3.setTime(LocalDateTime.now());
+        inst3.setType("CASH");
+        inst3.setAmount(new BigDecimal("13"));
+        inst3.setPaymentInfo("Payment info");
+
+        instalmentDAO.create(inst1);
+        instalmentDAO.create(inst2);
+        instalmentDAO.create(inst3);
+
+        // WHEN
+        List<Instalment> instalmentList = instalmentDAO.find(Instalment.withIdentity(inst1.getIdentity()));
+
+        // THEN
+        assertEquals(1, instalmentList.size());
+        assertEquals(inst1, instalmentList.get(0));
+
+        // WHEN
+        instalmentList = instalmentDAO.find(Instalment.withIdentity(inst2.getIdentity()));
+
+        // THEN
+        assertEquals(1, instalmentList.size());
+        assertEquals(inst2, instalmentList.get(0));
+
+        // WHEN
+        instalmentList = instalmentDAO.find(Instalment.withIdentity(inst3.getIdentity()));
+
+        // THEN
+        assertEquals(1, instalmentList.size());
+        assertEquals(inst3, instalmentList.get(0));
+    }
+
+    @Test
+    public void testFind_shouldReturnEmptyListWhenSearchingNull() throws DAOException {
+        // WHEN/THEN
+        instalmentDAO.find(null);
+    }
+
+    @Test
+    public void testFind_shouldReturnEmptyListWhenNoObjectIsStored() throws DAOException {
+        // WHEN
+        List results = instalmentDAO.find(Instalment.withIdentity(1L));
+
+        // THEN
+        assertTrue(results.isEmpty());
+    }
 }
