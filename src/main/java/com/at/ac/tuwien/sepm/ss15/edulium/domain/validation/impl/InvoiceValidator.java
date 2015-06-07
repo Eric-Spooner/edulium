@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 
-class InvoiceValidatorImpl implements Validator<Invoice> {
+class InvoiceValidator implements Validator<Invoice> {
 
     @Autowired
     private Validator<User> userValidator;

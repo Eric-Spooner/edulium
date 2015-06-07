@@ -20,6 +20,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.never;
 
 /**
@@ -53,28 +54,38 @@ public class TestUserService extends AbstractServiceTest {
         Mockito.verify(userDAO).create(user);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     @WithMockUser(username = "servicetester", roles={"MANAGER"})
-    public void testAddUser_invalidUserShouldThrow() throws ServiceException, ValidationException, DAOException {
+    public void testAddUser_invalidUserShouldNotCallDaoCreate() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         User user = new User();
         Mockito.doThrow(new ValidationException("invalid user test")).when(userValidator).validateForCreate(user);
 
         // WHEN
-        userService.addUser(user);
+        try {
+            userService.addUser(user);
+
+            fail("A ValidationException should have been thrown");
+        } catch (ValidationException e) {
+        }
 
         // THEN
         Mockito.verify(userDAO, never()).create(user);
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test
     @WithMockUser(username = "servicetester", roles={"NOROLE"})
     public void testAddUser_withoutPermissionShouldNotAddUser() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         User user = new User();
 
         // WHEN
-        userService.addUser(user);
+        try {
+            userService.addUser(user);
+
+            fail("An AccessDeniedException should have been thrown");
+        } catch (AccessDeniedException e) {
+        }
 
         // THEN
         Mockito.verify(userDAO, never()).create(user);
@@ -104,28 +115,38 @@ public class TestUserService extends AbstractServiceTest {
         Mockito.verify(userDAO).update(user);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     @WithMockUser(username = "servicetester", roles={"MANAGER"})
-    public void testUpdateUser_invalidUserShouldThrow() throws ServiceException, ValidationException, DAOException {
+    public void testUpdateUser_invalidUserShouldNotCallDaoUpdate() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         User user = new User();
         Mockito.doThrow(new ValidationException("invalid user test")).when(userValidator).validateForUpdate(user);
 
         // WHEN
-        userService.updateUser(user);
+        try {
+            userService.updateUser(user);
+
+            fail("A ValidationException should have been thrown");
+        } catch (ValidationException e) {
+        }
 
         // THEN
         Mockito.verify(userDAO, never()).update(user);
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test
     @WithMockUser(username = "servicetester", roles={"NOROLE"})
     public void testUpdateUser_withoutPermissionShouldNotUpdateUser() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         User user = new User();
 
         // WHEN
-        userService.updateUser(user);
+        try {
+            userService.updateUser(user);
+
+            fail("An AccessDeniedException should have been thrown");
+        } catch (AccessDeniedException e) {
+        }
 
         // THEN
         Mockito.verify(userDAO, never()).update(user);
@@ -155,28 +176,38 @@ public class TestUserService extends AbstractServiceTest {
         Mockito.verify(userDAO).delete(user);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     @WithMockUser(username = "servicetester", roles={"MANAGER"})
-    public void testDeleteUser_invalidUserShouldThrow() throws ServiceException, ValidationException, DAOException {
+    public void testDeleteUser_invalidUserShouldNotCallDaoDelete() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         User user = new User();
         Mockito.doThrow(new ValidationException("invalid user test")).when(userValidator).validateForDelete(user);
 
         // WHEN
-        userService.deleteUser(user);
+        try {
+            userService.deleteUser(user);
+
+            fail("A ValidationException should have been thrown");
+        } catch (ValidationException e) {
+        }
 
         // THEN
         Mockito.verify(userDAO, never()).delete(user);
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test
     @WithMockUser(username = "servicetester", roles={"NOROLE"})
     public void testDeleteUser_withoutPermissionShouldNotDeleteUser() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         User user = new User();
 
         // WHEN
-        userService.deleteUser(user);
+        try {
+            userService.deleteUser(user);
+
+            fail("An AccessDeniedException should have been thrown");
+        } catch (AccessDeniedException e) {
+        }
 
         // THEN
         Mockito.verify(userDAO, never()).delete(user);
