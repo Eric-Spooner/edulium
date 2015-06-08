@@ -5,6 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
@@ -16,50 +17,51 @@ import java.util.List;
 /**
  * Implementation of InteriorService
  */
-public class InteriorServiceImpl implements InteriorService {
+class InteriorServiceImpl implements InteriorService {
     private static final Logger LOGGER = LogManager.getLogger(InteriorServiceImpl.class);
 
     @Autowired
     private DAO<Table> tableDAO;
     @Autowired
     private DAO<Section> sectionDAO;
+    @Autowired
+    private Validator<Table> tableValidator;
+    @Autowired
+    private Validator<Section> sectionValidator;
 
     @Override
-    public void addTable(Table table) throws ServiceException {
+    public void addTable(Table table) throws ServiceException, ValidationException {
         LOGGER.debug("entering addTable with parameters " + table);
+        tableValidator.validateForCreate(table);
 
         try {
             tableDAO.create(table);
         } catch(DAOException e) {
             throw new ServiceException("couldn't add table", e);
-        } catch(ValidationException e) {
-            throw new ServiceException("couldn't validate table", e);
         }
     }
 
     @Override
-    public void updateTable(Table table) throws ServiceException {
+    public void updateTable(Table table) throws ServiceException, ValidationException {
         LOGGER.debug("entering updateTable with parameters " + table);
+        tableValidator.validateForUpdate(table);
 
         try {
             tableDAO.update(table);
         } catch(DAOException e) {
             throw new ServiceException("couldn't update table", e);
-        } catch(ValidationException e) {
-            throw new ServiceException("couldn't validate table", e);
         }
     }
 
     @Override
-    public void deleteTable(Table table) throws ServiceException {
+    public void deleteTable(Table table) throws ServiceException, ValidationException {
         LOGGER.debug("entering deleteTable with parameters " + table);
+        tableValidator.validateForDelete(table);
 
         try {
             tableDAO.delete(table);
         } catch(DAOException e) {
             throw new ServiceException("couldn't delete table", e);
-        } catch(ValidationException e) {
-            throw new ServiceException("couldn't validate table", e);
         }
     }
 
@@ -86,41 +88,38 @@ public class InteriorServiceImpl implements InteriorService {
     }
 
     @Override
-    public void addSection(Section section) throws ServiceException {
+    public void addSection(Section section) throws ServiceException, ValidationException {
         LOGGER.debug("entering addSection with parameters " + section);
+        sectionValidator.validateForCreate(section);
 
         try {
             sectionDAO.create(section);
         } catch(DAOException e) {
             throw new ServiceException("couldn't add section", e);
-        } catch(ValidationException e) {
-            throw new ServiceException("couldn't validate section", e);
         }
     }
 
     @Override
-    public void updateSection(Section section) throws ServiceException {
+    public void updateSection(Section section) throws ServiceException, ValidationException {
         LOGGER.debug("entering updateSection with parameters " + section);
+        sectionValidator.validateForUpdate(section);
 
         try {
             sectionDAO.update(section);
         } catch(DAOException e) {
             throw new ServiceException("couldn't update section", e);
-        } catch(ValidationException e) {
-            throw new ServiceException("couldn't validate section", e);
         }
     }
 
     @Override
-    public void deleteSection(Section section) throws ServiceException {
+    public void deleteSection(Section section) throws ServiceException, ValidationException {
         LOGGER.debug("entering deleteSection with parameters " + section);
+        sectionValidator.validateForDelete(section);
 
         try {
             sectionDAO.delete(section);
         } catch(DAOException e) {
             throw new ServiceException("couldn't delete section", e);
-        } catch(ValidationException e) {
-            throw new ServiceException("couldn't validate section", e);
         }
     }
 
