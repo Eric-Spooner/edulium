@@ -35,6 +35,8 @@ public class TestReservationService extends AbstractServiceTest {
     DAO<Reservation> reservationDAO;
     @Mock
     Validator<Reservation> reservationValidator;
+    @Mock
+    InteriorService interiorService;
 
     Table t1, t2, t3, t4, t5, t6;
 
@@ -43,6 +45,7 @@ public class TestReservationService extends AbstractServiceTest {
         MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(getTargetObject(reservationService), "reservationDAO", reservationDAO);
         ReflectionTestUtils.setField(getTargetObject(reservationService), "reservationValidator", reservationValidator);
+        ReflectionTestUtils.setField(getTargetObject(reservationService), "interiorService", interiorService);
         createTestData();
     }
 
@@ -51,6 +54,8 @@ public class TestReservationService extends AbstractServiceTest {
         t.setNumber(nr);
         t.setColumn(col);
         t.setRow(row);
+        t.setSeats(seats);
+        t.setSection(section);
         return t;
     }
 
@@ -67,7 +72,7 @@ public class TestReservationService extends AbstractServiceTest {
         | T1  T2 |   T5   |
         | T3  T4 |   T6   |
      */
-    private void createTestData() {
+    private void createTestData() throws ServiceException {
         Section room1 = new Section();
         room1.setName("room1");
         room1.setIdentity(1L);
@@ -83,6 +88,9 @@ public class TestReservationService extends AbstractServiceTest {
         t4 = createTable(4L, 2, 2, 3, room1);
         t5 = createTable(5L, 1, 1, 4, room2);
         t6 = createTable(6L, 1, 2, 4, room2);
+
+        Mockito.when(interiorService.getAllTables()).thenReturn(Arrays.asList(t1, t2, t3, t4, t5, t6));
+        Mockito.when(interiorService.getAllSections()).thenReturn(Arrays.asList(room1, room2));
     }
 
     @Test

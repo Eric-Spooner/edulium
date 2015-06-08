@@ -6,6 +6,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ReservationService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ public class ReservationServiceImpl implements ReservationService {
     DAO<Reservation> reservationDAO;
     @Autowired
     Validator<Reservation> reservationValidator;
+    @Autowired
+    InteriorService interiorService;
 
     @Override
     public List<Table> getFreeTables(Reservation reservation) throws ServiceException, ValidationException {
