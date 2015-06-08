@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.ManagerController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,10 +13,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class Main extends Application {
-
     @Override
     public void start(Stage primaryStage) throws Exception{
-        ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Service.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Edulium.xml");
 
         AuthenticationManager authenticationManager = context.getBean(AuthenticationManager.class);
         Authentication request = new UsernamePasswordAuthenticationToken("servicetester", "");
@@ -30,7 +28,6 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
-
 
     public static void main(String[] args) {
         launch(args);

@@ -54,7 +54,7 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Service.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Edulium.xml");
         userService = context.getBean("userService", UserService.class);
 
         try {

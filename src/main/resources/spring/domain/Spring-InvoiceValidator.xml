@@ -4,6 +4,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="invoiceValidator" class="com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl.InvoiceValidatorImpl">
+    <bean id="invoiceValidator" class="com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl.InvoiceValidator">
     </bean>
 </beans>

@@ -6,4 +6,5 @@
 
     <bean id="interiorService" class="com.at.ac.tuwien.sepm.ss15.edulium.service.impl.InteriorServiceImpl">
     </bean>
+
 </beans>

@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -755,6 +756,8 @@ public class ManagerController implements Initializable {
                 }
             } catch (ServiceException e) {
                 LOGGER.error("Unable to remove section");
+            } catch (ValidationException e) {
+                LOGGER.error("Validation error");
             }
         }
         drawCanvas();
