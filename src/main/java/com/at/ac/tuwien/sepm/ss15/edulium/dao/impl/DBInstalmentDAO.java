@@ -1,9 +1,8 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.ImmutableDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Instalment;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
@@ -17,7 +16,7 @@ import java.util.List;
 /**
  * Database implementation of the DAO interface for Instalment objects
  */
-class DBInstalmentDAO implements DAO<Instalment> {
+class DBInstalmentDAO implements ImmutableDAO<Instalment> {
 
     private static final Logger LOGGER = LogManager.getLogger(DBInstalmentDAO.class);
 
@@ -57,46 +56,6 @@ class DBInstalmentDAO implements DAO<Instalment> {
             LOGGER.error("Failed to insert instalment entry into database", e);
             throw new DAOException("Failed to insert instalment entry into database", e);
         }
-
-        // TODO: Generate history
-    }
-
-    /**
-     * Updates the instalment object in the database
-     */
-    @Override
-    public void update(Instalment object) throws DAOException, ValidationException {
-        LOGGER.debug("Entering update with parameters: " + object);
-
-        instalmentValidator.validateForUpdate(object);
-
-        final String query = "UPDATE Instalment SET instalmentTime = ?, paymentInfo = ?, type = ?, " +
-                "amount = ?, invoice_ID = ? WHERE id = ?;";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query,
-                Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setTimestamp(1, Timestamp.valueOf(object.getTime()));
-            stmt.setString(2, object.getPaymentInfo());
-            stmt.setString(3, object.getType());
-            stmt.setBigDecimal(4, object.getAmount());
-            stmt.setLong(5, object.getInvoice().getIdentity());
-            stmt.setLong(6, object.getIdentity());
-
-            if (stmt.executeUpdate() == 0) {
-                LOGGER.error("Failed to update instalment entry in database, dataset not found");
-                throw new DAOException("Failed to update instalment entry in database, dataset not found");
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Failed to update instalment entry in database", e);
-            throw new DAOException("Failed to update invoice entry in database", e);
-        }
-
-        // TODO: Generate history
-    }
-
-    @Override
-    public void delete(Instalment object) throws DAOException, ValidationException {
-
     }
 
     @Override
@@ -106,11 +65,6 @@ class DBInstalmentDAO implements DAO<Instalment> {
 
     @Override
     public List<Instalment> getAll() throws DAOException {
-        return null;
-    }
-
-    @Override
-    public List<History<Instalment>> getHistory(Instalment object) throws DAOException, ValidationException {
         return null;
     }
 
