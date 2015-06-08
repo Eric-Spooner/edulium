@@ -1,11 +1,9 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-
 /**
  * Validator interface for domain objects
  */
-public interface Validator<T> {
+public interface Validator<T> extends ImmutableValidator<T> {
 
     /**
      * validates the object for the create action
