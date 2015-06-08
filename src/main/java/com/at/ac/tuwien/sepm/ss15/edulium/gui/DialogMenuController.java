@@ -5,6 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -74,6 +75,9 @@ public class DialogMenuController implements Initializable{
     private TableColumn<MenuEntry, BigDecimal> tableColPriceInMen;
 
 
+    private ObservableList<MenuEntry> allMenuEntries;
+    private ObservableList<MenuEntry> inMenuMenuEntries;
+
 
 
     /**
@@ -97,11 +101,20 @@ public class DialogMenuController implements Initializable{
         if(menu.getEntries() == null) {
             menu.setEntries(new LinkedList<>());
         }
+        try {
+            allMenuEntries = observableArrayList(menuService.getAllMenuEntries());
+            inMenuMenuEntries = observableArrayList(menu.getEntries());
+        }catch (Exception e){
+            ManagerController.showErrorDialog
+                    ("Error", "Refreshing View", "An Error occured during initializing the View");
+        }
+        if(menu.getName() != null) textFieldName.setText(menu.getName());
+        tableViewData.setItems(allMenuEntries);
+        tableViewInMenu.setItems(inMenuMenuEntries);
         tableColNameInMenu.setCellValueFactory(new PropertyValueFactory<MenuEntry, String>("name"));
         tableColCategoryInMen.setCellValueFactory(new PropertyValueFactory<MenuEntry, MenuCategory>("category"));
         tableColPriceInMen.setCellValueFactory(new PropertyValueFactory<MenuEntry, BigDecimal>("price"));
 
-        refreshView();
     }
 
     public void buttonOKClick(ActionEvent actionEvent) {
@@ -182,7 +195,7 @@ public class DialogMenuController implements Initializable{
             List<MenuEntry> list = menu.getEntries();
             list.add(menuEntry);
             menu.setEntries(list);
-            refreshView();
+            inMenuMenuEntries.setAll(menu.getEntries());
         } catch (NumberFormatException e) {
             ManagerController.showErrorDialog("Error", "Input Validation Error", "Price must be a number");
             LOGGER.info("Dialog Menu Add Button Clicked Price must be number " + e);
@@ -203,7 +216,7 @@ public class DialogMenuController implements Initializable{
         List<MenuEntry> list = menu.getEntries();
         list.remove(menuEntry);
         menu.setEntries(list);
-        refreshView();
+        inMenuMenuEntries.setAll(menu.getEntries());
     }
 
     /**
@@ -211,16 +224,5 @@ public class DialogMenuController implements Initializable{
      */
     public static void resetDialog(){
         DialogMenuController.setMenu(null);
-    }
-
-    private void refreshView(){
-        try {
-            tableViewInMenu.setItems(observableArrayList(menu.getEntries()));
-            tableViewData.setItems(observableArrayList(menuService.getAllMenuEntries()));
-            if(menu.getName() != null) textFieldName.setText(menu.getName());
-        }catch (Exception e){
-            ManagerController.showErrorDialog
-                    ("Error", "Refreshing View", "An Error occured during refreshing the View");
-        }
     }
 }

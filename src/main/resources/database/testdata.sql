@@ -11,7 +11,7 @@ MERGE INTO TaxRate (ID,taxRateValue) KEY(ID) VALUES (2, 0.03);
 MERGE INTO TaxRate (ID,taxRateValue) KEY(ID) VALUES (3, 0.01);
 
 MERGE INTO MenuEntry (ID, name, price, available, description, taxRate_ID, category_ID)
-       KEY(ID) Values(1, 'Schnitzel', 10, true, 'Wiener Schnitzel', 1, 2);
+       KEY(ID) Values(1, 'Schnitzel', 9, true, 'Wiener Schnitzel', 1, 2);
 MERGE INTO MenuEntry (ID, name, price, available, description, taxRate_ID, category_ID)
        KEY(ID) Values(2, 'Gemüse-Suppe', 3, true, 'Frische Gemüsesuppe', 3, 1);
 MERGE INTO MenuEntry (ID, name, price, available, description, taxRate_ID, category_ID)
