@@ -4,6 +4,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.ImmutableDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Instalment;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ImmutableValidator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.apache.logging.log4j.LogManager;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,6 +26,8 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
 
     @Autowired
     private DataSource dataSource;
+    @Autowired
+    private DAO<Invoice> invoiceDAO;
     @Autowired
     private ImmutableValidator<Instalment> instalmentValidator;
 
@@ -103,9 +107,29 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
         return results;
     }
 
+    /**
+     * Parses a result set in an object of type instalment
+     * @param rs The database output
+     * @return The parsed object of type instalment
+     * @throws DAOException If an error, while retrieving the instalment data, occurs
+     * @throws SQLException If an error, while accessing database results, occurs
+     */
     private Instalment parseResult(ResultSet rs) throws DAOException, ValidationException, SQLException {
-        // TODO
-        return null;
+        List<Invoice> invoice = invoiceDAO.populate(Arrays.asList(Invoice.withIdentity(rs.getLong("invoice_ID"))));
+        if (invoice.size() != 1) {
+            LOGGER.error("Retrieving invoice failed");
+            throw new DAOException("Retrieving creator failed");
+        }
+
+        Instalment instalment = new Instalment();
+        instalment.setIdentity(rs.getLong("ID"));
+        instalment.setPaymentInfo(rs.getString("paymentInfo"));
+        instalment.setType(rs.getString("type"));
+        instalment.setAmount(rs.getBigDecimal("amount"));
+        instalment.setTime(rs.getTimestamp("instalmentTime").toLocalDateTime());
+        instalment.setInvoice(invoice.get(0));
+
+        return instalment;
     }
 
     @Override
