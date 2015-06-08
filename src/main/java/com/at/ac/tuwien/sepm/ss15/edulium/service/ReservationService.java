@@ -20,7 +20,7 @@ public interface ReservationService extends Service {
      * @throws ServiceException if an error in the service or persistence layer has occurred
      * @throws ValidationException if the reservation object is not valid for this action
      */
-    List<Table> getAllFreeTables(Reservation reservation) throws ServiceException, ValidationException;
+    List<Table> getFreeTables(Reservation reservation) throws ServiceException, ValidationException;
 
     /**
      * adds the reservation to the underlying datasource;
