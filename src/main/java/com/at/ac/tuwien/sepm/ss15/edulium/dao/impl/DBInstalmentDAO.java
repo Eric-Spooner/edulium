@@ -16,6 +16,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Database implementation of the DAO interface for Instalment objects
@@ -87,12 +88,22 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
                 "invoice_ID = ISNULL(?, invoice_ID);";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, object.getIdentity());
+            //stmt.setLong(1, object.getIdentity());
+            if (object.getIdentity() == null) {
+                stmt.setNull(1, Types.BIGINT);
+            } else {
+                stmt.setLong(1, object.getIdentity());
+            }
             stmt.setTimestamp(2, object.getTime() == null ? null : Timestamp.valueOf(object.getTime()));
             stmt.setString(3, object.getPaymentInfo());
             stmt.setString(4, object.getType());
             stmt.setBigDecimal(5, object.getAmount());
-            stmt.setLong(6, object.getInvoice() == null ? null : object.getInvoice().getIdentity());
+            if (object.getInvoice() == null) {
+                stmt.setNull(6, Types.BIGINT);
+            } else {
+                stmt.setLong(6, object.getInvoice().getIdentity());
+            }
+            //stmt.setLong(6, object.getInvoice() == null ? null : object.getInvoice().getIdentity());
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -110,6 +121,9 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
         return results;
     }
 
+    /**
+     * Retrieves all instalment entries from the database
+     */
     @Override
     public List<Instalment> getAll() throws DAOException {
         LOGGER.debug("Entering getAll");
@@ -136,9 +150,45 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
         return results;
     }
 
+    /**
+     * Populates the given list of instalment objects
+     */
     @Override
     public List<Instalment> populate(List<Instalment> objects) throws DAOException, ValidationException {
-        return null;
+        LOGGER.debug("Entering populate with parameters: " + objects);
+
+        if (objects == null || objects.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        for (Instalment instalment: objects) {
+            instalmentValidator.validateIdentity(instalment);
+        }
+
+        final String query = "SELECT * FROM Instalment WHERE ID IN (" +
+                objects.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
+
+        final List<Instalment> populatedInstalments = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            int index = 1;
+
+            // fill identity list
+            for (Instalment instalment : objects) {
+                stmt.setLong(index++, instalment.getIdentity());
+            }
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                populatedInstalments.add(parseResult(rs));
+            }
+
+        } catch (SQLException e) {
+            LOGGER.error("Populating instalments failed", e);
+            throw new DAOException("Populating instalments failed", e);
+        }
+
+        return populatedInstalments;
     }
 
     /**

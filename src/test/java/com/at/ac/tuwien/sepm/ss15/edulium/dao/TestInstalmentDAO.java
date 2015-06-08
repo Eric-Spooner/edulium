@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 
 public class TestInstalmentDAO extends AbstractDAOTest {
     @Autowired
-    private DAO<Instalment> instalmentDAO;
+    private ImmutableDAO<Instalment> instalmentDAO;
     @Autowired
     private DAO<Invoice> invoiceDAO;
 
@@ -32,7 +32,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
         // GIVEN
         Instalment instalment = new Instalment();
-        instalment.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
+        instalment.setInvoice(invoice);
         instalment.setTime(LocalDateTime.now());
         instalment.setType("CASH");
         instalment.setAmount(new BigDecimal("22"));
@@ -79,21 +79,21 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
         // GIVEN
         Instalment inst1 = new Instalment();
-        inst1.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
+        inst1.setInvoice(invoice);
         inst1.setTime(LocalDateTime.now());
         inst1.setType("CASH");
         inst1.setAmount(new BigDecimal("22"));
         inst1.setPaymentInfo("Payment info");
 
         Instalment inst2 = new Instalment();
-        inst2.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
+        inst2.setInvoice(invoice);
         inst2.setTime(LocalDateTime.now());
         inst2.setType("CREDIT_CARD");
         inst2.setAmount(new BigDecimal("19"));
         inst2.setPaymentInfo("Payment info");
 
         Instalment inst3 = new Instalment();
-        inst3.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
+        inst3.setInvoice(invoice);
         inst3.setTime(LocalDateTime.now());
         inst3.setType("CASH");
         inst3.setAmount(new BigDecimal("13"));
@@ -152,10 +152,8 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         invoiceDAO.create(invoice);
 
         // GIVEN
-        Invoice invoiceId = Invoice.withIdentity(invoice.getIdentity());
-
         Instalment instalment = new Instalment();
-        instalment.setInvoice(invoiceId);
+        instalment.setInvoice(invoice);
         instalment.setTime(LocalDateTime.now());
         instalment.setType("CASH");
         instalment.setAmount(new BigDecimal("22"));
@@ -164,6 +162,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         instalmentDAO.create(instalment);
 
         // WHEN
+        Invoice invoiceId = Invoice.withIdentity(invoice.getIdentity());
         Instalment matcher = new Instalment();
         matcher.setInvoice(invoiceId);
         List<Instalment> instalmentList = instalmentDAO.find(matcher);
@@ -185,21 +184,21 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
         // GIVEN
         Instalment inst1 = new Instalment();
-        inst1.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
+        inst1.setInvoice(invoice);
         inst1.setTime(LocalDateTime.now());
         inst1.setType("CASH");
         inst1.setAmount(new BigDecimal("22"));
         inst1.setPaymentInfo("Payment info");
 
         Instalment inst2 = new Instalment();
-        inst2.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
+        inst2.setInvoice(invoice);
         inst2.setTime(LocalDateTime.now());
         inst2.setType("CREDIT_CARD");
         inst2.setAmount(new BigDecimal("19"));
         inst2.setPaymentInfo("Payment info");
 
         Instalment inst3 = new Instalment();
-        inst3.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
+        inst3.setInvoice(invoice);
         inst3.setTime(LocalDateTime.now());
         inst3.setType("CASH");
         inst3.setAmount(new BigDecimal("13"));
@@ -233,7 +232,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
         // Instalment 1
         Instalment inst1 = new Instalment();
-        inst1.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
+        inst1.setInvoice(invoice);
         inst1.setTime(LocalDateTime.now());
         inst1.setType("CASH");
         inst1.setAmount(new BigDecimal("22"));
@@ -244,7 +243,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
         // Instalment 2
         Instalment inst2 = new Instalment();
-        inst2.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
+        inst2.setInvoice(invoice);
         inst2.setTime(LocalDateTime.now());
         inst2.setType("CREDIT_CARD");
         inst2.setAmount(new BigDecimal("19"));
@@ -255,7 +254,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
         // Instalment 3
         Instalment inst3 = new Instalment();
-        inst3.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
+        inst3.setInvoice(invoice);
         inst3.setTime(LocalDateTime.now());
         inst3.setType("CASH");
         inst3.setAmount(new BigDecimal("13"));
@@ -263,72 +262,6 @@ public class TestInstalmentDAO extends AbstractDAOTest {
 
         instalmentDAO.create(inst3);
         assertEquals(1, instalmentDAO.find(inst3).size());
-
-        // GIVEN
-        Instalment instalmentId1 = Instalment.withIdentity(inst1.getIdentity());
-        Instalment instalmentId2 = Instalment.withIdentity(inst2.getIdentity());
-        Instalment instalmentId3 = Instalment.withIdentity(inst3.getIdentity());
-        List<Instalment> instalmentIds = Arrays.asList(instalmentId1, instalmentId2, instalmentId3);
-
-        // WHEN
-        List<Instalment> result = instalmentDAO.populate(instalmentIds);
-
-        // THEN
-        assertEquals(3, result.size());
-        assertTrue(result.contains(inst1));
-        assertTrue(result.contains(inst2));
-        assertTrue(result.contains(inst3));
-    }
-
-    @Test
-    public void testPopulate_shouldReturnFullyPopulatedObjectsOfDeletedObjects() throws ValidationException, DAOException {
-        // PREPARE
-        // Invoice
-        Invoice invoice = new Invoice();
-        invoice.setTime(LocalDateTime.now());
-        invoice.setGross(new BigDecimal("15.6"));
-        invoice.setCreator(getCurrentUser());
-
-        invoiceDAO.create(invoice);
-
-        // Instalment 1
-        Instalment inst1 = new Instalment();
-        inst1.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
-        inst1.setTime(LocalDateTime.now());
-        inst1.setType("CASH");
-        inst1.setAmount(new BigDecimal("22"));
-        inst1.setPaymentInfo("Payment info");
-
-        instalmentDAO.create(inst1);
-        assertEquals(1, instalmentDAO.find(inst1).size());
-        instalmentDAO.delete(inst1);
-        assertEquals(0, instalmentDAO.find(inst1).size());
-
-        // Instalment 2
-        Instalment inst2 = new Instalment();
-        inst2.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
-        inst2.setTime(LocalDateTime.now());
-        inst2.setType("CREDIT_CARD");
-        inst2.setAmount(new BigDecimal("19"));
-        inst2.setPaymentInfo("Payment info");
-
-        instalmentDAO.create(inst2);
-        assertEquals(1, instalmentDAO.find(inst2).size());
-        instalmentDAO.delete(inst2);
-        assertEquals(0, instalmentDAO.find(inst2).size());
-
-        // Instalment 3
-        Instalment inst3 = new Instalment();
-        inst3.setInvoice(Invoice.withIdentity(invoice.getIdentity()));
-        inst3.setTime(LocalDateTime.now());
-        inst3.setType("CASH");
-        inst3.setAmount(new BigDecimal("13"));
-        inst3.setPaymentInfo("Payment info");
-
-        instalmentDAO.create(inst3);
-        assertEquals(1, instalmentDAO.find(inst3).size());
-        instalmentDAO.delete(inst3);
-        assertEquals(0, instalmentDAO.find(inst3).size());
 
         // GIVEN
         Instalment instalmentId1 = Instalment.withIdentity(inst1.getIdentity());

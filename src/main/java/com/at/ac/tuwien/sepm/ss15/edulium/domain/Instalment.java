@@ -119,7 +119,8 @@ public class Instalment {
                 ", time=" + time +
                 ", paymentInfo=" + paymentInfo +
                 ", type=" + type +
-                ", amount" + amount +
+                ", amount=" + amount +
+                ", invoice= " + invoice +
                 "}";
     }
 
@@ -136,6 +137,5 @@ public class Instalment {
         if (type != null ? !type.equals(that.type) : that.type != null) return false;
         if (amount != null ? amount.compareTo(that.amount) != 0 : that.amount != null) return false;
         return !(invoice != null ? !invoice.equals(that.invoice) : that.invoice != null);
-
     }
 }
