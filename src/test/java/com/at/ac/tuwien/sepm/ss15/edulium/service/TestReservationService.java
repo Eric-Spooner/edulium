@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.never;
 
 /**
  * Unit Test for the ReservationService class
@@ -125,14 +124,14 @@ public class TestReservationService extends AbstractServiceTest {
 
     @Test(expected = ValidationException.class)
     @WithMockUser(username = "servicetester", roles={"MANAGER"})
-    public void testAddTaxRate_withNullObjectShouldFail() throws ServiceException, ValidationException, DAOException {
+    public void testGetFreeTables_withNullObjectShouldFail() throws ServiceException, ValidationException, DAOException {
         // WHEN
         reservationService.getFreeTables(null);
     }
 
     @Test(expected = ValidationException.class)
     @WithMockUser(username = "servicetester", roles={"MANAGER"})
-    public void testAddTaxRate_withoutTimeShouldFail() throws ServiceException, ValidationException, DAOException {
+    public void testGetFreeTables_withoutTimeShouldFail() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Reservation res = new Reservation();
         res.setDuration(Duration.ofMinutes(90));
@@ -143,7 +142,7 @@ public class TestReservationService extends AbstractServiceTest {
 
     @Test(expected = ValidationException.class)
     @WithMockUser(username = "servicetester", roles={"MANAGER"})
-    public void testAddTaxRate_withoutDurationShouldFail() throws ServiceException, ValidationException, DAOException {
+    public void testGetFreeTables_withoutDurationShouldFail() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Reservation res = new Reservation();
         res.setTime(LocalDateTime.of(2099, 1, 1, 18, 30));
@@ -198,7 +197,7 @@ public class TestReservationService extends AbstractServiceTest {
         Mockito.verify(reservationDAO).create(res);
     }
 
-    @Test(expected = ValidationException.class)
+    @Test
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testAddReservation_shouldCreateReservation3() throws ServiceException, ValidationException, DAOException {
         // PREPARE
@@ -224,7 +223,7 @@ public class TestReservationService extends AbstractServiceTest {
         Mockito.verify(reservationDAO).create(res);
     }
 
-    @Test
+    @Test(expected = ValidationException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testAddReservation_withInvalidObjectShouldFail() throws ServiceException, ValidationException {
         // create reservation from 17:00 to 21:00
@@ -269,7 +268,7 @@ public class TestReservationService extends AbstractServiceTest {
         Mockito.verify(reservationDAO).update(res);
     }
 
-    @Test
+    @Test(expected = ValidationException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateReservation_withInvalidObjectShouldFail() throws ServiceException, ValidationException {
         // create reservation from 17:00 to 21:00
@@ -314,7 +313,7 @@ public class TestReservationService extends AbstractServiceTest {
         Mockito.verify(reservationDAO).delete(res);
     }
 
-    @Test
+    @Test(expected = ValidationException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testCancelReservation_withInvalidObjectShouldFail() throws ServiceException, ValidationException {
         // create reservation from 17:00 to 21:00
@@ -359,7 +358,6 @@ public class TestReservationService extends AbstractServiceTest {
         // THEN
         assertEquals(1, reservations.size());
         assertTrue(reservations.contains(res));
-
     }
 
     @Test(expected = ServiceException.class)
@@ -402,6 +400,7 @@ public class TestReservationService extends AbstractServiceTest {
         reservationService.getAllReservations();
     }
 
+    @Test
     @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testGetReservationHistory_shouldReturn() throws ServiceException, ValidationException, DAOException {
         // PREPARE
@@ -450,9 +449,5 @@ public class TestReservationService extends AbstractServiceTest {
 
         // WHEN
         reservationService.getReservationHistory(res);
-
-        // THEN
-        Mockito.verify(reservationDAO, never()).getHistory(res);
     }
-
 }
