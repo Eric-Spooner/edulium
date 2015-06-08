@@ -14,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class Main extends Application {
-
     @Override
     public void start(Stage primaryStage) throws Exception{
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Service.xml");
