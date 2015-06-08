@@ -40,7 +40,7 @@ public class OrdersOverviewController implements Initializable {
     private MenuService menuService;
     private InteriorService interiorService;
     private int ordersRow = 0;
-    private List orderEntries = new ArrayList<>();
+    private List orderEntries = new ArrayList<OrderEntry>();
 
     @FXML
     GridPane categoriesGP;
@@ -118,6 +118,7 @@ public class OrdersOverviewController implements Initializable {
                                         OrderEntry orderEntry = new OrderEntry();
                                         orderEntry.setAmount(1);
                                         orderEntry.setEntryId(entry.getIdentity());
+                                        orderEntries.add(orderEntry);
                                         Button buttonPlus = new Button();
                                         buttonPlus.setText("+");
                                         buttonPlus.setPrefSize(40, 40);
@@ -176,7 +177,9 @@ public class OrdersOverviewController implements Initializable {
     }
 
     public void cashButtonClicked(ActionEvent event) {
-        System.out.println(orderEntries);
+        for(OrderEntry entry : orderEntries) {
+            System.out.println(entry);
+        }
     }
 
     private Order createOrder(BigDecimal value, String additionalInformation,
