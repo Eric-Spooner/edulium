@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * implementation of the TableValidator
  */
-public class TableValidator implements Validator<Table> {
+class TableValidator implements Validator<Table> {
     @Autowired
     Validator<User> userValidator;
     @Autowired
