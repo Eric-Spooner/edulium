@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="506.0" prefWidth="1083.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.CookViewController">
+   <children>
+      <TableView fx:id="tableViewQueued" layoutX="12.0" layoutY="54.0" prefHeight="399.0" prefWidth="516.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="12.0" AnchorPane.topAnchor="54.0">
+        <columns>
+          <TableColumn fx:id="tableColQueudTisch" prefWidth="67.0" text="Tisch" />
+          <TableColumn fx:id="tableColQueudMenuEntry" prefWidth="186.0" text="Menu Entry" />
+            <TableColumn fx:id="tableColQueudAddInfo" prefWidth="180.0" text="Additional Information" />
+            <TableColumn fx:id="tableColQueudTime" prefWidth="82.0" text="Time" />
+        </columns>
+      </TableView>
+      <Button layoutX="796.0" layoutY="461.0" mnemonicParsing="false" onAction="#btnInProgressToReadyToDeliver" text="&gt;&gt;" AnchorPane.bottomAnchor="14.0" />
+      <Button cancelButton="true" layoutX="250.0" layoutY="461.0" mnemonicParsing="false" onAction="#btnQueuedToInProgress" text="&gt;&gt;" AnchorPane.bottomAnchor="14.0" />
+      <Text layoutX="14.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="QUEUED">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </Text>
+      <Text layoutX="558.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="IN PROGRESS">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </Text>
+      <TableView fx:id="tableViewInProgress" layoutX="558.0" layoutY="54.0" prefHeight="399.0" prefWidth="516.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="558.0" AnchorPane.topAnchor="54.0">
+         <columns>
+            <TableColumn fx:id="tableColProgTisch" prefWidth="67.0" text="Tisch" />
+            <TableColumn fx:id="tableColProgMenuEntry" prefWidth="186.0" text="Menu Entry" />
+            <TableColumn fx:id="tableColProgAddInfo" prefWidth="180.0" text="Additional Information" />
+            <TableColumn fx:id="tableColProgTime" prefWidth="82.0" text="Time" />
+         </columns>
+      </TableView>
+   </children>
+</AnchorPane>
