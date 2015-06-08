@@ -5,6 +5,8 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,6 +16,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -60,7 +63,7 @@ public class DialogMenuController implements Initializable{
     @FXML
     private TableColumn<MenuEntry, String> tableColNameData;
     @FXML
-    private TableColumn<MenuEntry, MenuCategory> tableColCategoryData;
+    private TableColumn<MenuEntry, String> tableColCategoryData;
     @FXML
     private TableColumn<MenuEntry, BigDecimal> tableColPriceData;
 
@@ -70,7 +73,7 @@ public class DialogMenuController implements Initializable{
     @FXML
     private TableColumn<MenuEntry, String> tableColNameInMenu;
     @FXML
-    private TableColumn<MenuEntry, MenuCategory> tableColCategoryInMen;
+    private TableColumn<MenuEntry, String> tableColCategoryInMen;
     @FXML
     private TableColumn<MenuEntry, BigDecimal> tableColPriceInMen;
 
@@ -90,7 +93,12 @@ public class DialogMenuController implements Initializable{
         LOGGER.info("Initialize Dialog Menu");
 
         tableColNameData.setCellValueFactory(new PropertyValueFactory<MenuEntry, String>("name"));
-        tableColCategoryData.setCellValueFactory(new PropertyValueFactory<MenuEntry, MenuCategory>("category"));
+        tableColCategoryData.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<MenuEntry, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<MenuEntry, String> p) {
+                // p.getValue() returns the Person instance for a particular TableView row
+                return new SimpleStringProperty(p.getValue().getCategory().getName());
+            }
+        });
         tableColPriceData.setCellValueFactory(new PropertyValueFactory<MenuEntry, BigDecimal>("price"));
 
         if(menu == null){
@@ -112,7 +120,12 @@ public class DialogMenuController implements Initializable{
         tableViewData.setItems(allMenuEntries);
         tableViewInMenu.setItems(inMenuMenuEntries);
         tableColNameInMenu.setCellValueFactory(new PropertyValueFactory<MenuEntry, String>("name"));
-        tableColCategoryInMen.setCellValueFactory(new PropertyValueFactory<MenuEntry, MenuCategory>("category"));
+        tableColCategoryInMen.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<MenuEntry, String>, ObservableValue<String>>() {
+            public ObservableValue<String> call(TableColumn.CellDataFeatures<MenuEntry, String> p) {
+                // p.getValue() returns the Person instance for a particular TableView row
+                return new SimpleStringProperty(p.getValue().getCategory().getName());
+            }
+        });
         tableColPriceInMen.setCellValueFactory(new PropertyValueFactory<MenuEntry, BigDecimal>("price"));
 
     }

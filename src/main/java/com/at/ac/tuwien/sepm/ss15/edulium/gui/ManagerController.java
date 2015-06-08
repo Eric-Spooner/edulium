@@ -4,6 +4,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -19,10 +20,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationContext;
@@ -85,7 +87,7 @@ public class ManagerController implements Initializable {
     @FXML
     private TableColumn<MenuEntry,BigDecimal> tableColMenuEntryPrice;
     @FXML
-    private TableColumn<MenuEntry, MenuCategory> tableColMenuEntryCategory;
+    private TableColumn<MenuEntry, String> tableColMenuEntryCategory;
     @FXML
     private TableColumn<MenuEntry, Boolean> tableColMenuEntryAvailable;
 
@@ -148,7 +150,13 @@ public class ManagerController implements Initializable {
             tableColMenuEntryId.setCellValueFactory(new PropertyValueFactory<MenuEntry, Long>("identity"));
             tableColMenuEntryName.setCellValueFactory(new PropertyValueFactory<MenuEntry, String>("name"));
             tableColMenuEntryPrice.setCellValueFactory(new PropertyValueFactory<MenuEntry, BigDecimal>("price"));
-            tableColMenuEntryCategory.setCellValueFactory(new PropertyValueFactory<MenuEntry, MenuCategory>("category"));
+            tableColMenuEntryCategory.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<MenuEntry, String>, ObservableValue<String>>() {
+                public ObservableValue<String> call(CellDataFeatures<MenuEntry, String> p) {
+                    // p.getValue() returns the Person instance for a particular TableView row
+                    return new SimpleStringProperty(p.getValue().getCategory().getName());
+                }
+            });
+            
             tableColMenuEntryAvailable.setCellValueFactory(new PropertyValueFactory<MenuEntry, Boolean>("available"));
 
             menuCategories = observableArrayList(menuService.getAllMenuCategories());
