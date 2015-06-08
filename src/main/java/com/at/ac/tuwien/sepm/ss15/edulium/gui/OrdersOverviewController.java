@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -40,7 +41,7 @@ public class OrdersOverviewController implements Initializable {
     private MenuService menuService;
     private InteriorService interiorService;
     private int ordersRow = 0;
-    private List orderEntries = new ArrayList<OrderEntry>();
+    private ArrayList<OrderEntry> orderEntries = new ArrayList<>();
 
     @FXML
     GridPane categoriesGP;
@@ -127,6 +128,13 @@ public class OrdersOverviewController implements Initializable {
                                         buttonPlus.setOnAction(new EventHandler<ActionEvent>() {
                                             public void handle(ActionEvent t) {
                                                 amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) + 1));
+                                                Iterator<OrderEntry> iter = orderEntries.iterator();
+                                                while(iter.hasNext()) {
+                                                    OrderEntry current = iter.next();
+                                                    if(current.getEntryId() == orderEntry.getEntryId()) {
+                                                        current.setAmount(Integer.valueOf(amountOrdered.getText()));
+                                                    }
+                                                }
                                             }
                                         });
                                         ordersGP.add(buttonPlus, 1, ordersRow);
@@ -138,6 +146,13 @@ public class OrdersOverviewController implements Initializable {
                                         buttonMinus.setOnAction(new EventHandler<ActionEvent>() {
                                             public void handle(ActionEvent t) {
                                                 amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) - 1));
+                                                Iterator<OrderEntry> iter = orderEntries.iterator();
+                                                while(iter.hasNext()) {
+                                                    OrderEntry current = iter.next();
+                                                    if(current.getEntryId() == orderEntry.getEntryId()) {
+                                                        current.setAmount(Integer.valueOf(amountOrdered.getText()));
+                                                    }
+                                                }
                                             }
                                         });
                                         ordersGP.add(buttonMinus, 2, ordersRow);
@@ -178,7 +193,7 @@ public class OrdersOverviewController implements Initializable {
 
     public void cashButtonClicked(ActionEvent event) {
         for(OrderEntry entry : orderEntries) {
-            System.out.println(entry);
+            System.out.println(entry.getEntryId() + ", "+entry.getAmount());
         }
     }
 
