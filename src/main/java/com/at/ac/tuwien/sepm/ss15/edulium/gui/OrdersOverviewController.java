@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -38,8 +39,8 @@ public class OrdersOverviewController implements Initializable {
     private OrderService orderService;
     private MenuService menuService;
     private InteriorService interiorService;
-    private ArrayList<Button> buttons = new ArrayList<>();
     private int ordersRow = 0;
+    private List orderEntries = new ArrayList<>();
 
     @FXML
     GridPane categoriesGP;
@@ -49,7 +50,6 @@ public class OrdersOverviewController implements Initializable {
     VBox entriesVB;
 
     @Override
-    @PreAuthorize("hasRole('SERVICE')")
     public void initialize(URL location, ResourceBundle resources) {
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Edulium.xml");
         orderService = context.getBean("orderService", OrderService.class);
@@ -78,7 +78,7 @@ public class OrdersOverviewController implements Initializable {
         }*/
 
         ordersGP.setVgap(4);
-        ordersGP.setHgap(20);
+        ordersGP.setHgap(4);
 
         try {
             categoriesGP.setVgap(4);
@@ -86,12 +86,12 @@ public class OrdersOverviewController implements Initializable {
             int row = 0;
             int col = 0;
             for(MenuCategory menuCategory : menuService.getAllMenuCategories()) {
-                Button button = new Button();
-                button.setText(menuCategory.getName());
-                button.setPrefSize(240, 40);
-                button.setMinWidth(140);
-                button.setStyle("-fx-font-size: 18px;");
-                button.setOnAction(new EventHandler<ActionEvent>() {
+                Button buttonCategory = new Button();
+                buttonCategory.setText(menuCategory.getName());
+                buttonCategory.setPrefSize(240, 40);
+                buttonCategory.setMinWidth(140);
+                buttonCategory.setStyle("-fx-font-size: 18px;");
+                buttonCategory.setOnAction(new EventHandler<ActionEvent>() {
                     public void handle(ActionEvent t){
                         entriesVB.getChildren().clear();
                         MenuEntry matcher = new MenuEntry();
@@ -99,12 +99,12 @@ public class OrdersOverviewController implements Initializable {
                         try {
                             int i = 0;
                             for (MenuEntry entry : menuService.findMenuEntry(matcher)) {
-                                Button button = new Button();
-                                button.setText(entry.getName());
-                                button.setPrefSize(240, 40);
-                                button.setMinWidth(140);
-                                button.setStyle("-fx-font-size: 18px;");
-                                button.setOnAction(new EventHandler<ActionEvent>() {
+                                Button buttonEntry = new Button();
+                                buttonEntry.setText(entry.getName());
+                                buttonEntry.setPrefSize(240, 40);
+                                buttonEntry.setMinWidth(140);
+                                buttonEntry.setStyle("-fx-font-size: 18px;");
+                                buttonEntry.setOnAction(new EventHandler<ActionEvent>() {
                                     public void handle(ActionEvent t) {
                                         if(ordersGP.getRowConstraints().size() <= ordersRow) {
                                             Separator sepVert1 = new Separator();
@@ -115,6 +115,9 @@ public class OrdersOverviewController implements Initializable {
                                         amountOrdered.setText("1");
                                         amountOrdered.setStyle("-fx-font-size: 18px;");
                                         ordersGP.add(amountOrdered, 0, ordersRow);
+                                        OrderEntry orderEntry = new OrderEntry();
+                                        orderEntry.setAmount(1);
+                                        orderEntry.setEntryId(entry.getIdentity());
                                         Button buttonPlus = new Button();
                                         buttonPlus.setText("+");
                                         buttonPlus.setPrefSize(40, 40);
@@ -144,7 +147,7 @@ public class OrdersOverviewController implements Initializable {
                                         ordersRow++;
                                     }
                                 });
-                                entriesVB.getChildren().add(i, button);
+                                entriesVB.getChildren().add(i, buttonEntry);
                                 i++;
                             }
                         } catch(ServiceException e) {
@@ -157,8 +160,7 @@ public class OrdersOverviewController implements Initializable {
                     Separator sepVert1 = new Separator();
                     categoriesGP.setRowSpan(sepVert1, row);
                 }
-                buttons.add(button);
-                categoriesGP.add(button, col, row);
+                categoriesGP.add(buttonCategory, col, row);
                 if(col == 1) row++;
                 //col = (col == 0) ? 1 : 0;
                 if(col++ == 1)
@@ -174,7 +176,7 @@ public class OrdersOverviewController implements Initializable {
     }
 
     public void cashButtonClicked(ActionEvent event) {
-
+        System.out.println(orderEntries);
     }
 
     private Order createOrder(BigDecimal value, String additionalInformation,
@@ -190,5 +192,26 @@ public class OrdersOverviewController implements Initializable {
         order.setState(state);
 
         return order;
+    }
+
+    private class OrderEntry {
+        private int amount;
+        private Long EntryId;
+
+        public int getAmount() {
+            return amount;
+        }
+
+        public void setAmount(int amount) {
+            this.amount = amount;
+        }
+
+        public Long getEntryId() {
+            return EntryId;
+        }
+
+        public void setEntryId(Long entryId) {
+            EntryId = entryId;
+        }
     }
 }
