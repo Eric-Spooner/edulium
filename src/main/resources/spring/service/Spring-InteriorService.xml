@@ -4,12 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="Spring-DAO.xml" />
-
-    <!-- Service beans -->
-    <import resource="service/Spring-MenuService.xml"/>
-    <import resource="service/Spring-TaxRateService.xml" />
-    <import resource="service/Spring-ReservationService.xml" />
-    <import resource="service/Spring-InteriorService.xml" />
+    <bean id="interiorService" class="com.at.ac.tuwien.sepm.ss15.edulium.service.impl.InteriorServiceImpl">
+    </bean>
 
 </beans>
