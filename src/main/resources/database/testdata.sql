@@ -1,4 +1,4 @@
-MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('daotester', 'DAO Testuser', 'ROLE_ADMIN');
+MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('daotester', 'DAO Testuser', 'COOK');
 MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('servicetester', 'Service Testuser', 'ROLE_MANAGER');
 
 MERGE INTO MenuCategory (ID, name) KEY(ID) VALUES (1, 'starter');

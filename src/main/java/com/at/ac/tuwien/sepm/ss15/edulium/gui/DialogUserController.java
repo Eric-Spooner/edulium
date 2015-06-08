@@ -9,12 +9,15 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.TaxRateService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -85,6 +88,15 @@ public class DialogUserController implements Initializable{
             if (user.getRole() != null){
                 dropRole.getSelectionModel().select(user.getRole());
             }
+            //Used to handle the dropDown with the keyboard
+            dropRole.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent event) {
+                    if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
+                        event.consume();
+                    }
+                }
+            });
         }catch (Exception e){
             LOGGER.error("Init Menu Entry crashed " + e);
         }
@@ -130,7 +142,10 @@ public class DialogUserController implements Initializable{
                     userService.updateUser(user);
                     break;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
+            ManagerController.showErrorDialog
+                    ("Error", "Input Validation Error", "Updating the User in The Database Failed\n"  +
+                    "Maybe the Username already exists");
             LOGGER.error("Updating the User in The Database Failed " + e);
             return;
         }

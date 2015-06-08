@@ -6,15 +6,15 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="217.0" prefWidth="421.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.DialogUserController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="217.0" prefWidth="421.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.DialogUserController">
    <children>
-      <Text layoutX="15.0" layoutY="86.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username:" />
-      <Button id="7" layoutX="359.0" layoutY="161.0" mnemonicParsing="false" onAction="#buttonOKClick" text="OK" />
-      <Button layoutX="288.0" layoutY="161.0" mnemonicParsing="false" onAction="#buttonCancelClick" text="Cancel" />
-      <TextField id="1" fx:id="textFieldUsername" layoutX="144.0" layoutY="65.0" prefHeight="31.0" prefWidth="260.0" />
-      <Text layoutX="18.0" layoutY="128.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Role:" />
-      <ChoiceBox id="4" fx:id="dropRole" layoutX="144.0" layoutY="107.0" prefHeight="31.0" prefWidth="260.0" />
-      <TextField id="1" fx:id="textFieldName" layoutX="144.0" layoutY="18.0" prefHeight="31.0" prefWidth="260.0" />
-      <Text layoutX="18.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name:" />
+      <Text layoutX="15.0" layoutY="86.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username:" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="336.13427734375" AnchorPane.topAnchor="69.8134765625" />
+      <TextField id="1" fx:id="textFieldName" layoutX="104.0" layoutY="18.0" prefHeight="31.0" prefWidth="300.0" AnchorPane.leftAnchor="104.0" AnchorPane.rightAnchor="17.0" AnchorPane.topAnchor="18.0" />
+      <TextField id="1" fx:id="textFieldUsername" layoutX="104.0" layoutY="65.0" prefHeight="31.0" prefWidth="300.0" AnchorPane.leftAnchor="104.0" AnchorPane.rightAnchor="17.0" AnchorPane.topAnchor="65.0" />
+      <ChoiceBox id="4" fx:id="dropRole" layoutX="104.0" layoutY="107.0" prefHeight="31.0" prefWidth="300.0" AnchorPane.leftAnchor="104.0" AnchorPane.rightAnchor="17.0" AnchorPane.topAnchor="107.0" />
+      <Button id="7" defaultButton="true" layoutX="359.0" layoutY="161.0" mnemonicParsing="false" onAction="#buttonOKClick" text="OK" AnchorPane.bottomAnchor="25.0" AnchorPane.rightAnchor="21.0" />
+      <Button cancelButton="true" layoutX="292.0" layoutY="161.0" mnemonicParsing="false" onAction="#buttonCancelClick" text="Cancel" AnchorPane.bottomAnchor="25.0" AnchorPane.rightAnchor="65.0" />
+      <Text layoutX="18.0" layoutY="128.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Role:" AnchorPane.leftAnchor="18.0" AnchorPane.rightAnchor="370.509765625" AnchorPane.topAnchor="112.0" />
+      <Text layoutX="13.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name:" AnchorPane.leftAnchor="13.0" AnchorPane.rightAnchor="365.13134765625" AnchorPane.topAnchor="22.8134765625" />
    </children>
-</Pane>
+</AnchorPane>

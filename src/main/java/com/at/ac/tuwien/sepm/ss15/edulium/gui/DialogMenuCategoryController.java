@@ -62,10 +62,9 @@ public class DialogMenuCategoryController implements Initializable{
         switch (DialogMenuCategoryController.dialogEnumeration){
             case ADD:
             case UPDATE:
-                if(textFieldName != null || textFieldName.getText().equals("") &&
-                    DialogMenuCategoryController.dialogEnumeration != DialogEnumeration.SEARCH) {
-                ManagerController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
-                return;
+                if(textFieldName.getText() == null || textFieldName.getText().equals("")){
+                    ManagerController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
+                    return;
                 }
         }
         try {

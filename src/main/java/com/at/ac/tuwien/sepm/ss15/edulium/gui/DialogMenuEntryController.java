@@ -7,9 +7,12 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.TaxRateService;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -87,6 +90,23 @@ public class DialogMenuEntryController implements Initializable{
                 textFieldDesription.setText(menuEntry.getDescription());
             }
             checkAvailible.setSelected(menuEntry.getAvailable());
+            //Used to handle the dropDown with the keyboard
+            dropTaxRate.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent event) {
+                    if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
+                        event.consume();
+                    }
+                }
+            });
+            dropMenuCategory.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent event) {
+                    if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
+                        event.consume();
+                    }
+                }
+            });
         }catch (Exception e){
             LOGGER.error("Init Menu Entry crashed " + e);
         }

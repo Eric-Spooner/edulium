@@ -310,7 +310,7 @@ public class ManagerController implements Initializable {
             DialogUserController.setUserService(userService);
             DialogUserController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Add Employee");
-            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogUser.fxml"));
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogUser.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
@@ -337,7 +337,7 @@ public class ManagerController implements Initializable {
             DialogUserController.setDialogEnumeration(DialogEnumeration.UPDATE);
             DialogUserController.setUser(tableViewEmployee.getSelectionModel().getSelectedItem());
             stage.setTitle("Update User");
-            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogUser.fxml"));
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogUser.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
@@ -359,7 +359,7 @@ public class ManagerController implements Initializable {
             DialogUserController.setUserService(userService);
             DialogUserController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search User");
-            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogUser.fxml"));
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogUser.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
@@ -406,7 +406,7 @@ public class ManagerController implements Initializable {
             DialogMenuController.setDialogEnumeration(DialogEnumeration.UPDATE);
             DialogMenuController.setMenu(tableViewMenu.getSelectionModel().getSelectedItem());
             stage.setTitle("Update Menu");
-            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
@@ -428,7 +428,7 @@ public class ManagerController implements Initializable {
             DialogMenuController.setMenuService(menuService);
             DialogMenuController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search Menu");
-            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
@@ -469,7 +469,7 @@ public class ManagerController implements Initializable {
             DialogMenuController.setMenuService(menuService);
             DialogMenuController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Add Menu");
-            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
@@ -506,7 +506,7 @@ public class ManagerController implements Initializable {
             DialogMenuEntryController.setTaxRateService(taxRateService);
             DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search MenuEntry");
-            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
@@ -544,7 +544,7 @@ public class ManagerController implements Initializable {
             DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.UPDATE);
             DialogMenuEntryController.setMenuEntry(tableViewMenuEntry.getSelectionModel().getSelectedItem());
             stage.setTitle("Update MenuEntry");
-            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
@@ -565,7 +565,7 @@ public class ManagerController implements Initializable {
             DialogMenuEntryController.setTaxRateService(taxRateService);
             DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Insert MenuEntry");
-            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
@@ -617,7 +617,7 @@ public class ManagerController implements Initializable {
             DialogMenuCategoryController.setMenuService(menuService);
             DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search Menu Category");
-            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
@@ -646,7 +646,7 @@ public class ManagerController implements Initializable {
             DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.UPDATE);
             DialogMenuCategoryController.setMenuCategory(tableViewMenuCategory.getSelectionModel().getSelectedItem());
             stage.setTitle("Update Menu Category");
-            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
@@ -665,7 +665,7 @@ public class ManagerController implements Initializable {
             DialogMenuCategoryController.setMenuService(menuService);
             DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Insert Menu Category");
-            Pane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
@@ -719,9 +719,12 @@ public class ManagerController implements Initializable {
     public void buttonTaxRateAddClicked(ActionEvent actionEvent){
         try {
             LOGGER.info("Add TaxRate Button Click");
-            BigDecimal value = BigDecimal.valueOf(0.0);
             try {
-                value = BigDecimal.valueOf(Double.parseDouble(txtTaxRateValue.getText()));
+                BigDecimal value = BigDecimal.valueOf(Double.parseDouble(txtTaxRateValue.getText()));
+                if(value.compareTo(BigDecimal.valueOf(1)) == 1 || value.compareTo(BigDecimal.valueOf(0))== 2 ){
+                    ManagerController.showErrorDialog("Error", "Input Validation Error", "Value must be between 0 and 1");
+                    LOGGER.debug("Tax Rate Value must be between 0 and 1");
+                }
                 TaxRate taxRate = new TaxRate();
                 taxRate.setValue(value);
                 taxRateService.addTaxRate(taxRate);

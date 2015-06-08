@@ -6,20 +6,20 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="369.0" prefWidth="421.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.DialogMenuEntryController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="369.0" prefWidth="421.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.DialogMenuEntryController">
    <children>
       <Text layoutX="14.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name: " />
-      <Button id="7" layoutX="359.0" layoutY="324.0" mnemonicParsing="false" onAction="#buttonOKClick" text="OK" />
-      <Button layoutX="288.0" layoutY="324.0" mnemonicParsing="false" onAction="#buttonCancelClick" text="Cancel" />
-      <TextField id="1" fx:id="textFieldName" layoutX="140.0" layoutY="21.0" prefHeight="31.0" prefWidth="260.0" />
-      <TextField id="2" fx:id="textFieldPrice" layoutX="140.0" layoutY="57.0" prefHeight="31.0" prefWidth="260.0" />
+      <TextField id="1" fx:id="textFieldName" layoutX="140.0" layoutY="21.0" prefHeight="31.0" prefWidth="260.0" AnchorPane.leftAnchor="140.0" AnchorPane.rightAnchor="21.0" AnchorPane.topAnchor="21.0" />
+      <TextField id="2" fx:id="textFieldPrice" layoutX="140.0" layoutY="57.0" prefHeight="31.0" prefWidth="260.0" AnchorPane.leftAnchor="140.0" AnchorPane.rightAnchor="21.0" AnchorPane.topAnchor="57.0" />
+      <TextArea id="3" fx:id="textFieldDesription" layoutX="140.0" layoutY="93.0" prefHeight="118.0" prefWidth="260.0" AnchorPane.bottomAnchor="158.0" AnchorPane.leftAnchor="140.0" AnchorPane.rightAnchor="21.0" AnchorPane.topAnchor="93.0" />
+      <ChoiceBox id="4" fx:id="dropMenuCategory" layoutX="140.0" layoutY="222.0" prefHeight="31.0" prefWidth="260.0" AnchorPane.bottomAnchor="116.0" AnchorPane.leftAnchor="140.0" AnchorPane.rightAnchor="21.0" />
+      <ChoiceBox id="5" fx:id="dropTaxRate" layoutX="140.0" layoutY="263.0" prefHeight="31.0" prefWidth="260.0" AnchorPane.bottomAnchor="75.0" AnchorPane.leftAnchor="140.0" AnchorPane.rightAnchor="21.0" />
+      <CheckBox id="6" fx:id="checkAvailible" layoutX="140.0" layoutY="329.0" mnemonicParsing="false" text="Availible" AnchorPane.bottomAnchor="19.0" AnchorPane.leftAnchor="140.0" AnchorPane.rightAnchor="197.0" />
+      <Button id="7" defaultButton="true" layoutX="359.0" layoutY="324.0" mnemonicParsing="false" onAction="#buttonOKClick" text="OK" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="21.0" />
+      <Button cancelButton="true" layoutX="288.0" layoutY="324.0" mnemonicParsing="false" onAction="#buttonCancelClick" text="Cancel" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="69.0" />
       <Text layoutX="17.0" layoutY="71.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Price: " />
-      <CheckBox id="6" fx:id="checkAvailible" layoutX="140.0" layoutY="329.0" mnemonicParsing="false" text="Availible" />
       <Text layoutX="17.0" layoutY="112.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Description:" />
-      <TextArea id="3" fx:id="textFieldDesription" layoutX="140.0" layoutY="93.0" prefHeight="118.0" prefWidth="260.0" />
-      <Text layoutX="14.0" layoutY="285.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tax Rate:" />
-      <Text layoutX="14.0" layoutY="243.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Menu Category:" />
-      <ChoiceBox id="4" fx:id="dropMenuCategory" layoutX="140.0" layoutY="222.0" prefHeight="31.0" prefWidth="260.0" />
-      <ChoiceBox id="5" fx:id="dropTaxRate" layoutX="140.0" layoutY="263.0" prefHeight="31.0" prefWidth="260.0" />
+      <Text layoutX="14.0" layoutY="285.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tax Rate:" AnchorPane.bottomAnchor="79.0" AnchorPane.leftAnchor="14.0" />
+      <Text layoutX="14.0" layoutY="243.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Menu Category:" AnchorPane.bottomAnchor="122.2353515625" AnchorPane.leftAnchor="14.0" />
    </children>
-</Pane>
+</AnchorPane>

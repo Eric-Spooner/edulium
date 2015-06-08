@@ -123,8 +123,8 @@
                               <TableColumn fx:id="tableColTaxRateValue" prefWidth="179.0" text="Value" />
                            </columns>
                         </TableView>
-                        <TextField fx:id="txtTaxRateValue" layoutX="494.0" layoutY="189.0" prefHeight="31.0" prefWidth="92.0" />
-                        <Text layoutX="494.0" layoutY="176.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Value" />
+                        <TextField fx:id="txtTaxRateValue" layoutX="494.0" layoutY="189.0" prefHeight="31.0" prefWidth="92.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="189.0" />
+                        <Text layoutX="494.0" layoutY="176.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Value" AnchorPane.rightAnchor="69.0859375" AnchorPane.topAnchor="159.8134765625" />
                      </children>
                   </AnchorPane>
                </content>
