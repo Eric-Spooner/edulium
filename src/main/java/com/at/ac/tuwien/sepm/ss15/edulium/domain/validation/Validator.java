@@ -10,6 +10,7 @@ public interface Validator<T> extends ImmutableValidator<T> {
      * @param object object to validate
      * @throws ValidationException if the object is not valid
      */
+    @Override
     void validateForCreate(T object) throws ValidationException;
 
     /**
@@ -31,5 +32,6 @@ public interface Validator<T> extends ImmutableValidator<T> {
      * @param object object to validate
      * @throws ValidationException if the identity of the object is not set
      */
+    @Override
     void validateIdentity(T object) throws ValidationException;
 }

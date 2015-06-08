@@ -19,6 +19,7 @@ public interface DAO<T> extends ImmutableDAO<T> {
      * @param object object to store
      * @throws DAOException if the object couldn't be stored
      */
+    @Override
     void create(T object) throws DAOException, ValidationException;
 
     /**
@@ -44,12 +45,14 @@ public interface DAO<T> extends ImmutableDAO<T> {
      * @return a list of matched objects
      * @throws DAOException if the data couldn't be retrieved
      */
+    @Override
     List<T> find(T object) throws DAOException;
 
     /**
      * @return returns all stored objects
      * @throws DAOException if the data couldn't be retrieved
      */
+    @Override
     List<T> getAll() throws DAOException;
 
     /**
@@ -68,5 +71,6 @@ public interface DAO<T> extends ImmutableDAO<T> {
      * @throws DAOException if the data couldn't be retrieved
      * @throws ValidationException if not all objects have a valid identity
      */
+    @Override
     List<T> populate(List<T> objects) throws DAOException, ValidationException;
 }
