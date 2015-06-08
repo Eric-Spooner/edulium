@@ -5,7 +5,9 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Hashtable;
 
 /**
  * Unit Test for the TestIntermittentSaleValidator validator
@@ -30,6 +32,9 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setFriday(false);
         intermittentSale.setSaturday(false);
         intermittentSale.setSunday(false);
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        intermittentSale.setEntries(entries);
 
         // WHEN
         intermittentSaleValidator.validateForCreate(intermittentSale);
@@ -50,6 +55,9 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setFriday(false);
         intermittentSale.setSaturday(false);
         intermittentSale.setSunday(false);
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        intermittentSale.setEntries(entries);
 
         // WHEN
         intermittentSaleValidator.validateForCreate(intermittentSale);
@@ -60,6 +68,19 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setEnabled(true);
+        intermittentSale.setDuration(120);
+        intermittentSale.setFromDayTime(LocalDateTime.now());
+        intermittentSale.setMonday(true);
+        intermittentSale.setTuesday(true);
+        intermittentSale.setWednesday(true);
+        intermittentSale.setThursday(true);
+        intermittentSale.setFriday(false);
+        intermittentSale.setSaturday(false);
+        intermittentSale.setSunday(false);
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        intermittentSale.setEntries(entries);
 
         // WHEN
         intermittentSaleValidator.validateForCreate(intermittentSale);
@@ -71,6 +92,19 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(new Long(123));
         intermittentSale.setName("");
+        intermittentSale.setEnabled(true);
+        intermittentSale.setDuration(120);
+        intermittentSale.setFromDayTime(LocalDateTime.now());
+        intermittentSale.setMonday(true);
+        intermittentSale.setTuesday(true);
+        intermittentSale.setWednesday(true);
+        intermittentSale.setThursday(true);
+        intermittentSale.setFriday(false);
+        intermittentSale.setSaturday(false);
+        intermittentSale.setSunday(false);
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        intermittentSale.setEntries(entries);
 
         // WHEN
         intermittentSaleValidator.validateForCreate(intermittentSale);
@@ -92,6 +126,9 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setFriday(false);
         intermittentSale.setSaturday(false);
         intermittentSale.setSunday(false);
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        intermittentSale.setEntries(entries);
 
         // WHEN
         intermittentSaleValidator.validateForCreate(intermittentSale);
@@ -122,6 +159,9 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setFriday(false);
         intermittentSale.setSaturday(false);
         intermittentSale.setSunday(false);
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        intermittentSale.setEntries(entries);
 
         // WHEN
         intermittentSaleValidator.validateForUpdate(intermittentSale);
@@ -142,6 +182,9 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setFriday(false);
         intermittentSale.setSaturday(false);
         intermittentSale.setSunday(false);
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        intermittentSale.setEntries(entries);
 
         // WHEN
         intermittentSaleValidator.validateForUpdate(intermittentSale);
@@ -152,6 +195,19 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setEnabled(true);
+        intermittentSale.setDuration(120);
+        intermittentSale.setFromDayTime(LocalDateTime.now());
+        intermittentSale.setMonday(true);
+        intermittentSale.setTuesday(true);
+        intermittentSale.setWednesday(true);
+        intermittentSale.setThursday(true);
+        intermittentSale.setFriday(false);
+        intermittentSale.setSaturday(false);
+        intermittentSale.setSunday(false);
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        intermittentSale.setEntries(entries);
 
         // WHEN
         intermittentSaleValidator.validateForUpdate(intermittentSale);
@@ -163,6 +219,19 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(new Long(123));
         intermittentSale.setName("");
+        intermittentSale.setEnabled(true);
+        intermittentSale.setDuration(120);
+        intermittentSale.setFromDayTime(LocalDateTime.now());
+        intermittentSale.setMonday(true);
+        intermittentSale.setTuesday(true);
+        intermittentSale.setWednesday(true);
+        intermittentSale.setThursday(true);
+        intermittentSale.setFriday(false);
+        intermittentSale.setSaturday(false);
+        intermittentSale.setSunday(false);
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        intermittentSale.setEntries(entries);
 
         // WHEN
         intermittentSaleValidator.validateForUpdate(intermittentSale);
@@ -184,6 +253,9 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setFriday(false);
         intermittentSale.setSaturday(false);
         intermittentSale.setSunday(false);
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        intermittentSale.setEntries(entries);
 
         // WHEN
         intermittentSaleValidator.validateForUpdate(intermittentSale);
@@ -214,6 +286,9 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setFriday(false);
         intermittentSale.setSaturday(false);
         intermittentSale.setSunday(false);
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        intermittentSale.setEntries(entries);
 
         // WHEN
         intermittentSaleValidator.validateForDelete(intermittentSale);
@@ -234,27 +309,9 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setFriday(false);
         intermittentSale.setSaturday(false);
         intermittentSale.setSunday(false);
-
-        // WHEN
-        intermittentSaleValidator.validateForDelete(intermittentSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForDelete_saleWithoutNameShouldThrow() throws ValidationException {
-        // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-
-        // WHEN
-        intermittentSaleValidator.validateForDelete(intermittentSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForDelete_saleWithEmptyNameShouldThrow() throws ValidationException {
-        // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-        intermittentSale.setName("");
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        intermittentSale.setEntries(entries);
 
         // WHEN
         intermittentSaleValidator.validateForDelete(intermittentSale);
@@ -286,7 +343,9 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setFriday(false);
         intermittentSale.setSaturday(false);
         intermittentSale.setSunday(false);
-
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        intermittentSale.setEntries(entries);
 
         // WHEN
         intermittentSaleValidator.validateIdentity(intermittentSale);
@@ -307,49 +366,9 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setFriday(false);
         intermittentSale.setSaturday(false);
         intermittentSale.setSunday(false);
-
-
-        // WHEN
-        intermittentSaleValidator.validateIdentity(intermittentSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateIdentity_saleWithoutNameShouldThrow() throws ValidationException {
-        // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-
-        // WHEN
-        intermittentSaleValidator.validateIdentity(intermittentSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateIdentitysaleWithEmptyNameShouldThrow() throws ValidationException {
-        // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-        intermittentSale.setName("");
-
-        // WHEN
-        intermittentSaleValidator.validateIdentity(intermittentSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateIdentity_saleWithNegativeDurationShouldThrow() throws ValidationException {
-        // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setName("Sale");
-        intermittentSale.setIdentity(new Long(123));
-        intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(-120);
-        intermittentSale.setFromDayTime(LocalDateTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        intermittentSale.setEntries(entries);
 
         // WHEN
         intermittentSaleValidator.validateIdentity(intermittentSale);

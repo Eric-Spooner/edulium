@@ -89,5 +89,8 @@ public class IntermittentSaleValidator implements Validator<IntermittentSale> {
         if (intermittentSale.getSunday() == null) {
             throw new ValidationException("Sunday must not be null");
         }
+        if (intermittentSale.getDuration() == null || intermittentSale.getDuration() < 0) {
+            throw new ValidationException("Negative durations are not accepted.");
+        }
     }
 }
