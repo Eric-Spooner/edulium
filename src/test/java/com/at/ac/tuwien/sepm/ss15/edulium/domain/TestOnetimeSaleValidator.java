@@ -24,7 +24,7 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
-        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
         entries.put(new MenuEntry(), new BigDecimal(10));
         onetimeSale.setEntries(entries);
 
@@ -39,6 +39,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        onetimeSale.setEntries(entries);
 
         // WHEN
         onetimeSaleValidator.validateForCreate(onetimeSale);
@@ -49,6 +52,11 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setFromTime(LocalDateTime.now());
+        onetimeSale.setToTime(LocalDateTime.now());
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        onetimeSale.setEntries(entries);
 
         // WHEN
         onetimeSaleValidator.validateForCreate(onetimeSale);
@@ -60,6 +68,11 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
         onetimeSale.setName("");
+        onetimeSale.setFromTime(LocalDateTime.now());
+        onetimeSale.setToTime(LocalDateTime.now());
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        onetimeSale.setEntries(entries);
 
         // WHEN
         onetimeSaleValidator.validateForCreate(onetimeSale);
@@ -82,6 +95,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.parse("2007-12-03T10:15:30"));
         onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:14:00"));
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        onetimeSale.setEntries(entries);
 
         // WHEN
         onetimeSaleValidator.validateForCreate(onetimeSale);
@@ -93,9 +109,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
         onetimeSale.setName("Sale");
-        onetimeSale.setFromTime(LocalDateTime.now());
-        onetimeSale.setToTime(LocalDateTime.now());
-        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        onetimeSale.setFromTime(LocalDateTime.parse("2007-12-03T10:15:30"));
+        onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
         entries.put(new MenuEntry(), new BigDecimal(10));
         onetimeSale.setEntries(entries);
 
@@ -108,8 +124,11 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setName("Sale");
-        onetimeSale.setFromTime(LocalDateTime.now());
-        onetimeSale.setToTime(LocalDateTime.now());
+        onetimeSale.setFromTime(LocalDateTime.parse("2007-12-03T10:15:30"));
+        onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        onetimeSale.setEntries(entries);
 
         // WHEN
         onetimeSaleValidator.validateForUpdate(onetimeSale);
@@ -120,6 +139,11 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setFromTime(LocalDateTime.parse("2007-12-03T10:15:30"));
+        onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        onetimeSale.setEntries(entries);
 
         // WHEN
         onetimeSaleValidator.validateForUpdate(onetimeSale);
@@ -131,6 +155,11 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
         onetimeSale.setName("");
+        onetimeSale.setFromTime(LocalDateTime.parse("2007-12-03T10:15:30"));
+        onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        onetimeSale.setEntries(entries);
 
         // WHEN
         onetimeSaleValidator.validateForUpdate(onetimeSale);
@@ -153,6 +182,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.parse("2007-12-03T10:15:30"));
         onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:14:00"));
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        onetimeSale.setEntries(entries);
 
         // WHEN
         onetimeSaleValidator.validateForUpdate(onetimeSale);
@@ -164,8 +196,11 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
         onetimeSale.setName("Sale");
-        onetimeSale.setFromTime(LocalDateTime.now());
-        onetimeSale.setToTime(LocalDateTime.now());
+        onetimeSale.setFromTime(LocalDateTime.parse("2007-12-03T10:15:30"));
+        onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        onetimeSale.setEntries(entries);
 
         // WHEN
         onetimeSaleValidator.validateForDelete(onetimeSale);
@@ -176,8 +211,11 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setName("Sale");
-        onetimeSale.setFromTime(LocalDateTime.now());
-        onetimeSale.setToTime(LocalDateTime.now());
+        onetimeSale.setFromTime(LocalDateTime.parse("2007-12-03T10:15:30"));
+        onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        onetimeSale.setEntries(entries);
 
         // WHEN
         onetimeSaleValidator.validateForDelete(onetimeSale);
@@ -198,8 +236,11 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
         onetimeSale.setName("Sale");
-        onetimeSale.setFromTime(LocalDateTime.now());
-        onetimeSale.setToTime(LocalDateTime.now());
+        onetimeSale.setFromTime(LocalDateTime.parse("2007-12-03T10:15:30"));
+        onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        onetimeSale.setEntries(entries);
 
         // WHEN
         onetimeSaleValidator.validateIdentity(onetimeSale);
@@ -210,8 +251,11 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         // GIVEN
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setName("Sale");
-        onetimeSale.setFromTime(LocalDateTime.now());
-        onetimeSale.setToTime(LocalDateTime.now());
+        onetimeSale.setFromTime(LocalDateTime.parse("2007-12-03T10:15:30"));
+        onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        onetimeSale.setEntries(entries);
 
         // WHEN
         onetimeSaleValidator.validateIdentity(onetimeSale);
