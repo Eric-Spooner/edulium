@@ -26,10 +26,10 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     @Autowired
     private DAO<TaxRate> taxRateDAO;
 
-    private MenuEntry createMenuEntry(String name, String description, String category, double price, double tax, boolean available)
+    private MenuEntry createMenuEntry(Long identity, String name, String description, String category, double price, double tax, boolean available)
             throws ValidationException, DAOException {
         MenuCategory menuCategory = new MenuCategory();
-        menuCategory.setName(name);
+        menuCategory.setName(category);
         menuCategoryDAO.create(menuCategory);
 
         TaxRate taxRate = new TaxRate();
@@ -37,6 +37,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         taxRateDAO.create(taxRate);
 
         MenuEntry entry = new MenuEntry();
+        entry.setIdentity(identity);
         entry.setCategory(menuCategory);
         entry.setTaxRate(taxRate);
         entry.setName(name);
@@ -58,7 +59,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     }
 
     private Hashtable<MenuEntry, BigDecimal> createRandomEntries() throws ValidationException, DAOException {
-        MenuEntry entry = createMenuEntry("entry", "desc", "cat", 20, 0.2, true);
+        MenuEntry entry = createMenuEntry(new Long((int)(Math.random()*999999999)),"entry", "desc", "cat", 20, 0.2, true);
         BigDecimal bigDecimal = new BigDecimal(10);
         Hashtable<MenuEntry, BigDecimal> hashtable = new Hashtable<>();
         hashtable.put(entry, bigDecimal);

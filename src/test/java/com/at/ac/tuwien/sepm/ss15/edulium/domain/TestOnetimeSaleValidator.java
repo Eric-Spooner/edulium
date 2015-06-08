@@ -5,7 +5,9 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Hashtable;
 
 /**
  * Unit Test for the TestOnetimeSaleValidator validator
@@ -22,6 +24,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        onetimeSale.setEntries(entries);
 
         // WHEN
         onetimeSaleValidator.validateForCreate(onetimeSale);
@@ -75,8 +80,8 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
         onetimeSale.setName("Sale");
-        onetimeSale.setFromTime(LocalDateTime.parse("2015-05-06"));
-        onetimeSale.setToTime(LocalDateTime.parse("2015-05-03"));
+        onetimeSale.setFromTime(LocalDateTime.parse("2007-12-03T10:15:30"));
+        onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:14:00"));
 
         // WHEN
         onetimeSaleValidator.validateForCreate(onetimeSale);
@@ -90,6 +95,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<MenuEntry,BigDecimal>();
+        entries.put(new MenuEntry(), new BigDecimal(10));
+        onetimeSale.setEntries(entries);
 
         // WHEN
         onetimeSaleValidator.validateForUpdate(onetimeSale);
@@ -143,8 +151,8 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(new Long(123));
         onetimeSale.setName("Sale");
-        onetimeSale.setFromTime(LocalDateTime.parse("2015-05-06"));
-        onetimeSale.setToTime(LocalDateTime.parse("2015-05-03"));
+        onetimeSale.setFromTime(LocalDateTime.parse("2007-12-03T10:15:30"));
+        onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:14:00"));
 
         // WHEN
         onetimeSaleValidator.validateForUpdate(onetimeSale);
@@ -176,43 +184,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateForDelete_saleWithoutNameShouldThrow() throws ValidationException {
-        // GIVEN
-        OnetimeSale onetimeSale = new OnetimeSale();
-        onetimeSale.setIdentity(new Long(123));
-
-        // WHEN
-        onetimeSaleValidator.validateForDelete(onetimeSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForDelete_saleWithEmptyNameShouldThrow() throws ValidationException {
-        // GIVEN
-        OnetimeSale onetimeSale = new OnetimeSale();
-        onetimeSale.setIdentity(new Long(123));
-        onetimeSale.setName("");
-
-        // WHEN
-        onetimeSaleValidator.validateForDelete(onetimeSale);
-    }
-
-    @Test(expected = ValidationException.class)
     public void testValidateForDelete_nullObjectShouldThrow() throws ValidationException {
         // GIVEN
         OnetimeSale onetimeSale = null;
-
-        // WHEN
-        onetimeSaleValidator.validateForDelete(onetimeSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForDelete_fromTimeAfterToTimeShouldThrow() throws ValidationException {
-        // GIVEN
-        OnetimeSale onetimeSale = new OnetimeSale();
-        onetimeSale.setIdentity(new Long(123));
-        onetimeSale.setName("Sale");
-        onetimeSale.setFromTime(LocalDateTime.parse("2015-05-06"));
-        onetimeSale.setToTime(LocalDateTime.parse("2015-05-03"));
 
         // WHEN
         onetimeSaleValidator.validateForDelete(onetimeSale);
@@ -244,43 +218,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void testValidateIdntity_saleWithoutNameShouldThrow() throws ValidationException {
-        // GIVEN
-        OnetimeSale onetimeSale = new OnetimeSale();
-        onetimeSale.setIdentity(new Long(123));
-
-        // WHEN
-        onetimeSaleValidator.validateIdentity(onetimeSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateIdentity_saleWithEmptyNameShouldThrow() throws ValidationException {
-        // GIVEN
-        OnetimeSale onetimeSale = new OnetimeSale();
-        onetimeSale.setIdentity(new Long(123));
-        onetimeSale.setName("");
-
-        // WHEN
-        onetimeSaleValidator.validateIdentity(onetimeSale);
-    }
-
-    @Test(expected = ValidationException.class)
     public void testValidateIdentity_nullObjectShouldThrow() throws ValidationException {
         // GIVEN
         OnetimeSale onetimeSale = null;
-
-        // WHEN
-        onetimeSaleValidator.validateIdentity(onetimeSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateIdentity_fromTimeAfterToTimeShouldThrow() throws ValidationException {
-        // GIVEN
-        OnetimeSale onetimeSale = new OnetimeSale();
-        onetimeSale.setIdentity(new Long(123));
-        onetimeSale.setName("Sale");
-        onetimeSale.setFromTime(LocalDateTime.parse("2015-05-06"));
-        onetimeSale.setToTime(LocalDateTime.parse("2015-05-03"));
 
         // WHEN
         onetimeSaleValidator.validateIdentity(onetimeSale);

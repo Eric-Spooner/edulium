@@ -67,8 +67,8 @@ public class OnetimeSaleValidator implements Validator<OnetimeSale> {
         if (onetimeSale.getToTime() == null) {
             throw new ValidationException("ToTime must not be null");
         }
-        if (onetimeSale.getFromTime().compareTo(onetimeSale.getToTime()) > 0) {
-            throw new ValidationException("FromTime must not be before toTime.");
+        if (onetimeSale.getFromTime().isAfter(onetimeSale.getToTime())) {
+            throw new ValidationException("FromTime must not be after toTime.");
         }
     }
 }
