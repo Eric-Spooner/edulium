@@ -11,8 +11,6 @@ import java.util.List;
 /**
  * Generic DAO interface
  */
-@Repository
-@Transactional(propagation = Propagation.MANDATORY)
 public interface DAO<T> extends ImmutableDAO<T> {
 
     /**
