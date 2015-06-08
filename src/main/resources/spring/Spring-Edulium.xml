@@ -19,6 +19,7 @@
     <import resource="domain/Spring-MenuEntryValidator.xml" />
     <import resource="domain/Spring-MenuValidator.xml" />
     <import resource="domain/Spring-OrderValidator.xml" />
+    <import resource="domain/Spring-InstalmentValidator.xml" />
 
     <!-- DAO beans -->
     <import resource="dao/Spring-MenuCategoryDAO.xml" />
@@ -27,6 +28,7 @@
     <import resource="dao/Spring-UserDAO.xml" />
     <import resource="dao/Spring-OrderDAO.xml" />
     <import resource="dao/Spring-MenuDAO.xml" />
+    <import resource="dao/Spring-InstalmentDAO.xml" />
     <import resource="dao/Spring-InvoiceDAO.xml"/>
     <import resource="dao/Spring-TaxRateDAO.xml" />
     <import resource="dao/Spring-MenuEntryDAO.xml" />
