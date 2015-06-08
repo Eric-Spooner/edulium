@@ -64,6 +64,10 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
         }
     }
 
+    /**
+     * Finds all instalment objects in the database which match the
+     * parameters of the provided invoice object
+     */
     @Override
     public List<Instalment> find(Instalment object) throws DAOException {
         LOGGER.debug("Entering find with parameters: " + object);
@@ -74,7 +78,7 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
 
         final List<Instalment> results = new ArrayList<>();
 
-        final String query = "SELECT * FROM Invoice WHERE " +
+        final String query = "SELECT * FROM Instalment WHERE " +
                 "ID = ISNULL(?, ID) AND " +
                 "instalmentTime = ISNULL(?, instalmentTime) AND " +
                 "paymentInfo = ISNULL(?, paymentInfo) AND " +
@@ -82,10 +86,9 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
                 "amount = ISNULL(?, amount) AND " +
                 "invoice_ID = ISNULL(?, invoice_ID);";
 
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query,
-                Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, object.getIdentity());
-            stmt.setTimestamp(2, Timestamp.valueOf(object.getTime()));
+            stmt.setTimestamp(2, object.getTime() == null ? null : Timestamp.valueOf(object.getTime()));
             stmt.setString(3, object.getPaymentInfo());
             stmt.setString(4, object.getType());
             stmt.setBigDecimal(5, object.getAmount());
@@ -105,6 +108,37 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
         }
 
         return results;
+    }
+
+    @Override
+    public List<Instalment> getAll() throws DAOException {
+        LOGGER.debug("Entering getAll");
+
+        final List<Instalment> results = new ArrayList<>();
+
+        final String query = "SELECT * FROM Instalment;";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                try {
+                    results.add(parseResult(rs));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + rs + "' failed", e);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Failed to retreive all instalment entries from the database", e);
+            throw new DAOException("Failed to retreive all instalment entries from the database", e);
+        }
+
+        return results;
+    }
+
+    @Override
+    public List<Instalment> populate(List<Instalment> objects) throws DAOException, ValidationException {
+        return null;
     }
 
     /**
@@ -130,15 +164,5 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
         instalment.setInvoice(invoice.get(0));
 
         return instalment;
-    }
-
-    @Override
-    public List<Instalment> getAll() throws DAOException {
-        return null;
-    }
-
-    @Override
-    public List<Instalment> populate(List<Instalment> objects) throws DAOException, ValidationException {
-        return null;
     }
 }
