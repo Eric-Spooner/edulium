@@ -14,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -75,10 +76,36 @@ public class DialogMenuEntryController implements Initializable{
                 menuEntry.setAvailable(true);
             }
             dropTaxRate.setItems(observableArrayList(taxRateService.getAllTaxRates()));
+            dropTaxRate.setConverter(new StringConverter<TaxRate>() {
+                @Override
+                public String toString(TaxRate object) {
+                    return object.getValue().toString();
+                }
+
+                @Override
+                public TaxRate fromString(String string) {
+                    TaxRate taxRate = new TaxRate();
+                    taxRate.setValue(BigDecimal.valueOf(Double.parseDouble(string)));
+                    return taxRate;
+                }
+            });
             if (menuEntry.getTaxRate() != null){
                 dropTaxRate.getSelectionModel().select(menuEntry.getTaxRate());
             }
             dropMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
+            dropMenuCategory.setConverter(new StringConverter<MenuCategory>() {
+                @Override
+                public String toString(MenuCategory object) {
+                    return object.getName();
+                }
+
+                @Override
+                public MenuCategory fromString(String string) {
+                    MenuCategory menuCategory = new MenuCategory();
+                    menuCategory.setName(string);
+                    return menuCategory;
+                }
+            });
             if (menuEntry.getCategory() != null){
                dropMenuCategory.getSelectionModel().select(menuEntry.getCategory());
             }

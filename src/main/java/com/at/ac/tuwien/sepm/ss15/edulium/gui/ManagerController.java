@@ -4,6 +4,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
+import com.sun.javafx.scene.control.skin.ListViewSkin;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -34,12 +35,10 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static javafx.collections.FXCollections.observableArrayList;
+import static javafx.collections.FXCollections.observableList;
 
 /**
  * Controller used for the Manager View
@@ -98,7 +97,7 @@ public class ManagerController implements Initializable {
     @FXML
     private TableColumn<Menu,String> tableColMenuName;
     @FXML
-    private TableColumn<Menu,List<MenuEntry>> tableColMenuEntries;
+    private TableColumn<Menu,String> tableColMenuEntries;
 
     @FXML
     private Canvas tablesCanvas;
@@ -156,7 +155,7 @@ public class ManagerController implements Initializable {
                     return new SimpleStringProperty(p.getValue().getCategory().getName());
                 }
             });
-            
+
             tableColMenuEntryAvailable.setCellValueFactory(new PropertyValueFactory<MenuEntry, Boolean>("available"));
 
             menuCategories = observableArrayList(menuService.getAllMenuCategories());
@@ -168,7 +167,14 @@ public class ManagerController implements Initializable {
             tableViewMenu.setItems(menus);
             tableColMenuId.setCellValueFactory(new PropertyValueFactory<Menu, Long>("identity"));
             tableColMenuName.setCellValueFactory(new PropertyValueFactory<Menu, String>("name"));
-            tableColMenuEntries.setCellValueFactory(new PropertyValueFactory<Menu, List<MenuEntry>>("entries"));
+            tableColMenuEntries.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Menu, String>, ObservableValue<String>>() {
+                public ObservableValue<String> call(CellDataFeatures<Menu, String>p) {
+                    // p.getValue() returns the Person instance for a particular TableView row
+                    List<String> list = new LinkedList<String>();
+                    p.getValue().getEntries().forEach(entry->list.add(entry.getName()));
+                    return new SimpleStringProperty(list.toString());
+                }
+            });
 
             // Example data for Table View
             Section section1 = new Section();
