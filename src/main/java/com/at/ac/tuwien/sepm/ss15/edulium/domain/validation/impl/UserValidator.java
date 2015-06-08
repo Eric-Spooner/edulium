@@ -7,7 +7,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 /**
  * validator implementation for the User domain object
  */
-public class UserValidator implements Validator<User> {
+class UserValidator implements Validator<User> {
 
     @Override
     public void validateForCreate(User user) throws ValidationException {

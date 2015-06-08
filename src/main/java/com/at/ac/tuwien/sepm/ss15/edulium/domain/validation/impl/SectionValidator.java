@@ -7,7 +7,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 /**
  * implementation of the SectionValidator
  */
-public class SectionValidator implements Validator<Section> {
+class SectionValidator implements Validator<Section> {
 
     /**
      * validates the object for the create action
