@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.ImmutableDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Instalment;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ImmutableValidator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +24,7 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
     @Autowired
     private DataSource dataSource;
     @Autowired
-    private Validator<Instalment> instalmentValidator;
+    private ImmutableValidator<Instalment> instalmentValidator;
 
     /**
      * Writes the instalment object into the database and sets the identity
