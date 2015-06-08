@@ -88,7 +88,6 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
                 "invoice_ID = ISNULL(?, invoice_ID);";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            //stmt.setLong(1, object.getIdentity());
             if (object.getIdentity() == null) {
                 stmt.setNull(1, Types.BIGINT);
             } else {
@@ -103,9 +102,8 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
             } else {
                 stmt.setLong(6, object.getInvoice().getIdentity());
             }
-            //stmt.setLong(6, object.getInvoice() == null ? null : object.getInvoice().getIdentity());
-            ResultSet rs = stmt.executeQuery();
 
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 try {
                     results.add(parseResult(rs));
