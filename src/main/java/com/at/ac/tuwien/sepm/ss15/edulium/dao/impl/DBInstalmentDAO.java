@@ -37,7 +37,7 @@ class DBInstalmentDAO implements DAO<Instalment> {
         instalmentValidator.validateForCreate(object);
 
         final String query = "INSERT INTO Instalment (instalmentTime, paymentInfo, type, " +
-                "amount, invoice_ID) VALUES (?, ?, ?, ?, ?)";
+                "amount, invoice_ID) VALUES (?, ?, ?, ?, ?);";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query,
                 Statement.RETURN_GENERATED_KEYS)) {
@@ -61,9 +61,37 @@ class DBInstalmentDAO implements DAO<Instalment> {
         // TODO: Generate history
     }
 
+    /**
+     * Updates the instalment object in the database
+     */
     @Override
     public void update(Instalment object) throws DAOException, ValidationException {
+        LOGGER.debug("Entering update with parameters: " + object);
 
+        instalmentValidator.validateForUpdate(object);
+
+        final String query = "UPDATE Instalment SET instalmentTime = ?, paymentInfo = ?, type = ?, " +
+                "amount = ?, invoice_ID = ? WHERE id = ?;";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query,
+                Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setTimestamp(1, Timestamp.valueOf(object.getTime()));
+            stmt.setString(2, object.getPaymentInfo());
+            stmt.setString(3, object.getType());
+            stmt.setBigDecimal(4, object.getAmount());
+            stmt.setLong(5, object.getInvoice().getIdentity());
+            stmt.setLong(6, object.getIdentity());
+
+            if (stmt.executeUpdate() == 0) {
+                LOGGER.error("Failed to update instalment entry in database, dataset not found");
+                throw new DAOException("Failed to update instalment entry in database, dataset not found");
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Failed to update instalment entry in database", e);
+            throw new DAOException("Failed to update invoice entry in database", e);
+        }
+
+        // TODO: Generate history
     }
 
     @Override
