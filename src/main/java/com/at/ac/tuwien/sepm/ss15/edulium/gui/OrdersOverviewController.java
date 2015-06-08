@@ -8,10 +8,12 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationContext;
@@ -37,6 +39,7 @@ public class OrdersOverviewController implements Initializable {
     private MenuService menuService;
     private InteriorService interiorService;
     private ArrayList<Button> buttons = new ArrayList<>();
+    private int ordersRow = 0;
 
     @FXML
     GridPane categoriesGP;
@@ -74,10 +77,8 @@ public class OrdersOverviewController implements Initializable {
             System.out.println(e);
         }*/
 
-        try {
-            System.out.println(orderService.getAllOrders());
-        } catch(ServiceException e) {
-        }
+        ordersGP.setVgap(4);
+        ordersGP.setHgap(20);
 
         try {
             categoriesGP.setVgap(4);
@@ -103,6 +104,46 @@ public class OrdersOverviewController implements Initializable {
                                 button.setPrefSize(240, 40);
                                 button.setMinWidth(140);
                                 button.setStyle("-fx-font-size: 18px;");
+                                button.setOnAction(new EventHandler<ActionEvent>() {
+                                    public void handle(ActionEvent t) {
+                                        if(ordersGP.getRowConstraints().size() <= ordersRow) {
+                                            Separator sepVert1 = new Separator();
+                                            ordersGP.setRowSpan(sepVert1, ordersRow);
+                                        }
+                                        ordersGP.setMinHeight((ordersRow+1)*44);
+                                        Label amountOrdered = new Label();
+                                        amountOrdered.setText("1");
+                                        amountOrdered.setStyle("-fx-font-size: 18px;");
+                                        ordersGP.add(amountOrdered, 0, ordersRow);
+                                        Button buttonPlus = new Button();
+                                        buttonPlus.setText("+");
+                                        buttonPlus.setPrefSize(40, 40);
+                                        buttonPlus.setMinWidth(40);
+                                        buttonPlus.setStyle("-fx-font-size: 18px;");
+                                        buttonPlus.setOnAction(new EventHandler<ActionEvent>() {
+                                            public void handle(ActionEvent t) {
+                                                amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) + 1));
+                                            }
+                                        });
+                                        ordersGP.add(buttonPlus, 1, ordersRow);
+                                        Button buttonMinus = new Button();
+                                        buttonMinus.setText("-");
+                                        buttonMinus.setPrefSize(40, 40);
+                                        buttonMinus.setMinWidth(40);
+                                        buttonMinus.setStyle("-fx-font-size: 18px;");
+                                        buttonMinus.setOnAction(new EventHandler<ActionEvent>() {
+                                            public void handle(ActionEvent t) {
+                                                amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) - 1));
+                                            }
+                                        });
+                                        ordersGP.add(buttonMinus, 2, ordersRow);
+                                        Text entryName = new Text();
+                                        entryName.setText(entry.getName());
+                                        entryName.setStyle("-fx-font-size: 18px;");
+                                        ordersGP.add(entryName, 3, ordersRow);
+                                        ordersRow++;
+                                    }
+                                });
                                 entriesVB.getChildren().add(i, button);
                                 i++;
                             }
