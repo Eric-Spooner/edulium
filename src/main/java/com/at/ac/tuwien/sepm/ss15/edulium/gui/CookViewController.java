@@ -41,6 +41,8 @@ public class CookViewController implements Initializable {
 
     private static Stage thisStage;
     private static OrderService orderService;
+    private static MenuService menuService;
+
 
     @FXML
     private TableView<Order> tableViewQueued;
@@ -71,6 +73,9 @@ public class CookViewController implements Initializable {
     public static void setOrderService(OrderService orderService) {
         CookViewController.orderService = orderService;
     }
+    public static void setMenuService(MenuService menuService) {
+        CookViewController.menuService = menuService;
+    }
 
 
     private ObservableList<Order> observableListQueued;
@@ -79,11 +84,10 @@ public class CookViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources){
         try {
-            Order order = new Order();
-            order.setState(Order.State.QUEUED);
-            observableListQueued = (observableArrayList(orderService.findOrder(order)));
-            order.setState(Order.State.IN_PROGRESS);
-            observableListInProgress = (observableArrayList(orderService.findOrder(order)));
+            observableListQueued = (observableArrayList(orderService.getAllOrdersToPrepare(
+                            menuService.getAllMenuCategories(), Order.State.QUEUED)));
+            observableListInProgress = (observableArrayList(orderService.getAllOrdersToPrepare(
+                    menuService.getAllMenuCategories(), Order.State.IN_PROGRESS)));
 
             tableViewQueued.setItems(observableListQueued);
             tableViewQueued.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -139,14 +143,15 @@ public class CookViewController implements Initializable {
     public void btnInProgressToReadyToDeliver(ActionEvent actionEvent) {
         LOGGER.info("Entered btnInProgressToReadyToDeliver");
         try {
-            if(tableViewQueued.getSelectionModel().getSelectedItems() != null){
-                for(Order order : tableViewQueued.getSelectionModel().getSelectedItems()){
-                    orderService.markAsInProgress(order);
+            if(tableViewInProgress.getSelectionModel().getSelectedItems() != null){
+                for(Order order : tableViewInProgress.getSelectionModel().getSelectedItems()){
+                    orderService.markAsReadyForDelivery(order);
                 }
             }
-            Order order = new Order();
-            order.setState(Order.State.QUEUED);
-            observableListQueued.setAll(observableArrayList(orderService.findOrder(order)));
+            observableListQueued.setAll(observableArrayList(orderService.getAllOrdersToPrepare(
+                    menuService.getAllMenuCategories(), Order.State.QUEUED)));
+            observableListInProgress.setAll(observableArrayList(orderService.getAllOrdersToPrepare(
+                    menuService.getAllMenuCategories(), Order.State.IN_PROGRESS)));
         }catch (Exception e){
             ManagerController.showErrorDialog
                     ("Error", "Putting State to in Progress", "The State shifting did not work");
@@ -159,13 +164,13 @@ public class CookViewController implements Initializable {
         try {
             if(tableViewInProgress.getSelectionModel().getSelectedItems() != null){
                 for(Order order : tableViewQueued.getSelectionModel().getSelectedItems()){
-                    orderService.markAsReadyForDelivery(order);
+                    orderService.markAsInProgress(order);
                 }
             }
-            Order order = new Order();
-            order.setState(Order.State.IN_PROGRESS);
-            observableListInProgress.setAll(observableArrayList(orderService.findOrder(order)));
-
+            observableListQueued.setAll(observableArrayList(orderService.getAllOrdersToPrepare(
+                    menuService.getAllMenuCategories(), Order.State.QUEUED)));
+            observableListInProgress.setAll(observableArrayList(orderService.getAllOrdersToPrepare(
+                    menuService.getAllMenuCategories(), Order.State.IN_PROGRESS)));
         }catch (Exception e){
             ManagerController.showErrorDialog
                     ("Error", "Putting State to in Ready to Deliver", "The State shifting did not work");
@@ -174,10 +179,9 @@ public class CookViewController implements Initializable {
     }
 
     public void btnRefresh(ActionEvent actionEvent) throws Exception{
-        Order order = new Order();
-        order.setState(Order.State.IN_PROGRESS);
-        observableListInProgress.setAll(observableArrayList(orderService.findOrder(order)));
-        order.setState(Order.State.QUEUED);
-        observableListQueued.setAll(observableArrayList(orderService.findOrder(order)));
+        observableListQueued.setAll(observableArrayList(orderService.getAllOrdersToPrepare(
+                menuService.getAllMenuCategories(), Order.State.QUEUED)));
+        observableListInProgress.setAll(observableArrayList(orderService.getAllOrdersToPrepare(
+                menuService.getAllMenuCategories(), Order.State.IN_PROGRESS)));
     }
 }

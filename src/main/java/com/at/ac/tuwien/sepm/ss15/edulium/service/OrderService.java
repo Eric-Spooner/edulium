@@ -79,7 +79,7 @@ public interface OrderService extends Service {
      * @throws ServiceException
      */
     @PreAuthorize("hasAnyRole('COOK','SERVICE')")
-    public List<Order> getAllOrdersToPrepare(List<MenuCategory> menuCategories) throws ServiceException, ValidationException;
+    public List<Order> getAllOrdersToPrepare(List<MenuCategory> menuCategories, Order.State state) throws ServiceException, ValidationException;
 
     /**
      * Cook uses this function, to set the state of the order to IN_PROGRESS

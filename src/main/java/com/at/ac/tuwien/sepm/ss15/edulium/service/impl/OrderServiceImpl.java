@@ -22,7 +22,7 @@ import java.util.List;
  * implementation of the Order Service
  */
 class OrderServiceImpl implements OrderService {
-    private static final Logger LOGGER = LogManager.getLogger(TaxRateServiceImpl.class);
+    private static final Logger LOGGER = LogManager.getLogger(OrderServiceImpl.class);
     @Autowired
     private DAO<Order> orderDAO;
     @Autowired
@@ -147,7 +147,7 @@ class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> getAllOrdersToPrepare(List<MenuCategory> menuCategories) throws
+    public List<Order> getAllOrdersToPrepare(List<MenuCategory> menuCategories, Order.State state) throws
             ServiceException, ValidationException {
         LOGGER.debug("Entering getAllOrdersToPrepare with parameter " + menuCategories);
 
@@ -163,7 +163,10 @@ class OrderServiceImpl implements OrderService {
             dummyEntry.setCategory(category);
             Order dummyOrder = new Order();
             dummyOrder.setMenuEntry(dummyEntry);
-            retVal.addAll(this.findOrder(dummyOrder));
+            dummyOrder.setState(state);
+            for(Order order : this.findOrder(dummyOrder)){
+               if(!retVal.contains(order)) retVal.add(order);
+            }
         }
         return retVal;
     }

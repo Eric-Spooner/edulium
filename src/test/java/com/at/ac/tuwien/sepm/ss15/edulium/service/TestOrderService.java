@@ -511,11 +511,11 @@ public class TestOrderService extends AbstractServiceTest {
         //THEN
         List<MenuCategory> listMenuCategories = new LinkedList<>();
         listMenuCategories.add(MenuCategory.withIdentity(1));
-        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories).size()==1);
+        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories, Order.State.QUEUED).size()==1);
         listMenuCategories.add(MenuCategory.withIdentity(2));
-        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories).size()==2);
+        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories, Order.State.QUEUED).size()==2);
         listMenuCategories.add(MenuCategory.withIdentity(3));
-        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories).size()==3);
+        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories, Order.State.QUEUED).size()==3);
     }
 
     @Test
@@ -540,11 +540,11 @@ public class TestOrderService extends AbstractServiceTest {
         //THEN
         List<MenuCategory> listMenuCategories = new LinkedList<>();
         listMenuCategories.add(MenuCategory.withIdentity(1));
-        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories).size()==1);
+        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories, Order.State.QUEUED).size()==1);
         listMenuCategories.add(MenuCategory.withIdentity(2));
-        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories).size()==2);
+        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories, Order.State.QUEUED).size()==2);
         listMenuCategories.add(MenuCategory.withIdentity(3));
-        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories).size()==3);
+        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories, Order.State.QUEUED).size()==3);
     }
 
     @Test
@@ -569,7 +569,7 @@ public class TestOrderService extends AbstractServiceTest {
         //THEN
         List<MenuCategory> listMenuCategories = new LinkedList<>();
         listMenuCategories.add(MenuCategory.withIdentity(4));
-        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories).size() == 0);
+        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories, Order.State.QUEUED).size() == 0);
     }
 
 }

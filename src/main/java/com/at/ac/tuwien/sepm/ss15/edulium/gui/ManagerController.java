@@ -984,6 +984,7 @@ public class ManagerController implements Initializable {
         Stage stage = new Stage();
         CookViewController.setThisStage(stage);
         CookViewController.setOrderService(orderService);
+        CookViewController.setMenuService(menuService);
         stage.setTitle("Cook View");
         AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/CookView.fxml"));
         Scene scene = new Scene(myPane);
