@@ -7,4 +7,7 @@
     <bean id="reservationService" class="com.at.ac.tuwien.sepm.ss15.edulium.service.impl.ReservationServiceImpl">
     </bean>
 
+    <!-- heuristic bean -->
+    <bean id="reservationHeuristic" class="com.at.ac.tuwien.sepm.ss15.edulium.service.heuristics.SimpleReservationHeuristic">
+    </bean>
 </beans>
