@@ -4,12 +4,14 @@ import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.*;
 import static org.junit.Assert.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -277,7 +279,7 @@ public class TestInvoiceService extends AbstractServiceTest {
     }
 
     @Test(expected = ServiceException.class)
-    public void testUpdateInvoice_updatingNotPersistentObjectShouldFail() throws ServiceException, ValidationException {
+    public void testUpdateInvoice_updatingNonPersistentObjectShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
@@ -336,7 +338,7 @@ public class TestInvoiceService extends AbstractServiceTest {
     }
 
     @Test(expected = ServiceException.class)
-    public void testDeleteInvoice_deletingNotPersistentObjectShouldFail() throws ServiceException, ValidationException {
+    public void testDeleteInvoice_deletingNonPersistentObjectShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
@@ -507,5 +509,73 @@ public class TestInvoiceService extends AbstractServiceTest {
         assertTrue(invoices.contains(inv1));
         assertTrue(invoices.contains(inv2));
         assertTrue(invoices.contains(inv3));
+    }
+
+    @Test
+    public void testGetHistory_shouldReturnHistory() throws ServiceException, ValidationException {
+        // GIVEN
+        // Create
+        Invoice invoiceA = new Invoice();
+        LocalDateTime createTime = LocalDateTime.now();
+        invoiceA.setGross(new BigDecimal("20.5"));
+        invoiceA.setTime(createTime);
+        invoiceA.setCreator(creator1);
+        invoiceService.addInvoice(invoiceA);
+
+        // Update
+        Invoice invoiceB = Invoice.withIdentity(invoiceA.getIdentity());
+        LocalDateTime updateTime = LocalDateTime.now();
+        invoiceB.setTime(createTime);
+        invoiceB.setGross(new BigDecimal("24"));
+        invoiceB.setCreator(creator1);
+        invoiceService.addInvoice(invoiceB);
+
+        // Delete
+        LocalDateTime deleteTime = LocalDateTime.now();
+        invoiceService.deleteInvoice(invoiceB);
+
+        // WHEN
+        List<History<Invoice>> history = invoiceService.getInvoiceHistory(invoiceA);
+
+        // THEN
+        assertEquals(3, history.size());
+        History<Invoice> event;
+
+        // Create history inspection
+        event = history.get(0);
+        assertEquals(Long.valueOf(1), event.getChangeNumber());
+        assertEquals(invoiceA, event.getData());
+        assertEquals(creator1, event.getUser());
+        assertTrue(Duration.between(createTime, event.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(event.isDeleted());
+
+        // Update history inspection
+        event = history.get(1);
+        assertEquals(Long.valueOf(2), event.getChangeNumber());
+        assertEquals(invoiceB, event.getData());
+        assertEquals(creator2, event.getUser());
+        assertTrue(Duration.between(updateTime, event.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(event.isDeleted());
+
+        // Delete history inspection
+        event = history.get(2);
+        assertEquals(Long.valueOf(3), event.getChangeNumber());
+        assertEquals(invoiceB, event.getData());
+        assertEquals(creator1, event.getUser());
+        assertTrue(Duration.between(deleteTime, event.getTimeOfChange()).getSeconds() < 1);
+        assertTrue(event.isDeleted());
+    }
+
+    @Test
+    public void testGetHistory_shouldReturnEmptyListForNonPersistentData() throws ServiceException {
+        // GIVEN
+        Long identity = 1L;
+
+        while (!invoiceService.findInvoices(Invoice.withIdentity(identity)).isEmpty()) {
+            identity++;
+        }
+
+        // WHEN/THEN
+        assertTrue(invoiceService.findInvoices(Invoice.withIdentity(identity)).isEmpty());
     }
 }
