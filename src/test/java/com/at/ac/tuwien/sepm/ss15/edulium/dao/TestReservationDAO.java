@@ -21,7 +21,7 @@ import java.util.*;
  */
 public class TestReservationDAO extends AbstractDAOTest {
     @Autowired
-    private DAO<Reservation> reservationDAO;
+    private ReservationDAO reservationDAO;
     @Autowired
     private DAO<Table> tableDAO; // only to create test tables
     @Autowired
@@ -757,6 +757,97 @@ public class TestReservationDAO extends AbstractDAOTest {
 
         // THEN
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testFindIn_ShouldReturnObjects() throws DAOException, ValidationException {
+        // PREPARE
+        // reservation 1
+        Reservation reservation1 = new Reservation();
+        reservation1.setName("Hardy Heron");
+        reservation1.setTime(LocalDateTime.of(2015, 05, 15, 17, 00));
+        reservation1.setDuration(Duration.ofMinutes(60));
+        reservation1.setQuantity(21);
+        reservation1.setTables(Arrays.asList(table1, table2));
+
+        reservationDAO.create(reservation1);
+        assertEquals(1, reservationDAO.find(reservation1).size());
+
+        // reservation 2
+        Reservation reservation2 = new Reservation();
+        reservation2.setName("Hardy Heron");
+        reservation2.setTime(LocalDateTime.of(2015, 05, 15, 19, 00));
+        reservation2.setDuration(Duration.ofMinutes(60));
+        reservation2.setQuantity(30);
+        reservation2.setTables(Arrays.asList(table1, table2));
+
+        reservationDAO.create(reservation2);
+        assertEquals(1, reservationDAO.find(reservation2).size());
+
+        // reservation 3
+        Reservation reservation3 = new Reservation();
+        reservation3.setName("Jaunty Jackalope");
+        reservation3.setTime(LocalDateTime.of(2015, 05, 15, 18, 00));
+        reservation3.setDuration(Duration.ofMinutes(60));
+        reservation3.setQuantity(30);
+        reservation3.setTables(Arrays.asList(table1, table2));
+
+        reservationDAO.create(reservation3);
+        assertEquals(1, reservationDAO.find(reservation3).size());
+
+        // reservation 4
+        Reservation reservation4 = new Reservation();
+        reservation4.setName("Jaunty Jackalope");
+        reservation4.setTime(LocalDateTime.of(2015, 05, 15, 17, 00));
+        reservation4.setDuration(Duration.ofMinutes(180));
+        reservation4.setQuantity(30);
+        reservation4.setTables(Arrays.asList(table1, table2));
+
+        reservationDAO.create(reservation4);
+        assertEquals(1, reservationDAO.find(reservation4).size());
+
+        // WHEN
+        List<Reservation> result = reservationDAO.findIn(LocalDateTime.of(2015, 05, 15, 17, 30), Duration.ofMinutes(120));
+
+        // THEN
+        assertEquals(4, result.size());
+        assertTrue(result.contains(reservation1));
+        assertTrue(result.contains(reservation2));
+        assertTrue(result.contains(reservation3));
+        assertTrue(result.contains(reservation4));
+
+        // WHEN
+        result = reservationDAO.findIn(LocalDateTime.of(2015, 05, 15, 19, 00), Duration.ofMinutes(60));
+
+        // THEN
+        assertEquals(2, result.size());
+        assertTrue(result.contains(reservation2));
+        assertTrue(result.contains(reservation4));
+
+        // WHEN
+        result = reservationDAO.findIn(LocalDateTime.of(2015, 05, 15, 17, 00), Duration.ofMinutes(60));
+
+        // THEN
+        assertEquals(2, result.size());
+        assertTrue(result.contains(reservation1));
+        assertTrue(result.contains(reservation4));
+
+
+        // WHEN
+        result = reservationDAO.findIn(LocalDateTime.of(2015, 05, 15, 15, 00), Duration.ofMinutes(60));
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testFindIn_WithNullTimeShouldThrow() throws DAOException, ValidationException {
+        reservationDAO.findIn(null, Duration.ofMinutes(60));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testFindIn_WithNullDurationShouldThrow() throws DAOException, ValidationException {
+        reservationDAO.findIn(LocalDateTime.of(2015, 05, 15, 15, 00), null);
     }
 
     @Test
