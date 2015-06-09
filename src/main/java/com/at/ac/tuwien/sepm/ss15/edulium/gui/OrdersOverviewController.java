@@ -60,7 +60,7 @@ public class OrdersOverviewController implements Initializable {
         menuService = context.getBean("menuService", MenuService.class);
         interiorService = context.getBean("interiorService", InteriorService.class);
         ordersSP.setStyle("-fx-font-size: 40px;");
-
+/*
         try {
             Section section = new Section();
             section.setIdentity(1L);
@@ -78,10 +78,10 @@ public class OrdersOverviewController implements Initializable {
             //orderService.addOrder(order);
         } catch(ServiceException e) {
             System.out.println(e);
-        }/* catch(ValidationException e) {
+        } catch(ValidationException e) {
             System.out.println(e);
-        }*/
-
+        }
+*/
         ordersGP.setVgap(4);
         ordersGP.setHgap(4);
 
@@ -221,6 +221,7 @@ public class OrdersOverviewController implements Initializable {
     }
 
     public void cashButtonClicked(ActionEvent event) {
+        // output for testing
         String out = new String();
         for(OrderEntry entry : orderEntries) {
             MenuEntry matcher = new MenuEntry();
@@ -234,6 +235,28 @@ public class OrdersOverviewController implements Initializable {
             out += en.getName() + ", "+entry.getAmountLabelText()+","+entry.getRow()+"\n";
         }
         System.out.println(out);
+
+        // create table and section for testing
+        /*try {
+            Section section = new Section();
+            section.setIdentity(1L);
+            section.setName("A");
+            interiorService.addSection(section);
+            Table table = new Table();
+            table.setNumber(1L);
+            table.setSection(section);
+            table.setRow(1);
+            table.setColumn(1);
+            table.setSeats(4);
+            interiorService.addTable(table);
+            Order order = createOrder(BigDecimal.valueOf(500), "Order Information", BigDecimal.valueOf(0.2),
+                    LocalDateTime.now(), Order.State.QUEUED, 1);
+            orderService.addOrder(order);
+        } catch(ServiceException e) {
+            System.out.println(e);
+        } catch(ValidationException e) {
+            System.out.println(e);
+        }*/
     }
 
     private Order createOrder(BigDecimal value, String additionalInformation,
