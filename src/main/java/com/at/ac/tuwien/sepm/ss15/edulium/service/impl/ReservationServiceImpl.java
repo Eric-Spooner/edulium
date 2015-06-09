@@ -40,6 +40,13 @@ class ReservationServiceImpl implements ReservationService {
 
         reservationValidator.validateForCreate(reservation);
 
+        LocalDateTime resEndTime = reservation.getTime().plus(reservation.getDuration());
+
+        if (resEndTime.isBefore(LocalDateTime.now())) {
+            LOGGER.error("Cannot add past reservation");
+            throw new ServiceException("Cannot add past reservation");
+        }
+
         try {
             List<Table> tables = reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables());
 

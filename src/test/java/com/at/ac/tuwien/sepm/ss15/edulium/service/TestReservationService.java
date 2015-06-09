@@ -99,12 +99,12 @@ public class TestReservationService extends AbstractServiceTest {
         // PREPARE
         Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t1));
         Reservation res2 = createReservation(1, 18, 120, Arrays.asList(t5));
-
-        Mockito.when(reservationDAO.getAll()).thenReturn(Arrays.asList(res1, res2));
-
-        // WHEN
         Reservation res = createReservation(1, 18, 150, null);
         res.setQuantity(4);
+
+        Mockito.when(reservationDAO.findIn(res.getTime(), res.getDuration())).thenReturn(Arrays.asList(res1, res2));
+
+        // WHEN
         reservationService.addReservation(res);
 
         // THEN
@@ -123,12 +123,11 @@ public class TestReservationService extends AbstractServiceTest {
     public void testAddReservation_shouldCreateReservation2() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t3));
-
-        Mockito.when(reservationDAO.getAll()).thenReturn(Arrays.asList(res1));
-
-        // WHEN
         Reservation res = createReservation(1, 17, 150, null);
         res.setQuantity(6);
+
+        Mockito.when(reservationDAO.findIn(res.getTime(), res.getDuration())).thenReturn(Arrays.asList(res1));
+        // WHEN
         reservationService.addReservation(res);
 
         // THEN
@@ -147,12 +146,11 @@ public class TestReservationService extends AbstractServiceTest {
     public void testAddReservation_shouldCreateReservation3() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t3));
-
-        Mockito.when(reservationDAO.getAll()).thenReturn(Arrays.asList(res1));
-
-        // WHEN
         Reservation res = createReservation(1, 19, 120, null);
         res.setQuantity(12);
+        Mockito.when(reservationDAO.findIn(res.getTime(), res.getDuration())).thenReturn(Arrays.asList(res1));
+
+        // WHEN
         reservationService.addReservation(res);
 
         // THEN
@@ -174,15 +172,16 @@ public class TestReservationService extends AbstractServiceTest {
         // PREPARE
         Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t3));
         Reservation res2 = createReservation(1, 17, 240, Arrays.asList(t5, t6));
-
-        Mockito.when(reservationDAO.getAll()).thenReturn(Arrays.asList(res1, res2));
-
-        // WHEN
         Reservation res = createReservation(1, 19, 120, null);
         res.setQuantity(12);
 
+        Mockito.when(reservationDAO.findIn(res.getTime(), res.getDuration())).thenReturn(Arrays.asList(res1, res2));
+
+        // WHEN
         // tables for max 9 persons free
         reservationService.addReservation(res);
+
+        System.out.println(res);
     }
 
     @Test(expected = ServiceException.class)
@@ -214,6 +213,9 @@ public class TestReservationService extends AbstractServiceTest {
     public void testAddReservation_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Reservation res = new Reservation();
+        res.setTime(LocalDateTime.of(2999, 1, 1, 18, 0));
+        res.setDuration(Duration.ofMinutes(150));
+        res.setQuantity(1);
         Mockito.doThrow(new DAOException("")).when(reservationDAO).create(res);
 
         // WHEN
