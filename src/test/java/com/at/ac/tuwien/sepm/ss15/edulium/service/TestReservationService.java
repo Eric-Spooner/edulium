@@ -314,7 +314,14 @@ public class TestReservationService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testCancelReservation_shouldCancel() throws ServiceException, ValidationException, DAOException {
         // PREPARE
+        Reservation resWithId = Reservation.withIdentity(1L);
+
         Reservation res = new Reservation();
+        res.setTime(LocalDateTime.of(2999, 1, 1, 18, 0));
+        res.setDuration(Duration.ofMinutes(150));
+        res.setIdentity(resWithId.getIdentity());
+
+        Mockito.when(reservationDAO.find(resWithId)).thenReturn(Arrays.asList(res));
 
         // WHEN
         reservationService.cancelReservation(res);
@@ -327,14 +334,17 @@ public class TestReservationService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testCancelReservation_cancelCurrentReservationShouldWork() throws ServiceException, ValidationException, DAOException {
         // PREPARE
+        Reservation resWithId = Reservation.withIdentity(1L);
+
         Reservation res = new Reservation();
+        res.setIdentity(resWithId.getIdentity());
         LocalDateTime now = LocalDateTime.now();
         now.minusMinutes(10);
 
         res.setTime(now);
         res.setDuration(Duration.ofMinutes(120));
 
-        Mockito.when(reservationDAO.find(res)).thenReturn(Arrays.asList(res));
+        Mockito.when(reservationDAO.find(resWithId)).thenReturn(Arrays.asList(res));
 
         // WHEN
         reservationService.cancelReservation(res);
@@ -347,11 +357,14 @@ public class TestReservationService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testCancelReservation_cancellingPastReservationShouldFail() throws ServiceException, ValidationException, DAOException {
         // PREPARE
+        Reservation resWithId = Reservation.withIdentity(1L);
+
         Reservation res = new Reservation();
+        res.setIdentity(resWithId.getIdentity());
         res.setTime(LocalDateTime.of(1999, 1, 1, 18, 0));
         res.setDuration(Duration.ofMinutes(150));
 
-        Mockito.when(reservationDAO.find(res)).thenReturn(Arrays.asList(res));
+        Mockito.when(reservationDAO.find(resWithId)).thenReturn(Arrays.asList(res));
 
         // WHEN
         reservationService.cancelReservation(res);
@@ -373,7 +386,14 @@ public class TestReservationService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testCancelReservation_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
         // PREPARE
+        Reservation resWithId = Reservation.withIdentity(1L);
+
         Reservation res = new Reservation();
+        res.setIdentity(resWithId.getIdentity());
+        res.setTime(LocalDateTime.of(2999, 1, 1, 18, 0));
+        res.setDuration(Duration.ofMinutes(150));
+
+        Mockito.when(reservationDAO.find(resWithId)).thenReturn(Arrays.asList(res));
         Mockito.doThrow(new DAOException("")).when(reservationDAO).delete(res);
 
         // WHEN

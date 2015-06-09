@@ -62,11 +62,13 @@ class ReservationServiceImpl implements ReservationService {
 
         reservationValidator.validateForUpdate(reservation);
 
-        LocalDateTime resEndTime = reservation.getTime().plus(reservation.getDuration());
+        if(reservation.getTime() != null && reservation.getDuration() != null) {
+            LocalDateTime resEndTime = reservation.getTime().plus(reservation.getDuration());
 
-        if(resEndTime.isBefore(LocalDateTime.now())) {
-            LOGGER.error("Cannot update past reservation");
-            throw new ServiceException("Cannot update past reservation");
+            if (resEndTime.isBefore(LocalDateTime.now())) {
+                LOGGER.error("Cannot update past reservation");
+                throw new ServiceException("Cannot update past reservation");
+            }
         }
 
         try {
@@ -83,14 +85,22 @@ class ReservationServiceImpl implements ReservationService {
 
         reservationValidator.validateForDelete(reservation);
 
-        LocalDateTime resEndTime = reservation.getTime().plus(reservation.getDuration());
-
-        if(resEndTime.isBefore(LocalDateTime.now())) {
-            LOGGER.error("Cannot cancel past reservation");
-            throw new ServiceException("Cannot cancel past reservation");
-        }
-
         try {
+            List<Reservation> resList = reservationDAO.find(Reservation.withIdentity(reservation.getIdentity()));
+
+            if(resList.isEmpty()) {
+                LOGGER.error("reservation not found");
+                throw new ServiceException("reservation not found");
+            }
+
+            reservation = resList.get(0);
+            LocalDateTime resEndTime = reservation.getTime().plus(reservation.getDuration());
+
+            if(resEndTime.isBefore(LocalDateTime.now())) {
+                LOGGER.error("Cannot cancel past reservation");
+                throw new ServiceException("Cannot cancel past reservation");
+            }
+
             reservationDAO.delete(reservation);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
