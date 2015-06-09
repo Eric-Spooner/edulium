@@ -58,29 +58,6 @@ public class LoginController implements Initializable {
         userService = context.getBean("userService", UserService.class);
 
         try {
-            // Add example users
-            User test = new User();
-            test.setRole("Service");
-            test.setName("User user1");
-            test.setIdentity("user1");
-            userService.addUser(test);
-            User test2 = new User();
-            test2.setRole("Service");
-            test2.setName("User user2");
-            test2.setIdentity("user2");
-            userService.addUser(test2);
-            User test3 = new User();
-            test3.setRole("Service");
-            test3.setName("User user3");
-            test3.setIdentity("user3");
-            userService.addUser(test3);
-        } catch(ServiceException e) {
-            System.out.println(e);
-        } catch(ValidationException e) {
-            System.out.println(e);
-        }
-
-        try {
             userGP.setVgap(4);
             userGP.setHgap(238);
             int row = 0;
