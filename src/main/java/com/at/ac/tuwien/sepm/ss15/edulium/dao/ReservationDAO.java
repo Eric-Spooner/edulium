@@ -18,6 +18,7 @@ public interface ReservationDAO extends DAO<Reservation> {
      * @param duration duration of the interval
      * @return a list of reservation
      * @throws DAOException if the data couldn't be retrieved
+     * @throws ValidationException if the parameters are invalid
      */
     List<Reservation> findIn(LocalDateTime start, Duration duration) throws DAOException, ValidationException;
 }

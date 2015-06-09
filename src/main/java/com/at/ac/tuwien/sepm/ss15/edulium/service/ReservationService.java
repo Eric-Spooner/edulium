@@ -6,6 +6,8 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -50,6 +52,15 @@ public interface ReservationService extends Service {
      * @throws ServiceException if an error processing the request ocurred
      */
     List<Reservation> findReservation(Reservation matcher) throws ServiceException;
+
+    /**
+     * returns all reservations in the given interval
+     * @param start start of the interval
+     * @param duration duration of the interval
+     * @throws ServiceException if an error processing the request ocurred
+     * @throws ValidationException if the parameters are invalid
+     */
+    List<Reservation> findReservationIn(LocalDateTime start, Duration duration) throws ServiceException, ValidationException;
 
     /**
      * returns all reservations from the underlying datasource; ordered by date and time

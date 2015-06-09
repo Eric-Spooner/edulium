@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.ReservationDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
@@ -31,7 +32,7 @@ public class TestReservationService extends AbstractServiceTest {
     @Autowired
     ReservationService reservationService;
     @Mock
-    DAO<Reservation> reservationDAO;
+    ReservationDAO reservationDAO;
     @Mock
     Validator<Reservation> reservationValidator;
     @Mock
@@ -413,6 +414,38 @@ public class TestReservationService extends AbstractServiceTest {
 
         // WHEN
         reservationService.findReservation(res);
+    }
+
+    @Test
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
+    public void testFindReservationIn_shouldReturnObjects() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        LocalDateTime start = LocalDateTime.of(2015, 05, 15, 15, 00);
+        Duration duration = Duration.ofMinutes(60);
+
+        Reservation res = new Reservation();
+        Mockito.when(reservationDAO.findIn(start, duration)).thenReturn(Arrays.asList(res));
+
+        // WHEN
+        List<Reservation> reservations = reservationService.findReservationIn(start, duration);
+
+        // THEN
+        assertEquals(1, reservations.size());
+        assertTrue(reservations.contains(res));
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
+    public void testFindReservationIn_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        LocalDateTime start = LocalDateTime.of(2015, 05, 15, 15, 00);
+        Duration duration = Duration.ofMinutes(60);
+
+        Reservation res = new Reservation();
+        Mockito.doThrow(new DAOException("")).when(reservationDAO).findIn(start, duration);
+
+        // WHEN
+        reservationService.findReservationIn(start, duration);
     }
 
     @Test

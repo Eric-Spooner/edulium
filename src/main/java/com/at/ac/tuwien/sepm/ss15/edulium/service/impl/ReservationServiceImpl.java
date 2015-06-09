@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.ReservationDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
@@ -25,7 +26,7 @@ import java.util.List;
 class ReservationServiceImpl implements ReservationService {
     private static final Logger LOGGER = LogManager.getLogger(MenuServiceImpl.class);
     @Autowired
-    private DAO<Reservation> reservationDAO;
+    private ReservationDAO reservationDAO;
     @Autowired
     private Validator<Reservation> reservationValidator;
     @Autowired
@@ -103,6 +104,18 @@ class ReservationServiceImpl implements ReservationService {
 
         try {
             return reservationDAO.find(matcher);
+        } catch (DAOException e) {
+            LOGGER.error("An Error has occurred in the data access object", e);
+            throw new ServiceException("An Error has occurred in the data access object");
+        }
+    }
+
+    @Override
+    public List<Reservation> findReservationIn(LocalDateTime start, Duration duration) throws ServiceException, ValidationException {
+        LOGGER.debug("Entering findReservationIn with parameters: " + start + " / " + duration);
+
+        try {
+            return reservationDAO.findIn(start, duration);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
             throw new ServiceException("An Error has occurred in the data access object");
