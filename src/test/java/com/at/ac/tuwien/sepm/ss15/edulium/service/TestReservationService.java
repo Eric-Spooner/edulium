@@ -94,65 +94,6 @@ public class TestReservationService extends AbstractServiceTest {
 
     @Test
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
-    public void testGetFreeTables_shouldReturnTables1() throws ServiceException, ValidationException, DAOException {
-        // PREPARE
-        Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t1));
-        Reservation res2 = createReservation(1, 18, 120, Arrays.asList(t5));
-
-        Mockito.when(reservationDAO.getAll()).thenReturn(Arrays.asList(res1, res2));
-
-        Reservation res = createReservation(1, 18, 150, null);
-        List<Table> tables = reservationService.getFreeTables(res);
-
-        assertEquals(4, tables.size());
-        assertTrue(tables.contains(t2));
-        assertTrue(tables.contains(t3));
-        assertTrue(tables.contains(t4));
-        assertTrue(tables.contains(t6));
-    }
-
-    @Test(expected = ServiceException.class)
-    @WithMockUser(username = "servicetester", roles={"SERVICE"})
-    public void testGetFreeTables_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
-        // PREPARE
-        Reservation res = new Reservation();
-        Mockito.doThrow(new DAOException("")).when(reservationDAO).create(res);
-
-        // WHEN
-        reservationService.getFreeTables(res);
-    }
-
-    @Test(expected = ValidationException.class)
-    @WithMockUser(username = "servicetester", roles={"MANAGER"})
-    public void testGetFreeTables_withNullObjectShouldFail() throws ServiceException, ValidationException, DAOException {
-        // WHEN
-        reservationService.getFreeTables(null);
-    }
-
-    @Test(expected = ValidationException.class)
-    @WithMockUser(username = "servicetester", roles={"MANAGER"})
-    public void testGetFreeTables_withoutTimeShouldFail() throws ServiceException, ValidationException, DAOException {
-        // PREPARE
-        Reservation res = new Reservation();
-        res.setDuration(Duration.ofMinutes(90));
-
-        // WHEN
-        reservationService.getFreeTables(res);
-    }
-
-    @Test(expected = ValidationException.class)
-    @WithMockUser(username = "servicetester", roles={"MANAGER"})
-    public void testGetFreeTables_withoutDurationShouldFail() throws ServiceException, ValidationException, DAOException {
-        // PREPARE
-        Reservation res = new Reservation();
-        res.setTime(LocalDateTime.of(2099, 1, 1, 18, 30));
-
-        // WHEN
-        reservationService.getFreeTables(res);
-    }
-
-    @Test
-    @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testAddReservation_shouldCreateReservation1() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t1));
@@ -217,7 +158,7 @@ public class TestReservationService extends AbstractServiceTest {
         for(Table t : res.getTables()) {
             seats += t.getSeats();
         }
-        assertEquals(12, seats);
+        assertTrue(seats >= res.getQuantity());
 
         // check if reservation is stored
         Mockito.verify(reservationDAO).create(res);

@@ -16,18 +16,13 @@ import java.util.List;
 /**
  * implementation of the ReservationService
  */
-public class ReservationServiceImpl implements ReservationService {
+class ReservationServiceImpl implements ReservationService {
     @Autowired
     DAO<Reservation> reservationDAO;
     @Autowired
     Validator<Reservation> reservationValidator;
     @Autowired
     InteriorService interiorService;
-
-    @Override
-    public List<Table> getFreeTables(Reservation reservation) throws ServiceException, ValidationException {
-        return null;
-    }
 
     @Override
     public void addReservation(Reservation reservation) throws ServiceException, ValidationException {

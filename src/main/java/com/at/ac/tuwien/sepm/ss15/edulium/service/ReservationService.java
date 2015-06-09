@@ -12,15 +12,6 @@ import java.util.List;
  * Service handling the reservations for tables
  */
 public interface ReservationService extends Service {
-    /**
-     * returns a list of tables which are free at the time of the reservation
-     * (can be used for manually selecting tables for the reservation)
-     * @param reservation reservation
-     * @return list of tables
-     * @throws ServiceException if an error in the service or persistence layer has occurred
-     * @throws ValidationException if the reservation object is not valid for this action
-     */
-    List<Table> getFreeTables(Reservation reservation) throws ServiceException, ValidationException;
 
     /**
      * adds the reservation to the underlying datasource;
