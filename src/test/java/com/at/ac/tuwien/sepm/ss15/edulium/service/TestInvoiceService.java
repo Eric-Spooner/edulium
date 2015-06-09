@@ -19,21 +19,40 @@ public class TestInvoiceService extends AbstractServiceTest {
     @Autowired
     private DAO<User> userDAO;
 
-    private User creator;
+    private User creator1;
+    private User creator2;
+    private User creator3;
 
     @Before
     public void setUp() throws ValidationException, DAOException {
-        creator = new User();
-        creator.setIdentity("A");
-        creator.setName("Bob");
-        creator.setRole("ROLE");
+        // creator 1
+        creator1 = new User();
+        creator1.setIdentity("A");
+        creator1.setName("Bob");
+        creator1.setRole("ROLE1");
 
-        userDAO.create(creator);
+        // creator 2
+        creator2 = new User();
+        creator2.setIdentity("B");
+        creator2.setName("Alice");
+        creator2.setRole("ROLE2");
+
+        // creator 3
+        creator3 = new User();
+        creator3.setIdentity("C");
+        creator3.setName("Joe");
+        creator3.setRole("ROLE3");
+
+        userDAO.create(creator1);
+        userDAO.create(creator2);
+        userDAO.create(creator3);
     }
 
     @After
     public void tearDown() throws ValidationException, DAOException {
-        userDAO.delete(creator);
+        userDAO.delete(creator1);
+        userDAO.delete(creator2);
+        userDAO.delete(creator3);
     }
 
     @Test
@@ -42,7 +61,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
-        invoice.setCreator(creator);
+        invoice.setCreator(creator1);
 
         // WHEN
         invoiceService.addInvoice(invoice);
@@ -108,7 +127,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("-15.6"));
-        invoice.setCreator(creator);
+        invoice.setCreator(creator1);
 
         // WHEN/THEN
         invoiceService.addInvoice(invoice);
@@ -119,7 +138,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         // GIVEN
         Invoice invoice = new Invoice();
         invoice.setGross(new BigDecimal("-15.6"));
-        invoice.setCreator(creator);
+        invoice.setCreator(creator1);
 
         // WHEN/THEN
         invoiceService.addInvoice(invoice);
@@ -130,7 +149,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         // GIVEN
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
-        invoice.setCreator(creator);
+        invoice.setCreator(creator1);
 
         // WHEN/THEN
         invoiceService.addInvoice(invoice);
@@ -142,7 +161,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
-        invoice.setCreator(creator);
+        invoice.setCreator(creator1);
         invoiceService.addInvoice(invoice);
 
         // update object
@@ -185,7 +204,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
-        invoice.setCreator(creator);
+        invoice.setCreator(creator1);
         invoiceService.addInvoice(invoice);
 
         // update object
@@ -202,7 +221,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
-        invoice.setCreator(creator);
+        invoice.setCreator(creator1);
         invoiceService.addInvoice(invoice);
 
         // update object
@@ -219,7 +238,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
-        invoice.setCreator(creator);
+        invoice.setCreator(creator1);
         invoiceService.addInvoice(invoice);
 
         // update object
@@ -235,7 +254,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
-        invoice.setCreator(creator);
+        invoice.setCreator(creator1);
         invoiceService.addInvoice(invoice);
 
         // update object
@@ -263,7 +282,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
-        invoice.setCreator(creator);
+        invoice.setCreator(creator1);
 
         Long identity = 1L;
 
@@ -287,7 +306,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
-        invoice.setCreator(creator);
+        invoice.setCreator(creator1);
         invoiceService.addInvoice(invoice);
 
         // WHEN
@@ -310,7 +329,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
-        invoice.setCreator(creator);
+        invoice.setCreator(creator1);
 
         // WHEN/THEN
         invoiceService.deleteInvoice(invoice);
@@ -322,7 +341,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
-        invoice.setCreator(creator);
+        invoice.setCreator(creator1);
 
         Long identity = 1L;
 
@@ -338,5 +357,119 @@ public class TestInvoiceService extends AbstractServiceTest {
 
         // WHEN/THEN
         invoiceService.deleteInvoice(invoice);
+    }
+
+    @Test
+    public void testFindInvoices_shouldFindInvoicesByIdentity() throws ServiceException, ValidationException {
+        // GIVEN
+        // Invoice 1
+        Invoice inv1 = new Invoice();
+        inv1.setTime(LocalDateTime.now());
+        inv1.setGross(new BigDecimal("51.6"));
+        inv1.setCreator(creator1);
+
+        // Invoice 2
+        Invoice inv2 = new Invoice();
+        inv2.setTime(LocalDateTime.now());
+        inv2.setGross(new BigDecimal("30"));
+        inv2.setCreator(creator2);
+
+        // invoice 3
+        Invoice inv3 = new Invoice();
+        inv3.setTime(LocalDateTime.now());
+        inv3.setGross(new BigDecimal("1.6"));
+        inv3.setCreator(creator3);
+
+        // store invoices
+        invoiceService.addInvoice(inv1);
+        invoiceService.addInvoice(inv2);
+        invoiceService.addInvoice(inv3);
+
+        // WHEN
+        List<Invoice> invoices = invoiceService.findInvoices(Invoice.withIdentity(inv1.getIdentity()));
+        // THEN
+        assertEquals(1, invoices.size());
+        assertTrue(invoices.contains(inv1));
+
+        // WHEN
+        invoices = invoiceService.findInvoices(Invoice.withIdentity(inv2.getIdentity()));
+        // THEN
+        assertEquals(1, invoices.size());
+        assertTrue(invoices.contains(inv2));
+
+        // WHEN
+        invoices = invoiceService.findInvoices(Invoice.withIdentity(inv3.getIdentity()));
+        // THEN
+        assertEquals(1, invoices.size());
+        assertTrue(invoices.contains(inv3));
+    }
+
+    @Test
+    public void testFindInvoices_shouldFindInvoicesByCreator() throws ServiceException, ValidationException {
+        // GIVEN
+        // Invoice 1
+        Invoice inv1 = new Invoice();
+        inv1.setTime(LocalDateTime.now());
+        inv1.setGross(new BigDecimal("51.6"));
+        inv1.setCreator(creator1);
+
+        // Invoice 2
+        Invoice inv2 = new Invoice();
+        inv2.setTime(LocalDateTime.now());
+        inv2.setGross(new BigDecimal("30"));
+        inv2.setCreator(creator2);
+
+        // invoice 3
+        Invoice inv3 = new Invoice();
+        inv3.setTime(LocalDateTime.now());
+        inv3.setGross(new BigDecimal("1.6"));
+        inv3.setCreator(creator3);
+
+        // store invoices
+        invoiceService.addInvoice(inv1);
+        invoiceService.addInvoice(inv2);
+        invoiceService.addInvoice(inv3);
+
+        // WHEN
+        Invoice matcher = new Invoice();
+        matcher.setCreator(User.withIdentity(creator1.getIdentity()));
+        List<Invoice> invoices = invoiceService.findInvoices(matcher);
+        // THEN
+        assertEquals(1, invoices.size());
+        assertTrue(invoices.contains(inv1));
+
+        // WHEN
+        matcher.setCreator(User.withIdentity(creator2.getIdentity()));
+        invoices = invoiceService.findInvoices(matcher);
+        // THEN
+        assertEquals(1, invoices.size());
+        assertTrue(invoices.contains(inv2));
+
+        // WHEN
+        matcher.setCreator(User.withIdentity(creator3.getIdentity()));
+        invoices = invoiceService.findInvoices(matcher);
+        // THEN
+        assertEquals(1, invoices.size());
+        assertTrue(invoices.contains(inv3));
+    }
+
+    @Test
+    public void testFindInvoices_shouldReturnEmptyListWhenSearchingNull() throws ServiceException {
+        // WHEN/THEN
+        List<Invoice> invoices = invoiceService.findInvoices(null);
+        assertTrue(invoices.isEmpty());
+    }
+
+    @Test
+    public void testFindInvoices_shouldReturnEmptyListWhenNoObjectIsStored() throws ServiceException {
+        // WHEN/THEN
+        Long identity = 1L;
+
+        while(!invoiceService.findInvoices(Invoice.withIdentity(identity)).isEmpty()) {
+            identity++;
+        }
+
+        List<Invoice> invoices = invoiceService.findInvoices(Invoice.withIdentity(identity));
+        assertTrue(invoices.isEmpty());
     }
 }
