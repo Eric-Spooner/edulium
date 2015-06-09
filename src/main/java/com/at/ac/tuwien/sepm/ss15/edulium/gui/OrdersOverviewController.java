@@ -106,11 +106,12 @@ public class OrdersOverviewController implements Initializable {
                                 buttonEntry.setOnAction(new EventHandler<ActionEvent>() {
                                     public void handle(ActionEvent t) {
                                         // Check if entry already in orders, then increase amount
-                                        /*for(OrderEntry orderEntry : orderEntries) {
+                                        for(OrderEntry orderEntry : orderEntries) {
                                             if(orderEntry.getEntryId().equals(entry.getIdentity())) {
+                                                orderEntry.setAmountLabelText(String.valueOf(Integer.valueOf(orderEntry.getAmountLabelText()) + 1));
                                                 return;
                                             }
-                                        }*/
+                                        }
                                         if(ordersGP.getRowConstraints().size() <= ordersRow) {
                                             Separator sepVert1 = new Separator();
                                             ordersGP.setRowSpan(sepVert1, ordersRow);
@@ -121,7 +122,8 @@ public class OrdersOverviewController implements Initializable {
                                         amountOrdered.setStyle("-fx-font-size: 18px;");
                                         ordersGP.add(amountOrdered, 0, ordersRow);
                                         OrderEntry orderEntry = new OrderEntry();
-                                        orderEntry.setAmount(1);
+                                        orderEntry.setAmountLabel(amountOrdered);
+                                        orderEntry.setAmountLabelText("1");
                                         orderEntry.setEntryId(entry.getIdentity());
                                         orderEntry.setRow(ordersRow);
                                         orderEntries.add(orderEntry);
@@ -132,8 +134,8 @@ public class OrdersOverviewController implements Initializable {
                                         buttonPlus.setStyle("-fx-font-size: 18px;");
                                         buttonPlus.setOnAction(new EventHandler<ActionEvent>() {
                                             public void handle(ActionEvent t) {
-                                                amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) + 1));
-                                                orderEntry.setAmount(Integer.valueOf(amountOrdered.getText()));
+                                                //amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) + 1));
+                                                orderEntry.setAmountLabelText(String.valueOf(Integer.valueOf(orderEntry.getAmountLabelText()) + 1));
                                             }
                                         });
                                         ordersGP.add(buttonPlus, 1, ordersRow);
@@ -165,8 +167,8 @@ public class OrdersOverviewController implements Initializable {
                                                     ordersGP.getRowConstraints().get(0).setMaxHeight(44);
                                                     ordersRow--;
                                                 } else {
-                                                    amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) - 1));
-                                                    orderEntry.setAmount(Integer.valueOf(amountOrdered.getText()));
+                                                    //amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) - 1));
+                                                    orderEntry.setAmountLabelText(String.valueOf(Integer.valueOf(orderEntry.getAmountLabelText()) - 1));
                                                 }
                                             }
                                         });
@@ -217,7 +219,7 @@ public class OrdersOverviewController implements Initializable {
             } catch(ServiceException e) {
                 System.out.println(e);
             }
-            out += en.getName() + ", "+entry.getAmount()+","+entry.getRow()+"\n";
+            out += en.getName() + ", "+entry.getAmountLabelText()+","+entry.getRow()+"\n";
         }
         System.out.println(out);
     }
@@ -238,7 +240,7 @@ public class OrdersOverviewController implements Initializable {
     }
 
     private class OrderEntry {
-        private int amount;
+        private Label amountLb;
         private Long EntryId;
         private int row;
 
@@ -250,12 +252,16 @@ public class OrdersOverviewController implements Initializable {
             this.row = row;
         }
 
-        public int getAmount() {
-            return amount;
+        public String getAmountLabelText() {
+            return amountLb.getText();
         }
 
-        public void setAmount(int amount) {
-            this.amount = amount;
+        public void setAmountLabel(Label amountLb) {
+            this.amountLb = amountLb;
+        }
+
+        public void setAmountLabelText(String amount) {
+            this.amountLb.setText(amount);
         }
 
         public Long getEntryId() {
