@@ -7,6 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -25,10 +26,7 @@ import javax.swing.*;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * Controller used for the Manager View
@@ -41,7 +39,7 @@ public class OrdersOverviewController implements Initializable {
     private MenuService menuService;
     private InteriorService interiorService;
     private int ordersRow = 0;
-    private ArrayList<OrderEntry> orderEntries = new ArrayList<>();
+    private LinkedList<OrderEntry> orderEntries = new LinkedList<>();
 
     @FXML
     GridPane categoriesGP;
@@ -107,6 +105,12 @@ public class OrdersOverviewController implements Initializable {
                                 buttonEntry.setStyle("-fx-font-size: 18px;");
                                 buttonEntry.setOnAction(new EventHandler<ActionEvent>() {
                                     public void handle(ActionEvent t) {
+                                        // Check if entry already in orders, then increase amount
+                                        /*for(OrderEntry orderEntry : orderEntries) {
+                                            if(orderEntry.getEntryId().equals(entry.getIdentity())) {
+                                                return;
+                                            }
+                                        }*/
                                         if(ordersGP.getRowConstraints().size() <= ordersRow) {
                                             Separator sepVert1 = new Separator();
                                             ordersGP.setRowSpan(sepVert1, ordersRow);
@@ -119,6 +123,7 @@ public class OrdersOverviewController implements Initializable {
                                         OrderEntry orderEntry = new OrderEntry();
                                         orderEntry.setAmount(1);
                                         orderEntry.setEntryId(entry.getIdentity());
+                                        orderEntry.setRow(ordersRow);
                                         orderEntries.add(orderEntry);
                                         Button buttonPlus = new Button();
                                         buttonPlus.setText("+");
@@ -128,13 +133,7 @@ public class OrdersOverviewController implements Initializable {
                                         buttonPlus.setOnAction(new EventHandler<ActionEvent>() {
                                             public void handle(ActionEvent t) {
                                                 amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) + 1));
-                                                Iterator<OrderEntry> iter = orderEntries.iterator();
-                                                while(iter.hasNext()) {
-                                                    OrderEntry current = iter.next();
-                                                    if(current.getEntryId() == orderEntry.getEntryId()) {
-                                                        current.setAmount(Integer.valueOf(amountOrdered.getText()));
-                                                    }
-                                                }
+                                                orderEntry.setAmount(Integer.valueOf(amountOrdered.getText()));
                                             }
                                         });
                                         ordersGP.add(buttonPlus, 1, ordersRow);
@@ -145,13 +144,29 @@ public class OrdersOverviewController implements Initializable {
                                         buttonMinus.setStyle("-fx-font-size: 18px;");
                                         buttonMinus.setOnAction(new EventHandler<ActionEvent>() {
                                             public void handle(ActionEvent t) {
-                                                amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) - 1));
-                                                Iterator<OrderEntry> iter = orderEntries.iterator();
-                                                while(iter.hasNext()) {
-                                                    OrderEntry current = iter.next();
-                                                    if(current.getEntryId() == orderEntry.getEntryId()) {
-                                                        current.setAmount(Integer.valueOf(amountOrdered.getText()));
+                                                // Remove order if amount = 1 and "-" pressed
+                                                if(Integer.valueOf(amountOrdered.getText()) <= 1) {
+                                                    orderEntries.remove(orderEntry);
+                                                    List<Node> children = new LinkedList<Node>(ordersGP.getChildren());
+                                                    for (Node node : children) {
+                                                        int nodeRow = GridPane.getRowIndex(node);
+                                                        if (nodeRow == orderEntry.getRow()) {
+                                                            ordersGP.getChildren().remove(node);
+                                                        }
+                                                        else if (nodeRow > orderEntry.getRow()) {
+                                                            ordersGP.setRowIndex(node, nodeRow - 1);
+                                                        }
                                                     }
+                                                    for(OrderEntry oe : orderEntries) {
+                                                        if(oe.getRow() > orderEntry.getRow()) {
+                                                            oe.setRow(oe.getRow() - 1);
+                                                        }
+                                                    }
+                                                    ordersGP.getRowConstraints().get(0).setMaxHeight(44);
+                                                    ordersRow--;
+                                                } else {
+                                                    amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) - 1));
+                                                    orderEntry.setAmount(Integer.valueOf(amountOrdered.getText()));
                                                 }
                                             }
                                         });
@@ -192,9 +207,19 @@ public class OrdersOverviewController implements Initializable {
     }
 
     public void cashButtonClicked(ActionEvent event) {
+        String out = new String();
         for(OrderEntry entry : orderEntries) {
-            System.out.println(entry.getEntryId() + ", "+entry.getAmount());
+            MenuEntry matcher = new MenuEntry();
+            matcher.setIdentity(entry.getEntryId());
+            MenuEntry en = null;
+            try {
+                en = menuService.findMenuEntry(matcher).get(0);
+            } catch(ServiceException e) {
+                System.out.println(e);
+            }
+            out += en.getName() + ", "+entry.getAmount()+","+entry.getRow()+"\n";
         }
+        System.out.println(out);
     }
 
     private Order createOrder(BigDecimal value, String additionalInformation,
@@ -215,6 +240,15 @@ public class OrdersOverviewController implements Initializable {
     private class OrderEntry {
         private int amount;
         private Long EntryId;
+        private int row;
+
+        public int getRow() {
+            return row;
+        }
+
+        public void setRow(int row) {
+            this.row = row;
+        }
 
         public int getAmount() {
             return amount;
