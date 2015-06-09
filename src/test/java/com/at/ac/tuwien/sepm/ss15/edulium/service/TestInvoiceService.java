@@ -113,4 +113,26 @@ public class TestInvoiceService extends AbstractServiceTest {
         // WHEN/THEN
         invoiceService.addInvoice(invoice);
     }
+
+    @Test(expected = ValidationException.class)
+    public void testAddInvoice_shouldFailWithNoTime() throws ServiceException, ValidationException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setGross(new BigDecimal("-15.6"));
+        invoice.setCreator(creator);
+
+        // WHEN/THEN
+        invoiceService.addInvoice(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testAddInvoice_shouldFailWithNullGrossAmount() throws ServiceException, ValidationException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setCreator(creator);
+
+        // WHEN/THEN
+        invoiceService.addInvoice(invoice);
+    }
 }
