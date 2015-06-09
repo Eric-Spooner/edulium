@@ -46,6 +46,7 @@
                         </ScrollPane>
                         <Button layoutX="498.0" layoutY="51.0" mnemonicParsing="false" onAction="#buttonEditSectionClicked" prefHeight="25.0" prefWidth="89.0" text="Edit..." AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="51.0" />
                         <Button layoutX="498.0" layoutY="89.0" mnemonicParsing="false" onAction="#buttonRemoveSectionClicked" prefHeight="25.0" prefWidth="89.0" text="Remove" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="88.0" />
+                        <Button layoutX="492.0" layoutY="316.0" mnemonicParsing="false" onAction="#btnCookView" prefHeight="31.0" prefWidth="101.0" text="Cook View" />
                      </children></AnchorPane>
             </content>
           </Tab>

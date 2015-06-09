@@ -51,6 +51,8 @@ public class ManagerController implements Initializable {
     private TaxRateService taxRateService;
     private InteriorService interiorService;
     private UserService userService;
+    private OrderService orderService;
+
 
     @FXML
     private TableView<User> tableViewEmployee;
@@ -131,6 +133,7 @@ public class ManagerController implements Initializable {
             taxRateService = context.getBean("taxRateService",  TaxRateService.class);
             interiorService = context.getBean("interiorService",  InteriorService.class);
             userService = context.getBean("userService",  UserService.class);
+            orderService = context.getBean("orderService",  OrderService.class);
 
             users = observableArrayList(userService.getAllUsers());
             tableViewEmployee.setItems(users);
@@ -974,6 +977,18 @@ public class ManagerController implements Initializable {
         } catch(ServiceException e) {
             showErrorDialog("Error", "Error", e.getMessage());
         }
+    }
+
+
+    public void btnCookView(ActionEvent actionEvent) throws IOException{
+        Stage stage = new Stage();
+        CookViewController.setThisStage(stage);
+        CookViewController.setOrderService(orderService);
+        stage.setTitle("Cook View");
+        AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/CookView.fxml"));
+        Scene scene = new Scene(myPane);
+        stage.setScene(scene);
+        stage.showAndWait();
     }
 
 

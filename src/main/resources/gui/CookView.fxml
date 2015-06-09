@@ -37,5 +37,6 @@
             <TableColumn fx:id="tableColProgTime" prefWidth="82.0" text="Time" />
          </columns>
       </TableView>
+      <Button layoutX="509.0" layoutY="461.0" mnemonicParsing="false" onAction="#btnRefresh" text="Refresh" />
    </children>
 </AnchorPane>

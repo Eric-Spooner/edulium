@@ -55,4 +55,10 @@ MERGE INTO Menu(ID,name) KEY(ID) VALUES (4, 'Bananen Menu');
 
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (4,3,3);
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (4,4,0.5);
->>>>>>> eric/service/order
+
+MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, state)
+KEY (id, table_section, table_number) VALUES (1, 1, 1, 1, 10, 0.01, 'QUEUED');
+MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, state)
+KEY (id, table_section, table_number) VALUES (2, 2, 2, 2, 10, 0.01, 'QUEUED');
+MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, info, state)
+KEY (id, table_section, table_number) VALUES (3, 2, 2, 3, 10, 0.01, 'Info' , 'QUEUED');
