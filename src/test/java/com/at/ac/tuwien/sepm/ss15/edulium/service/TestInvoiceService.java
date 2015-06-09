@@ -135,4 +135,125 @@ public class TestInvoiceService extends AbstractServiceTest {
         // WHEN/THEN
         invoiceService.addInvoice(invoice);
     }
+
+    @Test
+    public void testUpdateInvoice_shouldUpdateInvoice() throws ServiceException, ValidationException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(creator);
+        invoiceService.addInvoice(invoice);
+
+        // update object
+        invoice.setGross(new BigDecimal("22"));
+
+        // WHEN
+        invoiceService.updateInvoice(invoice);
+
+        // THEN
+        // check if entry was updated
+        List<Invoice> invoices = invoiceService.findInvoices(Invoice.withIdentity(invoice.getIdentity()));
+        assertEquals(1, invoices.size());
+        assertEquals(invoice, invoices.get(0));
+    }
+
+    @Test
+    public void testUpdateInvoice_shouldUpdateInvoiceWithoutUser() throws ServiceException, ValidationException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoiceService.addInvoice(invoice);
+
+        // update object
+        invoice.setGross(new BigDecimal("22"));
+
+        // WHEN
+        invoiceService.updateInvoice(invoice);
+
+        // THEN
+        // check if entry was updated
+        List<Invoice> invoices = invoiceService.findInvoices(Invoice.withIdentity(invoice.getIdentity()));
+        assertEquals(1, invoices.size());
+        assertEquals(invoice, invoices.get(0));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdateInvoice_shouldFailWithoutIdentity() throws ServiceException, ValidationException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(creator);
+        invoiceService.addInvoice(invoice);
+
+        // update object
+        invoice.setIdentity(null);
+        invoice.setGross(new BigDecimal("29"));
+
+        // WHEN/THEN
+        invoiceService.updateInvoice(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdateInvoice_shouldFailWithoutTime() throws ServiceException, ValidationException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(creator);
+        invoiceService.addInvoice(invoice);
+
+        // update object
+        invoice.setTime(null);
+        invoice.setGross(new BigDecimal("29"));
+
+        // WHEN/THEN
+        invoiceService.updateInvoice(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdateInvoice_shouldFailWithoutGrossAmount() throws ServiceException, ValidationException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(creator);
+        invoiceService.addInvoice(invoice);
+
+        // update object
+        invoice.setGross(null);
+
+        // WHEN/THEN
+        invoiceService.updateInvoice(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdateInvoice_shouldFailWithNegativeGrossAmount() throws ServiceException, ValidationException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(creator);
+        invoiceService.addInvoice(invoice);
+
+        // update object
+        invoice.setGross(new BigDecimal("-29"));
+
+        // WHEN/THEN
+        invoiceService.updateInvoice(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdateInvoice_shouldFailWithEmptyObject() throws ServiceException, ValidationException {
+        // WHEN/THEN
+        invoiceService.updateInvoice(new Invoice());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testUpdateInvoice_shouldFailWithNullObject() throws ServiceException, ValidationException {
+        // WHEN/THEN
+        invoiceService.updateInvoice(null);
+    }
 }
