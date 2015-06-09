@@ -20,7 +20,7 @@ public class Main extends Application {
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Edulium.xml");
 
         AuthenticationManager authenticationManager = context.getBean(AuthenticationManager.class);
-        Authentication request = new UsernamePasswordAuthenticationToken("servicetester", "");
+        Authentication request = new UsernamePasswordAuthenticationToken("daotester", "");
         Authentication result = authenticationManager.authenticate(request);
         SecurityContextHolder.getContext().setAuthentication(result);
 

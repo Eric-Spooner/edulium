@@ -237,7 +237,7 @@ public class OrdersOverviewController implements Initializable {
         System.out.println(out);
 
         // create table and section for testing
-        /*try {
+        try {
             Section section = new Section();
             section.setIdentity(1L);
             section.setName("A");
@@ -256,7 +256,7 @@ public class OrdersOverviewController implements Initializable {
             System.out.println(e);
         } catch(ValidationException e) {
             System.out.println(e);
-        }*/
+        }
     }
 
     private Order createOrder(BigDecimal value, String additionalInformation,
