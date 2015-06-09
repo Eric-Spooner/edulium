@@ -1,14 +1,18 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
  * Generic DAO interface
  */
-public interface DAO<T> extends ImmutableDAO<T> {
+@Repository
+@Transactional(propagation = Propagation.MANDATORY)
+public interface ImmutableDAO<T> {
 
     /**
      * writes the object to the underlying datasource;
@@ -19,22 +23,7 @@ public interface DAO<T> extends ImmutableDAO<T> {
      * @param object object to store
      * @throws DAOException if the object couldn't be stored
      */
-    @Override
     void create(T object) throws DAOException, ValidationException;
-
-    /**
-     * updates data of the object in the underlying datasource
-     * @param object object to update
-     * @throws DAOException if the object couldn't be updated
-     */
-    void update(T object) throws DAOException, ValidationException;
-
-    /**
-     * removes the object from the underlying datasource
-     * @param object object to remove
-     * @throws DAOException if the object couldn't be removed
-     */
-    void delete(T object) throws DAOException, ValidationException;
 
     /**
      * returns all objects which parameters match the
@@ -45,24 +34,13 @@ public interface DAO<T> extends ImmutableDAO<T> {
      * @return a list of matched objects
      * @throws DAOException if the data couldn't be retrieved
      */
-    @Override
     List<T> find(T object) throws DAOException;
 
     /**
      * @return returns all stored objects
      * @throws DAOException if the data couldn't be retrieved
      */
-    @Override
     List<T> getAll() throws DAOException;
-
-    /**
-     * @param object object to get the history for
-     * @return returns the history of changes for the object
-     * @throws DAOException if the data couldn't be retrieved
-     * @throws ValidationException if the object parameters are
-     *         not valid for this action
-     */
-    List<History<T>> getHistory(T object) throws DAOException, ValidationException;
 
     /**
      * populates the given list of objects (ignores if the object is marked as deleted)
@@ -71,6 +49,5 @@ public interface DAO<T> extends ImmutableDAO<T> {
      * @throws DAOException if the data couldn't be retrieved
      * @throws ValidationException if not all objects have a valid identity
      */
-    @Override
     List<T> populate(List<T> objects) throws DAOException, ValidationException;
 }
