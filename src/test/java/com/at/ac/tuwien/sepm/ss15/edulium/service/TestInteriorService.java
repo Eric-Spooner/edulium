@@ -67,7 +67,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testAddTable_shouldAddTable() throws ServiceException {
+    public void testAddTable_shouldAddTable() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setNumber((long) 1);
@@ -92,7 +92,7 @@ public class TestInteriorService extends AbstractServiceTest {
 
     /* user is optional */
     @Test
-    public void testAddTable_shouldAddTableWithoutUser() throws ServiceException {
+    public void testAddTable_shouldAddTableWithoutUser() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setNumber((long) 1);
@@ -116,7 +116,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test(expected = ServiceException.class)
-    public void testAddTable_addingTwoTablesWithSameIdentityShouldFail() throws ServiceException {
+    public void testAddTable_addingTwoTablesWithSameIdentityShouldFail() throws ServiceException, ValidationException {
         // PREPARE
         Table table1 = new Table();
         table1.setNumber(1L);
@@ -148,8 +148,8 @@ public class TestInteriorService extends AbstractServiceTest {
         interiorService.addTable(table2);
     }
 
-    @Test(expected = ServiceException.class)
-    public void testAddTable_addingTableWithoutNumberShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testAddTable_addingTableWithoutNumberShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setSection(section1);
@@ -162,8 +162,8 @@ public class TestInteriorService extends AbstractServiceTest {
         interiorService.addTable(table);
     }
 
-    @Test(expected = ServiceException.class)
-    public void testAddTable_addingTableWithoutSectionShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testAddTable_addingTableWithoutSectionShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setNumber((long) 1);
@@ -176,8 +176,8 @@ public class TestInteriorService extends AbstractServiceTest {
         interiorService.addTable(table);
     }
 
-    @Test(expected = ServiceException.class)
-    public void testAddTable_addingInvalidTableShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testAddTable_addingInvalidTableShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setNumber(1L);
@@ -187,8 +187,8 @@ public class TestInteriorService extends AbstractServiceTest {
         interiorService.addTable(table);
     }
 
-    @Test(expected = ServiceException.class)
-    public void testAddTable_addingNullTableShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testAddTable_addingNullTableShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Table table = null;
 
@@ -197,7 +197,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testUpdateTable_shouldUpdateTable() throws ServiceException {
+    public void testUpdateTable_shouldUpdateTable() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setNumber((long) 1);
@@ -230,7 +230,7 @@ public class TestInteriorService extends AbstractServiceTest {
 
     /* user is optional */
     @Test
-    public void testUpdateTable_shouldUpdateTableWithoutUser() throws ServiceException {
+    public void testUpdateTable_shouldUpdateTableWithoutUser() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setNumber((long) 1);
@@ -261,8 +261,8 @@ public class TestInteriorService extends AbstractServiceTest {
         Assert.assertEquals(table, storedObjects.get(0));
     }
 
-    @Test(expected = ServiceException.class)
-    public void testUpdateTable_updatingTableWithoutNumberShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testUpdateTable_updatingTableWithoutNumberShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setSeats(3);
@@ -275,8 +275,8 @@ public class TestInteriorService extends AbstractServiceTest {
         interiorService.updateTable(table);
     }
 
-    @Test(expected = ServiceException.class)
-    public void testUpdateTable_updatingTableWithoutSectionShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testUpdateTable_updatingTableWithoutSectionShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setNumber(1L);
@@ -289,8 +289,8 @@ public class TestInteriorService extends AbstractServiceTest {
         interiorService.updateTable(table);
     }
 
-    @Test(expected = ServiceException.class)
-    public void testUpdateTable_updatingInvalidTableShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testUpdateTable_updatingInvalidTableShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setNumber(1L);
@@ -300,8 +300,8 @@ public class TestInteriorService extends AbstractServiceTest {
         interiorService.updateTable(table);
     }
 
-    @Test(expected = ServiceException.class)
-    public void testUpdateTable_updatingNullTableShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testUpdateTable_updatingNullTableShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Table table = null;
 
@@ -310,7 +310,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test(expected = ServiceException.class)
-    public void testUpdateTable_updatingNotPersistentTableShouldFail() throws ServiceException {
+    public void testUpdateTable_updatingNotPersistentTableShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Table notPersitentTable = new Table();
         Long number = (long) 1;
@@ -341,7 +341,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testDeleteTable_shouldDeleteTable() throws ServiceException {
+    public void testDeleteTable_shouldDeleteTable() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setNumber((long) 2);
@@ -363,8 +363,8 @@ public class TestInteriorService extends AbstractServiceTest {
         Assert.assertEquals(0, interiorService.findTables(Table.withIdentity(section1, 2L)).size());
     }
 
-    @Test(expected = ServiceException.class)
-    public void testDeleteTable_deletingTableWithoutNumberShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testDeleteTable_deletingTableWithoutNumberShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setSection(section1);
@@ -377,8 +377,8 @@ public class TestInteriorService extends AbstractServiceTest {
         interiorService.deleteTable(table);
     }
 
-    @Test(expected = ServiceException.class)
-    public void testDeleteTable_deletingTableWithoutSectionShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testDeleteTable_deletingTableWithoutSectionShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setNumber(1L);
@@ -392,7 +392,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test(expected = ServiceException.class)
-    public void testDeleteTable_deletingNotPersistentTableShouldFail() throws ServiceException {
+    public void testDeleteTable_deletingNotPersistentTableShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         Long number = (long) 1;
@@ -415,7 +415,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testFindTable_byIdentityShouldReturnTable() throws ServiceException {
+    public void testFindTable_byIdentityShouldReturnTable() throws ServiceException, ValidationException {
         // PREPARE
         Table table1 = new Table();
         table1.setSeats(3);
@@ -465,7 +465,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testFindTable_byNumberShouldReturnTable() throws ServiceException {
+    public void testFindTable_byNumberShouldReturnTable() throws ServiceException, ValidationException {
         // PREPARE
         Table table1 = new Table();
         table1.setSeats(3);
@@ -513,7 +513,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testFindTable_bySectionShouldReturnTable() throws ServiceException {
+    public void testFindTable_bySectionShouldReturnTable() throws ServiceException, ValidationException {
         // PREPARE
         Table table1 = new Table();
         table1.setSeats(3);
@@ -561,7 +561,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testFindTable_byUserShouldReturnTable() throws ServiceException {
+    public void testFindTable_byUserShouldReturnTable() throws ServiceException, ValidationException {
         // PREPARE
         Table table1 = new Table();
         table1.setSeats(3);
@@ -609,7 +609,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testFindTable_bySeatsShouldReturnTable() throws ServiceException {
+    public void testFindTable_bySeatsShouldReturnTable() throws ServiceException, ValidationException {
         // PREPARE
         Table table1 = new Table();
         table1.setSeats(3);
@@ -657,7 +657,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testFindTable_byRowShouldReturnTable() throws ServiceException {
+    public void testFindTable_byRowShouldReturnTable() throws ServiceException, ValidationException {
         // PREPARE
         Table table1 = new Table();
         table1.setSeats(3);
@@ -705,7 +705,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testFindTable_byColumnShouldReturnTable() throws ServiceException {
+    public void testFindTable_byColumnShouldReturnTable() throws ServiceException, ValidationException {
         // PREPARE
         Table table1 = new Table();
         table1.setSeats(3);
@@ -787,7 +787,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testGetAllTables_shouldReturnTables() throws ServiceException {
+    public void testGetAllTables_shouldReturnTables() throws ServiceException, ValidationException {
         // GIVEN
         Table matcher = new Table();
         Table table1 = new Table();
@@ -830,7 +830,7 @@ public class TestInteriorService extends AbstractServiceTest {
      * 3. add the table again (same section and same number)
      */
     @Test
-    public void testAddTable_shouldAddRemoveAndReaddTable() throws ServiceException {
+    public void testAddTable_shouldAddRemoveAndReaddTable() throws ServiceException, ValidationException {
         // GIVEN
         Table table = new Table();
         table.setNumber(1L);
@@ -857,7 +857,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
     
     @Test
-    public void testAddSection_shouldAddSection() throws ServiceException {
+    public void testAddSection_shouldAddSection() throws ServiceException, ValidationException {
         // GIVEN
         Section section = new Section();
         section.setName("section");
@@ -875,8 +875,8 @@ public class TestInteriorService extends AbstractServiceTest {
         Assert.assertEquals(section, storedObjects.get(0));
     }
 
-    @Test(expected = ServiceException.class)
-    public void testAddSection_addingInvalidSectionShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testAddSection_addingInvalidSectionShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Section section = new Section();
 
@@ -888,8 +888,8 @@ public class TestInteriorService extends AbstractServiceTest {
         }
     }
 
-    @Test(expected = ServiceException.class)
-    public void testAddSection_addingNullSectionShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testAddSection_addingNullSectionShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Section section = null;
 
@@ -898,7 +898,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testUpdateSection_shouldUpdateSection() throws ServiceException {
+    public void testUpdateSection_shouldUpdateSection() throws ServiceException, ValidationException {
         // PREPARE
         Section section = new Section();
         section.setName("section");
@@ -920,8 +920,8 @@ public class TestInteriorService extends AbstractServiceTest {
         Assert.assertEquals(section, storedObjects.get(0));
     }
 
-    @Test(expected = ServiceException.class)
-    public void testUpdateSection_updatingSectionWithIdentityNullShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testUpdateSection_updatingSectionWithIdentityNullShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Section section = new Section();
         section.setName("section");
@@ -930,8 +930,8 @@ public class TestInteriorService extends AbstractServiceTest {
         interiorService.updateSection(section);
     }
 
-    @Test(expected = ServiceException.class)
-    public void testUpdateSection_updatingInvalidSectionShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testUpdateSection_updatingInvalidSectionShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Section section = new Section();
 
@@ -939,8 +939,8 @@ public class TestInteriorService extends AbstractServiceTest {
         interiorService.updateSection(section);
     }
 
-    @Test(expected = ServiceException.class)
-    public void testUpdateSection_updatingNullSectionShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testUpdateSection_updatingNullSectionShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Section section = null;
 
@@ -949,7 +949,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test(expected = ServiceException.class)
-    public void testUpdateSection_updatingNotPersistentSectionShouldFail() throws ServiceException {
+    public void testUpdateSection_updatingNotPersistentSectionShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Section notPersitentSection = new Section();
         Long identity = (long) 1;
@@ -975,7 +975,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testDeleteSection_shouldDeleteSection() throws ServiceException {
+    public void testDeleteSection_shouldDeleteSection() throws ServiceException, ValidationException {
         // PREPARE
         Section section = new Section();
         section.setName("section");
@@ -992,8 +992,8 @@ public class TestInteriorService extends AbstractServiceTest {
         Assert.assertEquals(0, interiorService.findSections(section).size());
     }
 
-    @Test(expected = ServiceException.class)
-    public void testDeleteSection_deletingSectionWithIdentityNullShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testDeleteSection_deletingSectionWithIdentityNullShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Section section = new Section();
 
@@ -1001,8 +1001,8 @@ public class TestInteriorService extends AbstractServiceTest {
         interiorService.deleteSection(section);
     }
 
-    @Test(expected = ServiceException.class)
-    public void testDeleteSection_deletingNullSectionShouldFail() throws ServiceException {
+    @Test(expected = ValidationException.class)
+    public void testDeleteSection_deletingNullSectionShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Section section = null;
 
@@ -1011,7 +1011,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test(expected = ServiceException.class)
-    public void testDeleteSection_deletingNotPersistentSectionShouldFail() throws ServiceException {
+    public void testDeleteSection_deletingNotPersistentSectionShouldFail() throws ServiceException, ValidationException {
         // GIVEN
         Section section = new Section();
         Long identity = (long) 1;
@@ -1033,7 +1033,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testFindSection_byIdentityShouldReturnSection() throws ServiceException {
+    public void testFindSection_byIdentityShouldReturnSection() throws ServiceException, ValidationException {
         // GIVEN
         Section matcher = new Section();
         Section section1 = new Section();
@@ -1069,7 +1069,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testFindSection_byNameShouldReturnSections() throws ServiceException {
+    public void testFindSection_byNameShouldReturnSections() throws ServiceException, ValidationException {
         // GIVEN
         Section matcher = new Section();
         Section section1 = new Section();
@@ -1130,7 +1130,7 @@ public class TestInteriorService extends AbstractServiceTest {
     }
 
     @Test
-    public void testGetAllSections_shouldReturnSections() throws ServiceException {
+    public void testGetAllSections_shouldReturnSections() throws ServiceException, ValidationException {
         // GIVEN
         Section section1 = new Section();
         Section section2 = new Section();

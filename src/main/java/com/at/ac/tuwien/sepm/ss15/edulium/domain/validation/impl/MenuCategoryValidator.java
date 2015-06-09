@@ -7,7 +7,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 /**
  * validator implementation for the MenuCategory domain object
  */
-public class MenuCategoryValidator implements Validator<MenuCategory> {
+class MenuCategoryValidator implements Validator<MenuCategory> {
 
     @Override
     public void validateForCreate(MenuCategory menuCategory) throws ValidationException {
