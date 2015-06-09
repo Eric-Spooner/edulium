@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -47,6 +48,10 @@ public class OrdersOverviewController implements Initializable {
     GridPane ordersGP;
     @FXML
     VBox entriesVB;
+    @FXML
+    AnchorPane orderAnchor;
+    @FXML
+    ScrollPane ordersSP;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -54,6 +59,7 @@ public class OrdersOverviewController implements Initializable {
         orderService = context.getBean("orderService", OrderService.class);
         menuService = context.getBean("menuService", MenuService.class);
         interiorService = context.getBean("interiorService", InteriorService.class);
+        ordersSP.setStyle("-fx-font-size: 40px;");
 
         try {
             Section section = new Section();
@@ -117,6 +123,10 @@ public class OrdersOverviewController implements Initializable {
                                             ordersGP.setRowSpan(sepVert1, ordersRow);
                                         }
                                         ordersGP.setMinHeight((ordersRow+1)*44);
+                                        if(!orderEntries.isEmpty()) {
+                                            orderAnchor.setMinHeight(orderEntries.get(orderEntries.size() - 1).getRow() * 44 + 120);
+                                            orderAnchor.setMaxHeight(orderEntries.get(orderEntries.size() - 1).getRow() * 44 + 120);
+                                        }
                                         Label amountOrdered = new Label();
                                         amountOrdered.setText("1");
                                         amountOrdered.setStyle("-fx-font-size: 18px;");
@@ -165,6 +175,8 @@ public class OrdersOverviewController implements Initializable {
                                                         }
                                                     }
                                                     ordersGP.getRowConstraints().get(0).setMaxHeight(44);
+                                                    orderAnchor.setMinHeight(orderEntries.get(orderEntries.size()-1).getRow()*44+88);
+                                                    orderAnchor.setMaxHeight(orderEntries.get(orderEntries.size()-1).getRow()*44+88);
                                                     ordersRow--;
                                                 } else {
                                                     //amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) - 1));
