@@ -256,4 +256,87 @@ public class TestInvoiceService extends AbstractServiceTest {
         // WHEN/THEN
         invoiceService.updateInvoice(null);
     }
+
+    @Test(expected = ServiceException.class)
+    public void testUpdateInvoice_updatingNotPersistentObjectShouldFail() throws ServiceException, ValidationException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(creator);
+
+        Long identity = 1L;
+
+        try {
+            while (!invoiceService.findInvoices(Invoice.withIdentity(identity)).isEmpty()) {
+                identity++;
+            }
+        } catch(ServiceException e) {
+            fail();
+        }
+
+        invoice.setIdentity(identity);
+
+        // WHEN/THEN
+        invoiceService.updateInvoice(invoice);
+    }
+
+    @Test
+    public void testDeleteInvoice_shouldDeleteInvoice() throws ServiceException, ValidationException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(creator);
+        invoiceService.addInvoice(invoice);
+
+        // WHEN
+        invoiceService.deleteInvoice(Invoice.withIdentity(invoice.getIdentity()));
+
+        // THEN
+        List<Invoice> invoices = invoiceService.findInvoices(Invoice.withIdentity(invoice.getIdentity()));
+        assertEquals(0, invoices.size());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testDeleteInvoice_shouldFailWithNullObject() throws ServiceException, ValidationException {
+        // WHEN/THEN
+        invoiceService.deleteInvoice(null);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testDeleteInvoice_shouldFailWithoutIdentity() throws ServiceException, ValidationException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(creator);
+
+        // WHEN/THEN
+        invoiceService.deleteInvoice(invoice);
+    }
+
+    @Test(expected = ServiceException.class)
+    public void testDeleteInvoice_deletingNotPersistentObjectShouldFail() throws ServiceException, ValidationException {
+        // GIVEN
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(creator);
+
+        Long identity = 1L;
+
+        try {
+            while (!invoiceService.findInvoices(Invoice.withIdentity(identity)).isEmpty()) {
+                identity++;
+            }
+        } catch(ServiceException e) {
+            fail();
+        }
+
+        invoice.setIdentity(identity);
+
+        // WHEN/THEN
+        invoiceService.deleteInvoice(invoice);
+    }
 }
