@@ -242,6 +242,26 @@ public class TestReservationService extends AbstractServiceTest {
         Mockito.verify(reservationDAO).update(res);
     }
 
+    @Test
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
+    public void testUpdateReservation_updateCurrentReservationShouldWork() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Reservation res = new Reservation();
+        LocalDateTime now = LocalDateTime.now();
+        now.minusMinutes(10);
+
+        res.setTime(now);
+        res.setDuration(Duration.ofMinutes(120));
+
+        Mockito.when(reservationDAO.find(res)).thenReturn(Arrays.asList(res));
+
+        // WHEN
+        reservationService.updateReservation(res);
+
+        // THEN
+        Mockito.verify(reservationDAO).update(res);
+    }
+
     @Test(expected = ValidationException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateReservation_withInvalidObjectShouldFail() throws ServiceException, ValidationException {
@@ -294,6 +314,26 @@ public class TestReservationService extends AbstractServiceTest {
     public void testCancelReservation_shouldCancel() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Reservation res = new Reservation();
+
+        // WHEN
+        reservationService.cancelReservation(res);
+
+        // THEN
+        Mockito.verify(reservationDAO).delete(res);
+    }
+
+    @Test
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
+    public void testCancelReservation_cancelCurrentReservationShouldWork() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Reservation res = new Reservation();
+        LocalDateTime now = LocalDateTime.now();
+        now.minusMinutes(10);
+
+        res.setTime(now);
+        res.setDuration(Duration.ofMinutes(120));
+
+        Mockito.when(reservationDAO.find(res)).thenReturn(Arrays.asList(res));
 
         // WHEN
         reservationService.cancelReservation(res);
