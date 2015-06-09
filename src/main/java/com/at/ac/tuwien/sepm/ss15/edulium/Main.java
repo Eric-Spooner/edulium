@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
         primaryStage.setWidth(300);
         primaryStage.setHeight(300);
         primaryStage.setTitle("Edulium");
