@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,23 +40,10 @@ class ReservationServiceImpl implements ReservationService {
         LOGGER.debug("Entering addReservation with parameter: " + reservation);
 
         reservationValidator.validateForCreate(reservation);
-
-        LocalDateTime resEndTime = reservation.getTime().plus(reservation.getDuration());
-
-        if (resEndTime.isBefore(LocalDateTime.now())) {
-            LOGGER.error("Cannot add past reservation");
-            throw new ServiceException("Cannot add past reservation");
-        }
+        validateReservationTime(reservation);
 
         try {
-            List<Table> tables = reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables());
-
-            if(tables.isEmpty()) {
-                LOGGER.error("Could not find any free tables");
-                throw new ServiceException("Could not find any free tables");
-            }
-
-            reservation.setTables(tables);
+            reservation.setTables(reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables()));
             reservationDAO.create(reservation);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
@@ -69,16 +57,34 @@ class ReservationServiceImpl implements ReservationService {
 
         reservationValidator.validateForUpdate(reservation);
 
-        if(reservation.getTime() != null && reservation.getDuration() != null) {
-            LocalDateTime resEndTime = reservation.getTime().plus(reservation.getDuration());
+        Reservation originalReservation = getReservationById(reservation.getIdentity());
+        validateReservationTime(originalReservation);
 
-            if (resEndTime.isBefore(LocalDateTime.now())) {
-                LOGGER.error("Cannot update past reservation");
-                throw new ServiceException("Cannot update past reservation");
-            }
+        // set time / duration for validation
+        if(reservation.getDuration() == null) {
+            reservation.setDuration(originalReservation.getDuration());
         }
 
+        if(reservation.getTime() == null) {
+            reservation.setTime(originalReservation.getTime());
+        }
+        validateReservationTime(reservation);
+
         try {
+            // check if reservation time or seats will be changed
+            if(reservation.getQuantity() != originalReservation.getQuantity() ||
+                    reservation.getTime() != originalReservation.getTime() ||
+                    reservation.getDuration() != originalReservation.getDuration()) {
+
+                // delete tables from reservation
+                Reservation tmpRes = Reservation.withIdentity(reservation.getIdentity());
+                tmpRes.setTables(new ArrayList<>());
+                reservationDAO.update(tmpRes);
+
+                // get new tables
+                reservation.setTables(reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables()));
+            }
+
             reservationDAO.update(reservation);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
@@ -92,22 +98,10 @@ class ReservationServiceImpl implements ReservationService {
 
         reservationValidator.validateForDelete(reservation);
 
+        reservation = getReservationById(reservation.getIdentity());
+        validateReservationTime(reservation);
+
         try {
-            List<Reservation> resList = reservationDAO.find(Reservation.withIdentity(reservation.getIdentity()));
-
-            if(resList.isEmpty()) {
-                LOGGER.error("reservation not found");
-                throw new ServiceException("reservation not found");
-            }
-
-            reservation = resList.get(0);
-            LocalDateTime resEndTime = reservation.getTime().plus(reservation.getDuration());
-
-            if(resEndTime.isBefore(LocalDateTime.now())) {
-                LOGGER.error("Cannot cancel past reservation");
-                throw new ServiceException("Cannot cancel past reservation");
-            }
-
             reservationDAO.delete(reservation);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
@@ -163,5 +157,31 @@ class ReservationServiceImpl implements ReservationService {
             LOGGER.error("An Error has occurred in the data access object", e);
             throw new ServiceException("An Error has occurred in the data access object");
         }
+    }
+
+    private void validateReservationTime(Reservation reservation) throws ServiceException {
+        LocalDateTime resEndTime = reservation.getTime().plus(reservation.getDuration());
+
+        if (resEndTime.isBefore(LocalDateTime.now())) {
+            LOGGER.error("cannot add/update/cancel past reservations");
+            throw new ServiceException("cannot add/update/cancel past reservations");
+        }
+    }
+
+    private Reservation getReservationById(long id) throws ServiceException {
+        List<Reservation> resList = null;
+        try {
+            resList = reservationDAO.find(Reservation.withIdentity(id));
+        } catch (DAOException e) {
+            LOGGER.error("An Error has occurred in the data access object", e);
+            throw new ServiceException("An Error has occurred in the data access object");
+        }
+
+        if(resList.isEmpty()) {
+            LOGGER.error("reservation not found");
+            throw new ServiceException("reservation not found");
+        }
+
+        return resList.get(0);
     }
 }
