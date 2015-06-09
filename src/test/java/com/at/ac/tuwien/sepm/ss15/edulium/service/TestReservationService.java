@@ -107,9 +107,11 @@ public class TestReservationService extends AbstractServiceTest {
         reservationService.addReservation(res);
 
         // THEN
-        // T6 is the only free table which can host exactly 4 persons
-        assertEquals(1, res.getTables().size());
-        assertTrue(res.getTables().contains(t6));
+        int seats = 0;
+        for(Table t : res.getTables()) {
+            seats += t.getSeats();
+        }
+        assertTrue(seats >= res.getQuantity());
 
         // check if reservation is stored
         Mockito.verify(reservationDAO).create(res);
@@ -129,10 +131,11 @@ public class TestReservationService extends AbstractServiceTest {
         reservationService.addReservation(res);
 
         // THEN
-        // no single table for 6 persons is available; should choose tables which are next to each other
-        assertEquals(2, res.getTables().size());
-        assertTrue(res.getTables().contains(t1));
-        assertTrue(res.getTables().contains(t2));
+        int seats = 0;
+        for(Table t : res.getTables()) {
+            seats += t.getSeats();
+        }
+        assertTrue(seats >= res.getQuantity());
 
         // check if reservation is stored
         Mockito.verify(reservationDAO).create(res);
@@ -164,6 +167,35 @@ public class TestReservationService extends AbstractServiceTest {
         Mockito.verify(reservationDAO).create(res);
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
+    public void testAddReservation_notEnoughTablesFreeShouldFail() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t3));
+        Reservation res2 = createReservation(1, 17, 240, Arrays.asList(t5, t6));
+
+        Mockito.when(reservationDAO.getAll()).thenReturn(Arrays.asList(res1, res2));
+
+        // WHEN
+        Reservation res = createReservation(1, 19, 120, null);
+        res.setQuantity(12);
+
+        // tables for max 9 persons free
+        reservationService.addReservation(res);
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
+    public void testAddReservation_addingPastReservationShouldFail() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Reservation res = new Reservation();
+        res.setTime(LocalDateTime.of(1999, 1, 1, 18, 0));
+        res.setDuration(Duration.ofMinutes(150));
+
+        // WHEN
+        reservationService.addReservation(res);
+    }
+
     @Test(expected = ValidationException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testAddReservation_withInvalidObjectShouldFail() throws ServiceException, ValidationException {
@@ -172,6 +204,7 @@ public class TestReservationService extends AbstractServiceTest {
 
         Mockito.doThrow(new ValidationException("")).when(reservationValidator).validateForCreate(res);
 
+        // WHEN
         reservationService.addReservation(res);
     }
 
@@ -212,11 +245,26 @@ public class TestReservationService extends AbstractServiceTest {
     @Test(expected = ValidationException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateReservation_withInvalidObjectShouldFail() throws ServiceException, ValidationException {
-        // create reservation from 17:00 to 21:00
+        // PREPARE
         Reservation res = new Reservation();
 
         Mockito.doThrow(new ValidationException("")).when(reservationValidator).validateForUpdate(res);
 
+        // WHEN
+        reservationService.updateReservation(res);
+    }
+
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
+    public void testUpdateReservation_updatingPastReservationShouldFail() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Reservation res = new Reservation();
+        res.setTime(LocalDateTime.of(1999, 1, 1, 18, 0));
+        res.setDuration(Duration.ofMinutes(150));
+
+        Mockito.when(reservationDAO.find(res)).thenReturn(Arrays.asList(res));
+
+        // WHEN
         reservationService.updateReservation(res);
     }
 
@@ -254,6 +302,20 @@ public class TestReservationService extends AbstractServiceTest {
         Mockito.verify(reservationDAO).delete(res);
     }
 
+    @Test(expected = ServiceException.class)
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
+    public void testCancelReservation_cancellingPastReservationShouldFail() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Reservation res = new Reservation();
+        res.setTime(LocalDateTime.of(1999, 1, 1, 18, 0));
+        res.setDuration(Duration.ofMinutes(150));
+
+        Mockito.when(reservationDAO.find(res)).thenReturn(Arrays.asList(res));
+
+        // WHEN
+        reservationService.cancelReservation(res);
+    }
+
     @Test(expected = ValidationException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testCancelReservation_withInvalidObjectShouldFail() throws ServiceException, ValidationException {
@@ -262,6 +324,7 @@ public class TestReservationService extends AbstractServiceTest {
 
         Mockito.doThrow(new ValidationException("")).when(reservationValidator).validateForDelete(res);
 
+        // WHEN
         reservationService.cancelReservation(res);
     }
 
