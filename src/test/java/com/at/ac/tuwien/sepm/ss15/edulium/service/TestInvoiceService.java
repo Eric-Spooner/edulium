@@ -472,4 +472,40 @@ public class TestInvoiceService extends AbstractServiceTest {
         List<Invoice> invoices = invoiceService.findInvoices(Invoice.withIdentity(identity));
         assertTrue(invoices.isEmpty());
     }
+
+    @Test
+    public void testGetAllInvoices_shouldReturnAllInvoices() throws ServiceException, ValidationException {
+        // GIVEN
+        // Invoice 1
+        Invoice inv1 = new Invoice();
+        inv1.setTime(LocalDateTime.now());
+        inv1.setGross(new BigDecimal("51.6"));
+        inv1.setCreator(creator1);
+
+        // Invoice 2
+        Invoice inv2 = new Invoice();
+        inv2.setTime(LocalDateTime.now());
+        inv2.setGross(new BigDecimal("30"));
+        inv2.setCreator(creator2);
+
+        // invoice 3
+        Invoice inv3 = new Invoice();
+        inv3.setTime(LocalDateTime.now());
+        inv3.setGross(new BigDecimal("1.6"));
+        inv3.setCreator(creator3);
+
+        // store invoices
+        invoiceService.addInvoice(inv1);
+        invoiceService.addInvoice(inv2);
+        invoiceService.addInvoice(inv3);
+
+        // WHEN
+        List<Invoice> invoices = invoiceService.getAllInvoices();
+
+        // THEN
+        assertEquals(3, invoices.size());
+        assertTrue(invoices.contains(inv1));
+        assertTrue(invoices.contains(inv2));
+        assertTrue(invoices.contains(inv3));
+    }
 }
