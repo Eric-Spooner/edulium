@@ -24,18 +24,29 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.GridCell;
+import org.controlsfx.control.GridView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Supplier;
 
 /**
  * Controller used for the Manager View
@@ -45,50 +56,81 @@ public class LoginController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(LoginController.class);
 
     @FXML
-    GridPane userGP;
-    @FXML
     private ScrollPane scrollPane;
 
+    @Autowired
     private UserService userService;
-    private ArrayList<Button> buttons = new ArrayList<>();
+    @Autowired
+    private TaskScheduler taskScheduler;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    private PollingList<User> users;
+
+    private class UserButtonCell extends GridCell<User> {
+        private Button button = new Button();
+        private User user = null;
+
+        public UserButtonCell() {
+            button.setPrefSize(240, 100);
+            button.setStyle("-fx-font-size: 18px;");
+            button.setOnAction(e -> loginAs(user));
+
+            setGraphic(button);
+        }
+
+        @Override
+        public void updateIndex(int i) {
+            if (i >= 0) {
+                user = users.get(i);
+                button.setText(user.getName());
+            }
+        }
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Edulium.xml");
-        userService = context.getBean("userService", UserService.class);
+        users = new PollingList<>(taskScheduler);
+        users.setInterval(1000);
+        users.setSupplier(new Supplier<List<User>>() {
+            @Override
+            public List<User> get() {
+                try {
+                    return userService.getAllUsers();
+                } catch (ServiceException e) {
+                    LOGGER.error("Getting all users via user supplier has failed", e);
+                    return null;
+                }
+            }
+        });
+        users.startPolling();
+
+        GridView<User> gridView = new GridView<>(users);
+        gridView.setCellFactory(view -> new UserButtonCell());
+        gridView.setCellWidth(240);
+        gridView.setCellHeight(100);
+
+        scrollPane.setContent(gridView);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setStyle("-fx-font-size: 40px;");
+    }
+
+    private void loginAs(User user) {
+        assert user != null;
 
         try {
-            userGP.setVgap(4);
-            userGP.setHgap(238);
-            int row = 0;
-            int col = 0;
-            for(User user : userService.getAllUsers()) {
-                Button button = new Button();
-                button.setText(user.getIdentity());
-                button.setPrefSize(240, 40);
-                button.setMinWidth(240);
-                button.setStyle("-fx-font-size: 18px;");
-                button.setOnAction(new EventHandler<ActionEvent>() {
-                    public void handle(ActionEvent t){
-                        System.out.println("You pressed "+button.getText());
-                    }
-                });
+            Authentication request = new UsernamePasswordAuthenticationToken(user.getIdentity(), "");
+            Authentication result = authenticationManager.authenticate(request);
 
-                if(userGP.getRowConstraints().size() <= row) {
-                    Separator sepVert1 = new Separator();
-                    userGP.setRowSpan(sepVert1, row);
-                }
-                buttons.add(button);
-                userGP.add(button, col, row);
-                if(col == 2) row++;
-                //col = (col == 0) ? 1 : 0;
-                if(col++ == 2)
-                    col = 0;
-            }
-        } catch(ServiceException e) {
-            System.out.println(e);
+            SecurityContextHolder.getContext().setAuthentication(result);
+        } catch (BadCredentialsException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Bad Credentials");
+            alert.setHeaderText("Login for " + user.getName() + " denied due bad credentials!");
+            alert.setContentText("Login as '" + user.getIdentity() + "' has failed, please try it again or contact your manager.");
+
+            alert.showAndWait();
         }
-
-        scrollPane.setStyle("-fx-font-size: 40px;");
     }
 }
