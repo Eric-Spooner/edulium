@@ -42,4 +42,7 @@
     <import resource="service/Spring-TaxRateService.xml" />
     <import resource="service/Spring-InteriorService.xml" />
 
+    <!-- GUI beans -->
+    <import resource="gui/Spring-LoginScene.xml" />
+
 </beans>
