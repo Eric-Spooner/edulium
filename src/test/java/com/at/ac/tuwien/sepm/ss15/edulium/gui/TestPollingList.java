@@ -45,7 +45,7 @@ public class TestPollingList extends AbstractGuiTest {
         user4.setRole("POLLINGTESTER");
 
         PollingList<User> users = new PollingList<>(taskScheduler);
-        users.setInterval(100);
+        users.setInterval(200);
         users.setSupplier(new Supplier<List<User>>() {
             @Override
             public List<User> get() {
@@ -64,20 +64,20 @@ public class TestPollingList extends AbstractGuiTest {
         users.startPolling();
         // THEN
         assertTrue(users.isPolling());
-        Thread.sleep(250L);
+        Thread.sleep(500L);
         assertTrue(users.isEmpty());
 
         // WHEN
         userService.addUser(user1);
         // THEN
-        Thread.sleep(250L);
+        Thread.sleep(500L);
         assertTrue(users.containsAll(Arrays.asList(user1)));
 
         // WHEN
         userService.addUser(user2);
         userService.addUser(user3);
         // THEN
-        Thread.sleep(250L);
+        Thread.sleep(500L);
         assertTrue(users.containsAll(Arrays.asList(user1, user2, user3)));
 
         // WHEN
@@ -85,14 +85,14 @@ public class TestPollingList extends AbstractGuiTest {
         userService.deleteUser(user3);
         userService.addUser(user4);
         // THEN
-        Thread.sleep(250L);
+        Thread.sleep(500L);
         assertTrue(users.containsAll(Arrays.asList(user2, user4)));
 
         // WHEN
         userService.deleteUser(user2);
         userService.deleteUser(user4);
         // THEN
-        Thread.sleep(250L);
+        Thread.sleep(500L);
         assertTrue(users.isEmpty());
 
         // WHEN
