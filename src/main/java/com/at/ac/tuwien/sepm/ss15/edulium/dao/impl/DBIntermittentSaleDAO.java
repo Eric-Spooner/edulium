@@ -31,6 +31,8 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
     @Autowired
     private DAO<User> userDAO;
     @Autowired
+    private DAO<MenuEntry> menuEntryDAO;
+    @Autowired
     private Validator<IntermittentSale> validator;
 
 
@@ -217,7 +219,7 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 IntermittentSale intermittentSaleFromResult = intermittentSaleFromResultSet(result);
-                DBAbstractSaleDAO.addNameToSale(intermittentSaleFromResult, dataSource);
+                DBAbstractSaleDAO.addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO);
                 intermittentSales.add(intermittentSaleFromResult);
             }
         } catch (SQLException e) {
@@ -240,7 +242,7 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 IntermittentSale intermittentSaleFromResult = intermittentSaleFromResultSet(result);
-                DBAbstractSaleDAO.addNameToSale(intermittentSaleFromResult, dataSource);
+                DBAbstractSaleDAO.addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO);
                 intermittentSales.add(intermittentSaleFromResult);
             }
         } catch (SQLException e) {
@@ -305,7 +307,7 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 IntermittentSale intermittentSaleFromResult = intermittentSaleFromResultSet(result);
-                DBAbstractSaleDAO.addNameToSale(intermittentSaleFromResult, dataSource);
+                DBAbstractSaleDAO.addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO);
                 populatedIntermittentSales.add(intermittentSaleFromResult);
             }
         } catch (SQLException e) {

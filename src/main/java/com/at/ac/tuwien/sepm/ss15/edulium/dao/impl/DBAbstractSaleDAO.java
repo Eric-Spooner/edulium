@@ -1,5 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
@@ -7,9 +8,12 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Hashtable;
+import java.util.List;
 
 /**
  * This is a helper class for the H2 Database implementations DBIntermittentSaleDAO and DBOnetimeSaleDAO
@@ -85,14 +89,35 @@ public class DBAbstractSaleDAO {
      * Sets the name of the sale object according to the value in the database.
      * @param sale sale object resulting from a query, not having a name value yet
      * @throws SQLException if an error accessing the database occurred
+     * @return true if the Sale was not deleted yet.
      */
-    public static void addNameToSale(Sale sale, DataSource dataSource) throws SQLException {
-        final String saleQuery = "SELECT name FROM Sale WHERE ID = ?";
+    public static boolean addNameToSale(Sale sale, DataSource dataSource, DAO<MenuEntry> menuEntryDAO) throws SQLException, DAOException {
+        // Get name
+        final String saleQuery = "SELECT * FROM Sale WHERE ID = ?";
         PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery);
         stmt.setObject(1, sale.getIdentity());
         ResultSet result = stmt.executeQuery();
         result.next();
         String name = result.getString("name");
         sale.setName(name);
+        Boolean deleted = result.getBoolean("deleted");
+        // Get entries
+        // SaleAssoc (sale_ID, menuEntry_ID, salePrice, disabled)
+        final String entriesQuery = "SELECT * FROM SaleAssoc WHERE sale_ID = ?";
+        PreparedStatement stmt2 = dataSource.getConnection().prepareStatement(entriesQuery);
+        stmt2.setObject(1, sale.getIdentity());
+        ResultSet result2 = stmt2.executeQuery();
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        while (result2.next()) {
+            List<MenuEntry> entriesList = menuEntryDAO.find(MenuEntry.withIdentity(result2.getLong("menuEntry_ID")));
+            entries.put(entriesList.get(0), result2.getBigDecimal("salePrice"));
+        }
+        sale.setEntries(entries);
+        // Return false if deleted
+        if (deleted==null) {
+            return true;
+        } else {
+            return !deleted;
+        }
     }
 }

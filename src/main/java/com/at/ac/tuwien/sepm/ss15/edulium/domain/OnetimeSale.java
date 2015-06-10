@@ -68,7 +68,46 @@ public class OnetimeSale extends Sale {
 
         if (fromTime != null ? !fromTime.equals(that.fromTime) : that.fromTime != null) return false;
         if (toTime != null ? !toTime.equals(that.toTime) : that.toTime != null) return false;
-        if (entries != null ? !entries.equals(that.entries) : that.entries != null) return false;
+        if (entries == null) {
+            return that.entries==null;
+        } else {
+            boolean sameKeySet = true;
+            if (entries.keySet().size() != that.entries.keySet().size()) {
+                sameKeySet = false;
+            } else {
+                for (MenuEntry e : entries.keySet()) {
+                    boolean equality = false;
+                    for (MenuEntry e2 : that.entries.keySet()) {
+                        if (e.equals(e2)) {
+                            equality = true;
+                        } else {
+                            System.out.println("A: "+e);
+                            System.out.println("B: "+e2);
+                        }
+                    }
+                    if (!equality) {
+                        sameKeySet=false;
+                    }
+                }
+            }
+            if (sameKeySet) {
+                for (MenuEntry e : entries.keySet()) {
+                    MenuEntry e2 = null;
+                    for (MenuEntry et : that.entries.keySet()) {
+                        if (e.equals(et)) {
+                            e2 = et;
+                        }
+                    }
+                    if (entries.get(e).compareTo(that.entries.get(e2)) != 0) {
+                        return false;
+                    }
+                }
+            } else {
+                System.out.println(entries.keySet());
+                System.out.println(that.entries.keySet());
+                return false;
+            }
+        }
         if (identity != null ? !identity.equals(that.identity) : that.identity != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
 

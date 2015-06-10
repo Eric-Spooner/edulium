@@ -1,9 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.OnetimeSale;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +20,8 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     private DAO<OnetimeSale> onetimeSaleDAO;
     @Autowired
     private DAO<MenuCategory> menuCategoryDAO;
+    @Autowired
+    private DAO<MenuEntry> menuEntryDAO;
     @Autowired
     private DAO<TaxRate> taxRateDAO;
 
@@ -44,13 +43,14 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         entry.setDescription(description);
         entry.setPrice(BigDecimal.valueOf(price));
         entry.setAvailable(available);
+        menuEntryDAO.create(entry);
 
         return entry;
     }
 
     private OnetimeSale createOnetimeSale(Long identity, String name, LocalDateTime fromTime, LocalDateTime toTime, Hashtable<MenuEntry, BigDecimal> entries) {
         OnetimeSale onetimeSale = new OnetimeSale();
-        onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setIdentity(identity);
         onetimeSale.setName("Sale");
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
@@ -129,8 +129,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         assertEquals(1, onetimeSaleDAO.find(onetimeSale).size());
 
         // GIVEN
-        OnetimeSale onetimeSale2 = createOnetimeSale(new Long(123));
-        onetimeSale2.setName("Sale2");
+        OnetimeSale onetimeSale2 = createOnetimeSale(onetimeSale.getIdentity(), "Sale2",onetimeSale.getFromTime(), onetimeSale.getToTime(),onetimeSale.getEntries());
 
         // WHEN
         onetimeSaleDAO.update(onetimeSale2);
@@ -146,6 +145,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     public void testUpdate_updatingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
        // GIVEN
         OnetimeSale onetimeSale = createOnetimeSale(null);
+        onetimeSale.setIdentity(null);
 
         // WHEN
         onetimeSaleDAO.update(onetimeSale);
@@ -273,6 +273,8 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
 
         // THEN
         assertEquals(1, result1.size());
+        System.out.println(onetimeSale1);
+        System.out.println(result1.get(0));
         assertTrue(result1.contains(onetimeSale1));
 
         assertEquals(1, result2.size());

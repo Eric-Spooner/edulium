@@ -28,6 +28,8 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
     @Autowired
     private DAO<User> userDAO;
     @Autowired
+    private DAO<MenuEntry> menuEntryDAO;
+    @Autowired
     private Validator<OnetimeSale> validator;
 
 
@@ -44,7 +46,6 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
             stmt.setLong(1, onetimeSale.getIdentity());
             stmt.setString(2, onetimeSale.getName());
             stmt.setBoolean(3, false);
-
             stmt.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error("Inserting sale into database failed", e);
@@ -139,21 +140,6 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
 
         DBAbstractSaleDAO.generateSaleHistory(onetimeSale, dataSource, LOGGER);
 
-        //Delete OnetimeSale
-        final String query = "UPDATE OnetimeSale SET deleted = true WHERE sale_ID = ?";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, onetimeSale.getIdentity());
-
-            if (stmt.executeUpdate() == 0) {
-                LOGGER.error("Deleting onetimeSale from database failed, onetimeSale not found");
-                throw new DAOException("Deleting onetimeSale from database failed, onetimeSale not found");
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Deleting onetimeSale from database failed", e);
-            throw new DAOException("Deleting onetimeSale from database failed", e);
-        }
-
         generateHistory(onetimeSale);
     }
 
@@ -168,22 +154,22 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
         final String query = "SELECT * FROM OnetimeSale WHERE sale_ID = ISNULL(?, sale_ID)" +
                 " AND fromTime = ISNULL(?, fromTime)"+
                 " AND toTime = ISNULL(?, toTime)"+
-                " AND deleted = false" +
                 " AND EXISTS (SELECT * FROM Sale WHERE OnetimeSale.sale_ID = Sale.ID AND name = ISNULL(?, name))";
 
         final List<OnetimeSale> onetimeSales = new ArrayList<>();
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setObject(1, onetimeSale.getIdentity());
-            stmt.setObject(2, onetimeSale.getFromTime());
-            stmt.setObject(3, onetimeSale.getToTime());
+            stmt.setObject(2, onetimeSale.getFromTime()==null ? null : Timestamp.valueOf(onetimeSale.getFromTime()));
+            stmt.setObject(3, onetimeSale.getToTime()==null ? null : Timestamp.valueOf(onetimeSale.getToTime()));
             stmt.setObject(4, onetimeSale.getName());
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
-                DBAbstractSaleDAO.addNameToSale(onetimeSaleFromResult, dataSource);
-                onetimeSales.add(onetimeSaleFromResult);
+                if (DBAbstractSaleDAO.addNameToSale(onetimeSaleFromResult, dataSource, menuEntryDAO)) {
+                    onetimeSales.add(onetimeSaleFromResult);
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("Searching for onetimeSales failed", e);
@@ -197,7 +183,7 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
     public List<OnetimeSale> getAll() throws DAOException {
         LOGGER.debug("Entering getAll");
 
-        final String query = "SELECT * FROM OnetimeSale WHERE deleted = false";
+        final String query = "SELECT * FROM OnetimeSale";
 
         final List<OnetimeSale> onetimeSales = new ArrayList<>();
 
@@ -205,8 +191,10 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
-                DBAbstractSaleDAO.addNameToSale(onetimeSaleFromResult, dataSource);
-                onetimeSales.add(onetimeSaleFromResult);
+                boolean notDeleted = DBAbstractSaleDAO.addNameToSale(onetimeSaleFromResult, dataSource, menuEntryDAO);
+                if (notDeleted){
+                    onetimeSales.add(onetimeSaleFromResult);
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("Searching for all onetimeSales failed", e);
@@ -269,8 +257,9 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
-                DBAbstractSaleDAO.addNameToSale(onetimeSaleFromResult, dataSource);
-                populatedOnetimeSales.add(onetimeSaleFromResult);
+                if (DBAbstractSaleDAO.addNameToSale(onetimeSaleFromResult, dataSource, menuEntryDAO)) {
+                    populatedOnetimeSales.add(onetimeSaleFromResult);
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("Populating onetimeSales failed", e);
