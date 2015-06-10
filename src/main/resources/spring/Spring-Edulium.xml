@@ -5,6 +5,7 @@
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <import resource="Spring-Context.xml" />
+    <import resource="Spring-Scheduler.xml" />
     <import resource="Spring-Security.xml" />
     <import resource="Spring-DataSource.xml" />
 
