@@ -69,4 +69,11 @@ public class TaxRate {
         return !(value != null ? (value.compareTo(taxRate.value) != 0) : taxRate.value != null);
 
     }
+
+    @Override
+    public int hashCode() {
+        int result = identity != null ? identity.hashCode() : 0;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
+    }
 }

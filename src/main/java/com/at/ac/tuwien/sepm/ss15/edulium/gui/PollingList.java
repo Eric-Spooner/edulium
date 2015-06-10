@@ -51,8 +51,10 @@ public class PollingList<E> extends ObservableListBase<E> {
 
                     // add new elements
                     suppliedElements.removeAll(elements); // remove all unchanged elements -> items to add
-                    nextAdd(elements.size(), elements.size() + suppliedElements.size());  // [start index, end index[
-                    elements.addAll(suppliedElements);
+                    if (!suppliedElements.isEmpty()) {
+                        nextAdd(elements.size(), elements.size() + suppliedElements.size());  // [start index, end index[
+                        elements.addAll(suppliedElements);
+                    }
 
                     endChange();
                 }

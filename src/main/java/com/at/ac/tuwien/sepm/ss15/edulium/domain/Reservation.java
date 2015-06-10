@@ -141,4 +141,15 @@ public class Reservation {
         return !(tables != null ? !tables.containsAll(that.tables) : that.tables != null);
 
     }
+
+    @Override
+    public int hashCode() {
+        int result = identity != null ? identity.hashCode() : 0;
+        result = 31 * result + (time != null ? time.hashCode() : 0);
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (quantity != null ? quantity.hashCode() : 0);
+        result = 31 * result + (duration != null ? duration.hashCode() : 0);
+        result = 31 * result + (tables != null ? tables.hashCode() : 0);
+        return result;
+    }
 }
