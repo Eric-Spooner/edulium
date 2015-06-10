@@ -6,14 +6,23 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.springframework.context.ApplicationContext;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         ApplicationContext context = EduliumApplicationContext.getContext();
 
-        Scene loginScene = context.getBean("loginScene", Scene.class);
-        primaryStage.setScene(loginScene);
+        AuthenticationManager authenticationManager = context.getBean(AuthenticationManager.class);
+        Authentication request = new UsernamePasswordAuthenticationToken("daotester", "");
+        Authentication result = authenticationManager.authenticate(request);
+        SecurityContextHolder.getContext().setAuthentication(result);
+
+        Scene cookViewScene = context.getBean("cookViewScene", Scene.class);
+        primaryStage.setScene(cookViewScene);
 
         primaryStage.setOnCloseRequest(event -> {
             Platform.exit();
