@@ -1,11 +1,13 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Hashtable;
 import java.util.List;
@@ -342,6 +344,53 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
 
     @Test
     public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
+// PREPARE
+        // get test user
+        User user = getCurrentUser();
 
+        // GIVEN
+        // create data
+        OnetimeSale onetimeSale = createOnetimeSale(new Long(123));
+        LocalDateTime createTime = LocalDateTime.now();
+        onetimeSaleDAO.create(onetimeSale);
+
+        // update data
+        OnetimeSale onetimeSale2 = createOnetimeSale(onetimeSale.getIdentity(), "Sale2", onetimeSale.getFromTime(), onetimeSale.getToTime(), onetimeSale.getEntries());
+        LocalDateTime updateTime = LocalDateTime.now();
+        onetimeSaleDAO.update(onetimeSale2);
+
+        // delete data
+        LocalDateTime deleteTime = LocalDateTime.now();
+        onetimeSaleDAO.delete(onetimeSale2);
+
+        // WHEN
+        List<History<OnetimeSale>> history = onetimeSaleDAO.getHistory(onetimeSale);
+
+        // THEN
+        assertEquals(3, history.size());
+
+        // check create history
+        History<OnetimeSale> entry = history.get(0);
+        assertEquals(Long.valueOf(1), entry.getChangeNumber());
+        assertEquals(onetimeSale, entry.getData());
+        assertEquals(user, entry.getUser());
+        assertTrue(Duration.between(createTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(entry.isDeleted());
+
+        // check update history
+        entry = history.get(1);
+        assertEquals(Long.valueOf(2), entry.getChangeNumber());
+        assertEquals(onetimeSale2, entry.getData());
+        assertEquals(user, entry.getUser());
+        assertTrue(Duration.between(updateTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertFalse(entry.isDeleted());
+
+        // check delete history
+        entry = history.get(2);
+        assertEquals(Long.valueOf(3), entry.getChangeNumber());
+        assertEquals(onetimeSale2, entry.getData());
+        assertEquals(user, entry.getUser());
+        assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
+        assertTrue(entry.isDeleted());
     }
 }
