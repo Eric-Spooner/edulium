@@ -68,8 +68,8 @@ public class OnetimeSale extends Sale {
 
         if (fromTime != null ? !fromTime.equals(that.fromTime) : that.fromTime != null) return false;
         if (toTime != null ? !toTime.equals(that.toTime) : that.toTime != null) return false;
-        if (entries == null) {
-            return that.entries==null;
+        if (entries == null && that.entries != null) {
+            return false;
         } else {
             if (that.entries==null) {
                 return false;

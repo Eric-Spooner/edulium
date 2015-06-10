@@ -200,22 +200,36 @@ public class IntermittentSale extends Sale {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
 
         IntermittentSale that = (IntermittentSale) o;
 
         if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
         if (enabled != null ? !enabled.equals(that.enabled) : that.enabled != null) return false;
         if (friday != null ? !friday.equals(that.friday) : that.friday != null) return false;
-        if (fromDayTime != null ? !fromDayTime.equals(that.fromDayTime) : that.fromDayTime != null) return false;
+        if (fromDayTime==null) {
+            if (that.fromDayTime!=null) {
+                return false;
+            }
+        } else {
+            if (that.fromDayTime==null) {
+                return false;
+            } else {
+                if (fromDayTime.getHour() != that.fromDayTime.getHour()) {
+                    return false;
+                }
+                if (fromDayTime.getMinute() != that.fromDayTime.getMinute()) {
+                    return false;
+                }
+            }
+        }
         if (monday != null ? !monday.equals(that.monday) : that.monday != null) return false;
         if (saturday != null ? !saturday.equals(that.saturday) : that.saturday != null) return false;
         if (sunday != null ? !sunday.equals(that.sunday) : that.sunday != null) return false;
         if (thursday != null ? !thursday.equals(that.thursday) : that.thursday != null) return false;
         if (tuesday != null ? !tuesday.equals(that.tuesday) : that.tuesday != null) return false;
         if (wednesday != null ? !wednesday.equals(that.wednesday) : that.wednesday != null) return false;
-        if (entries == null) {
-            return that.entries==null;
+        if (entries == null && that.entries != null) {
+            return false;
         } else {
             if (that.entries==null) {
                 return false;

@@ -140,8 +140,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         assertEquals(1, intermittentSaleDAO.find(intermittentSale).size());
 
         // GIVEN
-        IntermittentSale intermittentSale2 = IntermittentSale.withIdentity(intermittentSale.getIdentity());
-        intermittentSale2.setName("Sale2");
+        IntermittentSale intermittentSale2 = createIntermittentSale(intermittentSale.getIdentity(), "Sale2", intermittentSale.getEntries(), intermittentSale.getDuration(), intermittentSale.getEnabled(), intermittentSale.getFromDayTime(), intermittentSale.getMonday(), intermittentSale.getTuesday(), intermittentSale.getWednesday(), intermittentSale.getThursday(), intermittentSale.getFriday(), intermittentSale.getSaturday(), intermittentSale.getSunday());
 
         // WHEN
         intermittentSaleDAO.update(intermittentSale2);
