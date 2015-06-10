@@ -1,11 +1,16 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Hashtable;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -16,22 +21,70 @@ import static org.junit.Assert.*;
 public class TestIntermittentSaleDAO extends AbstractDAOTest {
     @Autowired
     private DAO<IntermittentSale> intermittentSaleDAO;
+    @Autowired
+    private DAO<MenuCategory> menuCategoryDAO;
+    @Autowired
+    private DAO<MenuEntry> menuEntryDAO;
+    @Autowired
+    private DAO<TaxRate> taxRateDAO;
+
+    private MenuEntry createMenuEntry(Long identity, String name, String description, String category, double price, double tax, boolean available)
+            throws ValidationException, DAOException {
+        MenuCategory menuCategory = new MenuCategory();
+        menuCategory.setName(category);
+        menuCategoryDAO.create(menuCategory);
+
+        TaxRate taxRate = new TaxRate();
+        taxRate.setValue(BigDecimal.valueOf(tax));
+        taxRateDAO.create(taxRate);
+
+        MenuEntry entry = new MenuEntry();
+        entry.setIdentity(identity);
+        entry.setCategory(menuCategory);
+        entry.setTaxRate(taxRate);
+        entry.setName(name);
+        entry.setDescription(description);
+        entry.setPrice(BigDecimal.valueOf(price));
+        entry.setAvailable(available);
+        menuEntryDAO.create(entry);
+
+        return entry;
+    }
+
+    private Hashtable<MenuEntry, BigDecimal> createRandomEntries() throws ValidationException, DAOException {
+        MenuEntry entry = createMenuEntry(new Long((int)(Math.random()*999999999)),"entry", "desc", "cat", 20, 0.2, true);
+        BigDecimal bigDecimal = new BigDecimal(10);
+        Hashtable<MenuEntry, BigDecimal> hashtable = new Hashtable<>();
+        hashtable.put(entry, bigDecimal);
+        return hashtable;
+    }
+
+    private IntermittentSale createIntermittentSale(Long identity, String name, Hashtable<MenuEntry, BigDecimal> entries, Integer duration, Boolean enabled, LocalDateTime fromDayTime, Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday, Boolean saturday, Boolean sunday) {
+        IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setIdentity(identity);
+        intermittentSale.setName("Sale");
+        intermittentSale.setEntries(entries);
+        intermittentSale.setDuration(duration);
+        intermittentSale.setEnabled(enabled);
+        intermittentSale.setFromDayTime(fromDayTime);
+        intermittentSale.setMonday(monday);
+        intermittentSale.setTuesday(tuesday);
+        intermittentSale.setWednesday(wednesday);
+        intermittentSale.setThursday(thursday);
+        intermittentSale.setFriday(friday);
+        intermittentSale.setSaturday(saturday);
+        intermittentSale.setSunday(sunday);
+        return intermittentSale;
+    }
+
+    private IntermittentSale createIntermittentSale(Long identity) throws ValidationException, DAOException {
+        return createIntermittentSale(identity, "Sale", createRandomEntries(), 60, true, LocalDateTime.now(), new Boolean(true), new Boolean(true), new Boolean(false), new Boolean(false), new Boolean(true), new Boolean(true), new Boolean(true));
+    }
 
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
         // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-        intermittentSale.setName("Sale");
-        intermittentSale.setFromDayTime(LocalDateTime.now());
-        intermittentSale.setDuration(120);
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(true);
-        intermittentSale.setSaturday(true);
-        intermittentSale.setSunday(true);
+        IntermittentSale intermittentSale = createIntermittentSale(new Long(123));
 
         // WHEN
         intermittentSaleDAO.create(intermittentSale);
@@ -47,35 +100,13 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
     @Test(expected = DAOException.class)
     public void testCreate_addingTwoObjectsWithSameIdentityShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-        intermittentSale.setName("Sale");
-        intermittentSale.setFromDayTime(LocalDateTime.now());
-        intermittentSale.setDuration(120);
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(true);
-        intermittentSale.setSaturday(true);
-        intermittentSale.setSunday(true);
+        IntermittentSale intermittentSale = createIntermittentSale(new Long(123));
 
         // WHEN
         intermittentSaleDAO.create(intermittentSale);
 
         // GIVEN
-        IntermittentSale intermittentSale2 = new IntermittentSale();
-        intermittentSale2.setIdentity(new Long(123));
-        intermittentSale.setName("Sale2");
-        intermittentSale2.setFromDayTime(LocalDateTime.now());
-        intermittentSale2.setDuration(60);
-        intermittentSale2.setMonday(true);
-        intermittentSale2.setTuesday(false);
-        intermittentSale2.setWednesday(false);
-        intermittentSale2.setThursday(true);
-        intermittentSale2.setFriday(true);
-        intermittentSale2.setSaturday(true);
-        intermittentSale2.setSunday(true);
+        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(123));
 
         // WHEN
         intermittentSaleDAO.create(intermittentSale2);
@@ -84,17 +115,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testCreate_addingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setName("Sale");
-        intermittentSale.setFromDayTime(LocalDateTime.now());
-        intermittentSale.setDuration(120);
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(true);
-        intermittentSale.setSaturday(true);
-        intermittentSale.setSunday(true);
+        IntermittentSale intermittentSale = createIntermittentSale(null);
 
         // WHEN
         intermittentSaleDAO.create(intermittentSale);
@@ -112,36 +133,15 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // PREPARE
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-        intermittentSale.setName("Sale");
-        intermittentSale.setFromDayTime(LocalDateTime.now());
-        intermittentSale.setDuration(120);
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(true);
-        intermittentSale.setSaturday(true);
-        intermittentSale.setSunday(true);
+        IntermittentSale intermittentSale = createIntermittentSale(new Long(123));
 
         // check if user is stored
         intermittentSaleDAO.create(intermittentSale);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale).size());
 
         // GIVEN
-        IntermittentSale intermittentSale2 = new IntermittentSale();
-        intermittentSale2.setIdentity(new Long(123));
-        intermittentSale.setName("Sale");
-        intermittentSale2.setFromDayTime(LocalDateTime.now());
-        intermittentSale2.setDuration(180);
-        intermittentSale2.setMonday(false);
-        intermittentSale2.setTuesday(true);
-        intermittentSale2.setWednesday(false);
-        intermittentSale2.setThursday(true);
-        intermittentSale2.setFriday(true);
-        intermittentSale2.setSaturday(true);
-        intermittentSale2.setSunday(true);
+        IntermittentSale intermittentSale2 = IntermittentSale.withIdentity(intermittentSale.getIdentity());
+        intermittentSale2.setName("Sale2");
 
         // WHEN
         intermittentSaleDAO.update(intermittentSale2);
@@ -156,17 +156,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
     @Test(expected = ValidationException.class)
     public void testUpdate_updatingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
         // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setFromDayTime(LocalDateTime.now());
-        intermittentSale.setDuration(120);
-        intermittentSale.setName("Sale");
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(true);
-        intermittentSale.setSaturday(true);
-        intermittentSale.setSunday(true);
+        IntermittentSale intermittentSale = createIntermittentSale(null);
 
         // WHEN
         intermittentSaleDAO.update(intermittentSale);
@@ -195,16 +185,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
             fail("DAOException should not occur while searching for a non-existing intermittent sale identity");
         }
 
-        intermittentSale.setName("Sale");
-        intermittentSale.setFromDayTime(LocalDateTime.now());
-        intermittentSale.setDuration(90);
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(false);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(true);
-        intermittentSale.setSaturday(true);
-        intermittentSale.setSunday(true);
+        intermittentSale = createIntermittentSale(intermittentSale.getIdentity());
 
         // WHEN
         intermittentSaleDAO.update(intermittentSale);
@@ -214,26 +195,14 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
     public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // PREPARE
         final int numberBefore = intermittentSaleDAO.getAll().size();
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-        intermittentSale.setName("Sale");
-        intermittentSale.setFromDayTime(LocalDateTime.now());
-        intermittentSale.setDuration(120);
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(true);
-        intermittentSale.setSaturday(true);
-        intermittentSale.setSunday(true);
+        IntermittentSale intermittentSale = createIntermittentSale(new Long(123));
 
         // check if user is stored
         intermittentSaleDAO.create(intermittentSale);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale).size());
 
         // GIVEN
-        IntermittentSale intermittentSale2 = new IntermittentSale();
-        intermittentSale2.setIdentity(intermittentSale.getIdentity());
+        IntermittentSale intermittentSale2 = IntermittentSale.withIdentity(intermittentSale.getIdentity());
 
         // WHEN
         intermittentSaleDAO.delete(intermittentSale2);
@@ -277,52 +246,19 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // Prepare
 
         // intermittent sale 1
-        IntermittentSale intermittentSale1 = new IntermittentSale();
-        intermittentSale1.setIdentity(new Long(123));
-        intermittentSale1.setName("Sale");
-        intermittentSale1.setFromDayTime(LocalDateTime.now());
-        intermittentSale1.setDuration(120);
-        intermittentSale1.setMonday(true);
-        intermittentSale1.setTuesday(true);
-        intermittentSale1.setWednesday(true);
-        intermittentSale1.setThursday(true);
-        intermittentSale1.setFriday(true);
-        intermittentSale1.setSaturday(true);
-        intermittentSale1.setSunday(true);
+        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
 
         intermittentSaleDAO.create(intermittentSale1);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
 
         // intermittent sale 2
-        IntermittentSale intermittentSale2 = new IntermittentSale();
-        intermittentSale2.setIdentity(new Long(124));
-        intermittentSale2.setName("Sale2");
-        intermittentSale2.setFromDayTime(LocalDateTime.now());
-        intermittentSale2.setDuration(120);
-        intermittentSale2.setMonday(true);
-        intermittentSale2.setTuesday(true);
-        intermittentSale2.setWednesday(true);
-        intermittentSale2.setThursday(true);
-        intermittentSale2.setFriday(true);
-        intermittentSale2.setSaturday(true);
-        intermittentSale2.setSunday(true);
+        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
 
         intermittentSaleDAO.create(intermittentSale2);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
 
         // intermittent sale 3
-        IntermittentSale intermittentSale3 = new IntermittentSale();
-        intermittentSale3.setIdentity(new Long(125));
-        intermittentSale3.setName("Sale3");
-        intermittentSale3.setFromDayTime(LocalDateTime.now());
-        intermittentSale3.setDuration(120);
-        intermittentSale3.setMonday(true);
-        intermittentSale3.setTuesday(true);
-        intermittentSale3.setWednesday(true);
-        intermittentSale3.setThursday(true);
-        intermittentSale3.setFriday(true);
-        intermittentSale3.setSaturday(true);
-        intermittentSale3.setSunday(true);
+        IntermittentSale intermittentSale3 = createIntermittentSale(new Long(125));
 
         intermittentSaleDAO.create(intermittentSale3);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale3).size());

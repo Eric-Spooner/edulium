@@ -160,21 +160,6 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
 
         DBAbstractSaleDAO.generateSaleHistory(intermittentSale, dataSource, LOGGER);
 
-        //Delete IntermittentSale
-        final String query = "UPDATE IntermittentSale SET deleted = true WHERE sale_ID = ?";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, intermittentSale.getIdentity());
-
-            if (stmt.executeUpdate() == 0) {
-                LOGGER.error("Deleting intermittentSale from database failed, intermittentSale not found");
-                throw new DAOException("Deleting intermittentSale from database failed, intermittentSale not found");
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Deleting intermittentSale from database failed", e);
-            throw new DAOException("Deleting intermittentSale from database failed", e);
-        }
-
         generateHistory(intermittentSale);
     }
 
@@ -234,7 +219,7 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
     public List<IntermittentSale> getAll() throws DAOException {
         LOGGER.debug("Entering getAll");
 
-        final String query = "SELECT * FROM IntermittentSale WHERE deleted = false";
+        final String query = "SELECT * FROM IntermittentSale";
 
         final List<IntermittentSale> intermittentSales = new ArrayList<>();
 
@@ -242,8 +227,9 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 IntermittentSale intermittentSaleFromResult = intermittentSaleFromResultSet(result);
-                DBAbstractSaleDAO.addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO);
-                intermittentSales.add(intermittentSaleFromResult);
+                if (DBAbstractSaleDAO.addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO)) {
+                    intermittentSales.add(intermittentSaleFromResult);
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("Searching for all intermittentSales failed", e);

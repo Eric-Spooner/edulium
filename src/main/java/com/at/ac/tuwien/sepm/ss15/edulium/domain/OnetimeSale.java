@@ -71,6 +71,9 @@ public class OnetimeSale extends Sale {
         if (entries == null) {
             return that.entries==null;
         } else {
+            if (that.entries==null) {
+                return false;
+            }
             boolean sameKeySet = true;
             if (entries.keySet().size() != that.entries.keySet().size()) {
                 sameKeySet = false;
