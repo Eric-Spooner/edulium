@@ -87,22 +87,6 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         assertEquals(onetimeSale, storedObjects.get(0));
     }
 
-
-    @Test(expected = DAOException.class)
-    public void testCreate_addingTwoObjectsWithSameIdentityShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        OnetimeSale onetimeSale = createOnetimeSale(new Long(123));
-
-        // WHEN
-        onetimeSaleDAO.create(onetimeSale);
-
-        // GIVEN
-        OnetimeSale onetimeSale2 = createOnetimeSale(new Long(123));
-
-        // WHEN
-        onetimeSaleDAO.create(onetimeSale2);
-    }
-
     @Test(expected = ValidationException.class)
     public void testCreate_addingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
         // GIVEN

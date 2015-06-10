@@ -43,14 +43,19 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
         validator.validateForCreate(intermittentSale);
 
         //Save Sale
-        final String saleQuery = "INSERT INTO Sale (ID, name, deleted) VALUES (?, ?, ?)";
+        final String saleQuery = "INSERT INTO Sale (name, deleted) VALUES (?, ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery)) {
-            stmt.setLong(1, intermittentSale.getIdentity());
-            stmt.setString(2, intermittentSale.getName());
-            stmt.setBoolean(3, false);
+            stmt.setString(1, intermittentSale.getName());
+            stmt.setBoolean(2, false);
 
             stmt.executeUpdate();
+
+            ResultSet key = stmt.getGeneratedKeys();
+            if (key.next()) {
+                intermittentSale.setIdentity(key.getLong(1));
+            }
+            key.close();
         } catch (SQLException e) {
             LOGGER.error("Inserting sale into database failed", e);
             throw new DAOException("Inserting sale into database failed", e);

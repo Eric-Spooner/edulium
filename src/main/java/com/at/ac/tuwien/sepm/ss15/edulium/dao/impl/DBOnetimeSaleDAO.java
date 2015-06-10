@@ -40,13 +40,18 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
         validator.validateForCreate(onetimeSale);
 
         //Create Sale
-        final String saleQuery = "INSERT INTO Sale (ID, name, deleted) VALUES (?, ?, ?)";
+        final String saleQuery = "INSERT INTO Sale (name, deleted) VALUES (?, ?)";
 
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery)) {
-            stmt.setLong(1, onetimeSale.getIdentity());
-            stmt.setString(2, onetimeSale.getName());
-            stmt.setBoolean(3, false);
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, onetimeSale.getName());
+            stmt.setBoolean(2, false);
             stmt.executeUpdate();
+
+            ResultSet key = stmt.getGeneratedKeys();
+            if (key.next()) {
+                onetimeSale.setIdentity(key.getLong(1));
+            }
+            key.close();
         } catch (SQLException e) {
             LOGGER.error("Inserting sale into database failed", e);
             throw new DAOException("Inserting sale into database failed", e);

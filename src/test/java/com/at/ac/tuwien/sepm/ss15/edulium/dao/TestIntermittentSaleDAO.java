@@ -95,22 +95,6 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         assertEquals(intermittentSale, storedObjects.get(0));
     }
 
-
-    @Test(expected = DAOException.class)
-    public void testCreate_addingTwoObjectsWithSameIdentityShouldFail() throws DAOException, ValidationException {
-        // GIVEN
-        IntermittentSale intermittentSale = createIntermittentSale(new Long(123));
-
-        // WHEN
-        intermittentSaleDAO.create(intermittentSale);
-
-        // GIVEN
-        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(123));
-
-        // WHEN
-        intermittentSaleDAO.create(intermittentSale2);
-    }
-
     @Test(expected = ValidationException.class)
     public void testCreate_addingObjectWithoutIdentityShouldFail() throws DAOException, ValidationException {
         // GIVEN
