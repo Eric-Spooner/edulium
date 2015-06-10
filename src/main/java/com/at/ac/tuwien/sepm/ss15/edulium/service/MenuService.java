@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * Service interface for the MenuCategory, MenuEntry and Menu domain objects
  */
+@PreAuthorize("isAuthenticated()")
 public interface MenuService extends Service {
     /**
      * adds a MenuEntry to the underlying datasource
