@@ -61,7 +61,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
     private IntermittentSale createIntermittentSale(Long identity, String name, Hashtable<MenuEntry, BigDecimal> entries, Integer duration, Boolean enabled, LocalDateTime fromDayTime, Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday, Boolean saturday, Boolean sunday) {
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(identity);
-        intermittentSale.setName("Sale");
+        intermittentSale.setName(name);
         intermittentSale.setEntries(entries);
         intermittentSale.setDuration(duration);
         intermittentSale.setEnabled(enabled);

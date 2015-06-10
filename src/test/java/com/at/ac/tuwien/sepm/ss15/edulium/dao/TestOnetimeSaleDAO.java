@@ -61,7 +61,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     private OnetimeSale createOnetimeSale(Long identity, String name, LocalDateTime fromTime, LocalDateTime toTime, Hashtable<MenuEntry, BigDecimal> entries) {
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(identity);
-        onetimeSale.setName("Sale");
+        onetimeSale.setName(name);
         onetimeSale.setFromTime(LocalDateTime.now());
         onetimeSale.setToTime(LocalDateTime.now());
         onetimeSale.setEntries(entries);

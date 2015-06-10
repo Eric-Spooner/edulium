@@ -2,8 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.OnetimeSale;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
@@ -17,12 +16,16 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Hashtable;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 
 /**
  * Unit Test of the SaleService interface
@@ -30,6 +33,10 @@ import static org.mockito.Mockito.never;
 public class TestSaleService extends AbstractServiceTest {
     @Autowired
     private SaleService saleService;
+    @Autowired
+    private MenuService menuService;
+    @Autowired
+    private TaxRateService taxRateService;
     @Mock
     private DAO<IntermittentSale> intermittentSaleDAO;
     @Mock
@@ -560,5 +567,46 @@ public class TestSaleService extends AbstractServiceTest {
 
         // THEN
         Mockito.verify(onetimeSaleDAO, never()).getHistory(onetimeSale);
+    }
+
+    @Test
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
+    public void testCreate_shouldAddRemoveAndReaddObject() throws DAOException, ValidationException, ServiceException {
+        //Create entries
+        MenuCategory menuCategory = new MenuCategory();
+        menuCategory.setName("Cat");
+        menuService.addMenuCategory(menuCategory);
+
+        TaxRate taxRate = new TaxRate();
+        taxRate.setValue(BigDecimal.valueOf(0.5));
+        taxRateService.addTaxRate(taxRate);
+
+        MenuEntry entry = new MenuEntry();
+        entry.setIdentity(new Long(232));
+        entry.setCategory(menuCategory);
+        entry.setTaxRate(taxRate);
+        entry.setName("MenuEntry");
+        entry.setDescription("Mmmmm");
+        entry.setPrice(BigDecimal.valueOf(500));
+        entry.setAvailable(true);
+        menuService.addMenuEntry(entry);
+        BigDecimal bigDecimal = new BigDecimal(10);
+        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        entries.put(entry, bigDecimal);
+
+        //Create onetimeSale
+        OnetimeSale onetimeSale = new OnetimeSale();
+        onetimeSale.setIdentity(new Long(123));
+        onetimeSale.setName("Sale");
+        onetimeSale.setFromTime(LocalDateTime.now());
+        onetimeSale.setToTime(LocalDateTime.now());
+        onetimeSale.setEntries(entries);
+
+        saleService.addOnetimeSale(onetimeSale);
+        saleService.removeOnetimeSale(onetimeSale);
+        saleService.addOnetimeSale(onetimeSale);
+
+        Mockito.verify(onetimeSaleDAO).delete(onetimeSale);
+        Mockito.verify(onetimeSaleDAO, times(2)).create(onetimeSale);
     }
 }
