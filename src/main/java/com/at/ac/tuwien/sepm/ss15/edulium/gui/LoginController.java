@@ -92,6 +92,10 @@ public class LoginController implements Initializable {
         scrollPane.setStyle("-fx-font-size: 40px;");
     }
 
+    public void logout() {
+        SecurityContextHolder.getContext().setAuthentication(null);
+    }
+
     private void loginAs(User user) {
         assert user != null;
 
