@@ -197,7 +197,6 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
                 " AND fromDayTime = ISNULL(?, fromDayTime)"+
                 " AND duration = ISNULL(?, duration)"+
                 " AND enabled = ISNULL(?, enabled)"+
-                " AND deleted = false" +
                 " AND EXISTS (SELECT * FROM Sale WHERE IntermittentSale.sale_ID = Sale.ID AND name = ISNULL(?, name))";
 
         final List<IntermittentSale> intermittentSales = new ArrayList<>();
@@ -211,7 +210,7 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             stmt.setObject(6, intermittentSale.getFriday());
             stmt.setObject(7, intermittentSale.getSaturday());
             stmt.setObject(8, intermittentSale.getSunday());
-            stmt.setObject(9, intermittentSale.getFromDayTime());
+            stmt.setObject(9, intermittentSale.getFromDayTime()==null ? null : Timestamp.valueOf(intermittentSale.getFromDayTime()));
             stmt.setObject(10, intermittentSale.getDuration());
             stmt.setObject(11, intermittentSale.getEnabled());
             stmt.setObject(12, intermittentSale.getName());
@@ -219,8 +218,9 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 IntermittentSale intermittentSaleFromResult = intermittentSaleFromResultSet(result);
-                DBAbstractSaleDAO.addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO);
-                intermittentSales.add(intermittentSaleFromResult);
+                if (DBAbstractSaleDAO.addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO)){
+                    intermittentSales.add(intermittentSaleFromResult);
+                }
             }
         } catch (SQLException e) {
             LOGGER.error("Searching for intermittentSales failed", e);

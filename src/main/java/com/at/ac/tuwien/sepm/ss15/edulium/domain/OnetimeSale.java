@@ -80,9 +80,6 @@ public class OnetimeSale extends Sale {
                     for (MenuEntry e2 : that.entries.keySet()) {
                         if (e.equals(e2)) {
                             equality = true;
-                        } else {
-                            System.out.println("A: "+e);
-                            System.out.println("B: "+e2);
                         }
                     }
                     if (!equality) {
@@ -103,8 +100,6 @@ public class OnetimeSale extends Sale {
                     }
                 }
             } else {
-                System.out.println(entries.keySet());
-                System.out.println(that.entries.keySet());
                 return false;
             }
         }
