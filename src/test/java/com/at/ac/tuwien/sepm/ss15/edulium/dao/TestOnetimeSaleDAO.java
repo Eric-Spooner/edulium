@@ -327,6 +327,23 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     }
 
     @Test
+    public void testCreate_shouldAddRemoveAndReaddObject() throws DAOException, ValidationException {
+        OnetimeSale onetimeSale = createOnetimeSale(new Long(123));
+
+        onetimeSaleDAO.create(onetimeSale);
+        assertEquals(onetimeSaleDAO.find(onetimeSale).size(), 1);
+        assertTrue(onetimeSaleDAO.find(onetimeSale).contains(onetimeSale));
+
+        onetimeSaleDAO.delete(onetimeSale);
+        assertEquals(onetimeSaleDAO.find(onetimeSale).size(), 0);
+        assertFalse(onetimeSaleDAO.find(onetimeSale).contains(onetimeSale));
+
+        onetimeSaleDAO.create(onetimeSale);
+        assertEquals(onetimeSaleDAO.find(onetimeSale).size(), 1);
+        assertTrue(onetimeSaleDAO.find(onetimeSale).contains(onetimeSale));
+    }
+
+    @Test
     public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
 // PREPARE
         // get test user

@@ -742,6 +742,23 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
     }
 
     @Test
+    public void testCreate_shouldAddRemoveAndReaddObject() throws DAOException, ValidationException {
+        IntermittentSale intermittentSale = createIntermittentSale(new Long(123));
+
+        intermittentSaleDAO.create(intermittentSale);
+        assertEquals(intermittentSaleDAO.find(intermittentSale).size(), 1);
+        assertTrue(intermittentSaleDAO.find(intermittentSale).contains(intermittentSale));
+
+        intermittentSaleDAO.delete(intermittentSale);
+        assertEquals(intermittentSaleDAO.find(intermittentSale).size(), 0);
+        assertFalse(intermittentSaleDAO.find(intermittentSale).contains(intermittentSale));
+
+        intermittentSaleDAO.create(intermittentSale);
+        assertEquals(intermittentSaleDAO.find(intermittentSale).size(), 1);
+        assertTrue(intermittentSaleDAO.find(intermittentSale).contains(intermittentSale));
+    }
+
+    @Test
     public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
         // get test user
