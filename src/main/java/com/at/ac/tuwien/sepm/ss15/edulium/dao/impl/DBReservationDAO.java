@@ -201,15 +201,13 @@ class DBReservationDAO implements ReservationDAO {
     }
 
     @Override
-    public List<Reservation> findIn(LocalDateTime start, Duration duration) throws DAOException, ValidationException {
-        LOGGER.debug("Entering findIn with parameters " + start + " / " + duration);
+    public List<Reservation> findBetween(LocalDateTime from, LocalDateTime to) throws DAOException, ValidationException {
+        LOGGER.debug("Entering findBetween with parameters " + from + " / " + to);
 
-        if(start == null || duration == null) {
+        if(from == null || to == null) {
             LOGGER.error("parameter 'start' or 'duration' is null");
             throw new ValidationException("parameter 'start' or 'duration' is null");
         }
-
-        LocalDateTime end = start.plus(duration);
 
         final String query = "SELECT * FROM Reservation WHERE deleted = false AND " +
                 "reservationTime < ? AND DATEADD('MILLISECOND', duration, reservationTime) > ?";
@@ -217,8 +215,8 @@ class DBReservationDAO implements ReservationDAO {
         final List<Reservation> reservations = new ArrayList<>();
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setTimestamp(1, Timestamp.valueOf(end));
-            stmt.setTimestamp(2, Timestamp.valueOf(start));
+            stmt.setTimestamp(1, Timestamp.valueOf(to));
+            stmt.setTimestamp(2, Timestamp.valueOf(from));
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {

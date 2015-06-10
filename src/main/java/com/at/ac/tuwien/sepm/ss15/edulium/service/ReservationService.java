@@ -55,12 +55,12 @@ public interface ReservationService extends Service {
 
     /**
      * returns all reservations in the given interval
-     * @param start start of the interval
-     * @param duration duration of the interval
+     * @param from start of the interval
+     * @param to end of the interval
      * @throws ServiceException if an error processing the request ocurred
      * @throws ValidationException if the parameters are invalid
      */
-    List<Reservation> findReservationIn(LocalDateTime start, Duration duration) throws ServiceException, ValidationException;
+    List<Reservation> findReservationBetween(LocalDateTime from, LocalDateTime to) throws ServiceException, ValidationException;
 
     /**
      * returns all reservations from the underlying datasource; ordered by date and time

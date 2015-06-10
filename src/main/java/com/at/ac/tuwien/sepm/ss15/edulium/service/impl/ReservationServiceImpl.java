@@ -14,6 +14,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.heuristics.ReservationHeuristic;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.mockito.cglib.core.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Duration;
@@ -122,11 +123,11 @@ class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
-    public List<Reservation> findReservationIn(LocalDateTime start, Duration duration) throws ServiceException, ValidationException {
-        LOGGER.debug("Entering findReservationIn with parameters: " + start + " / " + duration);
+    public List<Reservation> findReservationBetween(LocalDateTime from, LocalDateTime to) throws ServiceException, ValidationException {
+        LOGGER.debug("Entering findReservationBetween with parameters: " + from + " / " + to);
 
         try {
-            return reservationDAO.findIn(start, duration);
+            return reservationDAO.findBetween(from, to);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
             throw new ServiceException("An Error has occurred in the data access object");

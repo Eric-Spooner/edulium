@@ -760,7 +760,7 @@ public class TestReservationDAO extends AbstractDAOTest {
     }
 
     @Test
-    public void testFindIn_ShouldReturnObjects() throws DAOException, ValidationException {
+    public void testFindBetween_ShouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
         // reservation 1
         Reservation reservation1 = new Reservation();
@@ -807,7 +807,9 @@ public class TestReservationDAO extends AbstractDAOTest {
         assertEquals(1, reservationDAO.find(reservation4).size());
 
         // WHEN
-        List<Reservation> result = reservationDAO.findIn(LocalDateTime.of(2015, 05, 15, 17, 30), Duration.ofMinutes(120));
+        LocalDateTime from = LocalDateTime.of(2015, 05, 15, 17, 30);
+        LocalDateTime to = from.plus(Duration.ofMinutes(120));
+        List<Reservation> result = reservationDAO.findBetween(from, to);
 
         // THEN
         assertEquals(4, result.size());
@@ -817,7 +819,9 @@ public class TestReservationDAO extends AbstractDAOTest {
         assertTrue(result.contains(reservation4));
 
         // WHEN
-        result = reservationDAO.findIn(LocalDateTime.of(2015, 05, 15, 19, 00), Duration.ofMinutes(60));
+        from = LocalDateTime.of(2015, 05, 15, 19, 00);
+        to = from.plus(Duration.ofMinutes(60));
+        result = reservationDAO.findBetween(from, to);
 
         // THEN
         assertEquals(2, result.size());
@@ -825,7 +829,9 @@ public class TestReservationDAO extends AbstractDAOTest {
         assertTrue(result.contains(reservation4));
 
         // WHEN
-        result = reservationDAO.findIn(LocalDateTime.of(2015, 05, 15, 17, 00), Duration.ofMinutes(60));
+        from = LocalDateTime.of(2015, 05, 15, 17, 00);
+        to = from.plus(Duration.ofMinutes(60));
+        result = reservationDAO.findBetween(from, to);
 
         // THEN
         assertEquals(2, result.size());
@@ -834,20 +840,22 @@ public class TestReservationDAO extends AbstractDAOTest {
 
 
         // WHEN
-        result = reservationDAO.findIn(LocalDateTime.of(2015, 05, 15, 15, 00), Duration.ofMinutes(60));
+        from = LocalDateTime.of(2015, 05, 15, 15, 00);
+        to = from.plus(Duration.ofMinutes(60));
+        result = reservationDAO.findBetween(from, to);
 
         // THEN
         assertTrue(result.isEmpty());
     }
 
     @Test(expected = ValidationException.class)
-    public void testFindIn_WithNullTimeShouldThrow() throws DAOException, ValidationException {
-        reservationDAO.findIn(null, Duration.ofMinutes(60));
+    public void testFindIn_WithNullFromShouldThrow() throws DAOException, ValidationException {
+        reservationDAO.findBetween(null, LocalDateTime.of(2015, 05, 15, 15, 00));
     }
 
     @Test(expected = ValidationException.class)
-    public void testFindIn_WithNullDurationShouldThrow() throws DAOException, ValidationException {
-        reservationDAO.findIn(LocalDateTime.of(2015, 05, 15, 15, 00), null);
+    public void testFindIn_WithNullToShouldThrow() throws DAOException, ValidationException {
+        reservationDAO.findBetween(LocalDateTime.of(2015, 05, 15, 15, 00), null);
     }
 
     @Test

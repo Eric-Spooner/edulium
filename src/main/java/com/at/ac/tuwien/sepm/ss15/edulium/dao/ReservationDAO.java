@@ -14,11 +14,11 @@ public interface ReservationDAO extends DAO<Reservation> {
 
     /**
      * returns all reservatoins which take place in the specified interval
-     * @param start start of the interval
-     * @param duration duration of the interval
+     * @param from start of the interval
+     * @param to end of the interval
      * @return a list of reservation
      * @throws DAOException if the data couldn't be retrieved
      * @throws ValidationException if the parameters are invalid
      */
-    List<Reservation> findIn(LocalDateTime start, Duration duration) throws DAOException, ValidationException;
+    List<Reservation> findBetween(LocalDateTime from, LocalDateTime to) throws DAOException, ValidationException;
 }

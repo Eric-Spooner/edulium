@@ -102,7 +102,8 @@ public class TestReservationService extends AbstractServiceTest {
         Reservation res = createReservation(1, 18, 150, null);
         res.setQuantity(4);
 
-        Mockito.when(reservationDAO.findIn(res.getTime(), res.getDuration())).thenReturn(Arrays.asList(res1, res2));
+        Mockito.when(reservationDAO.findBetween(res.getTime(), res.getTime().plus(res.getDuration())))
+                .thenReturn(Arrays.asList(res1, res2));
 
         // WHEN
         reservationService.addReservation(res);
@@ -126,7 +127,8 @@ public class TestReservationService extends AbstractServiceTest {
         Reservation res = createReservation(1, 17, 150, null);
         res.setQuantity(6);
 
-        Mockito.when(reservationDAO.findIn(res.getTime(), res.getDuration())).thenReturn(Arrays.asList(res1));
+        Mockito.when(reservationDAO.findBetween(res.getTime(), res.getTime().plus(res.getDuration())))
+                .thenReturn(Arrays.asList(res1));
         // WHEN
         reservationService.addReservation(res);
 
@@ -148,7 +150,8 @@ public class TestReservationService extends AbstractServiceTest {
         Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t3));
         Reservation res = createReservation(1, 19, 120, null);
         res.setQuantity(12);
-        Mockito.when(reservationDAO.findIn(res.getTime(), res.getDuration())).thenReturn(Arrays.asList(res1));
+        Mockito.when(reservationDAO.findBetween(res.getTime(), res.getTime().plus(res.getDuration())))
+                .thenReturn(Arrays.asList(res1));
 
         // WHEN
         reservationService.addReservation(res);
@@ -175,7 +178,8 @@ public class TestReservationService extends AbstractServiceTest {
         Reservation res = createReservation(1, 19, 120, null);
         res.setQuantity(12);
 
-        Mockito.when(reservationDAO.findIn(res.getTime(), res.getDuration())).thenReturn(Arrays.asList(res1, res2));
+        Mockito.when(reservationDAO.findBetween(res.getTime(), res.getTime().plus(res.getDuration())))
+                .thenReturn(Arrays.asList(res1, res2));
 
         // WHEN
         // tables for max 9 persons free
@@ -462,14 +466,14 @@ public class TestReservationService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testFindReservationIn_shouldReturnObjects() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        LocalDateTime start = LocalDateTime.of(2015, 05, 15, 15, 00);
-        Duration duration = Duration.ofMinutes(60);
+        LocalDateTime from= LocalDateTime.of(2015, 05, 15, 15, 00);
+        LocalDateTime to = from.plus(Duration.ofMinutes(60));
 
         Reservation res = new Reservation();
-        Mockito.when(reservationDAO.findIn(start, duration)).thenReturn(Arrays.asList(res));
+        Mockito.when(reservationDAO.findBetween(from, to)).thenReturn(Arrays.asList(res));
 
         // WHEN
-        List<Reservation> reservations = reservationService.findReservationIn(start, duration);
+        List<Reservation> reservations = reservationService.findReservationBetween(from, to);
 
         // THEN
         assertEquals(1, reservations.size());
@@ -480,14 +484,14 @@ public class TestReservationService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testFindReservationIn_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        LocalDateTime start = LocalDateTime.of(2015, 05, 15, 15, 00);
-        Duration duration = Duration.ofMinutes(60);
+        LocalDateTime from = LocalDateTime.of(2015, 05, 15, 15, 00);
+        LocalDateTime to = from.plus(Duration.ofMinutes(60));
 
         Reservation res = new Reservation();
-        Mockito.doThrow(new DAOException("")).when(reservationDAO).findIn(start, duration);
+        Mockito.doThrow(new DAOException("")).when(reservationDAO).findBetween(from, to);
 
         // WHEN
-        reservationService.findReservationIn(start, duration);
+        reservationService.findReservationBetween(from, to);
     }
 
     @Test
