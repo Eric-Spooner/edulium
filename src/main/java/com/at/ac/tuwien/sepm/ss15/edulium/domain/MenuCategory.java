@@ -67,4 +67,11 @@ public class MenuCategory {
         if (identity != null ? !identity.equals(that.identity) : that.identity != null) return false;
         return !(name != null ? !name.equals(that.name) : that.name != null);
     }
+
+    @Override
+    public int hashCode() {
+        int result = identity != null ? identity.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
+    }
 }

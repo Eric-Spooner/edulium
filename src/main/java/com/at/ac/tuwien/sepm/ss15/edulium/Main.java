@@ -1,37 +1,27 @@
 package com.at.ac.tuwien.sepm.ss15.edulium;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.CookViewController;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.ManagerController;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
+import com.at.ac.tuwien.sepm.ss15.edulium.gui.EduliumApplicationContext;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
-        ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Service.xml");
+        ApplicationContext context = EduliumApplicationContext.getContext();
 
-        AuthenticationManager authenticationManager = context.getBean(AuthenticationManager.class);
-        Authentication request = new UsernamePasswordAuthenticationToken("daotester", "");
-        Authentication result = authenticationManager.authenticate(request);
-        SecurityContextHolder.getContext().setAuthentication(result);
+        Scene loginScene = context.getBean("loginScene", Scene.class);
+        primaryStage.setScene(loginScene);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/gui/Manager.fxml"));
-        Parent root = (Parent)fxmlLoader.load();
-        primaryStage.setTitle("Manager View");
-        primaryStage.setScene(new Scene(root));
+        primaryStage.setOnCloseRequest(event -> {
+            Platform.exit();
+            System.exit(0);
+        });
+
         primaryStage.show();
     }
-
 
     public static void main(String[] args) {
         launch(args);

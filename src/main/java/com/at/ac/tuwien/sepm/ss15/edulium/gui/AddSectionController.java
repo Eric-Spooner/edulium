@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
@@ -270,6 +271,8 @@ public class AddSectionController implements Initializable {
                 thisStage.close();
             } catch(ServiceException e) {
                 showErrorDialog("Error", "Database problem", "Could not access database!");
+            } catch (ValidationException e) {
+                showErrorDialog("Error", "Validation problem", "Validation has failed!");
             }
         }
     }

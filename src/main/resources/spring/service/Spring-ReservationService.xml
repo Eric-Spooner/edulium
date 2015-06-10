@@ -4,7 +4,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="interiorService" class="com.at.ac.tuwien.sepm.ss15.edulium.service.impl.InteriorServiceImpl">
+    <bean id="reservationService" class="com.at.ac.tuwien.sepm.ss15.edulium.service.impl.ReservationServiceImpl">
     </bean>
 
+    <!-- heuristic bean -->
+    <bean id="reservationHeuristic" class="com.at.ac.tuwien.sepm.ss15.edulium.service.heuristics.SimpleReservationHeuristic">
+    </bean>
 </beans>

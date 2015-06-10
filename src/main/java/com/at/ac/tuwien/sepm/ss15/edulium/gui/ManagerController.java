@@ -4,8 +4,8 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
-import com.sun.javafx.scene.control.skin.ListViewSkin;
 import javafx.beans.property.SimpleStringProperty;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -864,6 +864,8 @@ public class ManagerController implements Initializable {
                 }
             } catch (ServiceException e) {
                 LOGGER.error("Unable to remove section");
+            } catch (ValidationException e) {
+                LOGGER.error("Validation error");
             }
         }
         drawCanvas();

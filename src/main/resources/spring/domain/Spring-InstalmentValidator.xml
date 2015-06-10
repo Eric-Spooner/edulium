@@ -4,7 +4,6 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="interiorService" class="com.at.ac.tuwien.sepm.ss15.edulium.service.impl.InteriorServiceImpl">
+    <bean id="instalmentValidator" class="com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl.InstalmentValidator">
     </bean>
-
 </beans>

@@ -19,6 +19,7 @@
         <spring-security.version>4.0.1.RELEASE</spring-security.version>
         <maven-coveralls-plugin.version>3.1.0</maven-coveralls-plugin.version>
         <maven-jacoco-plugin.version>0.7.4.201502262128</maven-jacoco-plugin.version>
+        <controlsfx.version>8.40.9</controlsfx.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -97,6 +98,12 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <version>${spring-security.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>${controlsfx.version}</version>
         </dependency>
     </dependencies>
 
