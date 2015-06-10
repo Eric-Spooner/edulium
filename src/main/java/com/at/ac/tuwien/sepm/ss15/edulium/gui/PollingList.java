@@ -27,10 +27,11 @@ public class PollingList<E> extends ObservableListBase<E> {
         public void run() {
             assert supplier != null;
 
-            Set<E> suppliedElements = new HashSet<>(supplier.get());
-            if (suppliedElements == null) {
+            List<E> suppliedElementsList = supplier.get();
+            if (suppliedElementsList == null) {
                 return;
             }
+            Set<E> suppliedElements = new HashSet<>(suppliedElementsList);
 
             beginChange();
 
@@ -89,7 +90,8 @@ public class PollingList<E> extends ObservableListBase<E> {
      */
     public void startPolling() {
         if (supplier != null && interval > 0) {
-            scheduledFuture = taskScheduler.scheduleAtFixedRate(new DelegatingSecurityContextRunnable(new UpdateTask()), interval);
+            Runnable task = new DelegatingSecurityContextRunnable(new UpdateTask());
+            scheduledFuture = taskScheduler.scheduleAtFixedRate(task, interval);
         }
     }
 
