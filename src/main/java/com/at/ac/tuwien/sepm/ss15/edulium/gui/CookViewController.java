@@ -1,48 +1,39 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.TaxRateService;
-import javafx.beans.property.IntegerProperty;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.Period;
+import java.util.List;
 import java.util.ResourceBundle;
-
-import static javafx.collections.FXCollections.observableArrayList;
+import java.util.function.Supplier;
 
 /**
- * Created by - on 09.06.2015.
+ * Controller used for the Cook View
  */
+@Component
 public class CookViewController implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(DialogMenuController.class);
-
-    private static Stage thisStage;
-    private static OrderService orderService;
-    private static MenuService menuService;
-
+    private static final Logger LOGGER = LogManager.getLogger(CookViewController.class);
 
     @FXML
     private TableView<Order> tableViewQueued;
@@ -66,122 +57,110 @@ public class CookViewController implements Initializable {
     @FXML
     private TableColumn<Order, Long> tableColProgTime;
 
+    @Autowired
+    private MenuService menuService;
+    @Autowired
+    private OrderService orderService;
+    @Autowired
+    private TaskScheduler taskScheduler;
 
-    public static void setThisStage(Stage thisStage) {
-        CookViewController.thisStage = thisStage;
-    }
-    public static void setOrderService(OrderService orderService) {
-        CookViewController.orderService = orderService;
-    }
-    public static void setMenuService(MenuService menuService) {
-        CookViewController.menuService = menuService;
-    }
-
-
-    private ObservableList<Order> observableListQueued;
-    private ObservableList<Order> observableListInProgress;
+    private PollingList<Order> ordersQueued;
+    private PollingList<Order> ordersInProgress;
 
     @Override
-    public void initialize(URL location, ResourceBundle resources){
-        try {
-            observableListQueued = (observableArrayList(orderService.getAllOrdersToPrepare(
-                            menuService.getAllMenuCategories(), Order.State.QUEUED)));
-            observableListInProgress = (observableArrayList(orderService.getAllOrdersToPrepare(
-                    menuService.getAllMenuCategories(), Order.State.IN_PROGRESS)));
+    public void initialize(URL location, ResourceBundle resources) {
+        // queued
+        ordersQueued = new PollingList<>(taskScheduler);
+        ordersQueued.setInterval(1000);
+        ordersQueued.setSupplier(new Supplier<List<Order>>() {
+            @Override
+            public List<Order> get() {
+                try {
+                    Order matcher = new Order();
+                    matcher.setState(Order.State.QUEUED);
+                    return orderService.findOrder(matcher);
+                } catch (ServiceException e) {
+                    LOGGER.error("Getting all queued orders via order supplier has failed", e);
+                    return null;
+                }
+            }
+        });
+        ordersQueued.startPolling();
 
-            tableViewQueued.setItems(observableListQueued);
-            tableViewQueued.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            tableColQueudTisch.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Order, Long>, ObservableValue<Long>>() {
-                public ObservableValue<Long> call(TableColumn.CellDataFeatures<Order, Long> p) {
-                    // p.getValue() returns the Person instance for a particular TableView row
-                    return new SimpleObjectProperty<Long>(p.getValue().getTable().getNumber());
-                }
-            });
-            tableColQueudMenuEntry.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Order, String>, ObservableValue<String>>() {
-                public ObservableValue<String> call(TableColumn.CellDataFeatures<Order, String> p) {
-                    // p.getValue() returns the Person instance for a particular TableView row
-                    return new SimpleStringProperty(p.getValue().getMenuEntry().getName());
-                }
-            });
-            tableColQueudTime.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Order, Long>, ObservableValue<Long>>() {
-                public ObservableValue<Long> call(TableColumn.CellDataFeatures<Order, Long> p) {
-                    // p.getValue() returns the Person instance for a particular TableView row
-                    return new SimpleObjectProperty<Long>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes());
-                }
-            });
-            tableColQueudAddInfo.setCellValueFactory(new PropertyValueFactory<Order, String>("additionalInformation"));
+        tableViewQueued.setItems(ordersQueued);
+        tableViewQueued.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+        tableColQueudTisch.setCellValueFactory(p -> new SimpleObjectProperty<Long>(p.getValue().getTable().getNumber()));
+        tableColQueudMenuEntry.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getMenuEntry().getName()));
+        tableColQueudTime.setCellValueFactory(p -> new SimpleObjectProperty<Long>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes()));
+        tableColQueudAddInfo.setCellValueFactory(new PropertyValueFactory<Order, String>("additionalInformation"));
 
-            tableViewInProgress.setItems(observableListInProgress);
-            tableViewInProgress.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            tableColProgTisch.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Order, Long>, ObservableValue<Long>>() {
-                public ObservableValue<Long> call(TableColumn.CellDataFeatures<Order, Long> p) {
-                    // p.getValue() returns the Person instance for a particular TableView row
-                    return new SimpleObjectProperty<Long>(p.getValue().getTable().getNumber());
+        // in progress
+        ordersInProgress = new PollingList<>(taskScheduler);
+        ordersInProgress.setInterval(1000);
+        ordersInProgress.setSupplier(new Supplier<List<Order>>() {
+            @Override
+            public List<Order> get() {
+                try {
+                    Order matcher = new Order();
+                    matcher.setState(Order.State.IN_PROGRESS);
+                    return orderService.findOrder(matcher);
+                } catch (ServiceException e) {
+                    LOGGER.error("Getting all orders in progress via order supplier has failed", e);
+                    return null;
                 }
-            });
-            tableColProgMenuEntry.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Order, String>, ObservableValue<String>>() {
-                public ObservableValue<String> call(TableColumn.CellDataFeatures<Order, String> p) {
-                    // p.getValue() returns the Person instance for a particular TableView row
-                    return new SimpleStringProperty(p.getValue().getMenuEntry().getName());
-                }
-            });
-            tableColProgTime.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Order, Long>, ObservableValue<Long>>() {
-                public ObservableValue<Long> call(TableColumn.CellDataFeatures<Order, Long> p) {
-                    // p.getValue() returns the Person instance for a particular TableView row
-                    return new SimpleObjectProperty<Long>(Duration.between(p.getValue().getTime(),LocalDateTime.now()).toMinutes());
-                }
-            });
-            tableColProgAddInfo.setCellValueFactory(new PropertyValueFactory<Order, String>("additionalInformation"));
-        }catch (Exception e){
-            ManagerController.showErrorDialog
-                    ("Error", "Initialize Cook View", "The initialization did not work");
-            LOGGER.error("The initialization did not work" + e);
-        }
+            }
+        });
+        ordersInProgress.startPolling();
+
+        tableViewInProgress.setItems(ordersInProgress);
+        tableViewInProgress.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        tableColProgTisch.setCellValueFactory(p -> new SimpleObjectProperty<Long>(p.getValue().getTable().getNumber()));
+        tableColProgMenuEntry.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getMenuEntry().getName()));
+        tableColProgTime.setCellValueFactory(p -> new SimpleObjectProperty<Long>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes()));
+        tableColProgAddInfo.setCellValueFactory(new PropertyValueFactory<Order, String>("additionalInformation"));
     }
 
     public void btnInProgressToReadyToDeliver(ActionEvent actionEvent) {
         LOGGER.info("Entered btnInProgressToReadyToDeliver");
-        try {
-            if(tableViewInProgress.getSelectionModel().getSelectedItems() != null){
-                for(Order order : tableViewInProgress.getSelectionModel().getSelectedItems()){
+
+        if (tableViewInProgress.getSelectionModel().getSelectedItems() != null) {
+            try {
+                for (Order order : tableViewInProgress.getSelectionModel().getSelectedItems()) {
                     orderService.markAsReadyForDelivery(order);
                 }
+            } catch (ValidationException | ServiceException e) {
+                LOGGER.error("Putting State to in Progress did not work", e);
+
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Putting State to in Progress");
+                alert.setHeaderText("The State shifting did not work");
+                alert.setContentText(e.toString());
+
+                alert.showAndWait();
             }
-            observableListQueued.setAll(observableArrayList(orderService.getAllOrdersToPrepare(
-                    menuService.getAllMenuCategories(), Order.State.QUEUED)));
-            observableListInProgress.setAll(observableArrayList(orderService.getAllOrdersToPrepare(
-                    menuService.getAllMenuCategories(), Order.State.IN_PROGRESS)));
-        }catch (Exception e){
-            ManagerController.showErrorDialog
-                    ("Error", "Putting State to in Progress", "The State shifting did not work");
-            LOGGER.error("Putting State to in Progress did not work" + e);
         }
     }
 
     public void btnQueuedToInProgress(ActionEvent actionEvent) {
         LOGGER.info("Entered btnQueuedToInProgress");
-        try {
-            if(tableViewInProgress.getSelectionModel().getSelectedItems() != null){
-                for(Order order : tableViewQueued.getSelectionModel().getSelectedItems()){
+
+        if (tableViewInProgress.getSelectionModel().getSelectedItems() != null) {
+            try {
+                for (Order order : tableViewQueued.getSelectionModel().getSelectedItems()) {
                     orderService.markAsInProgress(order);
                 }
-            }
-            observableListQueued.setAll(observableArrayList(orderService.getAllOrdersToPrepare(
-                    menuService.getAllMenuCategories(), Order.State.QUEUED)));
-            observableListInProgress.setAll(observableArrayList(orderService.getAllOrdersToPrepare(
-                    menuService.getAllMenuCategories(), Order.State.IN_PROGRESS)));
-        }catch (Exception e){
-            ManagerController.showErrorDialog
-                    ("Error", "Putting State to in Ready to Deliver", "The State shifting did not work");
-            LOGGER.error("Putting State to in Ready to Deliver did not work" + e);
-        }
-    }
+            } catch (Exception e) {
+                LOGGER.error("Putting State to in Ready to Deliver did not work", e);
 
-    public void btnRefresh(ActionEvent actionEvent) throws Exception{
-        observableListQueued.setAll(observableArrayList(orderService.getAllOrdersToPrepare(
-                menuService.getAllMenuCategories(), Order.State.QUEUED)));
-        observableListInProgress.setAll(observableArrayList(orderService.getAllOrdersToPrepare(
-                menuService.getAllMenuCategories(), Order.State.IN_PROGRESS)));
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Putting State to in Ready to Deliver");
+                alert.setHeaderText("The State shifting did not work");
+                alert.setContentText(e.toString());
+
+                alert.showAndWait();
+            }
+        }
     }
 }
