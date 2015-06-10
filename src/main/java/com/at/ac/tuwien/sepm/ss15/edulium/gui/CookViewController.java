@@ -57,6 +57,17 @@ public class CookViewController implements Initializable {
     @FXML
     private TableColumn<Order, Long> tableColProgTime;
 
+    @FXML
+    private TableView<Order> tableViewReadyForDelivery;
+    @FXML
+    private TableColumn<Order, Long> tableColDeliveryTable;
+    @FXML
+    private TableColumn<Order, String> tableColDeliveryMenuEntry;
+    @FXML
+    private TableColumn<Order, String> tableColDeliveryAddInfo;
+    @FXML
+    private TableColumn<Order, Long> tableColDeliveryTime;
+
     @Autowired
     private MenuService menuService;
     @Autowired
@@ -66,6 +77,7 @@ public class CookViewController implements Initializable {
 
     private PollingList<Order> ordersQueued;
     private PollingList<Order> ordersInProgress;
+    private PollingList<Order> ordersReadyForDelivery;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -120,6 +132,31 @@ public class CookViewController implements Initializable {
         tableColProgMenuEntry.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getMenuEntry().getName()));
         tableColProgTime.setCellValueFactory(p -> new SimpleObjectProperty<Long>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes()));
         tableColProgAddInfo.setCellValueFactory(new PropertyValueFactory<Order, String>("additionalInformation"));
+
+        // ready for delivery
+        ordersReadyForDelivery = new PollingList<>(taskScheduler);
+        ordersReadyForDelivery.setInterval(1000);
+        ordersReadyForDelivery.setSupplier(new Supplier<List<Order>>() {
+            @Override
+            public List<Order> get() {
+                try {
+                    Order matcher = new Order();
+                    matcher.setState(Order.State.READY_FOR_DELIVERY);
+                    return orderService.findOrder(matcher);
+                } catch (ServiceException e) {
+                    LOGGER.error("Getting all ready for delivery orders via order supplier has failed", e);
+                    return null;
+                }
+            }
+        });
+        ordersReadyForDelivery.startPolling();
+
+        tableViewReadyForDelivery.setItems(ordersReadyForDelivery);
+
+        tableColDeliveryTable.setCellValueFactory(p -> new SimpleObjectProperty<Long>(p.getValue().getTable().getNumber()));
+        tableColDeliveryMenuEntry.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getMenuEntry().getName()));
+        tableColDeliveryTime.setCellValueFactory(p -> new SimpleObjectProperty<Long>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes()));
+        tableColDeliveryAddInfo.setCellValueFactory(new PropertyValueFactory<Order, String>("additionalInformation"));
     }
 
     public void btnInProgressToReadyToDeliver(ActionEvent actionEvent) {

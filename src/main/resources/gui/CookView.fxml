@@ -47,6 +47,23 @@
                   </Text>
                </children>
             </AnchorPane>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="209.0" prefWidth="142.0">
+                <children>
+                    <TableView fx:id="tableViewReadyForDelivery" layoutX="10.0" layoutY="54.0" prefHeight="399.0" prefWidth="516.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="54.0">
+                        <columns>
+                            <TableColumn fx:id="tableColDeliveryTable" prefWidth="67.0" text="Table" />
+                            <TableColumn fx:id="tableColDeliveryMenuEntry" prefWidth="186.0" text="Menu Entry" />
+                            <TableColumn fx:id="tableColDeliveryAddInfo" prefWidth="180.0" text="Additional Information" />
+                            <TableColumn fx:id="tableColDeliveryTime" prefWidth="82.0" text="Time" />
+                        </columns>
+                    </TableView>
+                    <Text layoutX="172.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="READY FOR DELIVERY" AnchorPane.topAnchor="14.0224609375">
+                        <font>
+                            <Font size="25.0" />
+                        </font>
+                    </Text>
+                </children>
+            </AnchorPane>
         </items>
       </SplitPane>
    </children>
