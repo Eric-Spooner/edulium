@@ -38,6 +38,7 @@
 
     <!-- Service beans -->
     <import resource="service/Spring-UserService.xml" />
+    <import resource="service/Spring-SaleService.xml" />
     <import resource="service/Spring-UserDetailsService.xml" />
     <import resource="service/Spring-MenuService.xml"/>
     <import resource="service/Spring-TaxRateService.xml" />

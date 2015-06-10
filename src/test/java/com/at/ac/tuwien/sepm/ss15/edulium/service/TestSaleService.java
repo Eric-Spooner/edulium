@@ -7,12 +7,15 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.OnetimeSale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,6 +38,15 @@ public class TestSaleService extends AbstractServiceTest {
     private DAO<OnetimeSale> onetimeSaleDAO;
     @Mock
     private Validator<OnetimeSale> onetimeSaleValidator;
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+        ReflectionTestUtils.setField(getTargetObject(saleService), "intermittentSaleDAO", intermittentSaleDAO);
+        ReflectionTestUtils.setField(getTargetObject(saleService), "intermittentSaleValidator", intermittentSaleValidator);
+        ReflectionTestUtils.setField(getTargetObject(saleService), "onetimeSaleDAO", onetimeSaleDAO);
+        ReflectionTestUtils.setField(getTargetObject(saleService), "onetimeSaleValidator", onetimeSaleValidator);
+    }
 
     @Test(expected = ServiceException.class)
     @WithMockUser(username = "servicetester", roles={"MANAGER"})
