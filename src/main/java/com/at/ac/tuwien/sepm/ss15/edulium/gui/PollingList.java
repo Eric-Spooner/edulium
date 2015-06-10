@@ -1,5 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
+import javafx.application.Platform;
 import javafx.collections.ObservableListBase;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
@@ -33,24 +34,29 @@ public class PollingList<E> extends ObservableListBase<E> {
             }
             Set<E> suppliedElements = new HashSet<>(suppliedElementsList);
 
-            beginChange();
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    beginChange();
 
-            // remove elements
-            for (int index = elements.size() - 1; index >= 0; index--) {
-                E element = elements.get(index);
+                    // remove elements
+                    for (int index = elements.size() - 1; index >= 0; index--) {
+                        E element = elements.get(index);
 
-                if (!suppliedElements.contains(element)) {
-                    nextRemove(index, element);
-                    elements.remove(index);
+                        if (!suppliedElements.contains(element)) {
+                            nextRemove(index, element);
+                            elements.remove(index);
+                        }
+                    }
+
+                    // add new elements
+                    suppliedElements.removeAll(elements); // remove all unchanged elements -> items to add
+                    nextAdd(elements.size(), elements.size() + suppliedElements.size());  // [start index, end index[
+                    elements.addAll(suppliedElements);
+
+                    endChange();
                 }
-            }
-
-            // add new elements
-            suppliedElements.removeAll(elements); // remove all unchanged elements -> items to add
-            nextAdd(elements.size(), elements.size() + suppliedElements.size());  // [start index, end index[
-            elements.addAll(suppliedElements);
-
-            endChange();
+            });
         }
     }
 
