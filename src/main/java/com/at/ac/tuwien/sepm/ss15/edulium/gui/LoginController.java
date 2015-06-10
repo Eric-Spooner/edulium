@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -42,6 +43,7 @@ public class LoginController implements Initializable {
     private AuthenticationManager authenticationManager;
 
     private PollingList<User> users;
+    private Consumer<User> loginConsumer = null;
 
     private class UserButtonCell extends GridCell<User> {
         private Button button = new Button();
@@ -96,6 +98,10 @@ public class LoginController implements Initializable {
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
+    public void setOnSuccessfulLoginAs(Consumer<User> loginConsumer) {
+        this.loginConsumer = loginConsumer;
+    }
+
     private void loginAs(User user) {
         assert user != null;
 
@@ -104,6 +110,10 @@ public class LoginController implements Initializable {
             Authentication result = authenticationManager.authenticate(request);
 
             SecurityContextHolder.getContext().setAuthentication(result);
+
+            if (loginConsumer != null) {
+                loginConsumer.accept(user);
+            }
         } catch (BadCredentialsException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Bad Credentials");
