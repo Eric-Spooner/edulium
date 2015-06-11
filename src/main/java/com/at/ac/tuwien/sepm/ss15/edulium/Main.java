@@ -13,8 +13,8 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         ApplicationContext context = EduliumApplicationContext.getContext();
 
-        FXMLPane loginPane = context.getBean("loginPane", FXMLPane.class);
-        primaryStage.setScene(new Scene(loginPane));
+        FXMLPane mainWindowPane = context.getBean("mainWindowPane", FXMLPane.class);
+        primaryStage.setScene(new Scene(mainWindowPane));
 
         primaryStage.setOnCloseRequest(event -> {
             Platform.exit();

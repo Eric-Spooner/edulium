@@ -43,7 +43,9 @@ public class LoginController implements Initializable {
     private AuthenticationManager authenticationManager;
 
     private PollingList<User> users;
-    private Consumer<User> loginConsumer = null;
+
+    private Consumer<User> succesfulLoginConsumer = null;
+    private Consumer<String> logoutConsumer = null;
 
     private class UserButtonCell extends GridCell<User> {
         private Button button = new Button();
@@ -96,10 +98,18 @@ public class LoginController implements Initializable {
 
     public void logout() {
         SecurityContextHolder.getContext().setAuthentication(null);
+
+        if (logoutConsumer != null) {
+            logoutConsumer.accept("logout by user");
+        }
     }
 
-    public void setOnSuccessfulLoginAs(Consumer<User> loginConsumer) {
-        this.loginConsumer = loginConsumer;
+    public void setOnSuccessfulLoginAs(Consumer<User> succesfulLoginConsumer) {
+        this.succesfulLoginConsumer = succesfulLoginConsumer;
+    }
+
+    public void setOnLogout(Consumer<String> logoutConsumer) {
+        this.logoutConsumer = logoutConsumer;
     }
 
     private void loginAs(User user) {
@@ -111,8 +121,8 @@ public class LoginController implements Initializable {
 
             SecurityContextHolder.getContext().setAuthentication(result);
 
-            if (loginConsumer != null) {
-                loginConsumer.accept(user);
+            if (succesfulLoginConsumer != null) {
+                succesfulLoginConsumer.accept(user);
             }
         } catch (BadCredentialsException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);

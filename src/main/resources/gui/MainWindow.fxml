@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+
+
+<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.MainWindowController">
+   <top>
+      <HBox fillHeight="false" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="userNameLabel" HBox.hgrow="ALWAYS" />
+            <Button fx:id="logoutButton" disable="true" mnemonicParsing="false" text="Logout" HBox.hgrow="NEVER" />
+         </children>
+      </HBox>
+   </top>
+</BorderPane>
