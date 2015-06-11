@@ -1,5 +1,6 @@
-MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('daotester', 'DAO Testuser', 'ROLE_COOK');
-MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('servicetester', 'Service Testuser', 'ROLE_MANAGER');
+MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('cook', 'Crusty Cook', 'ROLE_COOK');
+MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('waiter', 'Wily Waiter', 'ROLE_SERVICE');
+MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('manager', 'Maverick Manager', 'ROLE_MANAGER');
 
 MERGE INTO MenuCategory (ID, name) KEY(ID) VALUES (1, 'starter');
 MERGE INTO MenuCategory (ID, name) KEY(ID) VALUES (2, 'main dish');
