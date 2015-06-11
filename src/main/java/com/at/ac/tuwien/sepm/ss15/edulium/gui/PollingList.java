@@ -118,6 +118,15 @@ public class PollingList<E> extends ObservableListBase<E> {
         return scheduledFuture != null;
     }
 
+    /**
+     * Force an immediate update instead of waiting for the polling timeout. (Polling must be enabled)
+     */
+    public void immediateUpdate() {
+        if (isPolling()) {
+            restartPolling();
+        }
+    }
+
     private void restartPolling() {
         stopPolling();
         startPolling();
