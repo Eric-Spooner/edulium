@@ -681,4 +681,28 @@ public class TestMenuDAO extends AbstractDAOTest {
         // WHEN
         List<Menu> result = menuDAO.populate(invalidMenus);
     }
+
+    @Test
+    public void testBug47447_shouldUsePricesDefinedInMenuAssocInsteadOfTheRegularPrice() throws DAOException, ValidationException {
+        // GIVEN
+        MenuEntry menuEntry1 = createMenuEntry("entry1", "desc1", "cat", 20.0, 0.2, true);
+        menuEntryDAO.create(menuEntry1);
+
+        MenuEntry menuEntry2 = createMenuEntry("entry2", "desc2", "cat", 40.0, 0.2, true);
+        menuEntryDAO.create(menuEntry2);
+
+        menuEntry2.setPrice(BigDecimal.valueOf(130.0)); // special price
+
+        Menu menu = new Menu();
+        menu.setName("Menu1");
+        menu.setEntries(Arrays.asList(menuEntry1, menuEntry2));
+        menuDAO.create(menu);
+
+        // WHEN
+        List<Menu> objects = menuDAO.find(Menu.withIdentity(menu.getIdentity()));
+
+        // THEN
+        assertEquals(1, objects.size());
+        assertTrue(objects.contains(menu));
+    }
 }
