@@ -16,13 +16,13 @@ MERGE INTO RestaurantSection (ID, name) KEY(ID) VALUES(2, 'Main');
 MERGE INTO RestaurantSection (ID, name) KEY(ID) VALUES(3, 'Wintergarden');
 
 MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn, user_ID) KEY(section_ID, number)
-Values(1, 1, 5, 1, 2, 'daotester');
+Values(1, 1, 5, 1, 2, 'waiter');
 MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn, user_ID) KEY(section_ID, number)
-Values(2, 2, 5, 1, 2, 'servicetester');
+Values(2, 2, 5, 1, 2, 'waiter');
 MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn, user_ID) KEY(section_ID, number)
-Values(3, 3, 5, 1, 2, 'daotester');
+Values(3, 3, 5, 1, 2, 'waiter');
 MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn, user_ID) KEY(section_ID, number)
-Values(3, 4, 5, 1, 2, 'servicetester');
+Values(3, 4, 5, 1, 2, 'waiter');
 
 MERGE INTO MenuEntry (ID, name, price, available, description, taxRate_ID, category_ID)
        KEY(ID) Values(1, 'Schnitzel', 9, true, 'Wiener Schnitzel', 1, 2);
