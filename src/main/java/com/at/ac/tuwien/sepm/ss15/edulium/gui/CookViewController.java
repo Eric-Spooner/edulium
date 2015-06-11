@@ -31,8 +31,7 @@ import java.util.function.Supplier;
 /**
  * Controller used for the Cook View
  */
-@Component
-public class CookViewController implements Initializable {
+public class CookViewController implements Initializable, Controller {
     private static final Logger LOGGER = LogManager.getLogger(CookViewController.class);
 
     @FXML
@@ -97,7 +96,6 @@ public class CookViewController implements Initializable {
                 }
             }
         });
-        ordersQueued.startPolling();
 
         tableViewQueued.setItems(ordersQueued);
         tableViewQueued.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -123,7 +121,6 @@ public class CookViewController implements Initializable {
                 }
             }
         });
-        ordersInProgress.startPolling();
 
         tableViewInProgress.setItems(ordersInProgress);
         tableViewInProgress.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -149,7 +146,6 @@ public class CookViewController implements Initializable {
                 }
             }
         });
-        ordersReadyForDelivery.startPolling();
 
         tableViewReadyForDelivery.setItems(ordersReadyForDelivery);
 
@@ -204,6 +200,21 @@ public class CookViewController implements Initializable {
                 ordersQueued.immediateUpdate();
                 ordersInProgress.immediateUpdate();
             }
+        }
+    }
+
+    @Override
+    public void disable(boolean disabled) {
+        if (disabled) {
+            System.out.println("cook disabled");
+            ordersQueued.stopPolling();
+            ordersInProgress.stopPolling();
+            ordersReadyForDelivery.stopPolling();
+        } else {
+            System.out.println("cook enabled");
+            ordersQueued.startPolling();
+            ordersInProgress.startPolling();
+            ordersReadyForDelivery.startPolling();
         }
     }
 }

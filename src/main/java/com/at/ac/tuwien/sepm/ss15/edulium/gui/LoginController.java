@@ -28,8 +28,7 @@ import java.util.function.Supplier;
 /**
  * Controller used for the Manager View
  */
-@Component
-public class LoginController implements Initializable {
+public class LoginController implements Initializable, Controller {
     private static final Logger LOGGER = LogManager.getLogger(LoginController.class);
 
     @FXML
@@ -83,7 +82,6 @@ public class LoginController implements Initializable {
                 }
             }
         });
-        users.startPolling();
 
         GridView<User> gridView = new GridView<>(users);
         gridView.setCellFactory(view -> new UserButtonCell());
@@ -131,6 +129,15 @@ public class LoginController implements Initializable {
             alert.setContentText("Login as '" + user.getIdentity() + "' has failed, please try it again or contact your manager.");
 
             alert.showAndWait();
+        }
+    }
+
+    @Override
+    public void disable(boolean disabled) {
+        if (disabled) {
+            users.stopPolling();
+        } else {
+            users.startPolling();
         }
     }
 }

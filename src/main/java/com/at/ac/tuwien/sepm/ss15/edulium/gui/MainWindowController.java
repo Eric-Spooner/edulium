@@ -14,8 +14,7 @@ import javax.annotation.Resource;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-@Component
-public class MainWindowController implements Initializable {
+public class MainWindowController implements Initializable, Controller {
     private static final Logger LOGGER = LogManager.getLogger(MainWindowController.class);
 
     private enum ScreenType {
@@ -88,5 +87,10 @@ public class MainWindowController implements Initializable {
             default:
                 borderPane.setCenter(loginPane);
         }
+    }
+
+    @Override
+    public void disable(boolean disabled) {
+
     }
 }

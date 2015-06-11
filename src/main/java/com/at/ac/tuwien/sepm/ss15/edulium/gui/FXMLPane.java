@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationContext;
 import java.io.IOException;
 
 public class FXMLPane extends Pane {
-    private Object controller = null;
+    private Controller controller = null;
 
     public FXMLPane(String fxml) {
         ApplicationContext context = EduliumApplicationContext.getContext();
@@ -17,8 +17,12 @@ public class FXMLPane extends Pane {
 
         try {
             Pane pane = loader.load(context.getClassLoader().getResourceAsStream(fxml));
-            this.controller = loader.getController();
-            this.getChildren().setAll(pane);
+            controller = loader.getController();
+            getChildren().setAll(pane);
+
+            parentProperty().addListener(p -> disableController());
+            visibleProperty().addListener(p -> disableController());
+            disabledProperty().addListener(p -> disableController());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -28,7 +32,15 @@ public class FXMLPane extends Pane {
      * @param aClass Controller class type
      * @return Controller of this scene as object of class type aClass
      */
-    public <T> T getController(Class<T> aClass) {
+    public <T extends Controller> T getController(Class<T> aClass) {
         return (T)controller;
+    }
+
+    /**
+     * Calls Controller.disable(true/false) when the pane is/isn't visible or enabled/disabled, so that the
+     * controller can e.g. enable/disable polling
+     */
+    private void disableController() {
+        controller.disable(getParent() == null || !isVisible() || isDisabled());
     }
 }
