@@ -9,8 +9,6 @@
     <import resource="Spring-DataSource.xml" />
 
     <!-- Validator beans -->
-    <import resource="domain/Spring-IntermittentSaleValidator.xml" />
-    <import resource="domain/Spring-OnetimeSaleValidator.xml" />
     <import resource="domain/Spring-MenuCategoryValidator.xml" />
     <import resource="domain/Spring-TableValidator.xml" />
     <import resource="domain/Spring-SectionValidator.xml" />
@@ -21,10 +19,10 @@
     <import resource="domain/Spring-MenuEntryValidator.xml" />
     <import resource="domain/Spring-MenuValidator.xml" />
     <import resource="domain/Spring-OrderValidator.xml" />
+    <import resource="domain/Spring-IntermittentSaleValidator.xml" />
+    <import resource="domain/Spring-OnetimeSaleValidator.xml" />
 
     <!-- DAO beans -->
-    <import resource="dao/Spring-IntermittentSaleDAO.xml" />
-    <import resource="dao/Spring-OnetimeSaleDAO.xml" />
     <import resource="dao/Spring-MenuCategoryDAO.xml" />
     <import resource="dao/Spring-SectionDAO.xml" />
     <import resource="dao/Spring-TableDAO.xml" />
@@ -35,12 +33,14 @@
     <import resource="dao/Spring-TaxRateDAO.xml" />
     <import resource="dao/Spring-MenuEntryDAO.xml" />
     <import resource="dao/Spring-ReservationDAO.xml" />
+    <import resource="dao/Spring-IntermittentSaleDAO.xml" />
+    <import resource="dao/Spring-OnetimeSaleDAO.xml" />
 
     <!-- Service beans -->
     <import resource="service/Spring-UserService.xml" />
-    <import resource="service/Spring-SaleService.xml" />
     <import resource="service/Spring-UserDetailsService.xml" />
     <import resource="service/Spring-MenuService.xml"/>
     <import resource="service/Spring-TaxRateService.xml" />
+    <import resource="service/Spring-SaleService.xml" />
 
 </beans>
