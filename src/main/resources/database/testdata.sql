@@ -41,3 +41,20 @@ MERGE INTO Menu(ID,name) KEY(ID) VALUES (4, 'Bananen Menu');
 
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (4,3,3);
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (4,4,0.5);
+
+MERGE INTO RestaurantSection(ID, name) VALUES (1, 'Garten');
+MERGE INTO RestaurantSection(ID, name) VALUES (2, 'Bar');
+MERGE INTO RestaurantSection(ID, name) VALUES (3, 'Saal');
+MERGE INTO RestaurantSection(ID, name) VALUES (4, 'Gang');
+
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn) VALUES(1, 1, 4, 0, 0);
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn) VALUES(1, 2, 4, 5, 0);
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn) VALUES(1, 3, 4, 5, 5);
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn) VALUES(2, 4, 4, 0, 0);
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn) VALUES(2, 5, 4, 5, 5);
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn) VALUES(2, 6, 4, 0, 10);
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn) VALUES(3, 1, 4, 0, 0);
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn) VALUES(3, 2, 4, 5, 5);
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn) VALUES(3, 3, 4, 5, 10);
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn) VALUES(4, 1, 4, 0, 0);
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn) VALUES(4, 2, 4, 5, 5);

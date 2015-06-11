@@ -8,10 +8,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -59,45 +56,27 @@ public class OrdersOverviewController implements Initializable {
         orderService = context.getBean("orderService", OrderService.class);
         menuService = context.getBean("menuService", MenuService.class);
         interiorService = context.getBean("interiorService", InteriorService.class);
+
         ordersSP.setStyle("-fx-font-size: 40px;");
-/*
-        try {
-            Section section = new Section();
-            section.setIdentity(1L);
-            section.setName("A");
-            interiorService.addSection(section);
-            Table table = new Table();
-            table.setNumber(1L);
-            table.setSection(section);
-            table.setRow(1);
-            table.setColumn(1);
-            table.setSeats(4);
-            interiorService.addTable(table);
-            Order order = createOrder(BigDecimal.valueOf(500), "Order Information", BigDecimal.valueOf(0.2),
-                    LocalDateTime.now(), Order.State.QUEUED, 1);
-            //orderService.addOrder(order);
-        } catch(ServiceException e) {
-            System.out.println(e);
-        } catch(ValidationException e) {
-            System.out.println(e);
-        }
-*/
+
         ordersGP.setVgap(4);
         ordersGP.setHgap(4);
+
+        orderEntries.clear();
 
         try {
             categoriesGP.setVgap(4);
             categoriesGP.setHgap(150);
             int row = 0;
             int col = 0;
-            for(MenuCategory menuCategory : menuService.getAllMenuCategories()) {
+            for (MenuCategory menuCategory : menuService.getAllMenuCategories()) {
                 Button buttonCategory = new Button();
                 buttonCategory.setText(menuCategory.getName());
                 buttonCategory.setPrefSize(240, 40);
                 buttonCategory.setMinWidth(140);
                 buttonCategory.setStyle("-fx-font-size: 18px;");
                 buttonCategory.setOnAction(new EventHandler<ActionEvent>() {
-                    public void handle(ActionEvent t){
+                    public void handle(ActionEvent t) {
                         entriesVB.getChildren().clear();
                         MenuEntry matcher = new MenuEntry();
                         matcher.setCategory(menuCategory);
@@ -112,18 +91,18 @@ public class OrdersOverviewController implements Initializable {
                                 buttonEntry.setOnAction(new EventHandler<ActionEvent>() {
                                     public void handle(ActionEvent t) {
                                         // Check if entry already in orders, then increase amount
-                                        for(OrderEntry orderEntry : orderEntries) {
-                                            if(orderEntry.getEntryId().equals(entry.getIdentity())) {
+                                        for (OrderEntry orderEntry : orderEntries) {
+                                            if (orderEntry.getEntryId().equals(entry.getIdentity())) {
                                                 orderEntry.setAmountLabelText(String.valueOf(Integer.valueOf(orderEntry.getAmountLabelText()) + 1));
                                                 return;
                                             }
                                         }
-                                        if(ordersGP.getRowConstraints().size() <= ordersRow) {
+                                        if (ordersGP.getRowConstraints().size() <= ordersRow) {
                                             Separator sepVert1 = new Separator();
                                             ordersGP.setRowSpan(sepVert1, ordersRow);
                                         }
-                                        ordersGP.setMinHeight((ordersRow+1)*44);
-                                        if(!orderEntries.isEmpty()) {
+                                        ordersGP.setMinHeight((ordersRow + 1) * 44);
+                                        if (!orderEntries.isEmpty()) {
                                             orderAnchor.setMinHeight(orderEntries.get(orderEntries.size() - 1).getRow() * 44 + 120);
                                             orderAnchor.setMaxHeight(orderEntries.get(orderEntries.size() - 1).getRow() * 44 + 120);
                                         }
@@ -157,26 +136,25 @@ public class OrdersOverviewController implements Initializable {
                                         buttonMinus.setOnAction(new EventHandler<ActionEvent>() {
                                             public void handle(ActionEvent t) {
                                                 // Remove order if amount = 1 and "-" pressed
-                                                if(Integer.valueOf(amountOrdered.getText()) <= 1) {
+                                                if (Integer.valueOf(amountOrdered.getText()) <= 1) {
                                                     orderEntries.remove(orderEntry);
                                                     List<Node> children = new LinkedList<Node>(ordersGP.getChildren());
                                                     for (Node node : children) {
                                                         int nodeRow = GridPane.getRowIndex(node);
                                                         if (nodeRow == orderEntry.getRow()) {
                                                             ordersGP.getChildren().remove(node);
-                                                        }
-                                                        else if (nodeRow > orderEntry.getRow()) {
+                                                        } else if (nodeRow > orderEntry.getRow()) {
                                                             ordersGP.setRowIndex(node, nodeRow - 1);
                                                         }
                                                     }
-                                                    for(OrderEntry oe : orderEntries) {
-                                                        if(oe.getRow() > orderEntry.getRow()) {
+                                                    for (OrderEntry oe : orderEntries) {
+                                                        if (oe.getRow() > orderEntry.getRow()) {
                                                             oe.setRow(oe.getRow() - 1);
                                                         }
                                                     }
                                                     ordersGP.getRowConstraints().get(0).setMaxHeight(44);
-                                                    orderAnchor.setMinHeight(orderEntries.get(orderEntries.size()-1).getRow()*44+88);
-                                                    orderAnchor.setMaxHeight(orderEntries.get(orderEntries.size()-1).getRow()*44+88);
+                                                    orderAnchor.setMinHeight(orderEntries.get(orderEntries.size() - 1).getRow() * 44 + 88);
+                                                    orderAnchor.setMaxHeight(orderEntries.get(orderEntries.size() - 1).getRow() * 44 + 88);
                                                     ordersRow--;
                                                 } else {
                                                     //amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) - 1));
@@ -195,83 +173,58 @@ public class OrdersOverviewController implements Initializable {
                                 entriesVB.getChildren().add(i, buttonEntry);
                                 i++;
                             }
-                        } catch(ServiceException e) {
-                            System.out.println(e);
+                        } catch (ServiceException e) {
+                            showErrorDialog("Error", "Cannot retrieve menus", "There is a problem with accessing the database " + e);
                         }
                     }
                 });
 
-                if(categoriesGP.getRowConstraints().size() <= row) {
+                if (categoriesGP.getRowConstraints().size() <= row) {
                     Separator sepVert1 = new Separator();
                     categoriesGP.setRowSpan(sepVert1, row);
                 }
                 categoriesGP.add(buttonCategory, col, row);
-                if(col == 1) row++;
+                if (col == 1) row++;
                 //col = (col == 0) ? 1 : 0;
-                if(col++ == 1)
+                if (col++ == 1)
                     col = 0;
             }
-        } catch(ServiceException e) {
-            System.out.println(e);
+        } catch (ServiceException e) {
+            showErrorDialog("Error", "Cannot retrieve menus", "There is a problem with accessing the database " + e);
         }
     }
 
     public void backButtonClicked(ActionEvent event) {
-
     }
 
-    public void cashButtonClicked(ActionEvent event) {
-        // output for testing
-        String out = new String();
-        for(OrderEntry entry : orderEntries) {
+    public void commitButtonClicked(ActionEvent event) {
+        //String out = new String();
+        for (OrderEntry entry : orderEntries) {
             MenuEntry matcher = new MenuEntry();
             matcher.setIdentity(entry.getEntryId());
             MenuEntry en = null;
             try {
                 en = menuService.findMenuEntry(matcher).get(0);
-            } catch(ServiceException e) {
-                System.out.println(e);
+
+                for(int i = 0; i < Integer.valueOf(entry.getAmountLabelText()); i++) {
+                    Order order = new Order();
+                    order.setTable(interiorService.getAllTables().get(0)); //TODO selected table
+                    order.setMenuEntry(en);
+                    order.setBrutto(en.getPrice());
+                    order.setTax(en.getTaxRate().getValue());
+                    order.setAdditionalInformation("No additional information"); //TODO additional information?
+                    order.setTime(LocalDateTime.now());
+                    order.setState(Order.State.QUEUED);
+                    orderService.addOrder(order);
+                }
+            } catch (ServiceException e) {
+                showErrorDialog("Error", "Cannot store order", "There is a problem with accessing the database " + e);
+            } catch (ValidationException e) {
+                showErrorDialog("Error", "Cannot store order", "There is a problem with accessing the database " + e);
             }
-            out += en.getName() + ", "+entry.getAmountLabelText()+","+entry.getRow()+"\n";
+            //out += en.getName() + ", " + entry.getAmountLabelText() + "," + entry.getRow() + "\n";
         }
-        System.out.println(out);
-
-        // create table and section for testing
-        try {
-            Section section = new Section();
-            section.setIdentity(1L);
-            section.setName("A");
-            interiorService.addSection(section);
-            Table table = new Table();
-            table.setNumber(1L);
-            table.setSection(section);
-            table.setRow(1);
-            table.setColumn(1);
-            table.setSeats(4);
-            interiorService.addTable(table);
-            Order order = createOrder(BigDecimal.valueOf(500), "Order Information", BigDecimal.valueOf(0.2),
-                    LocalDateTime.now(), Order.State.QUEUED, 1);
-            orderService.addOrder(order);
-        } catch(ServiceException e) {
-            System.out.println(e);
-        } catch(ValidationException e) {
-            System.out.println(e);
-        }
-    }
-
-    private Order createOrder(BigDecimal value, String additionalInformation,
-                              BigDecimal taxRate, LocalDateTime time, Order.State state, int MenuEntryID) throws ServiceException{
-
-        Order order = new Order();
-        order.setTable(interiorService.getAllTables().get(0));
-        order.setMenuEntry(menuService.getAllMenuEntries().get(MenuEntryID));
-        order.setBrutto(value);
-        order.setTax(taxRate);
-        order.setAdditionalInformation(additionalInformation);
-        order.setTime(time);
-        order.setState(state);
-
-        return order;
+        //System.out.println(out);
     }
 
     private class OrderEntry {
@@ -306,5 +259,14 @@ public class OrdersOverviewController implements Initializable {
         public void setEntryId(Long entryId) {
             EntryId = entryId;
         }
+    }
+
+    public static void showErrorDialog(String title, String head, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(head);
+        alert.setContentText(content);
+
+        alert.showAndWait();
     }
 }
