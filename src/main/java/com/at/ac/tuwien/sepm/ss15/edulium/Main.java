@@ -24,7 +24,7 @@ public class Main extends Application {
         Authentication result = authenticationManager.authenticate(request);
         SecurityContextHolder.getContext().setAuthentication(result);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/gui/OrdersOverview.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/gui/TablesOverview.fxml"));
         Parent root = (Parent)fxmlLoader.load();
         primaryStage.setTitle("Orders Overview");
         primaryStage.setScene(new Scene(root));

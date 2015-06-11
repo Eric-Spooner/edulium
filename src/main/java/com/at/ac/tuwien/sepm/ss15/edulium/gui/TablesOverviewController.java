@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.value.ChangeListener;
@@ -15,6 +16,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
@@ -22,6 +24,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import sun.font.FontScalerException;
 
 import java.net.URL;
@@ -29,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class Controller implements Initializable {
+public class TablesOverviewController implements Initializable {
     @FXML
     private Canvas tablesCanvas;
     @FXML
@@ -60,12 +64,11 @@ public class Controller implements Initializable {
     private final int SECTION_PADDING = 10;
     private final int TEXT_BORDER_BOTTOM = 2;
 
-    public static void setInteriorService(InteriorService interiorService) {
-        Controller.interiorService = interiorService;
-    }
-
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
+        ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Edulium.xml");
+        interiorService = context.getBean("interiorService", InteriorService.class);
+
         Section section1 = new Section();
         section1.setIdentity((long)1);
         section1.setName("Garten");
@@ -165,7 +168,9 @@ public class Controller implements Initializable {
             interiorService.addTable(table10);
             interiorService.addTable(table11);
         } catch (ServiceException e) {
-            //TODO alert
+            showErrorDialog("Error", "Cannot store tables", "There is a problem with accessing the database");
+        } catch (ValidationException e) {
+            showErrorDialog("Error", "Cannot store tables", "There is a problem with accessing the database");
         }
 
         drawCanvas();
@@ -180,7 +185,7 @@ public class Controller implements Initializable {
                             tableIdLabel.setText(String.valueOf(clickedTable.getNumber()));
                         }
                     } catch(ServiceException e) {
-                        //TODO alert
+                        showErrorDialog("Error", "Cannot retrieve tables", "There is a problem with accessing the database");
                     }
 
                 }
@@ -324,7 +329,7 @@ public class Controller implements Initializable {
                     }
                 }
 
-                tablesCanvas.setHeight(y+calculateHeight(section)*scaleY+CANVAS_PADDING);
+                tablesCanvas.setHeight(y*scaleY+calculateHeight(section)*scaleY+CANVAS_PADDING*scaleY);
                 gc.strokeRoundRect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY, 10, 10);
                 gc.setFont(new Font(gc.getFont().getName(), 20 * scaleText));
                 gc.fillText(section.getName() + ":", x*scaleX, (y-TEXT_BORDER_BOTTOM)*scaleY);
@@ -340,7 +345,16 @@ public class Controller implements Initializable {
                 prevSection = section;
             }
         } catch(ServiceException e) {
-            //TODO Alert
+            showErrorDialog("Error", "Cannot retrieve sections", "There is a problem with accessing the database");
         }
+    }
+
+    public static void showErrorDialog(String title, String head, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(head);
+        alert.setContentText(content);
+
+        alert.showAndWait();
     }
 }
