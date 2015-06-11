@@ -45,7 +45,8 @@
     <import resource="service/Spring-ReservationService.xml" />
 
     <!-- GUI beans -->
-    <import resource="gui/Spring-LoginScene.xml" />
+    <import resource="gui/Spring-LoginPane.xml" />
+    <import resource="gui/Spring-MainWindowPane.xml" />
     <import resource="gui/Spring-CookViewScene.xml" />
 
 </beans>
