@@ -1,14 +1,5 @@
-MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('daotester', 'DAO Testuser', 'admin');
-MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('servicetester', 'Service Testuser', 'manager');
-
-MERGE INTO RestaurantSection (ID, name) KEY(ID) VALUES(1, 'Garden');
-MERGE INTO RestaurantSection (ID, name) KEY(ID) VALUES(2, 'Main');
-
-MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn, user_ID) KEY(section_ID, number)
-Values(1, 1, 5, 1, 2, 'daotester');
-MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn, user_ID) KEY(section_ID, number)
-Values(2, 2, 5, 1, 2, 'servicetester');
-
+MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('daotester', 'DAO Testuser', 'ROLE_SERVICE');
+MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('servicetester', 'Service Testuser', 'ROLE_MANAGER');
 
 MERGE INTO MenuCategory (ID, name) KEY(ID) VALUES (1, 'starter');
 MERGE INTO MenuCategory (ID, name) KEY(ID) VALUES (2, 'main dish');
