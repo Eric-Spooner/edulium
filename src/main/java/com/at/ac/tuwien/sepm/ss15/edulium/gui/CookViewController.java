@@ -206,12 +206,10 @@ public class CookViewController implements Initializable, Controller {
     @Override
     public void disable(boolean disabled) {
         if (disabled) {
-            System.out.println("cook disabled");
             ordersQueued.stopPolling();
             ordersInProgress.stopPolling();
             ordersReadyForDelivery.stopPolling();
         } else {
-            System.out.println("cook enabled");
             ordersQueued.startPolling();
             ordersInProgress.startPolling();
             ordersReadyForDelivery.startPolling();
