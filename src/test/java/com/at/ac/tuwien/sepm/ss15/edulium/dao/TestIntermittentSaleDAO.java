@@ -132,7 +132,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // check if the user has been updated;
         List<IntermittentSale> storedObjects = intermittentSaleDAO.find(intermittentSale2);
         assertEquals(1, storedObjects.size());
-        assertEquals(intermittentSale, storedObjects.get(0));
+        assertEquals(intermittentSale2, storedObjects.get(0));
     }
 
     @Test(expected = ValidationException.class)
