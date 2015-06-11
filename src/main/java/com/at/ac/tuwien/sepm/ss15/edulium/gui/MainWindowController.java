@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -51,6 +52,9 @@ public class MainWindowController implements Initializable {
 
             // show the right screen for the role
             switch (user.getRole()) {
+                case "ROLE_COOK":
+                    showScreen(ScreenType.CookScreen);
+                    break;
                 default:
                     LOGGER.debug("We have no screen for role '" + user.getRole() + "' -> logout");
                     loginController.logout();
@@ -69,10 +73,14 @@ public class MainWindowController implements Initializable {
     }
 
     private void showScreen(ScreenType screenType) {
+        ApplicationContext context = EduliumApplicationContext.getContext();
+
         switch (screenType) {
             case ManagerScreen:
                 break;
             case CookScreen:
+                FXMLPane cookViewPane = context.getBean("cookViewPane", FXMLPane.class);
+                borderPane.setCenter(cookViewPane);
                 break;
             case ServiceScreen:
                 break;
