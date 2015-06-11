@@ -1,9 +1,9 @@
 package com.at.ac.tuwien.sepm.ss15.edulium;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.EduliumApplicationContext;
+import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLScene;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.springframework.context.ApplicationContext;
 
@@ -12,7 +12,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         ApplicationContext context = EduliumApplicationContext.getContext();
 
-        Scene loginScene = context.getBean("loginScene", Scene.class);
+        FXMLScene loginScene = context.getBean("loginScene", FXMLScene.class);
         primaryStage.setScene(loginScene);
 
         primaryStage.setOnCloseRequest(event -> {
