@@ -47,6 +47,6 @@
     <!-- GUI beans -->
     <import resource="gui/Spring-LoginPane.xml" />
     <import resource="gui/Spring-MainWindowPane.xml" />
-    <import resource="gui/Spring-CookViewScene.xml" />
+    <import resource="gui/Spring-CookViewPane.xml" />
 
 </beans>
