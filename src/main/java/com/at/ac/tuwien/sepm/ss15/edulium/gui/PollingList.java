@@ -97,7 +97,7 @@ public class PollingList<E> extends ObservableListBase<E> {
      * Starts the polling of elements if a valid supplier is set and the update interval is bigger than 0.
      */
     public void startPolling() {
-        if (supplier != null && interval > 0) {
+        if (supplier != null && interval > 0 && !isPolling()) {
             Runnable task = new DelegatingSecurityContextRunnable(new UpdateTask());
             scheduledFuture = taskScheduler.scheduleAtFixedRate(task, interval);
         }
@@ -116,6 +116,15 @@ public class PollingList<E> extends ObservableListBase<E> {
      */
     public boolean isPolling() {
         return scheduledFuture != null;
+    }
+
+    /**
+     * Force an immediate update instead of waiting for the polling timeout. (Polling must be enabled)
+     */
+    public void immediateUpdate() {
+        if (isPolling()) {
+            restartPolling();
+        }
     }
 
     private void restartPolling() {
