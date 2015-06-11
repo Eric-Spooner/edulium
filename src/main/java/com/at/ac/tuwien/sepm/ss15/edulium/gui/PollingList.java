@@ -107,8 +107,10 @@ public class PollingList<E> extends ObservableListBase<E> {
      * Stops the polling
      */
     public void stopPolling() {
-        scheduledFuture.cancel(true);
-        scheduledFuture = null;
+        if (scheduledFuture != null) {
+            scheduledFuture.cancel(true);
+            scheduledFuture = null;
+        }
     }
 
     /**
