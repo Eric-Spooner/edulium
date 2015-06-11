@@ -176,6 +176,9 @@ public class CookViewController implements Initializable {
                 alert.setContentText(e.toString());
 
                 alert.showAndWait();
+            } finally {
+                ordersInProgress.immediateUpdate();
+                ordersReadyForDelivery.immediateUpdate();
             }
         }
     }
@@ -197,6 +200,9 @@ public class CookViewController implements Initializable {
                 alert.setContentText(e.toString());
 
                 alert.showAndWait();
+            } finally {
+                ordersQueued.immediateUpdate();
+                ordersInProgress.immediateUpdate();
             }
         }
     }
