@@ -7,7 +7,7 @@
     <bean id="roomViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.RoomViewController" scope="prototype" />
 
     <bean id="roomViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/roomView.fxml" />
+        <constructor-arg name="fxml" value="gui/RoomView.fxml" />
     </bean>
 
 </beans>
