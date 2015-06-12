@@ -193,6 +193,10 @@ public class OrderOverviewController implements Initializable, Controller {
         }
     }
 
+    public static void setSelectedTable(Table table) {
+
+    }
+
     public void backButtonClicked(ActionEvent event) {
     }
 

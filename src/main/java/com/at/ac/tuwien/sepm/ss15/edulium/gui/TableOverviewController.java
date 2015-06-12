@@ -21,6 +21,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -31,6 +32,7 @@ import sun.font.FontScalerException;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -79,12 +81,21 @@ public class TableOverviewController implements Initializable, Controller {
                     try {
                         Table clickedTable = rect.getTable(t.getX(), t.getY());
                         if (clickedTable != null) {
+                            System.out.println("Table " + clickedTable);
                             FXMLPane orderViewPane = context.getBean("orderOverviewPane", FXMLPane.class);
-                            Stage stage = new Stage();
+                            /*Stage stage = new Stage();
                             stage.setTitle("OrderOverview");
                             Scene scene = new Scene(orderViewPane);
                             stage.setScene(scene);
-                            stage.showAndWait();
+                            stage.showAndWait();*/
+                            OrderOverviewController.setSelectedTable(clickedTable);
+                            StackPane orderStackPane = new StackPane();
+                            orderStackPane.getChildren().setAll(orderViewPane);
+                            Scene orderScene = new Scene(orderStackPane);
+                            Stage orderStage = new Stage();
+                            orderStage.setTitle("Orders Overview");
+                            orderStage.setScene(orderScene);
+                            orderStage.show();
                             tableIdLabel.setText(String.valueOf(clickedTable.getNumber()));
                         }
                     } catch (ServiceException e) {
@@ -200,6 +211,8 @@ public class TableOverviewController implements Initializable, Controller {
             return h;
         }
 
+        public long getNumber() { return number; }
+
         public Table getTable(double x, double y) throws ServiceException {
             if (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h) {
                 Table matcher = new Table();
@@ -247,6 +260,14 @@ public class TableOverviewController implements Initializable, Controller {
                 for (Table table : interiorService.findTables(matcher)) {
                     Rect rect = new Rect(((x + SECTION_PADDING) + (table.getColumn() * FACT)) * scaleX, ((y + SECTION_PADDING) + (table.getRow() * FACT)) * scaleY, TABLE_SIZE * scaleX, TABLE_SIZE * scaleY, section, table.getNumber());
                     gc.strokeRoundRect(rect.getX(), rect.getY(), rect.getW(), rect.getH(), 2, 2);
+                    // Remove old rect and add new rect with changed parameters
+                    Iterator<Rect> iter = rects.iterator();
+                    while(iter.hasNext()) {
+                        Rect current = iter.next();
+                        if(current.getNumber() == table.getNumber()) {
+                            iter.remove();
+                        }
+                    }
                     rects.add(rect);
                     gc.fillText(String.valueOf(table.getNumber()), ((x + SECTION_PADDING) + (table.getColumn() * FACT) + TABLE_SIZE / 4) * scaleX, ((y + SECTION_PADDING) + (table.getRow() * FACT) + TABLE_SIZE / 1.5) * scaleY);
                 }
