@@ -21,6 +21,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -29,10 +30,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import sun.font.FontScalerException;
 
+import javax.annotation.Resource;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 public class TableOverviewController implements Initializable, Controller {
     @FXML
@@ -66,6 +70,8 @@ public class TableOverviewController implements Initializable, Controller {
     private final int SECTION_PADDING = 10;
     private final int TEXT_BORDER_BOTTOM = 2;
 
+    private Consumer<Table> tableConsumer = null;
+
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
         ApplicationContext context = EduliumApplicationContext.getContext();
@@ -79,12 +85,18 @@ public class TableOverviewController implements Initializable, Controller {
                     try {
                         Table clickedTable = rect.getTable(t.getX(), t.getY());
                         if (clickedTable != null) {
+                            //ServiceController serviceController = tablePane.getController(ServiceController.class);
+                            OrderOverviewController.setSelectedTable(clickedTable);
+                            //tableConsumer.accept(clickedTable);
                             FXMLPane orderViewPane = context.getBean("orderOverviewPane", FXMLPane.class);
-                            Stage stage = new Stage();
-                            stage.setTitle("OrderOverview");
-                            Scene scene = new Scene(orderViewPane);
-                            stage.setScene(scene);
-                            stage.showAndWait();
+                            StackPane orderStackPane = new StackPane();
+                            orderStackPane.getChildren().setAll(orderViewPane);
+                            Scene orderScene = new Scene(orderStackPane);
+                            Stage orderStage = new Stage();
+                            OrderOverviewController.setStage(orderStage);
+                            orderStage.setTitle("Orders Overview");
+                            orderStage.setScene(orderScene);
+                            orderStage.show();
                             tableIdLabel.setText(String.valueOf(clickedTable.getNumber()));
                         }
                     } catch (ServiceException e) {
@@ -131,9 +143,12 @@ public class TableOverviewController implements Initializable, Controller {
         });
     }
 
+    public void setOnTableClicked(Consumer<Table> tableConsumer) {
+        this.tableConsumer = tableConsumer;
+    }
+
     @FXML
     public void filterButtonClicked(ActionEvent event) {
-
     }
 
     @FXML
@@ -200,6 +215,8 @@ public class TableOverviewController implements Initializable, Controller {
             return h;
         }
 
+        public long getNumber() { return number; }
+
         public Table getTable(double x, double y) throws ServiceException {
             if (x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h) {
                 Table matcher = new Table();
@@ -247,6 +264,14 @@ public class TableOverviewController implements Initializable, Controller {
                 for (Table table : interiorService.findTables(matcher)) {
                     Rect rect = new Rect(((x + SECTION_PADDING) + (table.getColumn() * FACT)) * scaleX, ((y + SECTION_PADDING) + (table.getRow() * FACT)) * scaleY, TABLE_SIZE * scaleX, TABLE_SIZE * scaleY, section, table.getNumber());
                     gc.strokeRoundRect(rect.getX(), rect.getY(), rect.getW(), rect.getH(), 2, 2);
+                    // Remove old rect and add new rect with changed parameters
+                    Iterator<Rect> iter = rects.iterator();
+                    while(iter.hasNext()) {
+                        Rect current = iter.next();
+                        if(current.getNumber() == table.getNumber()) {
+                            iter.remove();
+                        }
+                    }
                     rects.add(rect);
                     gc.fillText(String.valueOf(table.getNumber()), ((x + SECTION_PADDING) + (table.getColumn() * FACT) + TABLE_SIZE / 4) * scaleX, ((y + SECTION_PADDING) + (table.getRow() * FACT) + TABLE_SIZE / 1.5) * scaleY);
                 }

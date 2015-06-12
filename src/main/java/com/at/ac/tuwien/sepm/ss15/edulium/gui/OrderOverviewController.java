@@ -8,11 +8,14 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,17 +43,21 @@ public class OrderOverviewController implements Initializable, Controller {
 
     private int ordersRow = 0;
     private LinkedList<OrderEntry> orderEntries = new LinkedList<>();
+    private static Table table = null;
+    private static Stage thisStage;
 
     @FXML
-    GridPane categoriesGP;
+    private GridPane categoriesGP;
     @FXML
-    GridPane ordersGP;
+    private GridPane ordersGP;
     @FXML
-    VBox entriesVB;
+    private VBox entriesVB;
     @FXML
-    AnchorPane orderAnchor;
+    private AnchorPane orderAnchor;
     @FXML
-    ScrollPane ordersSP;
+    private ScrollPane ordersSP;
+    @FXML
+    private Label tableNumberLabel;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -62,6 +69,7 @@ public class OrderOverviewController implements Initializable, Controller {
         ordersGP.setHgap(4);
 
         orderEntries.clear();
+        tableNumberLabel.setText(String.valueOf(table.getNumber()));
 
         try {
             categoriesGP.setVgap(4);
@@ -193,7 +201,16 @@ public class OrderOverviewController implements Initializable, Controller {
         }
     }
 
+    public static void setStage(Stage stage) {
+        OrderOverviewController.thisStage = stage;
+    }
+
+    public static void setSelectedTable(Table table) {
+        OrderOverviewController.table = table;
+    }
+
     public void backButtonClicked(ActionEvent event) {
+        thisStage.close();
     }
 
     public void commitButtonClicked(ActionEvent event) {
@@ -207,7 +224,7 @@ public class OrderOverviewController implements Initializable, Controller {
 
                 for(int i = 0; i < Integer.valueOf(entry.getAmountLabelText()); i++) {
                     Order order = new Order();
-                    order.setTable(interiorService.getAllTables().get(0)); //TODO selected table
+                    order.setTable(table);
                     order.setMenuEntry(en);
                     order.setBrutto(en.getPrice());
                     order.setTax(en.getTaxRate().getValue());
@@ -224,6 +241,7 @@ public class OrderOverviewController implements Initializable, Controller {
             //out += en.getName() + ", " + entry.getAmountLabelText() + "," + entry.getRow() + "\n";
         }
         //System.out.println(out);
+        thisStage.close();
     }
 
     @Override
