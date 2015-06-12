@@ -45,7 +45,8 @@
                         </ScrollPane>
                         <Button layoutX="498.0" layoutY="51.0" mnemonicParsing="false" onAction="#buttonEditSectionClicked" prefHeight="25.0" prefWidth="89.0" text="Edit..." AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="51.0" />
                         <Button layoutX="498.0" layoutY="89.0" mnemonicParsing="false" onAction="#buttonRemoveSectionClicked" prefHeight="25.0" prefWidth="89.0" text="Remove" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="88.0" />
-                     </children></AnchorPane>
+                     </children>
+              </AnchorPane>
             </content>
           </Tab>
             <Tab text="Menu">
@@ -64,7 +65,8 @@
                            </columns>
                         </TableView>
                         <Button fx:id="buttonShowAll" layoutX="494.0" layoutY="156.0" mnemonicParsing="false" onAction="#buttonShowAllMenuClicked" prefWidth="92.0" text="Show All" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="154.0" />
-                     </children></AnchorPane>
+                     </children>
+                  </AnchorPane>
                </content>
             </Tab>
             <Tab text="Menu Entry">

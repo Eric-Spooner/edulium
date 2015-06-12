@@ -136,14 +136,6 @@ public class ManagerViewController implements Initializable, Controller {
     public void initialize(URL location, ResourceBundle resources){
         try {
             ApplicationContext context = EduliumApplicationContext.getContext();
-            /*
-            context = new ClassPathXmlApplicationContext("spring/Spring-Service.xml");
-            menuService = context.getBean("menuService", MenuService.class);
-            taxRateService = context.getBean("taxRateService",  TaxRateService.class);
-            interiorService = context.getBean("interiorService",  InteriorService.class);
-            userService = context.getBean("userService",  UserService.class);
-            orderService = context.getBean("orderService",  OrderService.class);
-            */
 
             users = observableArrayList(userService.getAllUsers());
             tableViewEmployee.setItems(users);
@@ -819,7 +811,7 @@ public class ManagerViewController implements Initializable, Controller {
             Stage stage = new Stage();
             AddSectionController.setInteriorService(interiorService);
             AddSectionController.setThisStage(stage);
-            AddSectionController.setUpdateCanvas(new UpdateCanvas());
+            //AddSectionController.setUpdateCanvas(new UpdateCanvas());
             stage.setTitle("Add Section");
             AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/AddSection.fxml"));
             Scene scene = new Scene(myPane);
@@ -838,7 +830,7 @@ public class ManagerViewController implements Initializable, Controller {
                 Stage stage = new Stage();
                 EditSectionController.setInteriorService(interiorService);
                 EditSectionController.setThisStage(stage);
-                EditSectionController.setUpdateCanvas(new UpdateCanvas());
+                //EditSectionController.setUpdateCanvas(new UpdateCanvas());
                 EditSectionController.initTables(clickedSectionId);
                 stage.setTitle("Edit Section");
                 AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/EditSection.fxml"));
@@ -936,15 +928,6 @@ public class ManagerViewController implements Initializable, Controller {
     public void disable(boolean disabled) {
 
     }
-
-
-    //TODO think of a better solution
-    public class UpdateCanvas {
-        public void update() {
-            drawCanvas();
-        }
-    }
-
     private void drawCanvas() {
         GraphicsContext gc = tablesCanvas.getGraphicsContext2D();
         double scaleText = scaleY;
