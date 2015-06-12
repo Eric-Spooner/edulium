@@ -7,64 +7,60 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="591.0" prefWidth="1143.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.CookViewController">
-   <children>
-      <SplitPane dividerPositions="0.5" layoutX="33.0" layoutY="20.0" prefHeight="506.0" prefWidth="1083.0" AnchorPane.bottomAnchor="65.0" AnchorPane.leftAnchor="33.0" AnchorPane.rightAnchor="27.0" AnchorPane.topAnchor="20.0">
-        <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-               <children>
-                  <TableView fx:id="tableViewQueued" layoutX="11.0" layoutY="54.0" prefHeight="399.0" prefWidth="516.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="54.0">
-                    <columns>
-                      <TableColumn fx:id="tableColQueudTisch" prefWidth="67.0" text="Tisch" />
-                      <TableColumn fx:id="tableColQueudMenuEntry" prefWidth="186.0" text="Menu Entry" />
-                        <TableColumn fx:id="tableColQueudAddInfo" prefWidth="180.0" text="Additional Information" />
-                        <TableColumn fx:id="tableColQueudTime" prefWidth="82.0" text="Time" />
-                    </columns>
-                  </TableView>
-                  <Text layoutX="200.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="QUEUED">
-                     <font>
-                        <Font size="25.0" />
-                     </font>
-                  </Text>
-                  <Button cancelButton="true" layoutX="248.0" layoutY="459.0" mnemonicParsing="false" onAction="#btnQueuedToInProgress" text="&gt;&gt;" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="248.0" AnchorPane.rightAnchor="248.0" />
-               </children>
-            </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="209.0" prefWidth="142.0">
-               <children>
-                  <TableView fx:id="tableViewInProgress" layoutX="10.0" layoutY="54.0" prefHeight="399.0" prefWidth="516.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="54.0">
-                     <columns>
-                        <TableColumn fx:id="tableColProgTisch" prefWidth="67.0" text="Tisch" />
-                        <TableColumn fx:id="tableColProgMenuEntry" prefWidth="186.0" text="Menu Entry" />
-                        <TableColumn fx:id="tableColProgAddInfo" prefWidth="180.0" text="Additional Information" />
-                        <TableColumn fx:id="tableColProgTime" prefWidth="82.0" text="Time" />
-                     </columns>
-                  </TableView>
-                  <Button layoutX="248.0" layoutY="459.0" mnemonicParsing="false" onAction="#btnInProgressToReadyToDeliver" text="&gt;&gt;" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="248.0" AnchorPane.rightAnchor="247.0" />
-                  <Text layoutX="172.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="IN PROGRESS" AnchorPane.topAnchor="14.0224609375">
-                     <font>
-                        <Font size="25.0" />
-                     </font>
-                  </Text>
-               </children>
-            </AnchorPane>
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="209.0" prefWidth="142.0">
-                <children>
-                    <TableView fx:id="tableViewReadyForDelivery" layoutX="10.0" layoutY="54.0" prefHeight="399.0" prefWidth="516.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="54.0">
-                        <columns>
-                            <TableColumn fx:id="tableColDeliveryTable" prefWidth="67.0" text="Table" />
-                            <TableColumn fx:id="tableColDeliveryMenuEntry" prefWidth="186.0" text="Menu Entry" />
-                            <TableColumn fx:id="tableColDeliveryAddInfo" prefWidth="180.0" text="Additional Information" />
-                            <TableColumn fx:id="tableColDeliveryTime" prefWidth="82.0" text="Time" />
-                        </columns>
-                    </TableView>
-                    <Text layoutX="172.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="READY FOR DELIVERY" AnchorPane.topAnchor="14.0224609375">
-                        <font>
-                            <Font size="25.0" />
-                        </font>
-                    </Text>
-                </children>
-            </AnchorPane>
-        </items>
-      </SplitPane>
-   </children>
-</AnchorPane>
+<SplitPane dividerPositions="0.5, 0.5" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.CookViewController">
+   <items>
+      <AnchorPane>
+         <children>
+            <TableView fx:id="tableViewQueued" layoutX="11.0" layoutY="54.0" prefHeight="399.0" prefWidth="516.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="54.0">
+               <columns>
+                  <TableColumn fx:id="tableColQueudTisch" prefWidth="67.0" text="Tisch" />
+                  <TableColumn fx:id="tableColQueudMenuEntry" prefWidth="186.0" text="Menu Entry" />
+                  <TableColumn fx:id="tableColQueudAddInfo" prefWidth="180.0" text="Additional Information" />
+                  <TableColumn fx:id="tableColQueudTime" prefWidth="82.0" text="Time" />
+               </columns>
+            </TableView>
+            <Text layoutX="200.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="QUEUED">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Text>
+            <Button cancelButton="true" layoutX="248.0" layoutY="459.0" mnemonicParsing="false" onAction="#btnQueuedToInProgress" text="&gt;&gt;" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="248.0" AnchorPane.rightAnchor="248.0" />
+         </children>
+      </AnchorPane>
+      <AnchorPane>
+         <children>
+            <TableView fx:id="tableViewInProgress" layoutX="10.0" layoutY="54.0" prefHeight="399.0" prefWidth="516.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="54.0">
+               <columns>
+                  <TableColumn fx:id="tableColProgTisch" prefWidth="67.0" text="Tisch" />
+                  <TableColumn fx:id="tableColProgMenuEntry" prefWidth="186.0" text="Menu Entry" />
+                  <TableColumn fx:id="tableColProgAddInfo" prefWidth="180.0" text="Additional Information" />
+                  <TableColumn fx:id="tableColProgTime" prefWidth="82.0" text="Time" />
+               </columns>
+            </TableView>
+            <Button layoutX="248.0" layoutY="459.0" mnemonicParsing="false" onAction="#btnInProgressToReadyToDeliver" text="&gt;&gt;" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="248.0" AnchorPane.rightAnchor="247.0" />
+            <Text layoutX="172.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="IN PROGRESS" AnchorPane.topAnchor="14.0224609375">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+      <AnchorPane>
+         <children>
+            <TableView fx:id="tableViewReadyForDelivery" layoutX="10.0" layoutY="54.0" prefHeight="399.0" prefWidth="516.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="54.0">
+               <columns>
+                  <TableColumn fx:id="tableColDeliveryTable" prefWidth="67.0" text="Table" />
+                  <TableColumn fx:id="tableColDeliveryMenuEntry" prefWidth="186.0" text="Menu Entry" />
+                  <TableColumn fx:id="tableColDeliveryAddInfo" prefWidth="180.0" text="Additional Information" />
+                  <TableColumn fx:id="tableColDeliveryTime" prefWidth="82.0" text="Time" />
+               </columns>
+            </TableView>
+            <Text layoutX="172.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="READY FOR DELIVERY" AnchorPane.topAnchor="14.0224609375">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+   </items>
+</SplitPane>
