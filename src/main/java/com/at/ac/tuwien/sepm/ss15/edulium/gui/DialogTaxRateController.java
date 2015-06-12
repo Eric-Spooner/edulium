@@ -12,6 +12,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -24,7 +25,8 @@ public class DialogTaxRateController implements Initializable{
     private static final Logger LOGGER = LogManager.getLogger(DialogTaxRateController.class);
 
     private static Stage thisStage;
-    private static TaxRateService taxRateService;
+    @Autowired
+    private TaxRateService taxRateService;
     private static TaxRate taxRate;
     private static DialogEnumeration dialogEnumeration;
 
@@ -36,9 +38,6 @@ public class DialogTaxRateController implements Initializable{
     }
     public static TaxRate getTaxRate() {
         return taxRate;
-    }
-    public static void setTaxRateService(TaxRateService taxRateService) {
-        DialogTaxRateController.taxRateService = taxRateService;
     }
     public static void setTaxRate(TaxRate taxRate) {
         DialogTaxRateController.taxRate = taxRate;

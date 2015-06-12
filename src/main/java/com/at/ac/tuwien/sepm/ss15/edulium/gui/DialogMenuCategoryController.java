@@ -9,6 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -19,16 +20,15 @@ import java.util.ResourceBundle;
 public class DialogMenuCategoryController implements Initializable{
     private static final Logger LOGGER = LogManager.getLogger(DialogMenuCategoryController.class);
 
-    private static MenuService menuService;
+    @Autowired
+    private MenuService menuService;
+
     private static Stage thisStage;
     private static MenuCategory menuCategory;
     private static DialogEnumeration dialogEnumeration;
 
     public static void setThisStage(Stage thisStage) {
         DialogMenuCategoryController.thisStage = thisStage;
-    }
-    public static void setMenuService(MenuService menuService) {
-        DialogMenuCategoryController.menuService = menuService;
     }
     public static MenuCategory getMenuCategory() {
         return menuCategory;

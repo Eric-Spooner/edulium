@@ -67,7 +67,6 @@ public class EmployeeViewController implements Initializable, Controller {
             Stage stage = new Stage();
             DialogUserController.resetDialog();
             DialogUserController.setThisStage(stage);
-            DialogUserController.setUserService(userService);
             DialogUserController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Add Employee");
             AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogUser.fxml"));
@@ -93,7 +92,6 @@ public class EmployeeViewController implements Initializable, Controller {
             }
             DialogUserController.resetDialog();
             DialogUserController.setThisStage(stage);
-            DialogUserController.setUserService(userService);
             DialogUserController.setDialogEnumeration(DialogEnumeration.UPDATE);
             DialogUserController.setUser(tableViewEmployee.getSelectionModel().getSelectedItem());
             stage.setTitle("Update User");
@@ -116,7 +114,6 @@ public class EmployeeViewController implements Initializable, Controller {
             Stage stage = new Stage();
             DialogUserController.resetDialog();
             DialogUserController.setThisStage(stage);
-            DialogUserController.setUserService(userService);
             DialogUserController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search User");
             AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogUser.fxml"));

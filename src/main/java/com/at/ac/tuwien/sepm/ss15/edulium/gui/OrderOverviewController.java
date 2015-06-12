@@ -15,13 +15,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
-import javax.swing.*;
-import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -30,12 +28,16 @@ import java.util.*;
  * Controller used for the Manager View
  */
 @Component
-public class OrdersOverviewController implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(OrdersOverviewController.class);
+public class OrderOverviewController implements Initializable, Controller {
+    private static final Logger LOGGER = LogManager.getLogger(OrderOverviewController.class);
 
+    @Autowired
     private OrderService orderService;
+    @Autowired
     private MenuService menuService;
+    @Autowired
     private InteriorService interiorService;
+
     private int ordersRow = 0;
     private LinkedList<OrderEntry> orderEntries = new LinkedList<>();
 
@@ -52,10 +54,7 @@ public class OrdersOverviewController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Edulium.xml");
-        orderService = context.getBean("orderService", OrderService.class);
-        menuService = context.getBean("menuService", MenuService.class);
-        interiorService = context.getBean("interiorService", InteriorService.class);
+        ApplicationContext context = EduliumApplicationContext.getContext();
 
         ordersSP.setStyle("-fx-font-size: 40px;");
 
@@ -225,6 +224,11 @@ public class OrdersOverviewController implements Initializable {
             //out += en.getName() + ", " + entry.getAmountLabelText() + "," + entry.getRow() + "\n";
         }
         //System.out.println(out);
+    }
+
+    @Override
+    public void disable(boolean disabled) {
+
     }
 
     private class OrderEntry {

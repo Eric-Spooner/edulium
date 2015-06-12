@@ -106,8 +106,6 @@ public class MenuEntryViewController implements Initializable, Controller {
             Stage stage = new Stage();
             DialogMenuEntryController.resetDialog();
             DialogMenuEntryController.setThisStage(stage);
-            DialogMenuEntryController.setMenuService(menuService);
-            DialogMenuEntryController.setTaxRateService(taxRateService);
             DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search MenuEntry");
             AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
@@ -143,8 +141,6 @@ public class MenuEntryViewController implements Initializable, Controller {
             }
             DialogMenuEntryController.resetDialog();
             DialogMenuEntryController.setThisStage(stage);
-            DialogMenuEntryController.setMenuService(menuService);
-            DialogMenuEntryController.setTaxRateService(taxRateService);
             DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.UPDATE);
             DialogMenuEntryController.setMenuEntry(tableViewMenuEntry.getSelectionModel().getSelectedItem());
             stage.setTitle("Update MenuEntry");
@@ -165,8 +161,6 @@ public class MenuEntryViewController implements Initializable, Controller {
             Stage stage = new Stage();
             DialogMenuEntryController.resetDialog();
             DialogMenuEntryController.setThisStage(stage);
-            DialogMenuEntryController.setMenuService(menuService);
-            DialogMenuEntryController.setTaxRateService(taxRateService);
             DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Insert MenuEntry");
             AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));

@@ -24,6 +24,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import sun.font.FontScalerException;
@@ -33,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class TablesOverviewController implements Initializable {
+public class TableOverviewController implements Initializable, Controller {
     @FXML
     private Canvas tablesCanvas;
     @FXML
@@ -51,7 +52,8 @@ public class TablesOverviewController implements Initializable {
     @FXML
     private ScrollPane scrollPaneLeft;
 
-    private static InteriorService interiorService;
+    @Autowired
+    private InteriorService interiorService;
 
     private ArrayList<Rect> rects = new ArrayList<Rect>();
     private double scaleX = 1.0;
@@ -66,8 +68,7 @@ public class TablesOverviewController implements Initializable {
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Edulium.xml");
-        interiorService = context.getBean("interiorService", InteriorService.class);
+        ApplicationContext context = EduliumApplicationContext.getContext();
 
         drawCanvas();
 
@@ -78,6 +79,12 @@ public class TablesOverviewController implements Initializable {
                     try {
                         Table clickedTable = rect.getTable(t.getX(), t.getY());
                         if (clickedTable != null) {
+                            FXMLPane orderViewPane = context.getBean("orderOverviewPane", FXMLPane.class);
+                            Stage stage = new Stage();
+                            stage.setTitle("OrderOverview");
+                            Scene scene = new Scene(orderViewPane);
+                            stage.setScene(scene);
+                            stage.showAndWait();
                             tableIdLabel.setText(String.valueOf(clickedTable.getNumber()));
                         }
                     } catch (ServiceException e) {
@@ -156,6 +163,11 @@ public class TablesOverviewController implements Initializable {
             }
         }
         return max * FACT + TABLE_SIZE + 2 * SECTION_PADDING;
+    }
+
+    @Override
+    public void disable(boolean disabled) {
+
     }
 
     private class Rect {

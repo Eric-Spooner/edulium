@@ -22,6 +22,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -42,12 +43,19 @@ public class EditSectionController implements Initializable {
     private boolean updateTable = false;
     private static final int FACT = 10;
     private static final int TABLE_SIZE = 40;
-    private static InteriorService interiorService;
+    @Autowired
+    private InteriorService interiorService;
+
     private static Stage thisStage;
     private static RoomViewController.UpdateCanvas updateCanvas;
     private static ArrayList<Rect> rects = new ArrayList<Rect>();
     private Rect movingRect;
     private static String sectionName;
+
+    public static void setSectionId(Long sectionId) {
+        EditSectionController.sectionId = sectionId;
+    }
+
     private static Long sectionId;
 
     @FXML
@@ -62,6 +70,7 @@ public class EditSectionController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources){
         LOGGER.info("Initializing Edit Section Controller");
+        this.initTables();
         seatsTF.setText("6");
         numberTF.setText("1");
         sectionNameLb.setText(sectionName);
@@ -185,7 +194,7 @@ public class EditSectionController implements Initializable {
     }
 
     public static void setInteriorService(InteriorService interiorService) {
-        EditSectionController.interiorService = interiorService;
+        interiorService = interiorService;
     }
 
     public static void setThisStage(Stage thisStage) {
@@ -197,9 +206,8 @@ public class EditSectionController implements Initializable {
     }
 
     // Only called in editing mode, initalizes tables on the canvas
-    public static void initTables(Long sectionId) {
+    public void initTables() {
         rects.clear();
-        EditSectionController.sectionId = sectionId;
         Section sectionMatcher = new Section();
         sectionMatcher.setIdentity(sectionId);
 

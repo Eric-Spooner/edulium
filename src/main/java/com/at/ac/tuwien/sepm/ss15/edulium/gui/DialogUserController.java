@@ -13,6 +13,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URL;
 import java.util.LinkedList;
@@ -29,7 +30,8 @@ public class DialogUserController implements Initializable{
 
 
     private static Stage thisStage;
-    private static UserService userService;
+    @Autowired
+    private UserService userService;
     private static User user;
     private static DialogEnumeration dialogEnumeration;
 
@@ -47,10 +49,6 @@ public class DialogUserController implements Initializable{
     public static void setUser(User user) {
         DialogUserController.user = user;
     }
-    public static void setUserService(UserService userService) {
-        DialogUserController.userService = userService;
-    }
-
     public static void setThisStage(Stage thisStage) {
         DialogUserController.thisStage = thisStage;
     }

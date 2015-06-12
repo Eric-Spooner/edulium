@@ -66,7 +66,6 @@ public class MenuCategoryViewController implements Initializable, Controller {
             LOGGER.info("Search MenuCategory Button Click");
             Stage stage = new Stage();
             DialogMenuCategoryController.setThisStage(stage);
-            DialogMenuCategoryController.setMenuService(menuService);
             DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search Menu Category");
             AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
@@ -94,7 +93,6 @@ public class MenuCategoryViewController implements Initializable, Controller {
                 return;
             }
             DialogMenuCategoryController.setThisStage(stage);
-            DialogMenuCategoryController.setMenuService(menuService);
             DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.UPDATE);
             DialogMenuCategoryController.setMenuCategory(tableViewMenuCategory.getSelectionModel().getSelectedItem());
             stage.setTitle("Update Menu Category");
@@ -114,7 +112,6 @@ public class MenuCategoryViewController implements Initializable, Controller {
             LOGGER.info("Add MenuCategory Button Click");
             Stage stage = new Stage();
             DialogMenuCategoryController.setThisStage(stage);
-            DialogMenuCategoryController.setMenuService(menuService);
             DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Insert Menu Category");
             AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));

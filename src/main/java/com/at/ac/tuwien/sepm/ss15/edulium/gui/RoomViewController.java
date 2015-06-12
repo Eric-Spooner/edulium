@@ -198,7 +198,7 @@ public class RoomViewController implements Initializable, Controller {
                 EditSectionController.setInteriorService(interiorService);
                 EditSectionController.setThisStage(stage);
                 EditSectionController.setUpdateCanvas(new UpdateCanvas());
-                EditSectionController.initTables(clickedSectionId);
+                EditSectionController.setSectionId(clickedSectionId);
                 stage.setTitle("Edit Section");
                 AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/EditSection.fxml"));
                 Scene scene = new Scene(myPane);

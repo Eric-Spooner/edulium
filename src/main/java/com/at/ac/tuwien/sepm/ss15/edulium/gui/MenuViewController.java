@@ -87,7 +87,6 @@ public class MenuViewController implements Initializable, Controller {
             }
             DialogMenuController.resetDialog();
             DialogMenuController.setThisStage(stage);
-            DialogMenuController.setMenuService(menuService);
             DialogMenuController.setDialogEnumeration(DialogEnumeration.UPDATE);
             DialogMenuController.setMenu(tableViewMenu.getSelectionModel().getSelectedItem());
             stage.setTitle("Update Menu");
@@ -110,7 +109,6 @@ public class MenuViewController implements Initializable, Controller {
             Stage stage = new Stage();
             DialogMenuController.resetDialog();
             DialogMenuController.setThisStage(stage);
-            DialogMenuController.setMenuService(menuService);
             DialogMenuController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search Menu");
             AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
@@ -151,7 +149,6 @@ public class MenuViewController implements Initializable, Controller {
             Stage stage = new Stage();
             DialogMenuController.resetDialog();
             DialogMenuController.setThisStage(stage);
-            DialogMenuController.setMenuService(menuService);
             DialogMenuController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Add Menu");
             AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));

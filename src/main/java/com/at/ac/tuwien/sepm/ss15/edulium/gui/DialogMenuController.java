@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -33,15 +34,15 @@ public class DialogMenuController implements Initializable{
     private static final Logger LOGGER = LogManager.getLogger(DialogMenuController.class);
 
     private static Stage thisStage;
-    private static MenuService menuService;
+
+    @Autowired
+    private MenuService menuService;
+
     private static Menu menu;
     private static DialogEnumeration dialogEnumeration;
 
     public static void setThisStage(Stage thisStage) {
         DialogMenuController.thisStage = thisStage;
-    }
-    public static void setMenuService(MenuService menuService) {
-        DialogMenuController.menuService = menuService;
     }
     public static void setMenu(Menu menu) {DialogMenuController.menu = menu; }
     public static void setDialogEnumeration(DialogEnumeration dialogEnumeration) {
