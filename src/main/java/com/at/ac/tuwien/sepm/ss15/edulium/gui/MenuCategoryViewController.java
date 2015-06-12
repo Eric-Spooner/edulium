@@ -128,6 +128,21 @@ public class MenuCategoryViewController implements Initializable, Controller {
         }
     }
 
+    public void buttonMenuCategoryRemoveClicked(ActionEvent actionEvent) {
+        try {
+            LOGGER.info("Delete MenuCategory Button Click");
+            if(tableViewMenuCategory.getSelectionModel().getSelectedItem() == null){
+                ManagerViewController.showErrorDialog
+                        ("Error", "Input Validation Error", "You have to select a Menu Category to Delete");
+                return;
+            }
+            menuService.removeMenuCategory(tableViewMenuCategory.getSelectionModel().getSelectedItem());
+            menuCategories.setAll(menuService.getAllMenuCategories());
+        }catch (Exception e){
+            LOGGER.error("Loading the Menus Categories failed" + e);
+        }
+    }
+
     public void buttonShowAllMenuCategoryClicked(ActionEvent actionEvent) {
         try {
             menuCategories.setAll(menuService.getAllMenuCategories());
@@ -140,4 +155,6 @@ public class MenuCategoryViewController implements Initializable, Controller {
     public void disable(boolean disabled) {
 
     }
+
+
 }

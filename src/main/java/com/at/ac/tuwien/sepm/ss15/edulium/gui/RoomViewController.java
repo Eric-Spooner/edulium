@@ -90,7 +90,7 @@ public class RoomViewController implements Initializable, Controller {
                             System.out.println((String.valueOf(clickedSection.getName()) + " clicked" + clickedSection.getIdentity()));
                         }
                     } catch(ServiceException e) {
-                        showErrorDialog("Error", "Error", e.getMessage());
+                        ManagerViewController.showErrorDialog("Error", "Error", e.getMessage());
                     }
                 }
                 if(noSectionClicked)
@@ -165,18 +165,11 @@ public class RoomViewController implements Initializable, Controller {
                 prevSection = section;
             }
         } catch(ServiceException e) {
-            showErrorDialog("Error", "Error", e.getMessage());
+            ManagerViewController.showErrorDialog("Error", "Error", e.getMessage());
         }
     }
 
-    public static void showErrorDialog(String title, String head, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(head);
-        alert.setContentText(content);
 
-        alert.showAndWait();
-    }
 
     public void buttonAddSectionClicked(ActionEvent actionEvent) {
         LOGGER.info("Add Section Button Click");
