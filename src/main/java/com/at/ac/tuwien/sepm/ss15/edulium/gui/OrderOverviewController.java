@@ -43,15 +43,17 @@ public class OrderOverviewController implements Initializable, Controller {
     private static Table table = null;
 
     @FXML
-    GridPane categoriesGP;
+    private GridPane categoriesGP;
     @FXML
-    GridPane ordersGP;
+    private GridPane ordersGP;
     @FXML
-    VBox entriesVB;
+    private VBox entriesVB;
     @FXML
-    AnchorPane orderAnchor;
+    private AnchorPane orderAnchor;
     @FXML
-    ScrollPane ordersSP;
+    private ScrollPane ordersSP;
+    @FXML
+    private Label tableNumberLabel;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -63,6 +65,7 @@ public class OrderOverviewController implements Initializable, Controller {
         ordersGP.setHgap(4);
 
         orderEntries.clear();
+        tableNumberLabel.setText(String.valueOf(table.getNumber()));
 
         try {
             categoriesGP.setVgap(4);

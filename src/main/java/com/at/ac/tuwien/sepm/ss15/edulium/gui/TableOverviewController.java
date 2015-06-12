@@ -82,13 +82,13 @@ public class TableOverviewController implements Initializable, Controller {
                         Table clickedTable = rect.getTable(t.getX(), t.getY());
                         if (clickedTable != null) {
                             System.out.println("Table " + clickedTable);
+                            OrderOverviewController.setSelectedTable(clickedTable);
                             FXMLPane orderViewPane = context.getBean("orderOverviewPane", FXMLPane.class);
                             /*Stage stage = new Stage();
                             stage.setTitle("OrderOverview");
                             Scene scene = new Scene(orderViewPane);
                             stage.setScene(scene);
                             stage.showAndWait();*/
-                            OrderOverviewController.setSelectedTable(clickedTable);
                             StackPane orderStackPane = new StackPane();
                             orderStackPane.getChildren().setAll(orderViewPane);
                             Scene orderScene = new Scene(orderStackPane);
