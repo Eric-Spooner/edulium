@@ -42,7 +42,7 @@ import static javafx.collections.FXCollections.observableArrayList;
  * Created by - on 12.06.2015.
  */
 public class RoomViewController implements Initializable, Controller {
-    private static final Logger LOGGER = LogManager.getLogger(ManagerViewController.class);
+    private static final Logger LOGGER = LogManager.getLogger(RoomViewController.class);
 
     @FXML
     private Canvas tablesCanvas;

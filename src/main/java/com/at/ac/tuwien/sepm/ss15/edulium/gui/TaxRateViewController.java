@@ -33,7 +33,7 @@ import static javafx.collections.FXCollections.observableArrayList;
  * Created by - on 12.06.2015.
  */
 public class TaxRateViewController implements Initializable, Controller {
-    private static final Logger LOGGER = LogManager.getLogger(ManagerViewController.class);
+    private static final Logger LOGGER = LogManager.getLogger(TaxRateViewController.class);
 
     @FXML
     private TableView<TaxRate> tableViewTaxRate;
@@ -60,12 +60,10 @@ public class TaxRateViewController implements Initializable, Controller {
             tableColTaxRateID.setCellValueFactory(new PropertyValueFactory<TaxRate, Long>("identity"));
             tableColTaxRateValue.setCellValueFactory(new PropertyValueFactory<TaxRate, BigDecimal>("value"));
         }catch (ServiceException e){
-            LOGGER.error("Initialize User View Failed due to" + e);
+            LOGGER.error("Initialize taxRate View Failed due to" + e);
         }
 
     }
-
-
 
     public void buttonTaxRateRemoveClicked(ActionEvent actionEvent) {
         try {

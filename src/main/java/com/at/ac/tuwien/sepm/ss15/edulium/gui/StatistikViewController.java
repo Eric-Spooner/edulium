@@ -29,7 +29,7 @@ import static javafx.collections.FXCollections.observableArrayList;
  * Created by - on 12.06.2015.
  */
 public class StatistikViewController implements Initializable, Controller {
-    private static final Logger LOGGER = LogManager.getLogger(ManagerViewController.class);
+    private static final Logger LOGGER = LogManager.getLogger(StatistikViewController.class);
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

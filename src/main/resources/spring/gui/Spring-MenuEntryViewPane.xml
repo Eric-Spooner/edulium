@@ -6,7 +6,7 @@
 
     <bean id="menuEntryViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.MenuEntryViewController" scope="prototype" />
 
-    <bean id="meunEntryViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
+    <bean id="menuEntryViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
         <constructor-arg name="fxml" value="gui/MenuEntryView.fxml" />
     </bean>
 

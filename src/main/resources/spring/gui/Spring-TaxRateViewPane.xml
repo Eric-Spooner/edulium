@@ -4,10 +4,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="taxRateViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.taxRateViewController" scope="prototype" />
+    <bean id="taxRateViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.TaxRateViewController" scope="prototype" />
 
     <bean id="taxRateViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/taxRateView.fxml" />
+        <constructor-arg name="fxml" value="gui/TaxRateView.fxml" />
     </bean>
 
 </beans>

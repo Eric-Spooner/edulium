@@ -82,7 +82,7 @@ public class MainWindowController implements Initializable, Controller {
 
         switch (screenType) {
             case ManagerScreen:
-                FXMLPane managerViewPane = context.getBean("managerViewPane", FXMLPane.class);
+                FXMLPane managerViewPane = context.getBean("managerViewController", FXMLPane.class);
                 borderPane.setCenter(managerViewPane);
                 break;
             case CookScreen:
@@ -90,8 +90,6 @@ public class MainWindowController implements Initializable, Controller {
                 borderPane.setCenter(cookViewPane);
                 break;
             case ServiceScreen:
-                FXMLPane employeeViewPane = context.getBean("emplyoeeViewPane", FXMLPane.class);
-                borderPane.setCenter(employeeViewPane);
                 break;
             case LoginScreen:
             default:

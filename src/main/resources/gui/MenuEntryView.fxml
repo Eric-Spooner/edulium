@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.ManagerViewController">
+<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.MenuEntryViewController">
     <children>
         <Button fx:id="buttonMenuEntryRemove" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuEntryRemoveClicked" prefWidth="92.0" text="Remove" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="119.0" />
         <Button fx:id="buttonMenuEntrySearch" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonMenuEntrySearchClicked" prefWidth="92.0" text="Search..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="84.0" />
