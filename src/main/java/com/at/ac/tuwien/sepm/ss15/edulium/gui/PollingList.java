@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 public class PollingList<E> extends ObservableListBase<E> {
     private final List<E> elements = new ArrayList<>();
 
-    private static TaskScheduler taskScheduler;
+    private final TaskScheduler taskScheduler;
     private ScheduledFuture<?> scheduledFuture = null;
     private Supplier<List<E>> supplier = null;
     private long interval = 0;
