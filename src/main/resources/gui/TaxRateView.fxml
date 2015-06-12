@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.text.Text?>
+<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.TaxRateViewController">
+    <children>
+        <Button fx:id="buttonTaxRateRemove" layoutX="494.0" layoutY="85.0" mnemonicParsing="false" onAction="#buttonTaxRateRemoveClicked" prefWidth="92.0" text="Remove" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="85.0" />
+        <Button fx:id="buttonTaxRateUpdate" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonTaxRateUpdateClicked" prefWidth="92.0" text="Update..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="49.0" />
+        <Button fx:id="buttonTaxRateAdd" layoutX="34.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonTaxRateAddClicked" prefWidth="92.0" text="Add..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
+        <TableView fx:id="tableViewTaxRate" layoutX="14.0" layoutY="14.0" prefHeight="343.0" prefWidth="451.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="14.0">
+            <columns>
+                <TableColumn fx:id="tableColTaxRateID" prefWidth="59.0" text="ID" />
+                <TableColumn fx:id="tableColTaxRateValue" prefWidth="179.0" text="Value" />
+            </columns>
+        </TableView>
+        <TextField fx:id="txtTaxRateValue" layoutX="494.0" layoutY="189.0" prefHeight="31.0" prefWidth="92.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="189.0" />
+        <Text layoutX="494.0" layoutY="176.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Value" AnchorPane.rightAnchor="69.0859375" AnchorPane.topAnchor="159.8134765625" />
+    </children>
+</AnchorPane>

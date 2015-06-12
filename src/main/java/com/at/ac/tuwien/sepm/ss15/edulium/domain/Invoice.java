@@ -101,4 +101,13 @@ public class Invoice {
         if (gross != null ? gross.compareTo(invoice.gross) != 0 : invoice.gross != null) return false;
         return !(creator != null ? !creator.equals(invoice.creator) : invoice.creator != null);
     }
+
+    @Override
+    public int hashCode() {
+        int result = identity != null ? identity.hashCode() : 0;
+        result = 31 * result + (time != null ? time.hashCode() : 0);
+        result = 31 * result + (gross != null ? gross.hashCode() : 0);
+        result = 31 * result + (creator != null ? creator.hashCode() : 0);
+        return result;
+    }
 }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.EmployeeViewController">
+    <children>
+        <TableView fx:id="tableViewEmployee" layoutX="14.0" layoutY="14.0" prefHeight="343.0" prefWidth="451.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="14.0">
+            <columns>
+                <TableColumn fx:id="employeeId" prefWidth="138.0" text="ID" />
+                <TableColumn fx:id="employeeName" prefWidth="190.0" text="Name" />
+                <TableColumn fx:id="employeeRole" prefWidth="137.0" text="Role" />
+            </columns>
+        </TableView>
+        <Button fx:id="buttonAdd" layoutX="534.0" layoutY="14.0" mnemonicParsing="false" onAction="#buttonEmployeesAddClicked" prefWidth="92.0" text="Add..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
+        <Button fx:id="buttonUpdate" layoutX="494.0" layoutY="47.0" mnemonicParsing="false" onAction="#buttonEmployeesUpdateClicked" prefWidth="92.0" text="Update..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="49.0" />
+        <Button fx:id="buttonSearch" layoutX="494.0" layoutY="89.0" mnemonicParsing="false" onAction="#buttonEmployeesSearchClicked" prefWidth="92.0" text="Search..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="84.0" />
+        <Button fx:id="buttonShowAllEmployee" layoutX="494.0" layoutY="121.0" mnemonicParsing="false" onAction="#buttonEmployeesShowAll" prefWidth="92.0" text="Show All" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="154.0" />
+        <Button fx:id="buttonRemove1" layoutX="494.0" layoutY="135.0" mnemonicParsing="false" onAction="#buttonEmployeesRemoveClicked" prefWidth="92.0" text="Remove" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="119.0" />
+    </children>
+</AnchorPane>

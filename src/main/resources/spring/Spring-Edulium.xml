@@ -5,6 +5,7 @@
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <import resource="Spring-Context.xml" />
+    <import resource="Spring-Scheduler.xml" />
     <import resource="Spring-Security.xml" />
     <import resource="Spring-DataSource.xml" />
 
@@ -40,6 +41,20 @@
     <import resource="service/Spring-MenuService.xml"/>
     <import resource="service/Spring-TaxRateService.xml" />
     <import resource="service/Spring-InteriorService.xml" />
+    <import resource="service/Spring-OrderService.xml" />
     <import resource="service/Spring-ReservationService.xml" />
+
+    <!-- GUI beans -->
+    <import resource="gui/Spring-LoginPane.xml" />
+    <import resource="gui/Spring-MainWindowPane.xml" />
+    <import resource="gui/Spring-CookViewPane.xml" />
+    <import resource="gui/Spring-EmployeeViewPane.xml" />
+    <import resource="gui/Spring-ManagerViewPane.xml" />
+    <import resource="gui/Spring-MenuViewPane.xml" />
+    <import resource="gui/Spring-MenuEntryViewPane.xml" />
+    <import resource="gui/Spring-MenuCategoryViewPane.xml" />
+    <import resource="gui/Spring-TaxRateViewPane.xml" />
+    <import resource="gui/Spring-RoomViewPane.xml" />
+    <import resource="gui/Spring-StatisticViewPane.xml" />
 
 </beans>

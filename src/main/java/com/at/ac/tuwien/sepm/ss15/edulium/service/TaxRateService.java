@@ -10,6 +10,7 @@ import java.util.List;
 /**
  * service for the taxRate domain object
  */
+@PreAuthorize("isAuthenticated()")
 public interface TaxRateService extends Service {
     /**
      * adds a taxRate object to the underlying datasource

@@ -138,4 +138,15 @@ public class Instalment {
         if (amount != null ? amount.compareTo(that.amount) != 0 : that.amount != null) return false;
         return !(invoice != null ? !invoice.equals(that.invoice) : that.invoice != null);
     }
+
+    @Override
+    public int hashCode() {
+        int result = identity != null ? identity.hashCode() : 0;
+        result = 31 * result + (time != null ? time.hashCode() : 0);
+        result = 31 * result + (paymentInfo != null ? paymentInfo.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (amount != null ? amount.hashCode() : 0);
+        result = 31 * result + (invoice != null ? invoice.hashCode() : 0);
+        return result;
+    }
 }
