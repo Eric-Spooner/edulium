@@ -30,11 +30,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import sun.font.FontScalerException;
 
+import javax.annotation.Resource;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 public class TableOverviewController implements Initializable, Controller {
     @FXML
@@ -68,6 +70,8 @@ public class TableOverviewController implements Initializable, Controller {
     private final int SECTION_PADDING = 10;
     private final int TEXT_BORDER_BOTTOM = 2;
 
+    private Consumer<Table> tableConsumer = null;
+
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
         ApplicationContext context = EduliumApplicationContext.getContext();
@@ -81,18 +85,15 @@ public class TableOverviewController implements Initializable, Controller {
                     try {
                         Table clickedTable = rect.getTable(t.getX(), t.getY());
                         if (clickedTable != null) {
-                            System.out.println("Table " + clickedTable);
+                            //ServiceController serviceController = tablePane.getController(ServiceController.class);
                             OrderOverviewController.setSelectedTable(clickedTable);
+                            //tableConsumer.accept(clickedTable);
                             FXMLPane orderViewPane = context.getBean("orderOverviewPane", FXMLPane.class);
-                            /*Stage stage = new Stage();
-                            stage.setTitle("OrderOverview");
-                            Scene scene = new Scene(orderViewPane);
-                            stage.setScene(scene);
-                            stage.showAndWait();*/
                             StackPane orderStackPane = new StackPane();
                             orderStackPane.getChildren().setAll(orderViewPane);
                             Scene orderScene = new Scene(orderStackPane);
                             Stage orderStage = new Stage();
+                            OrderOverviewController.setStage(orderStage);
                             orderStage.setTitle("Orders Overview");
                             orderStage.setScene(orderScene);
                             orderStage.show();
@@ -142,9 +143,12 @@ public class TableOverviewController implements Initializable, Controller {
         });
     }
 
+    public void setOnTableClicked(Consumer<Table> tableConsumer) {
+        this.tableConsumer = tableConsumer;
+    }
+
     @FXML
     public void filterButtonClicked(ActionEvent event) {
-
     }
 
     @FXML

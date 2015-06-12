@@ -8,11 +8,14 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +44,7 @@ public class OrderOverviewController implements Initializable, Controller {
     private int ordersRow = 0;
     private LinkedList<OrderEntry> orderEntries = new LinkedList<>();
     private static Table table = null;
+    private static Stage thisStage;
 
     @FXML
     private GridPane categoriesGP;
@@ -197,11 +201,16 @@ public class OrderOverviewController implements Initializable, Controller {
         }
     }
 
+    public static void setStage(Stage stage) {
+        OrderOverviewController.thisStage = stage;
+    }
+
     public static void setSelectedTable(Table table) {
         OrderOverviewController.table = table;
     }
 
     public void backButtonClicked(ActionEvent event) {
+        thisStage.close();
     }
 
     public void commitButtonClicked(ActionEvent event) {
@@ -232,6 +241,7 @@ public class OrderOverviewController implements Initializable, Controller {
             //out += en.getName() + ", " + entry.getAmountLabelText() + "," + entry.getRow() + "\n";
         }
         //System.out.println(out);
+        thisStage.close();
     }
 
     @Override
