@@ -55,5 +55,6 @@
     <import resource="gui/Spring-MenuCategoryViewPane.xml" />
     <import resource="gui/Spring-TaxRateViewPane.xml" />
     <import resource="gui/Spring-RoomViewPane.xml" />
+    <import resource="gui/Spring-StatisticViewPane.xml" />
 
 </beans>
