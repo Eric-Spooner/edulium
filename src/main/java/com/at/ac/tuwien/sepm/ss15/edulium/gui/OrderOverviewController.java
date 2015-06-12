@@ -40,6 +40,7 @@ public class OrderOverviewController implements Initializable, Controller {
 
     private int ordersRow = 0;
     private LinkedList<OrderEntry> orderEntries = new LinkedList<>();
+    private static Table table = null;
 
     @FXML
     GridPane categoriesGP;
@@ -194,7 +195,7 @@ public class OrderOverviewController implements Initializable, Controller {
     }
 
     public static void setSelectedTable(Table table) {
-
+        OrderOverviewController.table = table;
     }
 
     public void backButtonClicked(ActionEvent event) {
@@ -211,7 +212,7 @@ public class OrderOverviewController implements Initializable, Controller {
 
                 for(int i = 0; i < Integer.valueOf(entry.getAmountLabelText()); i++) {
                     Order order = new Order();
-                    order.setTable(interiorService.getAllTables().get(0)); //TODO selected table
+                    order.setTable(table);
                     order.setMenuEntry(en);
                     order.setBrutto(en.getPrice());
                     order.setTax(en.getTaxRate().getValue());
