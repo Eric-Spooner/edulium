@@ -1,9 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -63,7 +61,7 @@ public class DialogMenuCategoryController implements Initializable{
             case ADD:
             case UPDATE:
                 if(textFieldName.getText() == null || textFieldName.getText().equals("")){
-                    ManagerController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
+                    ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
                     return;
                 }
         }

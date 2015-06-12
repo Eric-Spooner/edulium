@@ -48,5 +48,12 @@
     <import resource="gui/Spring-LoginPane.xml" />
     <import resource="gui/Spring-MainWindowPane.xml" />
     <import resource="gui/Spring-CookViewPane.xml" />
+    <import resource="gui/Spring-EmployeeViewPane.xml" />
+    <import resource="gui/Spring-ManagerViewPane.xml" />
+    <import resource="gui/Spring-MenuViewPane.xml" />
+    <import resource="gui/Spring-MenuEntryViewPane.xml" />
+    <import resource="gui/Spring-MenuCategoryViewPane.xml" />
+    <import resource="gui/Spring-TaxRateViewPane.xml" />
+    <import resource="gui/Spring-RoomsViewPane.xml" />
 
 </beans>

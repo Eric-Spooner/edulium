@@ -44,7 +44,7 @@ public class EditSectionController implements Initializable {
     private static final int TABLE_SIZE = 40;
     private static InteriorService interiorService;
     private static Stage thisStage;
-    private static ManagerController.UpdateCanvas updateCanvas;
+    private static ManagerViewController.UpdateCanvas updateCanvas;
     private static ArrayList<Rect> rects = new ArrayList<Rect>();
     private Rect movingRect;
     private static String sectionName;
@@ -192,7 +192,7 @@ public class EditSectionController implements Initializable {
         EditSectionController.thisStage = thisStage;
     }
 
-    public static void setUpdateCanvas(ManagerController.UpdateCanvas updateCanvas) {
+    public static void setUpdateCanvas(ManagerViewController.UpdateCanvas updateCanvas) {
         EditSectionController.updateCanvas = updateCanvas;
     }
 

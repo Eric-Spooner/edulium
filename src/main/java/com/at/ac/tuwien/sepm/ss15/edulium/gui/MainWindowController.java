@@ -51,8 +51,14 @@ public class MainWindowController implements Initializable, Controller {
 
             // show the right screen for the role
             switch (user.getRole()) {
+                case "ROLE_MANAGER":
+                    showScreen(ScreenType.ManagerScreen);
+                    break;
                 case "ROLE_COOK":
                     showScreen(ScreenType.CookScreen);
+                    break;
+                case "ROLE_SERVICE":
+                    showScreen(ScreenType.ServiceScreen);
                     break;
                 default:
                     LOGGER.debug("We have no screen for role '" + user.getRole() + "' -> logout");
@@ -76,12 +82,16 @@ public class MainWindowController implements Initializable, Controller {
 
         switch (screenType) {
             case ManagerScreen:
+                FXMLPane managerViewPane = context.getBean("managerViewPane", FXMLPane.class);
+                borderPane.setCenter(managerViewPane);
                 break;
             case CookScreen:
                 FXMLPane cookViewPane = context.getBean("cookViewPane", FXMLPane.class);
                 borderPane.setCenter(cookViewPane);
                 break;
             case ServiceScreen:
+                FXMLPane employeeViewPane = context.getBean("emplyoeeViewPane", FXMLPane.class);
+                borderPane.setCenter(employeeViewPane);
                 break;
             case LoginScreen:
             default:

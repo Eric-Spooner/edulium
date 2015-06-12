@@ -1,20 +1,12 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.TaxRateService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -22,7 +14,6 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.math.BigDecimal;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,17 +99,17 @@ public class DialogUserController implements Initializable{
             case ADD:
             case UPDATE:
                 if(textFieldUsername == null || textFieldUsername.getText().isEmpty()){
-                    ManagerController.showErrorDialog
+                    ManagerViewController.showErrorDialog
                             ("Error", "Input Validation Error", "You have to insert a Username");
                     return;
                 }
                 if(textFieldName == null || textFieldName.getText().isEmpty()){
-                    ManagerController.showErrorDialog
-                        ("Error", "Input Validation Error", "You have to insert a Username");
+                    ManagerViewController.showErrorDialog
+                            ("Error", "Input Validation Error", "You have to insert a Username");
                     return;
                 }
                 if(dropRole.getSelectionModel().getSelectedItem() == null){
-                    ManagerController.showErrorDialog
+                    ManagerViewController.showErrorDialog
                             ("Error", "Input Validation Error", "You have to select a Role");
                     return;
                 }
@@ -143,9 +134,9 @@ public class DialogUserController implements Initializable{
                     break;
             }
         } catch (Exception e) {
-            ManagerController.showErrorDialog
-                    ("Error", "Input Validation Error", "Updating the User in The Database Failed\n"  +
-                    "Maybe the Username already exists");
+            ManagerViewController.showErrorDialog
+                    ("Error", "Input Validation Error", "Updating the User in The Database Failed\n" +
+                            "Maybe the Username already exists");
             LOGGER.error("Updating the User in The Database Failed " + e);
             return;
         }

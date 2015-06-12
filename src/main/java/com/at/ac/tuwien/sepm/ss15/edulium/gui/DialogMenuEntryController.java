@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
@@ -146,12 +145,12 @@ public class DialogMenuEntryController implements Initializable{
             case ADD:
             case UPDATE:
                 if(textFieldName.getText() == null || textFieldName.getText().equals("")){
-                    ManagerController.showErrorDialog
+                    ManagerViewController.showErrorDialog
                             ("Error", "Input Validation Error", "You have to insert a Name");
                     return;
                 }
                 if(textFieldPrice.getText() == null || textFieldPrice.getText().equals("")){
-                    ManagerController.showErrorDialog
+                    ManagerViewController.showErrorDialog
                             ("Error", "Input Validation Error", "You have to insert a Price");
                     return;
                 }
@@ -159,23 +158,23 @@ public class DialogMenuEntryController implements Initializable{
                 try {
                     price = BigDecimal.valueOf(Double.parseDouble(textFieldPrice.getText()));
                 } catch (NumberFormatException e) {
-                    ManagerController.showErrorDialog("Error", "Input Validation Error", "Price must be a number");
+                    ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must be a number");
                     LOGGER.info("Dialog MenuEntry Price must be number " + e);
                     return;
                 }
 
                 if(textFieldDesription.getText() == null || textFieldDesription.getText().equals("")){
-                    ManagerController.showErrorDialog
+                    ManagerViewController.showErrorDialog
                             ("Error", "Input Validation Error", "You have to insert a Description");
                     return;
                 }
                 if(dropMenuCategory.getSelectionModel().getSelectedItem() == null){
-                    ManagerController.showErrorDialog
+                    ManagerViewController.showErrorDialog
                             ("Error", "Input Validation Error", "You have to select a Category");
                     return;
                 }
                 if(dropTaxRate.getSelectionModel().getSelectedItem() == null){
-                    ManagerController.showErrorDialog
+                    ManagerViewController.showErrorDialog
                             ("Error", "Input Validation Error", "You have to select a TaxRate");
                     return;
                 }
@@ -185,7 +184,7 @@ public class DialogMenuEntryController implements Initializable{
                     try {
                         price = BigDecimal.valueOf(Double.parseDouble(textFieldPrice.getText()));
                     } catch (NumberFormatException e) {
-                        ManagerController.showErrorDialog("Error", "Input Validation Error", "Price must be a number");
+                        ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must be a number");
                         LOGGER.info("Dialog MenuEntry Price must be number " + e);
                         return;
                     }

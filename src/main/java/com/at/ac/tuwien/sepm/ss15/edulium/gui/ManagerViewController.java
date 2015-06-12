@@ -28,8 +28,8 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -44,15 +44,22 @@ import static javafx.collections.FXCollections.observableList;
  * Controller used for the Manager View
  */
 @Component
-public class ManagerController implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(ManagerController.class);
+public class ManagerViewController implements Initializable, Controller {
+    private static final Logger LOGGER = LogManager.getLogger(ManagerViewController.class);
 
+    @Autowired
     private MenuService menuService;
+    @Autowired
     private TaxRateService taxRateService;
+    @Autowired
     private InteriorService interiorService;
+    @Autowired
     private UserService userService;
+    @Autowired
     private OrderService orderService;
 
+
+    @FXML TabPane tabPaneManager;
 
     @FXML
     private TableView<User> tableViewEmployee;
@@ -128,18 +135,26 @@ public class ManagerController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources){
         try {
-            ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Service.xml");
+            ApplicationContext context = EduliumApplicationContext.getContext();
+            /*
+            context = new ClassPathXmlApplicationContext("spring/Spring-Service.xml");
             menuService = context.getBean("menuService", MenuService.class);
             taxRateService = context.getBean("taxRateService",  TaxRateService.class);
             interiorService = context.getBean("interiorService",  InteriorService.class);
             userService = context.getBean("userService",  UserService.class);
             orderService = context.getBean("orderService",  OrderService.class);
+            */
 
             users = observableArrayList(userService.getAllUsers());
             tableViewEmployee.setItems(users);
             employeeId.setCellValueFactory(new PropertyValueFactory<User, String>("identity"));
             employeeName.setCellValueFactory(new PropertyValueFactory<User, String>("name"));
             employeeRole.setCellValueFactory(new PropertyValueFactory<User, String>("role"));
+
+            Tab tab = new Tab();
+            tab.setText("User");
+            tab.setContent(context.getBean("employeeViewPane", FXMLPane.class));
+            tabPaneManager.getTabs().set(1,tab);
 
             taxRates = observableArrayList(taxRateService.getAllTaxRates());
             tableViewTaxRate.setItems(taxRates);
@@ -344,7 +359,7 @@ public class ManagerController implements Initializable {
             LOGGER.info("Update User Button Click");
             Stage stage = new Stage();
             if(tableViewEmployee.getSelectionModel().getSelectedItem() == null){
-                ManagerController.showErrorDialog
+                ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a User to Update");
                 return;
             }
@@ -397,7 +412,7 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Delete User Button Click");
             if(tableViewEmployee.getSelectionModel().getSelectedItem() == null){
-                ManagerController.showErrorDialog
+                ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a User to Delete");
                 return;
             }
@@ -413,7 +428,7 @@ public class ManagerController implements Initializable {
             LOGGER.info("Update Menu Button Click");
             Stage stage = new Stage();
             if(tableViewMenu.getSelectionModel().getSelectedItem() == null){
-                ManagerController.showErrorDialog
+                ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a Menu to Update");
                 return;
             }
@@ -466,7 +481,7 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Delete Menu Button Click");
             if(tableViewMenu.getSelectionModel().getSelectedItem() == null){
-                ManagerController.showErrorDialog
+                ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a Menu to Delete");
                 return;
             }
@@ -502,7 +517,7 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Delete MenuEntry Button Click");
             if(tableViewMenuEntry.getSelectionModel().getSelectedItem() == null){
-                ManagerController.showErrorDialog
+                ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a MenuEntry to Delete");
                 return;
             }
@@ -545,12 +560,12 @@ public class ManagerController implements Initializable {
             LOGGER.info("Update MenuEntry Button Click");
             Stage stage = new Stage();
             if(tableViewMenuEntry.getSelectionModel().getSelectedItem() == null){
-                ManagerController.showErrorDialog
+                ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a MenuEntry to Update");
                 return;
             }
             if(tableViewMenuEntry.getSelectionModel().getSelectedItems().size() >1){
-                ManagerController.showErrorDialog
+                ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "You have to select only one MenuEntry to Update");
                 return;
             }
@@ -597,7 +612,7 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Update MenuEntry Button Click");
             if (tableViewMenuEntry.getSelectionModel().getSelectedItem() == null) {
-                ManagerController.showErrorDialog
+                ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a MenuEntry to Update");
                 return;
             }
@@ -615,7 +630,7 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Delete MenuCategory Button Click");
             if(tableViewMenuCategory.getSelectionModel().getSelectedItem() == null){
-                ManagerController.showErrorDialog
+                ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a Menu Category to Delete");
                 return;
             }
@@ -654,7 +669,7 @@ public class ManagerController implements Initializable {
             LOGGER.info("Update MenuCategory Button Click");
             Stage stage = new Stage();
             if(tableViewMenuCategory.getSelectionModel().getSelectedItem() == null){
-                ManagerController.showErrorDialog
+                ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a MenuCategory to Update");
                 return;
             }
@@ -697,7 +712,7 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Delete TaxRate Button Click");
             if(tableViewTaxRate.getSelectionModel().getSelectedItem() == null){
-                ManagerController.showErrorDialog
+                ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a Tax Rate to Delete");
                 return;
             }
@@ -713,7 +728,7 @@ public class ManagerController implements Initializable {
         try {
             LOGGER.info("Delete TaxRate Button Click");
             if(tableViewTaxRate.getSelectionModel().getSelectedItem() == null){
-                ManagerController.showErrorDialog
+                ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a Tax Rate to Delete");
                 return;
             }
@@ -721,7 +736,7 @@ public class ManagerController implements Initializable {
             try {
                 value = BigDecimal.valueOf(Double.parseDouble(txtTaxRateValue.getText()));
             } catch (NumberFormatException e) {
-                ManagerController.showErrorDialog("Error", "Input Validation Error", "Value must be a number");
+                ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Value must be a number");
                 LOGGER.info("Tax Rate Value must be a number" + e);
             }
             TaxRate taxRate = tableViewTaxRate.getSelectionModel().getSelectedItem();
@@ -739,7 +754,7 @@ public class ManagerController implements Initializable {
             try {
                 BigDecimal value = BigDecimal.valueOf(Double.parseDouble(txtTaxRateValue.getText()));
                 if(value.compareTo(BigDecimal.valueOf(1)) == 1 || value.compareTo(BigDecimal.valueOf(0))== 2 ){
-                    ManagerController.showErrorDialog("Error", "Input Validation Error", "Value must be between 0 and 1");
+                    ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Value must be between 0 and 1");
                     LOGGER.debug("Tax Rate Value must be between 0 and 1");
                 }
                 TaxRate taxRate = new TaxRate();
@@ -747,7 +762,7 @@ public class ManagerController implements Initializable {
                 taxRateService.addTaxRate(taxRate);
                 taxRates.setAll(taxRateService.getAllTaxRates());
             } catch (NumberFormatException e) {
-                ManagerController.showErrorDialog("Error", "Input Validation Error", "Value must be a number");
+                ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Value must be a number");
                 LOGGER.info("Tax Rate Value must be a number" + e);
             }
         }catch (Exception e){
@@ -917,6 +932,10 @@ public class ManagerController implements Initializable {
         return max*FACT + TABLE_SIZE + 2*SECTION_PADDING;
     }
 
+    @Override
+    public void disable(boolean disabled) {
+
+    }
 
 
     //TODO think of a better solution

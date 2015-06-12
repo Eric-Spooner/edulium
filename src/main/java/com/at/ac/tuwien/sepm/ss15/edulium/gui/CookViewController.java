@@ -7,6 +7,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -97,7 +98,10 @@ public class CookViewController implements Initializable, Controller {
             }
         });
 
-        tableViewQueued.setItems(ordersQueued);
+
+        SortedList<Order> sortedDataQueued = new SortedList<>(ordersQueued);
+        sortedDataQueued.comparatorProperty().bind(tableViewQueued.comparatorProperty());
+        tableViewQueued.setItems(sortedDataQueued);
         tableViewQueued.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         tableColQueudTisch.setCellValueFactory(p -> new SimpleObjectProperty<Long>(p.getValue().getTable().getNumber()));
@@ -121,8 +125,9 @@ public class CookViewController implements Initializable, Controller {
                 }
             }
         });
-
-        tableViewInProgress.setItems(ordersInProgress);
+        SortedList<Order> sortedDataInProgress = new SortedList<>(ordersInProgress);
+        sortedDataInProgress.comparatorProperty().bind(tableViewInProgress.comparatorProperty());
+        tableViewInProgress.setItems(sortedDataInProgress);
         tableViewInProgress.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         tableColProgTisch.setCellValueFactory(p -> new SimpleObjectProperty<Long>(p.getValue().getTable().getNumber()));
@@ -146,8 +151,9 @@ public class CookViewController implements Initializable, Controller {
                 }
             }
         });
-
-        tableViewReadyForDelivery.setItems(ordersReadyForDelivery);
+        SortedList<Order> sortedDataReady = new SortedList<>(ordersReadyForDelivery);
+        sortedDataReady.comparatorProperty().bind(tableViewInProgress.comparatorProperty());
+        tableViewReadyForDelivery.setItems(sortedDataReady);
 
         tableColDeliveryTable.setCellValueFactory(p -> new SimpleObjectProperty<Long>(p.getValue().getTable().getNumber()));
         tableColDeliveryMenuEntry.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getMenuEntry().getName()));

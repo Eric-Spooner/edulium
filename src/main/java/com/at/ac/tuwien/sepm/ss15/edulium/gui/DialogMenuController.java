@@ -1,10 +1,8 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -113,7 +111,7 @@ public class DialogMenuController implements Initializable{
             allMenuEntries = observableArrayList(menuService.getAllMenuEntries());
             inMenuMenuEntries = observableArrayList(menu.getEntries());
         }catch (Exception e){
-            ManagerController.showErrorDialog
+            ManagerViewController.showErrorDialog
                     ("Error", "Refreshing View", "An Error occured during initializing the View");
         }
         if(menu.getName() != null) textFieldName.setText(menu.getName());
@@ -134,7 +132,7 @@ public class DialogMenuController implements Initializable{
         LOGGER.info("Dialog Menu OK Button clicked");
         if ((textFieldName.getText() == null || textFieldName.getText().equals("")) &&
                 DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH) {
-            ManagerController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
+            ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
             return;
         }
         if (DialogMenuController.dialogEnumeration == DialogEnumeration.SEARCH) {
@@ -144,7 +142,7 @@ public class DialogMenuController implements Initializable{
         }
         if(DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH){
             if (menu.getEntries().size() == 0) {
-                ManagerController.showErrorDialog
+                ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "There hast to be at least one Menu Entry");
                 return;
             }
@@ -159,7 +157,7 @@ public class DialogMenuController implements Initializable{
                     break;
             }
         }catch (Exception e){
-            ManagerController.showErrorDialog
+            ManagerViewController.showErrorDialog
                     ("Error", "Menu Service Error", "The Service was unable to handle the required Menu action");
             LOGGER.error("The Service was unable to handle the required Menu action " + e);
             return;
@@ -179,12 +177,12 @@ public class DialogMenuController implements Initializable{
             switch (DialogMenuController.dialogEnumeration) {
                 case UPDATE:
                 case ADD: //There has to be a Price, if the User want's to ADD or UPDATE
-                    ManagerController.showErrorDialog("Error", "Input Validation Error", "Price must have a value");
+                    ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must have a value");
                     return;
             }
         }
         if(tableViewData.getSelectionModel().getSelectedItem() == null){
-            ManagerController.showErrorDialog
+            ManagerViewController.showErrorDialog
                     ("Error", "Input Validation Error", "You have to select a Menu Entry from the left side");
             return;
         }
@@ -210,10 +208,10 @@ public class DialogMenuController implements Initializable{
             menu.setEntries(list);
             inMenuMenuEntries.setAll(menu.getEntries());
         } catch (NumberFormatException e) {
-            ManagerController.showErrorDialog("Error", "Input Validation Error", "Price must be a number");
+            ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must be a number");
             LOGGER.info("Dialog Menu Add Button Clicked Price must be number " + e);
         } catch (Exception e) {
-            ManagerController.showErrorDialog
+            ManagerViewController.showErrorDialog
                     ("Error", "Data Validation", "An Error occured during adding MenuEntry");
             LOGGER.info("Dialog Menu Add Button Menu Entry handling Error" + e);
         }
@@ -221,7 +219,7 @@ public class DialogMenuController implements Initializable{
 
     public void buttonRemoveClick(ActionEvent actionEvent) {
         if(tableViewInMenu.getSelectionModel().getSelectedItem() == null){
-            ManagerController.showErrorDialog
+            ManagerViewController.showErrorDialog
                     ("Error", "Input Validation Error", "You have to select a Menu Entry from the right side");
             return;
         }
