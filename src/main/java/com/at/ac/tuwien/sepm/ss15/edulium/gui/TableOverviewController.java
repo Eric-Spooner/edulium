@@ -17,6 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
@@ -42,19 +43,7 @@ public class TableOverviewController implements Initializable, Controller {
     @FXML
     private Canvas tablesCanvas;
     @FXML
-    private Label tableIdLabel;
-    @FXML
-    private Label timeLabel;
-    @FXML
-    private Label numberPersonsLabel;
-    @FXML
-    private AnchorPane anchor;
-    @FXML
-    private AnchorPane anchorLeft;
-    @FXML
-    private AnchorPane anchorRight;
-    @FXML
-    private ScrollPane scrollPaneLeft;
+    private ScrollPane scrollPane;
 
     @Autowired
     private InteriorService interiorService;
@@ -70,7 +59,7 @@ public class TableOverviewController implements Initializable, Controller {
     private final int SECTION_PADDING = 10;
     private final int TEXT_BORDER_BOTTOM = 2;
 
-    private Consumer<Table> tableConsumer = null;
+    private Consumer<Table> tableClickedConsumer = null;
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
@@ -85,19 +74,9 @@ public class TableOverviewController implements Initializable, Controller {
                     try {
                         Table clickedTable = rect.getTable(t.getX(), t.getY());
                         if (clickedTable != null) {
-                            //ServiceController serviceController = tablePane.getController(ServiceController.class);
-                            OrderOverviewController.setSelectedTable(clickedTable);
-                            //tableConsumer.accept(clickedTable);
-                            FXMLPane orderViewPane = context.getBean("orderOverviewPane", FXMLPane.class);
-                            StackPane orderStackPane = new StackPane();
-                            orderStackPane.getChildren().setAll(orderViewPane);
-                            Scene orderScene = new Scene(orderStackPane);
-                            Stage orderStage = new Stage();
-                            OrderOverviewController.setStage(orderStage);
-                            orderStage.setTitle("Orders Overview");
-                            orderStage.setScene(orderScene);
-                            orderStage.show();
-                            tableIdLabel.setText(String.valueOf(clickedTable.getNumber()));
+                            if (tableClickedConsumer != null) {
+                                tableClickedConsumer.accept(clickedTable);
+                            }
                         }
                     } catch (ServiceException e) {
                         showErrorDialog("Error", "Cannot retrieve tables", "There is a problem with accessing the database " + e);
@@ -107,21 +86,13 @@ public class TableOverviewController implements Initializable, Controller {
             }
         });
 
-        scrollPaneLeft.setPrefSize(120, 120);
-        scrollPaneLeft.setContent(tablesCanvas);
-        scrollPaneLeft.setStyle("-fx-font-size: 40px;");
-        /*scrollPaneLeft.vvalueProperty().addListener(new ChangeListener<Number>() {
-            public void changed(ObservableValue<? extends Number> ov,
-                                Number old_val, Number new_val) {
-                System.out.println(new_val.intValue());
-            }
-        });*/
+        scrollPane.setStyle("-fx-font-size: 40px;");
 
         setupListeners();
     }
 
     public void setupListeners() {
-        anchorLeft.widthProperty().addListener(new ChangeListener<Number>() {
+        scrollPane.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) {
                 tablesCanvas.setWidth(tablesCanvas.getWidth() - (oldSceneWidth.intValue() - newSceneWidth.intValue()));
@@ -131,7 +102,7 @@ public class TableOverviewController implements Initializable, Controller {
                 drawCanvas();
             }
         });
-        anchorLeft.heightProperty().addListener(new ChangeListener<Number>() {
+        scrollPane.heightProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneHeight, Number newSceneHeight) {
                 tablesCanvas.setHeight(tablesCanvas.getHeight() - (oldSceneHeight.intValue() - newSceneHeight.intValue()));
@@ -144,16 +115,11 @@ public class TableOverviewController implements Initializable, Controller {
     }
 
     public void setOnTableClicked(Consumer<Table> tableConsumer) {
-        this.tableConsumer = tableConsumer;
+        this.tableClickedConsumer = tableConsumer;
     }
 
     @FXML
     public void filterButtonClicked(ActionEvent event) {
-    }
-
-    @FXML
-    public void reservationButtonClicked(ActionEvent event) {
-
     }
 
     private int calculateWidth(Section section) throws ServiceException {
@@ -237,7 +203,7 @@ public class TableOverviewController implements Initializable, Controller {
         int rowHeight = 0;
         int x = CANVAS_PADDING;
         int y = CANVAS_PADDING;
-        tablesCanvas.setWidth(anchorLeft.getWidth() - 60);
+        tablesCanvas.setWidth(scrollPane.getWidth() - 60);
 
         gc.clearRect(0, 0, tablesCanvas.getWidth(), tablesCanvas.getHeight());
 
@@ -283,7 +249,7 @@ public class TableOverviewController implements Initializable, Controller {
         }
     }
 
-    public static void showErrorDialog(String title, String head, String content) {
+    public void showErrorDialog(String title, String head, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(head);
