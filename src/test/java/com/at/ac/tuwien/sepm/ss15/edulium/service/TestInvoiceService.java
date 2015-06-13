@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import javax.sql.rowset.serial.SerialException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,8 +29,6 @@ import static org.junit.Assert.*;
 public class TestInvoiceService extends AbstractServiceTest {
     @Autowired
     private InvoiceService invoiceService;
-    @Mock
-    private DAO<User> userDAO;
     @Mock
     private DAO<Invoice> invoiceDAO;
     @Mock
@@ -189,6 +188,8 @@ public class TestInvoiceService extends AbstractServiceTest {
 
         // check if invoice was created
         Mockito.verify(invoiceDAO).create(invoice);
+        // after the invoice is being created, an identity must be assigned
+        invoice.setIdentity(1L);
 
         // update object
         invoice.setGross(new BigDecimal("22"));
@@ -212,6 +213,8 @@ public class TestInvoiceService extends AbstractServiceTest {
 
         // check if invoice was created
         Mockito.verify(invoiceDAO).create(invoice);
+        // after the invoice is being created, an identity must be assigned
+        invoice.setIdentity(1L);
 
         // update object
         invoice.setGross(new BigDecimal("22"));
@@ -254,6 +257,8 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
         invoiceService.addInvoice(invoice);
+        // after the invoice is being created, an identity must be assigned
+        invoice.setIdentity(1L);
 
         // update object
         invoice.setTime(null);
@@ -275,6 +280,8 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
         invoiceService.addInvoice(invoice);
+        // after the invoice is being created, an identity must be assigned
+        invoice.setIdentity(1L);
 
         // update object
         invoice.setGross(null);
@@ -295,6 +302,8 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
         invoiceService.addInvoice(invoice);
+        // after the invoice is being created, an identity must be assigned
+        invoice.setIdentity(1L);
 
         // update object
         invoice.setGross(new BigDecimal("-29"));
@@ -374,6 +383,8 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
         invoiceService.addInvoice(invoice);
+        // after the invoice is being created, an identity must be assigned
+        invoice.setIdentity(1L);
 
         // WHEN
         invoiceService.deleteInvoice(Invoice.withIdentity(invoice.getIdentity()));
@@ -415,6 +426,8 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
+        // after the invoice is being created, an identity must be assigned
+        invoice.setIdentity(1L);
 
         Long identity = 1L;
 
@@ -459,8 +472,16 @@ public class TestInvoiceService extends AbstractServiceTest {
 
         // store invoices
         invoiceService.addInvoice(inv1);
+        // after the invoice is being created, an identity must be assigned
+        inv1.setIdentity(1L);
+
         invoiceService.addInvoice(inv2);
+        // after the invoice is being created, an identity must be assigned
+        inv2.setIdentity(2L);
+
         invoiceService.addInvoice(inv3);
+        // after the invoice is being created, an identity must be assigned
+        inv3.setIdentity(3L);
 
         Mockito.when(invoiceDAO.find(Invoice.withIdentity(inv1.getIdentity())))
                 .thenReturn(Collections.singletonList(inv1));
@@ -515,8 +536,16 @@ public class TestInvoiceService extends AbstractServiceTest {
 
         // store invoices
         invoiceService.addInvoice(inv1);
+        // after the invoice is being created, an identity must be assigned
+        inv1.setIdentity(1L);
+
         invoiceService.addInvoice(inv2);
+        // after the invoice is being created, an identity must be assigned
+        inv2.setIdentity(2L);
+
         invoiceService.addInvoice(inv3);
+        // after the invoice is being created, an identity must be assigned
+        inv3.setIdentity(3L);
 
         // Matcher 1
         Invoice m1 = new Invoice();
@@ -607,8 +636,16 @@ public class TestInvoiceService extends AbstractServiceTest {
 
         // store invoices
         invoiceService.addInvoice(inv1);
+        // after the invoice is being created, an identity must be assigned
+        inv1.setIdentity(1L);
+
         invoiceService.addInvoice(inv2);
+        // after the invoice is being created, an identity must be assigned
+        inv2.setIdentity(2L);
+
         invoiceService.addInvoice(inv3);
+        // after the invoice is being created, an identity must be assigned
+        inv3.setIdentity(3L);
 
         Mockito.when(invoiceDAO.getAll()).thenReturn(Arrays.asList(inv1, inv2, inv3));
 
