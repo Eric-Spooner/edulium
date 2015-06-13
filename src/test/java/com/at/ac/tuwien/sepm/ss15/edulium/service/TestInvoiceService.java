@@ -392,7 +392,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoiceService.deleteInvoice(Invoice.withIdentity(invoice.getIdentity()));
 
         // THEN
-        Mockito.verify(invoiceDAO).delete(invoice);
+        Mockito.verify(invoiceDAO).delete(Invoice.withIdentity(invoice.getIdentity()));
     }
 
     @Test(expected = ValidationException.class)
