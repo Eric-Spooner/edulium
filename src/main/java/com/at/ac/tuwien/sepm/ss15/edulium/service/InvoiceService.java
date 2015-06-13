@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ public interface InvoiceService extends Service {
      * @throws ServiceException If the object couldn't be stored
      * @throws ValidationException If the object doesn't pass the validation
      */
+    @PreAuthorize("hasRole('SERVICE')")
     void addInvoice(Invoice invoice) throws ServiceException, ValidationException;
 
     /**
@@ -26,6 +28,7 @@ public interface InvoiceService extends Service {
      * @throws ServiceException If the object couldn't be updated
      * @throws ValidationException If the object doesn't pass the validation
      */
+    @PreAuthorize("hasRole('SERVICE')")
     void updateInvoice(Invoice invoice) throws ServiceException, ValidationException;
 
     /**
@@ -34,6 +37,7 @@ public interface InvoiceService extends Service {
      * @throws ServiceException If the object couldn't be deleted
      * @throws ValidationException If the object doesn't pass the validation
      */
+    @PreAuthorize("hasRole('SERVICE')")
     void deleteInvoice(Invoice invoice) throws ServiceException, ValidationException;
 
     /**

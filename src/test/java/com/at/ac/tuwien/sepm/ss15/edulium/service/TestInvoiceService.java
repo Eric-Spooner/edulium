@@ -10,7 +10,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -25,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 public class TestInvoiceService extends AbstractServiceTest {
     @Autowired
@@ -77,7 +77,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoiceService.addInvoice(invoice);
 
         // THEN
-        Mockito.verify(invoiceDAO).create(invoice);
+        verify(invoiceDAO).create(invoice);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoiceService.addInvoice(invoice);
 
         // THEN
-        Mockito.verify(invoiceDAO).create(invoice);
+        verify(invoiceDAO).create(invoice);
     }
 
     @Test(expected = ValidationException.class)
@@ -100,7 +100,7 @@ public class TestInvoiceService extends AbstractServiceTest {
     public void testAddInvoice_shouldFailWithEmptyObject() throws ServiceException, ValidationException {
         // PREPARE
         Invoice invoice = new Invoice();
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(invoice);
+        doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(invoice);
 
         // WHEN/THEN
         invoiceService.addInvoice(invoice);
@@ -110,7 +110,7 @@ public class TestInvoiceService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles = {"SERVICE"})
     public void testAddInvoice_shouldFailWithNullObject() throws ServiceException, ValidationException {
         // PREPARE
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(null);
+        doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(null);
 
         // WHEN/THEN
         invoiceService.addInvoice(null);
@@ -122,7 +122,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         // PREPARE
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(invoice);
+        doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(invoice);
 
         // WHEN/THEN
         invoiceService.addInvoice(invoice);
@@ -136,7 +136,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("-15.6"));
         invoice.setCreator(creator1);
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(invoice);
+        doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(invoice);
 
         // WHEN/THEN
         invoiceService.addInvoice(invoice);
@@ -149,7 +149,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(invoice);
+        doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(invoice);
 
         // WHEN/THEN
         invoiceService.addInvoice(invoice);
@@ -162,7 +162,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setCreator(creator1);
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(invoice);
+        doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(invoice);
 
         // WHEN/THEN
         invoiceService.addInvoice(invoice);
@@ -189,7 +189,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoiceService.addInvoice(invoice);
 
         // check if invoice was created
-        Mockito.verify(invoiceDAO).create(invoice);
+        verify(invoiceDAO).create(invoice);
         // after the invoice is being created, an identity must be assigned
         invoice.setIdentity(1L);
 
@@ -201,7 +201,7 @@ public class TestInvoiceService extends AbstractServiceTest {
 
         // THEN
         // check if invoice was updated
-        Mockito.verify(invoiceDAO).update(invoice);
+        verify(invoiceDAO).update(invoice);
     }
 
     @Test
@@ -214,7 +214,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoiceService.addInvoice(invoice);
 
         // check if invoice was created
-        Mockito.verify(invoiceDAO).create(invoice);
+        verify(invoiceDAO).create(invoice);
         // after the invoice is being created, an identity must be assigned
         invoice.setIdentity(1L);
 
@@ -226,7 +226,7 @@ public class TestInvoiceService extends AbstractServiceTest {
 
         // THEN
         // check if invoice was updated
-        Mockito.verify(invoiceDAO).update(invoice);
+        verify(invoiceDAO).update(invoice);
     }
 
     @Test(expected = ValidationException.class)
@@ -244,7 +244,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setGross(new BigDecimal("29"));
 
         // invoiceValidator should throw a ValidationException
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForUpdate(invoice);
+        doThrow(new ValidationException("")).when(invoiceValidator).validateForUpdate(invoice);
 
         // WHEN/THEN
         invoiceService.updateInvoice(invoice);
@@ -267,7 +267,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setGross(new BigDecimal("29"));
 
         // invoiceValidator should throw a ValidationException
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForUpdate(invoice);
+        doThrow(new ValidationException("")).when(invoiceValidator).validateForUpdate(invoice);
 
         // WHEN/THEN
         invoiceService.updateInvoice(invoice);
@@ -289,7 +289,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setGross(null);
 
         // invoiceValidator should throw a ValidationException
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForUpdate(invoice);
+        doThrow(new ValidationException("")).when(invoiceValidator).validateForUpdate(invoice);
 
         // WHEN/THEN
         invoiceService.updateInvoice(invoice);
@@ -311,7 +311,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setGross(new BigDecimal("-29"));
 
         // invoiceValidator should throw a ValidationException
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForUpdate(invoice);
+        doThrow(new ValidationException("")).when(invoiceValidator).validateForUpdate(invoice);
 
         // WHEN/THEN
         invoiceService.updateInvoice(invoice);
@@ -322,7 +322,7 @@ public class TestInvoiceService extends AbstractServiceTest {
     public void testUpdateInvoice_shouldFailWithEmptyObject() throws ServiceException, ValidationException {
         // PREPARE
         Invoice invoice = new Invoice();
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForUpdate(invoice);
+        doThrow(new ValidationException("")).when(invoiceValidator).validateForUpdate(invoice);
 
         // WHEN/THEN
         invoiceService.updateInvoice(invoice);
@@ -332,7 +332,7 @@ public class TestInvoiceService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles = {"SERVICE"})
     public void testUpdateInvoice_shouldFailWithNullObject() throws ServiceException, ValidationException {
         // PREPARE
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForUpdate(null);
+        doThrow(new ValidationException("")).when(invoiceValidator).validateForUpdate(null);
 
         // WHEN/THEN
         invoiceService.updateInvoice(null);
@@ -360,7 +360,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setIdentity(identity);
 
         // invoiceDAO should throw exception
-        Mockito.doThrow(new DAOException("")).when(invoiceDAO).update(invoice);
+        doThrow(new DAOException("")).when(invoiceDAO).update(invoice);
 
         // WHEN/THEN
         invoiceService.updateInvoice(invoice);
@@ -392,14 +392,14 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoiceService.deleteInvoice(Invoice.withIdentity(invoice.getIdentity()));
 
         // THEN
-        Mockito.verify(invoiceDAO).delete(Invoice.withIdentity(invoice.getIdentity()));
+        verify(invoiceDAO).delete(Invoice.withIdentity(invoice.getIdentity()));
     }
 
     @Test(expected = ValidationException.class)
     @WithMockUser(username = "servicetester", roles = {"SERVICE"})
     public void testDeleteInvoice_shouldFailWithNullObject() throws ServiceException, ValidationException {
         // PREPARE
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForDelete(null);
+        doThrow(new ValidationException("")).when(invoiceValidator).validateForDelete(null);
 
         // WHEN/THEN
         invoiceService.deleteInvoice(null);
@@ -414,7 +414,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
 
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForDelete(invoice);
+        doThrow(new ValidationException("")).when(invoiceValidator).validateForDelete(invoice);
 
         // WHEN/THEN
         invoiceService.deleteInvoice(invoice);
@@ -444,7 +444,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setIdentity(identity);
 
         // invoiceDAO should throw DAOException
-        Mockito.doThrow(new DAOException("")).when(invoiceDAO).delete(invoice);
+        doThrow(new DAOException("")).when(invoiceDAO).delete(invoice);
 
         // WHEN/THEN
         invoiceService.deleteInvoice(invoice);
@@ -485,31 +485,31 @@ public class TestInvoiceService extends AbstractServiceTest {
         // after the invoice is being created, an identity must be assigned
         inv3.setIdentity(3L);
 
-        Mockito.when(invoiceDAO.find(Invoice.withIdentity(inv1.getIdentity())))
+        when(invoiceDAO.find(Invoice.withIdentity(inv1.getIdentity())))
                 .thenReturn(Collections.singletonList(inv1));
-        Mockito.when(invoiceDAO.find(Invoice.withIdentity(inv2.getIdentity())))
+        when(invoiceDAO.find(Invoice.withIdentity(inv2.getIdentity())))
                 .thenReturn(Collections.singletonList(inv2));
-        Mockito.when(invoiceDAO.find(Invoice.withIdentity(inv3.getIdentity())))
+        when(invoiceDAO.find(Invoice.withIdentity(inv3.getIdentity())))
                 .thenReturn(Collections.singletonList(inv3));
 
         // WHEN
         List<Invoice> invoices = invoiceService.findInvoices(Invoice.withIdentity(inv1.getIdentity()));
         // THEN
-        Mockito.verify(invoiceDAO).find(Invoice.withIdentity(inv1.getIdentity()));
+        verify(invoiceDAO).find(Invoice.withIdentity(inv1.getIdentity()));
         assertEquals(1, invoices.size());
         assertTrue(invoices.contains(inv1));
 
         // WHEN
         invoices = invoiceService.findInvoices(Invoice.withIdentity(inv2.getIdentity()));
         // THEN
-        Mockito.verify(invoiceDAO).find(Invoice.withIdentity(inv2.getIdentity()));
+        verify(invoiceDAO).find(Invoice.withIdentity(inv2.getIdentity()));
         assertEquals(1, invoices.size());
         assertTrue(invoices.contains(inv2));
 
         // WHEN
         invoices = invoiceService.findInvoices(Invoice.withIdentity(inv3.getIdentity()));
         // THEN
-        Mockito.verify(invoiceDAO).find(Invoice.withIdentity(inv3.getIdentity()));
+        verify(invoiceDAO).find(Invoice.withIdentity(inv3.getIdentity()));
         assertEquals(1, invoices.size());
         assertTrue(invoices.contains(inv3));
     }
@@ -559,28 +559,28 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice m3 = new Invoice();
         m3.setCreator(creator3);
 
-        Mockito.when(invoiceDAO.find(m1)).thenReturn(Collections.singletonList(inv1));
-        Mockito.when(invoiceDAO.find(m2)).thenReturn(Collections.singletonList(inv2));
-        Mockito.when(invoiceDAO.find(m3)).thenReturn(Collections.singletonList(inv3));
+        when(invoiceDAO.find(m1)).thenReturn(Collections.singletonList(inv1));
+        when(invoiceDAO.find(m2)).thenReturn(Collections.singletonList(inv2));
+        when(invoiceDAO.find(m3)).thenReturn(Collections.singletonList(inv3));
 
         // WHEN
         List<Invoice> invoices = invoiceService.findInvoices(m1);
         // THEN
-        Mockito.verify(invoiceDAO).find(m1);
+        verify(invoiceDAO).find(m1);
         assertEquals(1, invoices.size());
         assertTrue(invoices.contains(inv1));
 
         // WHEN
         invoices = invoiceService.findInvoices(m2);
         // THEN
-        Mockito.verify(invoiceDAO).find(m2);
+        verify(invoiceDAO).find(m2);
         assertEquals(1, invoices.size());
         assertTrue(invoices.contains(inv2));
 
         // WHEN
         invoices = invoiceService.findInvoices(m3);
         // THEN
-        Mockito.verify(invoiceDAO).find(m3);
+        verify(invoiceDAO).find(m3);
         assertEquals(1, invoices.size());
         assertTrue(invoices.contains(inv3));
     }
@@ -589,11 +589,11 @@ public class TestInvoiceService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles = {"SERVICE"})
     public void testFindInvoices_shouldReturnEmptyListWhenSearchingNull() throws ServiceException, DAOException {
         // PREPARE
-        Mockito.when(invoiceDAO.find(null)).thenReturn(new ArrayList<>());
+        when(invoiceDAO.find(null)).thenReturn(new ArrayList<>());
 
         // WHEN/THEN
         List<Invoice> invoices = invoiceService.findInvoices(null);
-        Mockito.verify(invoiceDAO).find(null);
+        verify(invoiceDAO).find(null);
         assertTrue(invoices.isEmpty());
     }
 
@@ -607,10 +607,10 @@ public class TestInvoiceService extends AbstractServiceTest {
             identity++;
         }
 
-        Mockito.when(invoiceDAO.find(Invoice.withIdentity(identity))).thenReturn(new ArrayList<>());
+        when(invoiceDAO.find(Invoice.withIdentity(identity))).thenReturn(new ArrayList<>());
 
         List<Invoice> invoices = invoiceService.findInvoices(Invoice.withIdentity(identity));
-        Mockito.verify(invoiceDAO).find(Invoice.withIdentity(identity));
+        verify(invoiceDAO, atLeast(2)).find(Invoice.withIdentity(identity));
         assertTrue(invoices.isEmpty());
     }
 
@@ -649,13 +649,13 @@ public class TestInvoiceService extends AbstractServiceTest {
         // after the invoice is being created, an identity must be assigned
         inv3.setIdentity(3L);
 
-        Mockito.when(invoiceDAO.getAll()).thenReturn(Arrays.asList(inv1, inv2, inv3));
+        when(invoiceDAO.getAll()).thenReturn(Arrays.asList(inv1, inv2, inv3));
 
         // WHEN
         List<Invoice> invoices = invoiceService.getAllInvoices();
 
         // THEN
-        Mockito.verify(invoiceDAO).getAll();
+        verify(invoiceDAO).getAll();
         assertEquals(3, invoices.size());
         assertTrue(invoices.contains(inv1));
         assertTrue(invoices.contains(inv2));
@@ -670,7 +670,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         History<Invoice> history = new History<>();
         history.setData(res);
 
-        Mockito.when(invoiceDAO.getHistory(res)).thenReturn(Collections.singletonList(history));
+        when(invoiceDAO.getHistory(res)).thenReturn(Collections.singletonList(history));
 
         // WHEN
         List<History<Invoice>> changes = invoiceService.getInvoiceHistory(res);
@@ -678,7 +678,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         // THEN
         assertEquals(1, changes.size());
         assertTrue(changes.contains(history));
-        Mockito.verify(invoiceDAO).getHistory(res);
+        verify(invoiceDAO).getHistory(res);
     }
 
     @Test(expected = ServiceException.class)
@@ -686,7 +686,7 @@ public class TestInvoiceService extends AbstractServiceTest {
     public void testGetReservationHistory_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Invoice res = new Invoice();
-        Mockito.doThrow(new DAOException("")).when(invoiceDAO).getHistory(res);
+        doThrow(new DAOException("")).when(invoiceDAO).getHistory(res);
 
         // WHEN
         invoiceService.getInvoiceHistory(res);
@@ -697,17 +697,7 @@ public class TestInvoiceService extends AbstractServiceTest {
     public void testGetReservationHistory_onValidationExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Invoice res = new Invoice();
-        Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateIdentity(res);
-
-        // WHEN
-        invoiceService.getInvoiceHistory(res);
-    }
-
-    @Test(expected = AccessDeniedException.class)
-    @WithMockUser(username = "servicetester", roles={"SERVICE"})
-    public void testGetReservationHistory_WithoutPermissionShouldFail() throws ValidationException, DAOException, ServiceException {
-        // PREPARE
-        Invoice res = new Invoice();
+        doThrow(new ValidationException("")).when(invoiceValidator).validateIdentity(res);
 
         // WHEN
         invoiceService.getInvoiceHistory(res);
