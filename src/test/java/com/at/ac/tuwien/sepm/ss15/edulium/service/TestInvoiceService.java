@@ -146,7 +146,7 @@ public class TestInvoiceService extends AbstractServiceTest {
     public void testAddInvoice_shouldFailWithNoTime() throws ServiceException, ValidationException {
         // PREPARE
         Invoice invoice = new Invoice();
-        invoice.setGross(new BigDecimal("-15.6"));
+        invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
         Mockito.doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(invoice);
 
