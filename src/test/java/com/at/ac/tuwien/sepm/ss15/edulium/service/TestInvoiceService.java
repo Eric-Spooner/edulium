@@ -15,8 +15,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.sql.rowset.serial.SerialException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class TestInvoiceService extends AbstractServiceTest {
     private User creator3;
 
     @Before
-    public void setUp() throws ValidationException, DAOException {
+    public void setUp() throws Exception {
         // creator 1
         creator1 = new User();
         creator1.setIdentity("A");
@@ -60,6 +60,8 @@ public class TestInvoiceService extends AbstractServiceTest {
 
         // init mocks
         MockitoAnnotations.initMocks(this);
+        ReflectionTestUtils.setField(getTargetObject(invoiceService), "invoiceDAO", invoiceDAO);
+        ReflectionTestUtils.setField(getTargetObject(invoiceService), "invoiceValidator", invoiceValidator);
     }
 
     @Test
