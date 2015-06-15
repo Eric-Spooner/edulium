@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -22,17 +23,17 @@ import java.util.List;
 class MenuServiceImpl implements MenuService {
     private static final Logger LOGGER = LogManager.getLogger(MenuServiceImpl.class);
 
-    @Autowired
+    @Resource(name = "menuEntryDAO")
     private DAO<MenuEntry> menuEntryDAO;
-    @Autowired
+    @Resource(name = "menuCategoryDAO")
     private DAO<MenuCategory> menuCategoryDAO;
-    @Autowired
+    @Resource(name = "menuDAO")
     private DAO<Menu> menuDAO;
-    @Autowired
+    @Resource(name = "menuEntryValidator")
     private Validator<MenuEntry> menuEntryValidator;
-    @Autowired
+    @Resource(name = "menuCategoryValidator")
     private Validator<MenuCategory> menuCategoryValidator;
-    @Autowired
+    @Resource(name = "menuValidator")
     private Validator<Menu> menuValidator;
 
     @Override

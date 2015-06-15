@@ -7,6 +7,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ReservationService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +18,7 @@ import java.util.List;
  * a simple reservation heuristic
  */
 class SimpleReservationHeuristic implements ReservationHeuristic {
-    @Autowired
+    @Resource(name = "reservationService")
     private ReservationService reservationService;
 
     @Override

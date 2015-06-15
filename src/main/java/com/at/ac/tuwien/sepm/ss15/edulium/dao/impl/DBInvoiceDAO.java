@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,14 +30,13 @@ import java.util.stream.Collectors;
  */
 @PreAuthorize("isAuthenticated()")
 class DBInvoiceDAO implements DAO<Invoice> {
-
     private static final Logger LOGGER = LogManager.getLogger(DBInvoiceDAO.class);
 
-    @Autowired
+    @Resource(name = "dataSource")
     private DataSource dataSource;
-    @Autowired
+    @Resource(name = "invoiceValidator")
     private Validator<Invoice> invoiceValidator;
-    @Autowired
+    @Resource(name = "userDAO")
     private DAO<User> userDAO;
 
     /**
