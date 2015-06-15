@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.mockito.cglib.core.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -27,13 +28,14 @@ import java.util.List;
  */
 class ReservationServiceImpl implements ReservationService {
     private static final Logger LOGGER = LogManager.getLogger(MenuServiceImpl.class);
-    @Autowired
+
+    @Resource(name = "reservationDAO")
     private ReservationDAO reservationDAO;
-    @Autowired
+    @Resource(name = "reservationValidator")
     private Validator<Reservation> reservationValidator;
-    @Autowired
+    @Resource(name = "interiorService")
     private InteriorService interiorService;
-    @Autowired
+    @Resource(name = "reservationHeuristic")
     private ReservationHeuristic reservationHeuristic;
 
     @Override
