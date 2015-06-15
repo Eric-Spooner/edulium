@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
@@ -55,6 +56,19 @@ class InvoiceServiceImpl implements InvoiceService {
             invoiceDAO.delete(invoice);
         } catch (DAOException e) {
             throw new ServiceException("Could not delete invoice", e);
+        }
+    }
+
+    @Override
+    public void setOrders(Invoice invoice, List<Order> orders) throws ServiceException, ValidationException {
+        LOGGER.debug("Entering setOrders with parameters: " + invoice + " " + orders);
+        invoiceValidator.validateIdentity(invoice);
+
+        invoice.setOrders(orders);
+        try {
+            invoiceDAO.update(invoice);
+        } catch (DAOException e) {
+            throw new ServiceException("Could not set orders", e);
         }
     }
 

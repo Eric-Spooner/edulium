@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
@@ -14,11 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +33,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
     private DataSource dataSource;
     @Autowired
     private Validator<Invoice> invoiceValidator;
+    @Autowired
+    private Validator<Order> orderValidator;
     @Autowired
     private DAO<User> userDAO;
 
@@ -63,6 +62,12 @@ class DBInvoiceDAO implements DAO<Invoice> {
                 invoice.setIdentity(key.getLong(1));
             }
             key.close();
+
+            try {
+                updateOrders(invoice);
+            } catch (ValidationException e) {
+                LOGGER.info("No orders set for updating their invoice id");
+            }
         } catch (SQLException e) {
             LOGGER.error("Failed to insert invoice entry into database", e);
             throw new DAOException("Failed to insert invoice entry into database", e);
@@ -92,12 +97,52 @@ class DBInvoiceDAO implements DAO<Invoice> {
                 LOGGER.error("Failed to update invoice entry in database, dataset not found");
                 throw new DAOException("Failed to update invoice entry in database, dataset not found");
             }
+
+            try {
+                updateOrders(invoice);
+            } catch (ValidationException e) {
+                LOGGER.info("No orders set for updating their invoice id");
+            }
         } catch (SQLException e) {
             LOGGER.error("Failed to update invoice entry in database", e);
             throw new DAOException("Failed to update invoice entry in database", e);
         }
 
         generateHistory(invoice);
+    }
+
+    private void updateOrders(Invoice invoice) throws DAOException, ValidationException {
+        LOGGER.debug("Entering updateOrders with parameters: " + invoice);
+
+        invoiceValidator.validateIdentity(invoice);
+
+        // validate orders
+        if (invoice.getOrders() == null) {
+            throw new ValidationException("List of orders in invoice not set");
+        }
+
+        if (invoice.getOrders().isEmpty()) {
+            throw new ValidationException("List of order in invoice is empty");
+        }
+
+        for (Order o : invoice.getOrders()) {
+            orderValidator.validateIdentity(o);
+        }
+
+        final String orderQuery = "UPDATE RestaurantOrder SET invoice_ID = ? WHERE id = ?;";
+        try (PreparedStatement orderStmt = dataSource.getConnection().prepareStatement(orderQuery)) {
+            orderStmt.setLong(1, invoice.getIdentity());
+            for (Order o : invoice.getOrders()) {
+                orderStmt.setLong(2, o.getIdentity());
+                if (orderStmt.executeUpdate() == 0) {
+                    LOGGER.error("Failed to update order entry in database, dataset not found");
+                    throw new DAOException("Failed to update order entry in database, dataset not found");
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Failed to update order entries in database", e);
+            throw new DAOException("Failed to update order entries in database", e);
+        }
     }
 
     /**
