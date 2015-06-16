@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -28,13 +29,13 @@ import java.util.stream.Collectors;
 class DBTableDAO implements DAO<Table> {
     private static final Logger LOGGER = LogManager.getLogger(DBTableDAO.class);
 
-    @Autowired
+    @Resource(name = "dataSource")
     private DataSource dataSource;
-    @Autowired
+    @Resource(name = "userDAO")
     private DAO<User> userDAO;
-    @Autowired
+    @Resource(name = "sectionDAO")
     private DAO<Section> sectionDAO;
-    @Autowired
+    @Resource(name = "tableValidator")
     private Validator<Table> validator;
 
     /**

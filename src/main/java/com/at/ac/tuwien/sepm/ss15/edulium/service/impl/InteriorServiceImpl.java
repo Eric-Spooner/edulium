@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -20,13 +21,13 @@ import java.util.List;
 class InteriorServiceImpl implements InteriorService {
     private static final Logger LOGGER = LogManager.getLogger(InteriorServiceImpl.class);
 
-    @Autowired
+    @Resource(name = "tableDAO")
     private DAO<Table> tableDAO;
-    @Autowired
+    @Resource(name = "sectionDAO")
     private DAO<Section> sectionDAO;
-    @Autowired
+    @Resource(name = "tableValidator")
     private Validator<Table> tableValidator;
-    @Autowired
+    @Resource(name = "sectionValidator")
     private Validator<Section> sectionValidator;
 
     @Override

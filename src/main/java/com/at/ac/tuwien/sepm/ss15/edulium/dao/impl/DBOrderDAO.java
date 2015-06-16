@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -26,18 +27,17 @@ import java.util.stream.Collectors;
 class DBOrderDAO implements DAO<Order> {
     private static final Logger LOGGER = LogManager.getLogger(DBOrderDAO.class);
 
-
-    @Autowired
+    @Resource(name = "dataSource")
     private DataSource dataSource;
-    @Autowired
+    @Resource(name = "orderValidator")
     private Validator<Order> validator;
-    @Autowired
+    @Resource(name = "userDAO")
     private DAO<User> userDAO;
-    @Autowired
+    @Resource(name = "invoiceDAO")
     private DAO<Invoice> invoiceDAO;
-    @Autowired
+    @Resource(name = "tableDAO")
     private DAO<Table> tableDAO;
-    @Autowired
+    @Resource(name = "menuEntryDAO")
     private DAO<MenuEntry> menuEntryDAO;
 
     @Override

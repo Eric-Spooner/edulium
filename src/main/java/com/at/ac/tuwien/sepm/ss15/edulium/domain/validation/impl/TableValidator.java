@@ -7,13 +7,15 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
+
 /**
  * implementation of the TableValidator
  */
 class TableValidator implements Validator<Table> {
-    @Autowired
+    @Resource(name = "userValidator")
     Validator<User> userValidator;
-    @Autowired
+    @Resource(name = "sectionValidator")
     Validator<Section> sectionValidator;
 
     /**

@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,7 +27,7 @@ import java.util.List;
 class UserDetailsServiceImpl implements UserDetailsService {
     private static final Logger LOGGER = LogManager.getLogger(UserDetailsServiceImpl.class);
 
-    @Autowired
+    @Resource(name = "userDAO")
     private DAO<User> userDAO;
 
     @Override
