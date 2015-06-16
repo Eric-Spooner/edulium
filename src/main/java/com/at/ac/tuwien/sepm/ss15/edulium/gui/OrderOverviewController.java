@@ -43,6 +43,7 @@ public class OrderOverviewController implements Initializable, Controller {
 
     private int ordersRow = 0;
     private LinkedList<OrderEntry> orderEntries = new LinkedList<>();
+    private LinkedList<OrderEntry> alreadyExistingOrderEntries = new LinkedList<>();
     private static Table table = null;
     private static Stage thisStage;
 
@@ -72,6 +73,25 @@ public class OrderOverviewController implements Initializable, Controller {
         tableNumberLabel.setText(String.valueOf(table.getNumber()));
 
         try {
+            // Initialize and show all orders for this table
+                /*OrderEntry oe = new OrderEntry();
+                for(OrderEntry orderEntry : orderEntries) {
+                    if(orderEntry.getEntryId().equals(order.getIdentity())) {
+                        orderEntry.setAmountLabelText(String.valueOf(Integer.valueOf(orderEntry.getAmountLabelText())+1));
+                        newEntry = false;
+                        break;
+                    }
+                }
+                if(newEntry) {
+                    oe.setEntryId(order.getIdentity());
+                    oe.setRow(rowCounter);
+                    Label amountLb = new Label();
+                    amountLb.setText("1");
+                    oe.setAmountLabel(amountLb);
+                    orderEntries.add(oe);
+                    rowCounter++;
+                }
+            }*/
             categoriesGP.setVgap(4);
             categoriesGP.setHgap(150);
             int row = 0;
@@ -196,6 +216,91 @@ public class OrderOverviewController implements Initializable, Controller {
                 if (col++ == 1)
                     col = 0;
             }
+
+            Order matcher = new Order();
+            matcher.setTable(table);
+            int rowCounter = 0;
+            boolean newEntry = true;
+            for(Order order : orderService.findOrder(matcher)) {
+                // Check if entry already in orders, then increase amount
+                for (OrderEntry orderEntry : alreadyExistingOrderEntries) {
+                    if (orderEntry.getEntryId().equals(order.getMenuEntry().getIdentity())) {
+                        orderEntry.setAmountLabelText(String.valueOf(Integer.valueOf(orderEntry.getAmountLabelText()) + 1));
+                        return;
+                    }
+                }
+                if (ordersGP.getRowConstraints().size() <= ordersRow) {
+                    Separator sepVert1 = new Separator();
+                    ordersGP.setRowSpan(sepVert1, ordersRow);
+                }
+                ordersGP.setMinHeight((ordersRow + 1) * 44);
+                if (!alreadyExistingOrderEntries.isEmpty()) {
+                    orderAnchor.setMinHeight(alreadyExistingOrderEntries.get(alreadyExistingOrderEntries.size() - 1).getRow() * 44 + 120);
+                    orderAnchor.setMaxHeight(alreadyExistingOrderEntries.get(alreadyExistingOrderEntries.size() - 1).getRow() * 44 + 120);
+                }
+                Label amountOrdered = new Label();
+                amountOrdered.setText("1");
+                amountOrdered.setStyle("-fx-font-size: 18px;");
+                ordersGP.add(amountOrdered, 0, ordersRow);
+                OrderEntry orderEntry = new OrderEntry();
+                orderEntry.setAmountLabel(amountOrdered);
+                orderEntry.setAmountLabelText("1");
+                orderEntry.setEntryId(order.getMenuEntry().getIdentity());
+                orderEntry.setRow(ordersRow);
+                alreadyExistingOrderEntries.add(orderEntry);
+                Button buttonPlus = new Button();
+                buttonPlus.setText("+");
+                buttonPlus.setPrefSize(40, 40);
+                buttonPlus.setMinWidth(40);
+                buttonPlus.setStyle("-fx-font-size: 18px;");
+                buttonPlus.setOnAction(new EventHandler<ActionEvent>() {
+                    public void handle(ActionEvent t) {
+                        //amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) + 1));
+                        orderEntry.setAmountLabelText(String.valueOf(Integer.valueOf(orderEntry.getAmountLabelText()) + 1));
+                    }
+                });
+                ordersGP.add(buttonPlus, 1, ordersRow);
+                Button buttonMinus = new Button();
+                buttonMinus.setText("-");
+                buttonMinus.setPrefSize(40, 40);
+                buttonMinus.setMinWidth(40);
+                buttonMinus.setStyle("-fx-font-size: 18px;");
+                buttonMinus.setOnAction(new EventHandler<ActionEvent>() {
+                    public void handle(ActionEvent t) {
+                        // Remove order if amount = 1 and "-" pressed
+                        if (Integer.valueOf(amountOrdered.getText()) <= 1) {
+                            alreadyExistingOrderEntries.remove(orderEntry);
+                            List<Node> children = new LinkedList<Node>(ordersGP.getChildren());
+                            for (Node node : children) {
+                                int nodeRow = GridPane.getRowIndex(node);
+                                if (nodeRow == orderEntry.getRow()) {
+                                    ordersGP.getChildren().remove(node);
+                                } else if (nodeRow > orderEntry.getRow()) {
+                                    ordersGP.setRowIndex(node, nodeRow - 1);
+                                }
+                            }
+                            for (OrderEntry oe : alreadyExistingOrderEntries) {
+                                if (oe.getRow() > orderEntry.getRow()) {
+                                    oe.setRow(oe.getRow() - 1);
+                                }
+                            }
+                            ordersGP.getRowConstraints().get(0).setMaxHeight(44);
+                            orderAnchor.setMinHeight(alreadyExistingOrderEntries.get(alreadyExistingOrderEntries.size() - 1).getRow() * 44 + 88);
+                            orderAnchor.setMaxHeight(alreadyExistingOrderEntries.get(alreadyExistingOrderEntries.size() - 1).getRow() * 44 + 88);
+                            ordersRow--;
+                        } else {
+                            //amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) - 1));
+                            orderEntry.setAmountLabelText(String.valueOf(Integer.valueOf(orderEntry.getAmountLabelText()) - 1));
+                        }
+                    }
+                });
+                ordersGP.add(buttonMinus, 2, ordersRow);
+                Text entryName = new Text();
+                entryName.setText(order.getMenuEntry().getName());
+                entryName.setStyle("-fx-font-size: 18px;");
+                ordersGP.add(entryName, 3, ordersRow);
+                ordersRow++;
+            }
         } catch (ServiceException e) {
             showErrorDialog("Error", "Cannot retrieve menus", "There is a problem with accessing the database " + e);
         }
@@ -210,7 +315,33 @@ public class OrderOverviewController implements Initializable, Controller {
     }
 
     public void backButtonClicked(ActionEvent event) {
-        thisStage.close();
+        String out = "old:";
+        for (OrderEntry entry : alreadyExistingOrderEntries) {
+            MenuEntry matcher = new MenuEntry();
+            matcher.setIdentity(entry.getEntryId());
+            MenuEntry en = null;
+            try {
+                en = menuService.findMenuEntry(matcher).get(0);
+            } catch (ServiceException e) {
+                showErrorDialog("Error", "Cannot store order", "There is a problem with accessing the database " + e);
+            }
+            out += en.getName() + ", " + entry.getAmountLabelText() + "," + entry.getRow() + "\n";
+        }
+        System.out.println(out);
+        out = "new:";
+        for (OrderEntry entry : orderEntries) {
+            MenuEntry matcher = new MenuEntry();
+            matcher.setIdentity(entry.getEntryId());
+            MenuEntry en = null;
+            try {
+                en = menuService.findMenuEntry(matcher).get(0);
+            } catch (ServiceException e) {
+                showErrorDialog("Error", "Cannot store order", "There is a problem with accessing the database " + e);
+            }
+            out += en.getName() + ", " + entry.getAmountLabelText() + "," + entry.getRow() + "\n";
+        }
+        System.out.println(out);
+        //thisStage.close();
     }
 
     public void commitButtonClicked(ActionEvent event) {
