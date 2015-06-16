@@ -60,19 +60,6 @@ class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public void setOrders(Invoice invoice, List<Order> orders) throws ServiceException, ValidationException {
-        LOGGER.debug("Entering setOrders with parameters: " + invoice + " " + orders);
-        invoiceValidator.validateIdentity(invoice);
-
-        invoice.setOrders(orders);
-        try {
-            invoiceDAO.update(invoice);
-        } catch (DAOException e) {
-            throw new ServiceException("Could not set orders", e);
-        }
-    }
-
-    @Override
     public List<Invoice> findInvoices(Invoice invoice) throws ServiceException {
         LOGGER.debug("Entering findInvoices with parameters: " + invoice);
 
