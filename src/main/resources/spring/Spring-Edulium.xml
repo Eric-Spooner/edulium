@@ -58,6 +58,8 @@
     <import resource="gui/Spring-StatisticViewPane.xml" />
     <import resource="gui/Spring-TableOverviewPane.xml" />
     <import resource="gui/Spring-OrderOverviewPane.xml" />
-
+    <import resource="gui/Spring-ServiceViewPane.xml" />
+    <import resource="gui/Spring-MenuCategoryOverviewPane.xml" />
+    <import resource="gui/Spring-MenuEntryOverviewPane.xml" />
 
 </beans>

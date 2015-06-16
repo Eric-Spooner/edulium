@@ -1,50 +1,53 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.controlsfx.control.GridCell;
-import org.controlsfx.control.GridView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
-/**
- * Controller used for the Manager View
- */
 public class ServiceController implements Initializable, Controller {
-    private static final Logger LOGGER = LogManager.getLogger(LoginController.class);
+    private static final Logger LOGGER = LogManager.getLogger(ServiceController.class);
 
-    @Resource(name = "tablePane")
-    FXMLPane tablePane;
+    @FXML
+    private BorderPane borderPane;
+
+    @Resource(name = "tableOverviewPane")
+    private FXMLPane tableOverviewPane;
+    @Resource(name = "menuCategoryOverviewPane")
+    private FXMLPane menuCategoryOverviewPane;
+    @Resource(name = "menuEntryOverviewPane")
+    private FXMLPane menuEntryOverviewPane;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        TableOverviewController tableOverviewController = tablePane.getController(TableOverviewController.class);
+        borderPane.setCenter(tableOverviewPane);
+
+        TableOverviewController tableOverviewController = tableOverviewPane.getController(TableOverviewController.class);
+        MenuCategoryOverviewController menuCategoryOverviewController = menuCategoryOverviewPane.getController(MenuCategoryOverviewController.class);
+        MenuEntryOverviewController menuEntryOverviewController = menuEntryOverviewPane.getController(MenuEntryOverviewController.class);
+
         tableOverviewController.setOnTableClicked(table -> {
-            OrderOverviewController.setSelectedTable(table);
+            borderPane.setCenter(menuCategoryOverviewPane);
+        });
+
+        menuCategoryOverviewController.setOnMenuCategoryClicked(menuCategory -> {
+            menuEntryOverviewController.setMenuCategory(menuCategory);
+            borderPane.setCenter(menuEntryOverviewPane);
+        });
+
+        menuEntryOverviewController.setOnMenuEntryClicked(menuCategory -> {
+            borderPane.setCenter(tableOverviewPane);
         });
     }
 
     @Override
     public void disable(boolean disabled) {
+
     }
 }
