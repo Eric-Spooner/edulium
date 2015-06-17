@@ -4,10 +4,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="tableOverviewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.TableOverviewController" scope="prototype" />
+    <bean id="reservationEditViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.ReservationEditViewController" scope="prototype" />
 
-    <bean id="tableOverviewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/TableOverview.fxml" />
+    <bean id="reservationEditViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
+        <constructor-arg name="fxml" value="gui/ReservationEditView.fxml" />
     </bean>
 
 </beans>

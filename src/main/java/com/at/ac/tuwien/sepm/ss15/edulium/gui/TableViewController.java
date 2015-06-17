@@ -4,6 +4,8 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -23,8 +25,8 @@ import java.util.function.Supplier;
 /**
  * Created by phili on 6/16/15.
  */
-public class TableOverviewController2 implements Initializable, Controller {
-    private static final Logger LOGGER = LogManager.getLogger(TableOverviewController2.class);
+public class TableViewController implements Initializable, Controller {
+    private static final Logger LOGGER = LogManager.getLogger(TableViewController.class);
 
     @FXML
     private ScrollPane scrollPane;
@@ -37,12 +39,17 @@ public class TableOverviewController2 implements Initializable, Controller {
     private PollingList<Table> tables;
     private PollingList<Section> sections;
     private Consumer<Table> tableClickedConsumer = null;
+
     private Map<Section, GridView<Table>> sectionsMap = new HashMap<>();
 
     private class SectionListCell extends ListCell<Section> {
         @Override
         public void updateItem(Section item, boolean empty) {
             super.updateItem(item, empty);
+
+            if(empty) {
+                setGraphic(null);
+            }
 
             GridView<Table> gridView = new GridView<>();
             gridView.setCellFactory(table -> {
@@ -74,29 +81,23 @@ public class TableOverviewController2 implements Initializable, Controller {
     public void initialize(URL location, ResourceBundle resources) {
         tables = new PollingList<>(taskScheduler);
         tables.setInterval(1000);
-        tables.setSupplier(new Supplier<List<Table>>() {
-            @Override
-            public List<Table> get() {
-                try {
-                    return interiorService.getAllTables();
-                } catch (ServiceException e) {
-                    LOGGER.error("Getting all tables via user supplier has failed", e);
-                    return null;
-                }
+        tables.setSupplier(() -> {
+            try {
+                return interiorService.getAllTables();
+            } catch (ServiceException e) {
+                LOGGER.error("Getting all tables via user supplier has failed", e);
+                return null;
             }
         });
 
         sections = new PollingList<>(taskScheduler);
         sections.setInterval(1000);
-        sections.setSupplier(new Supplier<List<Section>>() {
-            @Override
-            public List<Section> get() {
-                try {
-                    return interiorService.getAllSections();
-                } catch (ServiceException e) {
-                    LOGGER.error("Getting all sections via user supplier has failed", e);
-                    return null;
-                }
+        sections.setSupplier(() -> {
+            try {
+                return interiorService.getAllSections();
+            } catch (ServiceException e) {
+                LOGGER.error("Getting all sections via user supplier has failed", e);
+                return null;
             }
         });
 

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ScrollPane?>
+
+<BorderPane fx:id="borderPane" prefHeight="278.0" prefWidth="466.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.ReservationOverviewController">
+    <bottom>
+        <Pane prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <children>
+            <HBox layoutX="7.0" layoutY="5.0" spacing="20.0">
+               <children>
+                      <Button fx:id="btnAdd" layoutX="7.0" layoutY="5.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="75.0" text="Add" />
+                  <Button fx:id="btnEdit" layoutX="105.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnEdit_clicked" prefHeight="40.0" prefWidth="75.0" text="Edit" />
+                      <Button fx:id="btnDelete" layoutX="196.0" layoutY="5.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="75.0" text="Delete" />
+               </children>
+            </HBox>
+            </children>
+        </Pane>
+    </bottom>
+   <top>
+      <Pane prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="btnBack" layoutX="7.0" layoutY="5.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="75.0" text="Back" />
+         </children>
+      </Pane>
+   </top>
+   <center>
+      <SplitPane fx:id="listViewReservationView" dividerPositions="0.6508620689655172" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <items>
+            <ListView fx:id="lvReservations" prefHeight="200.0" prefWidth="200.0" />
+            <VBox prefHeight="176.0" prefWidth="162.0">
+               <children>
+                  <Label text="Name:" />
+                  <TextField fx:id="tfNameFilter" />
+                  <Label text="Date:" />
+                  <HBox>
+                     <children>
+                        <DatePicker fx:id="datePickerFilter" prefHeight="25.0" prefWidth="102.0" />
+                        <Button fx:id="btnClearDate" mnemonicParsing="false" text="clear" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </items>
+      </SplitPane>
+   </center>
+</BorderPane>

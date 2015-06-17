@@ -82,3 +82,23 @@ MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brut
 KEY (id, table_section, table_number) VALUES (5, 3, 3, 3, 10, 0.01, 'Without salt' , 'QUEUED');
 MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, info, state)
 KEY (id, table_section, table_number) VALUES (6, 3, 4, 2, 10, 0.01, '' , 'QUEUED');
+
+MERGE INTO Reservation(id, reservationTime, name, quantity, duration) KEY(id)
+VALUES(1, TIMESTAMP '2015-01-01 12:00:00', 'peter', 4, 12000000);
+MERGE INTO Reservation(id, reservationTime, name, quantity, duration) KEY(id)
+VALUES(2, TIMESTAMP '2015-01-02 12:00:00', 'paul', 6, 20000000);
+MERGE INTO Reservation(id, reservationTime, name, quantity, duration) KEY(id)
+VALUES(3, TIMESTAMP '2015-01-01 12:45:00', 'evan', 8, 30000000);
+
+MERGE INTO ReservationAssoc (reservation_id, table_section, table_number) KEY(reservation_id, table_section, table_number)
+VALUES(1, 3, 6);
+
+MERGE INTO ReservationAssoc (reservation_id, table_section, table_number) KEY(reservation_id, table_section, table_number)
+VALUES(2, 3, 9);
+MERGE INTO ReservationAssoc (reservation_id, table_section, table_number) KEY(reservation_id, table_section, table_number)
+VALUES(2, 3, 10);
+
+MERGE INTO ReservationAssoc (reservation_id, table_section, table_number) KEY(reservation_id, table_section, table_number)
+VALUES(3, 3, 7);
+MERGE INTO ReservationAssoc (reservation_id, table_section, table_number) KEY(reservation_id, table_section, table_number)
+VALUES(3, 2, 2);

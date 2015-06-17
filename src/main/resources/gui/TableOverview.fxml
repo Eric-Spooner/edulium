@@ -1,22 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.lang.*?>
-<?import javafx.scene.canvas.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ScrollPane?>
 
-<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.TableOverviewController">
-   <children>
-      <Button fx:id="filterButton" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Filter">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Button>
-      <ScrollPane fx:id="scrollPane" prefViewportHeight="516.0" prefViewportWidth="502.0">
-         <content>
-            <Canvas fx:id="tablesCanvas" height="516.0" layoutX="264.0" layoutY="-239.0" width="502.0" />
-         </content>
-      </ScrollPane>
-   </children>
-</VBox>
+<BorderPane fx:id="borderPane" prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.TableOverviewController">
+   <bottom>
+      <Pane prefHeight="52.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="btnReservation" layoutX="6.0" layoutY="6.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="75.0" text="Reservations" />
+         </children>
+      </Pane>
+   </bottom>
+</BorderPane>

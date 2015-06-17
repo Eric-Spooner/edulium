@@ -4,10 +4,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="tableOverviewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.TableOverviewController" scope="prototype" />
+    <bean id="tableViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.TableViewController" scope="prototype" />
 
-    <bean id="tableOverviewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/TableOverview.fxml" />
+    <bean id="tableViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
+        <constructor-arg name="fxml" value="gui/TableView.fxml" />
     </bean>
 
 </beans>

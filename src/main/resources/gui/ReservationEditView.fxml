@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ScrollPane?>
+
+<BorderPane fx:id="borderPane" prefHeight="278.0" prefWidth="466.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.ReservationEditViewController">
+    <bottom>
+        <Pane prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="btnSave" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnSave_clicked" prefHeight="40.0" prefWidth="75.0" text="Save" />
+            <Button fx:id="btnAutoCreate" layoutX="348.0" layoutY="5.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="110.0" text="Auto-Create" />
+         </children>
+        </Pane>
+    </bottom>
+   <top>
+      <Pane prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="btnCancel" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnCancel_clicked" prefHeight="40.0" prefWidth="75.0" text="Cancel" />
+         </children>
+      </Pane>
+   </top>
+   <center>
+      <SplitPane fx:id="splitPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <items>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label text="Name:" />
+                  <TextField fx:id="tfName" />
+                  <Label text="Quantity:" />
+                  <TextField fx:id="tfQuantity" />
+                  <Label text="Duration" />
+                  <TextField fx:id="tfDuration" />
+                  <Label text="Date:" />
+                  <DatePicker fx:id="datePicker" />
+                  <Label text="Time:" />
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <TextField fx:id="tfHour" prefHeight="25.0" prefWidth="45.0" />
+                        <Label prefHeight="22.0" prefWidth="7.0" text=":" />
+                        <TextField fx:id="tfMinute" prefHeight="25.0" prefWidth="46.0" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </items>
+      </SplitPane>
+   </center>
+</BorderPane>
