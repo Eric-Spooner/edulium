@@ -248,7 +248,7 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
             validator.validateIdentity(onetimeSale);
         }
 
-        final String query = "SELECT * FROM OnetimeSale WHERE ID IN (" +
+        final String query = "SELECT * FROM OnetimeSale WHERE sale_ID IN (" +
                 onetimeSales.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
 
         final List<OnetimeSale> populatedOnetimeSales = new ArrayList<>();
@@ -264,9 +264,8 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
-                if (DBAbstractSaleDAO.addNameToSale(onetimeSaleFromResult, dataSource, menuEntryDAO)) {
-                    populatedOnetimeSales.add(onetimeSaleFromResult);
-                }
+                DBAbstractSaleDAO.addNameToSale(onetimeSaleFromResult, dataSource, menuEntryDAO);
+                populatedOnetimeSales.add(onetimeSaleFromResult);
             }
         } catch (SQLException e) {
             LOGGER.error("Populating onetimeSales failed", e);

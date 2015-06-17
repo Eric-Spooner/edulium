@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -463,6 +465,116 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         onetimeSaleDAO.create(onetimeSale);
         assertEquals(onetimeSaleDAO.find(onetimeSale).size(), 1);
         assertTrue(onetimeSaleDAO.find(onetimeSale).contains(onetimeSale));
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjects() throws DAOException, ValidationException {
+        // Prepare
+
+        // one time sale 1
+        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+
+        onetimeSaleDAO.create(onetimeSale1);
+
+        // one time sale 2
+        OnetimeSale onetimeSale2 =  createOnetimeSale(new Long(124));
+
+        onetimeSaleDAO.create(onetimeSale2);
+
+        // one time sale 3
+        OnetimeSale onetimeSale3 =  createOnetimeSale(new Long(125));
+
+        onetimeSaleDAO.create(onetimeSale3);
+
+        List<OnetimeSale> list = Arrays.asList(onetimeSale1, onetimeSale2, onetimeSale3);
+
+        // WHEN
+        List<OnetimeSale> result1 = onetimeSaleDAO.populate(list);
+
+        // THEN
+        assertEquals(3, result1.size());
+        assertTrue(result1.contains(onetimeSale1));
+        assertTrue(result1.contains(onetimeSale2));
+        assertTrue(result1.contains(onetimeSale3));
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjectsOfDeletedObjects() throws DAOException, ValidationException {
+        // Prepare
+
+        // one time sale 1
+        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+
+        onetimeSaleDAO.create(onetimeSale1);
+        assertEquals(1, onetimeSaleDAO.find(onetimeSale1).size());
+        onetimeSaleDAO.delete(onetimeSale1);
+        assertEquals(0, onetimeSaleDAO.find(onetimeSale1).size());
+
+        // one time sale 2
+        OnetimeSale onetimeSale2 =  createOnetimeSale(new Long(124));
+
+        onetimeSaleDAO.create(onetimeSale2);
+        assertEquals(1, onetimeSaleDAO.find(onetimeSale2).size());
+        onetimeSaleDAO.delete(onetimeSale2);
+        assertEquals(0, onetimeSaleDAO.find(onetimeSale2).size());
+
+        // one time sale 3
+        OnetimeSale onetimeSale3 =  createOnetimeSale(new Long(125));
+
+        onetimeSaleDAO.create(onetimeSale3);
+        assertEquals(1, onetimeSaleDAO.find(onetimeSale3).size());
+        onetimeSaleDAO.delete(onetimeSale3);
+        assertEquals(0, onetimeSaleDAO.find(onetimeSale3).size());
+
+        List<OnetimeSale> list = Arrays.asList(onetimeSale1, onetimeSale2, onetimeSale3);
+
+        // WHEN
+        List<OnetimeSale> result1 = onetimeSaleDAO.populate(list);
+
+        // THEN
+        assertEquals(3, result1.size());
+        assertTrue(result1.contains(onetimeSale1));
+        assertTrue(result1.contains(onetimeSale2));
+        assertTrue(result1.contains(onetimeSale3));
+    }
+
+    @Test
+    public void testPopulate_nullListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // GIVEN
+        List<OnetimeSale> invalidSales = null;
+
+        // WHEN
+        List<OnetimeSale> result = onetimeSaleDAO.populate(invalidSales);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testPopulate_emptyListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // GIVEN
+        List<OnetimeSale> invalidSales = Arrays.asList();
+
+        // WHEN
+        List<OnetimeSale> result = onetimeSaleDAO.populate(invalidSales);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithInvalidObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<OnetimeSale> invalidSales = Arrays.asList(new OnetimeSale());
+
+        // WHEN
+        List<OnetimeSale> result = onetimeSaleDAO.populate(invalidSales);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<OnetimeSale> invalidSales = new ArrayList<>();
+        invalidSales.add(null);
+
+        // WHEN
+        List<OnetimeSale> result = onetimeSaleDAO.populate(invalidSales);
     }
 
     /*

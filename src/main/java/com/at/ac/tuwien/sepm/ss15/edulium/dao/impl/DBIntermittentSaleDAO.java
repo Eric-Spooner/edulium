@@ -281,7 +281,7 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             validator.validateIdentity(order);
         }
 
-        final String query = "SELECT * FROM IntermittentSale WHERE ID IN (" +
+        final String query = "SELECT * FROM IntermittentSale WHERE sale_ID IN (" +
                 intermittentSales.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
 
         final List<IntermittentSale> populatedIntermittentSales = new ArrayList<>();

@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -754,6 +756,121 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         intermittentSaleDAO.create(intermittentSale);
         assertEquals(intermittentSaleDAO.find(intermittentSale).size(), 1);
         assertTrue(intermittentSaleDAO.find(intermittentSale).contains(intermittentSale));
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjects() throws DAOException, ValidationException {
+        // Prepare
+
+        // intermittent sale 1
+        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
+
+        intermittentSaleDAO.create(intermittentSale1);
+        assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
+
+        // intermittent sale 2
+        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
+
+        intermittentSaleDAO.create(intermittentSale2);
+        assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
+
+        // intermittent sale 3
+        IntermittentSale intermittentSale3 = createIntermittentSale(new Long(125));
+
+        intermittentSaleDAO.create(intermittentSale3);
+        assertEquals(1, intermittentSaleDAO.find(intermittentSale3).size());
+
+        List<IntermittentSale> salesList = Arrays.asList(intermittentSale1, intermittentSale2, intermittentSale3);
+
+        // WHEN
+        List<IntermittentSale> result = intermittentSaleDAO.populate(salesList);
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(intermittentSale1));
+        assertTrue(result.contains(intermittentSale2));
+        assertTrue(result.contains(intermittentSale3));
+    }
+
+    @Test
+    public void testPopulate_shouldReturnFullyPopulatedObjectsOfDeletedObjects() throws DAOException, ValidationException {
+        // Prepare
+
+        // intermittent sale 1
+        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
+
+        intermittentSaleDAO.create(intermittentSale1);
+        assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
+        intermittentSaleDAO.delete(intermittentSale1);
+        assertEquals(0, intermittentSaleDAO.find(intermittentSale1).size());
+
+        // intermittent sale 2
+        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
+
+        intermittentSaleDAO.create(intermittentSale2);
+        assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
+        intermittentSaleDAO.delete(intermittentSale2);
+        assertEquals(0, intermittentSaleDAO.find(intermittentSale2).size());
+
+        // intermittent sale 3
+        IntermittentSale intermittentSale3 = createIntermittentSale(new Long(125));
+
+        intermittentSaleDAO.create(intermittentSale3);
+        assertEquals(1, intermittentSaleDAO.find(intermittentSale3).size());
+        intermittentSaleDAO.delete(intermittentSale3);
+        assertEquals(0, intermittentSaleDAO.find(intermittentSale3).size());
+
+        List<IntermittentSale> salesList = Arrays.asList(intermittentSale1, intermittentSale2, intermittentSale3);
+
+        // WHEN
+        List<IntermittentSale> result = intermittentSaleDAO.populate(salesList);
+        // THEN
+        assertEquals(3, result.size());
+        assertTrue(result.contains(intermittentSale1));
+        assertTrue(result.contains(intermittentSale2));
+        assertTrue(result.contains(intermittentSale3));
+    }
+
+    @Test
+    public void testPopulate_nullListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // GIVEN
+        List<IntermittentSale> invalidSales = null;
+
+        // WHEN
+        List<IntermittentSale> result = intermittentSaleDAO.populate(invalidSales);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void testPopulate_emptyListShouldReturnEmptyObjects() throws DAOException, ValidationException {
+        // GIVEN
+        List<IntermittentSale> invalidSales = Arrays.asList();
+
+        // WHEN
+        List<IntermittentSale> result = intermittentSaleDAO.populate(invalidSales);
+
+        // THEN
+        assertTrue(result.isEmpty());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithInvalidObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<IntermittentSale> invalidSales = Arrays.asList(new IntermittentSale());
+
+        // WHEN
+        List<IntermittentSale> result = intermittentSaleDAO.populate(invalidSales);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testPopulate_listWithNullObjectsShouldThrow() throws DAOException, ValidationException {
+        // GIVEN
+        List<IntermittentSale> invalidSales = new ArrayList<>();
+        invalidSales.add(null);
+
+        // WHEN
+        List<IntermittentSale> result = intermittentSaleDAO.populate(invalidSales);
     }
 
     /*
