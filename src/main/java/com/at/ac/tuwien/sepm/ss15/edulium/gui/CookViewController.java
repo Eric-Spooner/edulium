@@ -103,8 +103,8 @@ public class CookViewController implements Initializable, Controller {
         SortedList<Order> sortedDataQueued = new SortedList<>(ordersQueued);
         sortedDataQueued.comparatorProperty().bind(tableViewQueued.comparatorProperty());
         tableViewQueued.setItems(sortedDataQueued);
+        tableViewQueued.setStyle("-fx-font-size: 25px;");
         tableViewQueued.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        tableViewQueued.setStyle("-fx-font-size: 15;");
         tableViewQueued.setRowFactory(new Callback<TableView<Order>, TableRow<Order>> () {
             @Override
             public TableRow<Order> call(TableView<Order> tableView) {
@@ -148,6 +148,7 @@ public class CookViewController implements Initializable, Controller {
         SortedList<Order> sortedDataInProgress = new SortedList<>(ordersInProgress);
         sortedDataInProgress.comparatorProperty().bind(tableViewInProgress.comparatorProperty());
         tableViewInProgress.setItems(sortedDataInProgress);
+        tableViewInProgress.setStyle("-fx-font-size: 25px;");
         tableViewInProgress.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         tableViewInProgress.setRowFactory(new Callback<TableView<Order>, TableRow<Order>> () {
             @Override
@@ -193,7 +194,7 @@ public class CookViewController implements Initializable, Controller {
         SortedList<Order> sortedDataReady = new SortedList<>(ordersReadyForDelivery);
         sortedDataReady.comparatorProperty().bind(tableViewInProgress.comparatorProperty());
         tableViewReadyForDelivery.setItems(sortedDataReady);
-
+        tableViewReadyForDelivery.setStyle("-fx-font-size: 25px;");
         tableColDeliveryTable.setCellValueFactory(p -> new SimpleObjectProperty<Long>(p.getValue().getTable().getNumber()));
         tableColDeliveryMenuEntry.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getMenuEntry().getName()));
         tableColDeliveryTime.setCellValueFactory(p -> new SimpleObjectProperty<Long>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes()));
