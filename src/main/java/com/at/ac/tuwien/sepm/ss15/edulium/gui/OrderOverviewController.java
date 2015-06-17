@@ -231,6 +231,7 @@ public class OrderOverviewController implements Initializable, Controller {
         cancelPopOver = new PopOver(layout);
         cancelPopOver.setHideOnEscape(true);
         cancelPopOver.setAutoHide(true);
+        cancelPopOver.setDetachable(false);
         cancelPopOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_LEFT);
     }
 
@@ -270,6 +271,7 @@ public class OrderOverviewController implements Initializable, Controller {
         moveToTablePopOver = new PopOver(tableViewPane);
         moveToTablePopOver.setHideOnEscape(true);
         moveToTablePopOver.setAutoHide(true);
+        moveToTablePopOver.setDetachable(false);
         moveToTablePopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
     }
 
@@ -277,6 +279,7 @@ public class OrderOverviewController implements Initializable, Controller {
         newOrderPopOver = new PopOver();
         newOrderPopOver.setHideOnEscape(true);
         newOrderPopOver.setAutoHide(true);
+        newOrderPopOver.setDetachable(false);
         newOrderPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
     }
 
