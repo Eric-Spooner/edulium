@@ -45,5 +45,6 @@
     <import resource="service/Spring-TaxRateService.xml" />
     <import resource="service/Spring-InteriorService.xml" />
     <import resource="service/Spring-ReservationService.xml" />
+    <import resource="service/Spring-SaleService.xml" />
 
 </beans>
