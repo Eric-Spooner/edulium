@@ -20,6 +20,8 @@
     <import resource="domain/Spring-MenuValidator.xml" />
     <import resource="domain/Spring-OrderValidator.xml" />
     <import resource="domain/Spring-InstalmentValidator.xml" />
+    <import resource="domain/Spring-IntermittentSaleValidator.xml" />
+    <import resource="domain/Spring-OnetimeSaleValidator.xml" />
 
     <!-- DAO beans -->
     <import resource="dao/Spring-MenuCategoryDAO.xml" />
