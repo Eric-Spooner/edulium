@@ -57,7 +57,7 @@ class OrderServiceImpl implements OrderService {
         }else {
             Order preOrder = preOrders.get(0);
             //if the order already had an invoice it is not allowed to be changed
-            if(preOrder.getInvoice() != null){
+            if(false){ //TODO: ! Invoice.find(invoice with order).isEmpty()
                 LOGGER.error("It is not allowed to change an order with invoice");
                 throw new ServiceException("It is not allowed to change an order with invoice");
             }
@@ -145,29 +145,6 @@ class OrderServiceImpl implements OrderService {
             throw new ServiceException("An Error has occurred in the data access object");
         }
     }
-
-    @Override
-    public List<Order> getAllOrdersToPrepare(List<MenuCategory> menuCategories) throws
-            ServiceException, ValidationException {
-        LOGGER.debug("Entering getAllOrdersToPrepare with parameter " + menuCategories);
-
-        List<Order> retVal = new LinkedList<>();
-
-        if(menuCategories.isEmpty()){
-            return new LinkedList<>();
-        }
-
-        //Prepare dummy MenuEntries with the given Categories for finding purpose
-        for(MenuCategory category : menuCategories){
-            MenuEntry dummyEntry = new MenuEntry();
-            dummyEntry.setCategory(category);
-            Order dummyOrder = new Order();
-            dummyOrder.setMenuEntry(dummyEntry);
-            retVal.addAll(this.findOrder(dummyOrder));
-        }
-        return retVal;
-    }
-
     @Override
     public void markAsInProgress(Order order) throws ServiceException, ValidationException {
         LOGGER.debug("Entering markAsInProgress with parameter " + order);

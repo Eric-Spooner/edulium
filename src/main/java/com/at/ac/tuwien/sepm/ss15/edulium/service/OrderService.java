@@ -74,14 +74,6 @@ public interface OrderService extends Service {
     List<History<Order>> getOrderHistory(Order template) throws ServiceException, ValidationException;
 
     /**
-     * returns all Orders, which have to be cooked
-     * @return List of MenuEntries, which should be cooked
-     * @throws ServiceException
-     */
-    @PreAuthorize("hasAnyRole('COOK','SERVICE')")
-    public List<Order> getAllOrdersToPrepare(List<MenuCategory> menuCategories) throws ServiceException, ValidationException;
-
-    /**
      * Cook uses this function, to set the state of the order to IN_PROGRESS
      * @pre: The state of the order has to be QUEUED
      * @post: The state of the order is IN_PROGRESS
