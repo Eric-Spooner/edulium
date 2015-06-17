@@ -19,10 +19,6 @@ public class ServiceController implements Initializable, Controller {
 
     @Resource(name = "tableOverviewPane")
     private FXMLPane tableOverviewPane;
-    @Resource(name = "menuCategoryOverviewPane")
-    private FXMLPane menuCategoryOverviewPane;
-    @Resource(name = "menuEntryOverviewPane")
-    private FXMLPane menuEntryOverviewPane;
     @Resource(name = "reservationOverviewPane")
     private FXMLPane reservationOverviewPane;
     @Resource(name = "reservationEditViewPane")
@@ -35,8 +31,7 @@ public class ServiceController implements Initializable, Controller {
         borderPane.setCenter(tableOverviewPane);
 
         TableOverviewController tableOverviewController = tableOverviewPane.getController(TableOverviewController.class);
-        MenuCategoryOverviewController menuCategoryOverviewController = menuCategoryOverviewPane.getController(MenuCategoryOverviewController.class);
-        MenuEntryOverviewController menuEntryOverviewController = menuEntryOverviewPane.getController(MenuEntryOverviewController.class);
+        OrderOverviewController orderOverviewController = orderOverviewPane.getController(OrderOverviewController.class);
 
         ReservationOverviewController reservationOverviewController = reservationOverviewPane.getController(ReservationOverviewController.class);
         ReservationEditViewController reservationEditViewController = reservationEditViewPane.getController(ReservationEditViewController.class);
@@ -54,8 +49,6 @@ public class ServiceController implements Initializable, Controller {
                     reservationEditViewController.setReservation(reservation);
         });
 
-        OrderOverviewController orderOverviewController = orderOverviewPane.getController(OrderOverviewController.class);
-
         tableOverviewController.setOnReservationButtonAction(event -> borderPane.setCenter(reservationOverviewPane));
 
         tableOverviewController.setOnTableClicked(table -> {
@@ -63,17 +56,10 @@ public class ServiceController implements Initializable, Controller {
             borderPane.setCenter(orderOverviewPane);
         });
 
+        orderOverviewController.setOnBackButtonAction(event -> borderPane.setCenter(tableOverviewPane));
+
         reservationEditViewController.onCancel(reservation -> borderPane.setCenter(reservationOverviewPane));
         reservationEditViewController.onAccept(reservation -> borderPane.setCenter(reservationOverviewPane));
-
-        menuCategoryOverviewController.setOnMenuCategoryClicked(menuCategory -> {
-            menuEntryOverviewController.setMenuCategory(menuCategory);
-            borderPane.setCenter(menuEntryOverviewPane);
-        });
-
-        menuEntryOverviewController.setOnMenuEntryClicked(menuCategory -> {
-            borderPane.setCenter(tableOverviewPane);
-        });
     }
 
     @Override

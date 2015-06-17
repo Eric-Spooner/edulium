@@ -6,6 +6,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
 import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -326,11 +327,6 @@ public class OrderOverviewController implements Initializable, Controller {
     }
 
     @FXML
-    public void onBackButtonClicked(ActionEvent actionEvent) {
-
-    }
-
-    @FXML
     public void onNewOrderButtonClicked(ActionEvent actionEvent) {
         if (newOrderPopOver.isShowing()) {
             newOrderPopOver.hide();
@@ -416,6 +412,10 @@ public class OrderOverviewController implements Initializable, Controller {
                 }
             }
         });
+    }
+
+    public void setOnBackButtonAction(EventHandler<ActionEvent> event) {
+        backButton.setOnAction(event);
     }
 
     @Override
