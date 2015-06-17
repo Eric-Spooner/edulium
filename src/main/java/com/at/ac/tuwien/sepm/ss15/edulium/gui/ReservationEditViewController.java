@@ -9,11 +9,13 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
@@ -23,9 +25,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -34,6 +34,8 @@ import java.util.function.Consumer;
 public class ReservationEditViewController implements Initializable, Controller {
     enum Mode {EDIT, ADD}
 
+    @FXML
+    private Button btnAutoCreate;
     @FXML
     private Button btnCancel;
     @FXML
@@ -52,6 +54,8 @@ public class ReservationEditViewController implements Initializable, Controller 
     private NumericTextField tfDuration;
     @FXML
     private DatePicker datePicker;
+    @FXML
+    private Label lblSeats;
 
     @Autowired
     private ReservationService reservationService;
@@ -73,8 +77,10 @@ public class ReservationEditViewController implements Initializable, Controller 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        splitPane.getItems().add(0, tableViewPane);
         tableViewController = tableViewPane.getController(TableViewController.class);
+        tableViewController.showSeats(true);
+
+        splitPane.getItems().add(0, tableViewPane);
 
         tableViewController.setOnTableClicked(table -> {
             if(reservation.getTables().contains(table)) {
@@ -86,29 +92,43 @@ public class ReservationEditViewController implements Initializable, Controller 
                 reservation.getTables().add(table);
                 tableViewController.setTableColor(table, Color.BLUE);
             }
+            updateSeatsLabel();
         });
 
-
-        ChangeListener<Object> dateTimeChangeListener = new ChangeListener<Object>() {
+        ChangeListener<Object> changeListener = new ChangeListener<Object>() {
             @Override
             public void changed(ObservableValue<?> observable, Object oldValue, Object newValue) {
                 LocalDateTime dateTime = getLocalDateTime();
+
+                if(tfDuration.isEmpty() || dateTime == null) {
+                    btnSave.setDisable(true);
+                    btnAutoCreate.setDisable(true);
+                    return;
+                }
+
+                boolean disable = dateTime.isBefore(LocalDateTime.now()) || tfDuration.isEmpty() || tfName.getText().isEmpty() || tfQuantity.isEmpty();
+
+                btnSave.setDisable(disable);
+                btnAutoCreate.setDisable(disable);
+
                 try {
-                    if(tfDuration.isEmpty() || dateTime == null) {
-                        return;
-                    }
                     List<Reservation> reservations = reservationService.findReservationBetween(dateTime, dateTime.plusHours((int) tfDuration.getValue()));
                     displayOccupiedTables(reservations);
+
                 } catch (ServiceException | ValidationException e) {
                     displayErrorMessage("error retrieving reservations", e);
                 }
             }
         };
 
-        datePicker.valueProperty().addListener(dateTimeChangeListener);
-        tfDuration.textProperty().addListener(dateTimeChangeListener);
-        tfHour.textProperty().addListener(dateTimeChangeListener);
-        tfMinute.textProperty().addListener(dateTimeChangeListener);
+        datePicker.valueProperty().addListener(changeListener);
+        tfDuration.textProperty().addListener(changeListener);
+        tfHour.textProperty().addListener(changeListener);
+        tfMinute.textProperty().addListener(changeListener);
+        tfName.textProperty().addListener(changeListener);
+        tfQuantity.textProperty().addListener(changeListener);
+
+        lblSeats.setFont(new Font(30));
 
         tfHour.setMinMax(0, 24);
         tfMinute.setMinMax(0, 60);
@@ -118,13 +138,13 @@ public class ReservationEditViewController implements Initializable, Controller 
         this.reservation = reservation;
 
         // clear inputs
-        tableViewController.clear();
         tfName.clear();
         tfQuantity.clear();
         tfDuration.clear();
         tfHour.clear();
         tfMinute.clear();
         datePicker.setValue(null);
+        tableViewController.clear();
 
         if(reservation.getIdentity() == null) {
             mode = Mode.ADD;
@@ -143,8 +163,12 @@ public class ReservationEditViewController implements Initializable, Controller 
 
             displayReservationData();
         } else {
+            btnSave.setDisable(true);
+            btnAutoCreate.setDisable(true);
             reservation.setTables(new ArrayList<>());
         }
+
+        updateSeatsLabel();
     }
 
     public void onAccept(Consumer<Reservation> consumer) {
@@ -157,9 +181,8 @@ public class ReservationEditViewController implements Initializable, Controller 
 
     public void setReservationData() {
         reservation.setName(tfName.getText());
-        reservation.setDuration(Duration.ofHours(Long.valueOf(tfDuration.getText())));
-        reservation.setQuantity(Integer.valueOf(tfQuantity.getText()));
-
+        reservation.setDuration(Duration.ofHours((long) tfDuration.getValue()));
+        reservation.setQuantity((int) tfQuantity.getValue());
         reservation.setTime(getLocalDateTime());
     }
 
@@ -183,9 +206,19 @@ public class ReservationEditViewController implements Initializable, Controller 
             datePicker.setValue(dateTime.toLocalDate());
         }
 
-        if (reservation.getTables() != null) {
-            reservation.getTables().stream().forEach(t -> tableViewController.setTableColor(t, Color.BLUE));
-        }
+        // delay setting table colors; wait for tableview to load tables
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                if (reservation.getTables() != null) {
+                    reservation.getTables().stream().forEach(t -> tableViewController.setTableColor(t, Color.BLUE));
+                }
+            }
+        };
+
+        Timer timer = new Timer();
+        timer.schedule(task, 100);
+
     }
 
     @FXML
@@ -228,22 +261,36 @@ public class ReservationEditViewController implements Initializable, Controller 
     public void on_autoCreate_clicked() {
         // delete tables
         reservation.getTables().clear();
+        tableViewController.clear();
 
         setReservationData();
 
         // add reservation, so that the tables are automatically set
         try {
-            reservationService.addReservation(reservation);
-        } catch (ServiceException e) {
-            e.printStackTrace();
-        } catch (ValidationException e) {
-            e.printStackTrace();
+            if(mode == Mode.ADD) {
+                reservationService.addReservation(reservation);
+            } else {
+                reservationService.updateReservation(reservation);
+            }
+        } catch (ServiceException | ValidationException e) {
+            displayErrorMessage("Could not find any free Tables", e);
         }
 
         // display selected tables
         if(reservation.getTables() != null) {
             reservation.getTables().stream().forEach(t -> tableViewController.setTableColor(t, Color.BLUE));
         }
+        updateSeatsLabel();
+    }
+
+    private void updateSeatsLabel() {
+        int sumSeats = 0;
+        if(reservation.getTables() != null) {
+            for(Table t : reservation.getTables()) {
+                sumSeats += t.getSeats();
+            }
+        }
+        lblSeats.setText(sumSeats + " / " + (int) tfQuantity.getValue());
     }
 
     private LocalDateTime getLocalDateTime() {
@@ -265,8 +312,13 @@ public class ReservationEditViewController implements Initializable, Controller 
             for(Table t : res.getTables()) {
                 tableViewController.setTableColor(t, Color.RED);
                 tableViewController.setTableDisable(t, true);
+                // remove not free tables from reservation
+                if(reservation.getTables() != null) {
+                    reservation.getTables().remove(t);
+                }
             }
         }
+        updateSeatsLabel();
     }
 
     private void displayErrorMessage(String message, Exception e) {

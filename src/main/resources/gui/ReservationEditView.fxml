@@ -6,24 +6,38 @@
 <?import javafx.scene.control.ScrollPane?>
 
 <?import com.at.ac.tuwien.sepm.ss15.edulium.gui.NumericTextField?>
+<?import javafx.scene.text.Font?>
 <BorderPane fx:id="borderPane" prefHeight="278.0" prefWidth="466.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.ReservationEditViewController">
     <bottom>
         <Pane prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="btnSave" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnSave_clicked" prefHeight="40.0" prefWidth="75.0" text="Save" />
-            <Button fx:id="btnAutoCreate" layoutX="348.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_autoCreate_clicked" prefHeight="40.0" prefWidth="110.0" text="Auto-Create" />
+            <Label fx:id="lblSeats" alignment="CENTER" text="0 / 0"/>
          </children>
         </Pane>
     </bottom>
    <top>
-      <Pane prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <HBox prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER" spacing="20.0">
          <children>
-            <Button fx:id="btnCancel" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnCancel_clicked" prefHeight="40.0" prefWidth="75.0" text="Cancel" />
+            <Button fx:id="btnSave" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnSave_clicked" prefHeight="40.0" prefWidth="75.0" text="Save" >
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
+            <Button fx:id="btnAutoCreate" layoutX="348.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_autoCreate_clicked" prefHeight="40.0" prefWidth="120.0" text="Auto-Create" >
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Button>
+            <Button fx:id="btnCancel" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnCancel_clicked" prefHeight="40.0" prefWidth="120.0" text="Cancel" >
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
          </children>
-      </Pane>
+      </HBox>
    </top>
    <center>
-      <SplitPane fx:id="splitPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <SplitPane fx:id="splitPane" prefHeight="200.0" prefWidth="200.0" dividerPositions="0.7" BorderPane.alignment="CENTER">
          <items>
             <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
