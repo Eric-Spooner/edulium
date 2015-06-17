@@ -213,6 +213,20 @@ public class OrderOverviewController implements Initializable, Controller {
         thisStage.close();
     }
 
+    public void cashButtonClicked(ActionEvent event) {
+        ApplicationContext context = EduliumApplicationContext.getContext();
+        CashViewController.setSelectedTable(table);
+        FXMLPane cashViewPane = context.getBean("cashViewPane", FXMLPane.class);
+        StackPane cashStackPane = new StackPane();
+        cashStackPane.getChildren().setAll(cashViewPane);
+        Scene cashScene = new Scene(cashStackPane);
+        Stage cashStage = new Stage();
+        OrderOverviewController.setStage(cashStage);
+        cashStage.setTitle("Cash View");
+        cashStage.setScene(cashScene);
+        cashStage.show();
+    }
+
     public void commitButtonClicked(ActionEvent event) {
         //String out = new String();
         for (OrderEntry entry : orderEntries) {

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<SplitPane dividerPositions="0.47901591895803186" prefHeight="507.0" prefWidth="693.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.CashViewController">
+   <items>
+      <VBox>
+         <children>
+            <Text layoutX="200.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="ORDERS">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Text>
+            <TableView fx:id="tableViewOrders" layoutX="11.0" layoutY="54.0" prefHeight="399.0" prefWidth="233.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="54.0" VBox.vgrow="ALWAYS">
+               <columns>
+                  <TableColumn fx:id="tableColOrdersName" prefWidth="327.0" text="Name" />
+               </columns>
+            </TableView>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Button cancelButton="true" mnemonicParsing="false" onAction="#btnToInvoiceClicked" prefHeight="72.0" prefWidth="121.0" text="&gt;&gt;" />
+                  <Button cancelButton="true" mnemonicParsing="false" onAction="#btnAllToInvoiceClicked" prefHeight="72.0" prefWidth="121.0" text="All" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <VBox prefHeight="505.0" prefWidth="541.0">
+         <children>
+            <Text layoutX="172.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="INVOICE" AnchorPane.topAnchor="14.0224609375">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Text>
+            <TableView fx:id="tableViewInvoice" layoutX="10.0" layoutY="54.0" prefHeight="399.0" prefWidth="552.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="54.0" VBox.vgrow="ALWAYS">
+               <columns>
+                  <TableColumn fx:id="tableColInvoiceName" prefWidth="356.0" text="Name" />
+               </columns>
+            </TableView>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#btnToOrdersClicked" prefHeight="72.0" prefWidth="121.0" text="&lt;&lt;" />
+                  <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#btnOKClicked" prefHeight="72.0" prefWidth="121.0" text="OK" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </items>
+</SplitPane>
