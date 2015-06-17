@@ -259,8 +259,6 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
 
         // THEN
         assertEquals(1, result1.size());
-        System.out.println(onetimeSale1);
-        System.out.println(result1.get(0));
         assertTrue(result1.contains(onetimeSale1));
 
         assertEquals(1, result2.size());
@@ -272,27 +270,151 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
 
     @Test
     public void testFind_byFromTimeShouldReturnObjects() throws DAOException, ValidationException {
+        // Prepare
+        LocalDateTime time1 = LocalDateTime.parse("2007-12-03T10:15:30");
+        LocalDateTime time2 = LocalDateTime.parse("2008-12-03T10:15:30");
 
+        // one time sale 1
+        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+        onetimeSale1.setFromTime(time1);
+
+        onetimeSaleDAO.create(onetimeSale1);
+        assertEquals(1, onetimeSaleDAO.find(onetimeSale1).size());
+
+        // one time sale 2
+        OnetimeSale onetimeSale2 =  createOnetimeSale(new Long(124));
+        onetimeSale2.setFromTime(time2);
+
+        onetimeSaleDAO.create(onetimeSale2);
+        assertEquals(1, onetimeSaleDAO.find(onetimeSale2).size());
+
+        // GIVEN
+        OnetimeSale matcher1 = OnetimeSale.withIdentity(onetimeSale1.getIdentity()); // for sale 1
+        matcher1.setIdentity(null);
+        matcher1.setFromTime(onetimeSale1.getFromTime());
+        OnetimeSale matcher2 = OnetimeSale.withIdentity(onetimeSale2.getIdentity()); // for sale 2
+        matcher2.setIdentity(null);
+        matcher2.setFromTime(onetimeSale2.getFromTime());
+
+        // WHEN
+        List<OnetimeSale> result1 = onetimeSaleDAO.find(matcher1);
+        List<OnetimeSale> result2 = onetimeSaleDAO.find(matcher2);
+
+        // THEN
+        assertEquals(1, result1.size());
+        assertTrue(result1.contains(onetimeSale1));
+
+        assertEquals(1, result2.size());
+        assertTrue(result2.contains(onetimeSale2));
     }
 
     @Test
     public void testFind_byToTimeShouldReturnObjects() throws DAOException, ValidationException {
+        // Prepare
+        LocalDateTime time1 = LocalDateTime.parse("2027-12-03T10:15:30");
+        LocalDateTime time2 = LocalDateTime.parse("2028-12-03T10:15:30");
 
+        // one time sale 1
+        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+        onetimeSale1.setToTime(time1);
+
+        onetimeSaleDAO.create(onetimeSale1);
+        assertEquals(1, onetimeSaleDAO.find(onetimeSale1).size());
+
+        // one time sale 2
+        OnetimeSale onetimeSale2 =  createOnetimeSale(new Long(124));
+        onetimeSale2.setToTime(time2);
+
+        onetimeSaleDAO.create(onetimeSale2);
+        assertEquals(1, onetimeSaleDAO.find(onetimeSale2).size());
+
+        // GIVEN
+        OnetimeSale matcher1 = OnetimeSale.withIdentity(onetimeSale1.getIdentity()); // for sale 1
+        matcher1.setIdentity(null);
+        matcher1.setToTime(onetimeSale1.getToTime());
+        OnetimeSale matcher2 = OnetimeSale.withIdentity(onetimeSale2.getIdentity()); // for sale 2
+        matcher2.setIdentity(null);
+        matcher2.setToTime(onetimeSale2.getToTime());
+
+        // WHEN
+        List<OnetimeSale> result1 = onetimeSaleDAO.find(matcher1);
+        List<OnetimeSale> result2 = onetimeSaleDAO.find(matcher2);
+
+        // THEN
+        assertEquals(1, result1.size());
+        assertTrue(result1.contains(onetimeSale1));
+
+        assertEquals(1, result2.size());
+        assertTrue(result2.contains(onetimeSale2));
     }
 
     @Test
-    public void testFind_shouldReturnEmptyList() throws DAOException {
-        //find a non existent id
+    public void testFind_shouldReturnEmptyList() throws DAOException, ValidationException {
+        // Prepare
+
+        // one time sale 1
+        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+
+        onetimeSaleDAO.create(onetimeSale1);
+        assertEquals(1, onetimeSaleDAO.find(onetimeSale1).size());
+
+        // GIVEN
+        OnetimeSale matcher1 = OnetimeSale.withIdentity(onetimeSale1.getIdentity().intValue()+3492189); // for sale 1
+
+        // WHEN
+        List<OnetimeSale> result1 = onetimeSaleDAO.find(matcher1);
+
+        // THEN
+        assertEquals(0, result1.size());
     }
 
     @Test
-    public void testFind_nullObjectShouldReturnEmptyList() throws DAOException {
+    public void testFind_nullObjectShouldReturnEmptyList() throws DAOException, ValidationException {
+        // Prepare
 
+        // one time sale 1
+        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+
+        onetimeSaleDAO.create(onetimeSale1);
+        assertEquals(1, onetimeSaleDAO.find(onetimeSale1).size());
+
+        // GIVEN
+        OnetimeSale matcher1 = null; // for sale 1
+
+        // WHEN
+        List<OnetimeSale> result1 = onetimeSaleDAO.find(matcher1);
+
+        // THEN
+        assertEquals(0, result1.size());
     }
 
     @Test
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
+        // Prepare
 
+        // one time sale 1
+        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+
+        onetimeSaleDAO.create(onetimeSale1);
+
+        // one time sale 2
+        OnetimeSale onetimeSale2 =  createOnetimeSale(new Long(124));
+
+        onetimeSaleDAO.create(onetimeSale2);
+
+        // one time sale 3
+        OnetimeSale onetimeSale3 =  createOnetimeSale(new Long(125));
+
+        onetimeSaleDAO.create(onetimeSale3);
+
+        // WHEN
+        List<OnetimeSale> result1 = onetimeSaleDAO.getAll();
+
+        // THEN
+        assertEquals(3, result1.size());
+        assertTrue(result1.contains(onetimeSale1));
+        assertTrue(result1.contains(onetimeSale2));
+        assertTrue(result1.contains(onetimeSale3));
     }
 
     @Test(expected = ValidationException.class)
