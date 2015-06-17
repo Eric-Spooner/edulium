@@ -49,10 +49,12 @@ public class TableOverviewController implements Initializable, Controller {
     @Resource(name = "tableViewPane")
     private FXMLPane tableViewPane;
 
+    private TableViewController tableViewController;
+
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
 
-        TableViewController tableViewController = tableViewPane.getController(TableViewController.class);
+        tableViewController = tableViewPane.getController(TableViewController.class);
 
         borderPane.setCenter(tableViewPane);
     }
@@ -64,6 +66,10 @@ public class TableOverviewController implements Initializable, Controller {
 
     public void setOnReservationButtonAction(EventHandler<ActionEvent> event) {
         btnReservation.setOnAction(event);
+    }
+
+    public void setOnTableClicked(Consumer<Table> consumer) {
+        tableViewController.setOnTableClicked(consumer);
     }
 
 }

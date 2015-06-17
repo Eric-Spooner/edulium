@@ -27,6 +27,8 @@ public class ServiceController implements Initializable, Controller {
     private FXMLPane reservationOverviewPane;
     @Resource(name = "reservationEditViewPane")
     private FXMLPane reservationEditViewPane;
+    @Resource(name = "orderOverviewPane")
+    private FXMLPane orderOverviewPane;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -35,6 +37,7 @@ public class ServiceController implements Initializable, Controller {
         TableOverviewController tableOverviewController = tableOverviewPane.getController(TableOverviewController.class);
         MenuCategoryOverviewController menuCategoryOverviewController = menuCategoryOverviewPane.getController(MenuCategoryOverviewController.class);
         MenuEntryOverviewController menuEntryOverviewController = menuEntryOverviewPane.getController(MenuEntryOverviewController.class);
+
         ReservationOverviewController reservationOverviewController = reservationOverviewPane.getController(ReservationOverviewController.class);
         ReservationEditViewController reservationEditViewController = reservationEditViewPane.getController(ReservationEditViewController.class);
 
@@ -47,8 +50,17 @@ public class ServiceController implements Initializable, Controller {
         });
 
         reservationOverviewController.setOnEditConsumer(reservation -> {
-            borderPane.setCenter(reservationEditViewPane);
-            reservationEditViewController.setReservation(reservation);
+                    borderPane.setCenter(reservationEditViewPane);
+                    reservationEditViewController.setReservation(reservation);
+        });
+
+        OrderOverviewController orderOverviewController = orderOverviewPane.getController(OrderOverviewController.class);
+
+        tableOverviewController.setOnReservationButtonAction(event -> borderPane.setCenter(reservationOverviewPane));
+
+        tableOverviewController.setOnTableClicked(table -> {
+            orderOverviewController.setTable(table);
+            borderPane.setCenter(orderOverviewPane);
         });
 
         reservationEditViewController.onCancel(reservation -> borderPane.setCenter(reservationOverviewPane));
