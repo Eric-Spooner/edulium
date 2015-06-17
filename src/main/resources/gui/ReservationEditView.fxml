@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.ScrollPane?>
 
+<?import com.at.ac.tuwien.sepm.ss15.edulium.gui.NumericTextField?>
 <BorderPane fx:id="borderPane" prefHeight="278.0" prefWidth="466.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.ReservationEditViewController">
     <bottom>
         <Pane prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
@@ -29,17 +30,17 @@
                   <Label text="Name:" />
                   <TextField fx:id="tfName" />
                   <Label text="Quantity:" />
-                  <TextField fx:id="tfQuantity" />
+                  <NumericTextField fx:id="tfQuantity" />
                   <Label text="Duration" />
-                  <TextField fx:id="tfDuration" />
+                  <NumericTextField fx:id="tfDuration" />
                   <Label text="Date:" />
                   <DatePicker fx:id="datePicker" />
                   <Label text="Time:" />
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <TextField fx:id="tfHour" prefHeight="25.0" prefWidth="45.0" />
+                        <NumericTextField fx:id="tfHour" prefHeight="25.0" prefWidth="45.0" />
                         <Label prefHeight="22.0" prefWidth="7.0" text=":" />
-                        <TextField fx:id="tfMinute" prefHeight="25.0" prefWidth="46.0" />
+                        <NumericTextField fx:id="tfMinute" prefHeight="25.0" prefWidth="46.0" />
                      </children>
                   </HBox>
                </children>

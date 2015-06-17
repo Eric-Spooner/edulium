@@ -5,14 +5,13 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ReservationService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +20,11 @@ import javax.annotation.Resource;
 import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
@@ -42,13 +43,13 @@ public class ReservationEditViewController implements Initializable, Controller 
     @FXML
     private TextField tfName;
     @FXML
-    private TextField tfQuantity;
+    private NumericTextField tfQuantity;
     @FXML
-    private TextField tfHour;
+    private NumericTextField tfHour;
     @FXML
-    private TextField tfMinute;
+    private NumericTextField tfMinute;
     @FXML
-    private TextField tfDuration;
+    private NumericTextField tfDuration;
     @FXML
     private DatePicker datePicker;
 
@@ -86,12 +87,38 @@ public class ReservationEditViewController implements Initializable, Controller 
                 tableViewController.setTableColor(table, Color.BLUE);
             }
         });
+
+
+        ChangeListener<Object> dateTimeChangeListener = new ChangeListener<Object>() {
+            @Override
+            public void changed(ObservableValue<?> observable, Object oldValue, Object newValue) {
+                LocalDateTime dateTime = getLocalDateTime();
+                try {
+                    if(tfDuration.isEmpty() || dateTime == null) {
+                        return;
+                    }
+                    List<Reservation> reservations = reservationService.findReservationBetween(dateTime, dateTime.plusHours((int) tfDuration.getValue()));
+                    displayOccupiedTables(reservations);
+                } catch (ServiceException | ValidationException e) {
+                    displayErrorMessage("error retrieving reservations", e);
+                }
+            }
+        };
+
+        datePicker.valueProperty().addListener(dateTimeChangeListener);
+        tfDuration.textProperty().addListener(dateTimeChangeListener);
+        tfHour.textProperty().addListener(dateTimeChangeListener);
+        tfMinute.textProperty().addListener(dateTimeChangeListener);
+
+        tfHour.setMinMax(0, 24);
+        tfMinute.setMinMax(0, 60);
     }
 
     public void setReservation(Reservation reservation) {
         this.reservation = reservation;
 
         // clear inputs
+        tableViewController.clear();
         tfName.clear();
         tfQuantity.clear();
         tfDuration.clear();
@@ -115,6 +142,8 @@ public class ReservationEditViewController implements Initializable, Controller 
             reservationCopy.setTables(new ArrayList<>(reservation.getTables()));
 
             displayReservationData();
+        } else {
+            reservation.setTables(new ArrayList<>());
         }
     }
 
@@ -131,8 +160,7 @@ public class ReservationEditViewController implements Initializable, Controller 
         reservation.setDuration(Duration.ofHours(Long.valueOf(tfDuration.getText())));
         reservation.setQuantity(Integer.valueOf(tfQuantity.getText()));
 
-        LocalDateTime dateTime = LocalDateTime.of(datePicker.getValue(), LocalTime.of(Integer.valueOf(tfHour.getText()), Integer.valueOf(tfMinute.getText())));
-        reservation.setTime(dateTime);
+        reservation.setTime(getLocalDateTime());
     }
 
     public void displayReservationData() {
@@ -162,10 +190,6 @@ public class ReservationEditViewController implements Initializable, Controller 
 
     @FXML
     public void on_btnSave_clicked() {
-        if(reservation.getTables() != null) {
-            reservation.getTables().stream().forEach(t -> tableViewController.setTableColor(t, Color.BLACK));
-        }
-
         setReservationData();
 
         try {
@@ -176,10 +200,8 @@ public class ReservationEditViewController implements Initializable, Controller 
                 // if in EDIT or ADD mode with set identity -> update
                 reservationService.updateReservation(reservation);
             }
-        } catch (ServiceException e) {
-            e.printStackTrace();
-        } catch (ValidationException e) {
-            e.printStackTrace();
+        } catch (ServiceException | ValidationException e) {
+            displayErrorMessage("error adding/editing reservation", e);
         }
 
         onAcceptedConsumer.accept(reservation);
@@ -187,10 +209,6 @@ public class ReservationEditViewController implements Initializable, Controller 
 
     @FXML
     public void on_btnCancel_clicked() {
-        if(reservation.getTables() != null) {
-            reservation.getTables().stream().forEach(t -> tableViewController.setTableColor(t, Color.BLACK));
-        }
-
         try {
             if (mode == Mode.ADD && reservation.getIdentity() != null) {
                 // reservation was added because of the auto create function
@@ -199,10 +217,8 @@ public class ReservationEditViewController implements Initializable, Controller 
                 // reset reservation to previous state
                 reservationService.updateReservation(reservationCopy);
             }
-        } catch (ServiceException e) {
-            // TODO print message
-        } catch (ValidationException e) {
-            // TODO print message
+        } catch (ServiceException | ValidationException e) {
+            displayErrorMessage("error cancelling request", e);
         }
 
         onCanceledConsumer.accept(reservation);
@@ -211,10 +227,7 @@ public class ReservationEditViewController implements Initializable, Controller 
     @FXML
     public void on_autoCreate_clicked() {
         // delete tables
-        if(reservation.getTables() != null) {
-            reservation.getTables().stream().forEach(t -> tableViewController.setTableColor(t, Color.BLACK));
-            reservation.getTables().clear();
-        }
+        reservation.getTables().clear();
 
         setReservationData();
 
@@ -231,5 +244,39 @@ public class ReservationEditViewController implements Initializable, Controller 
         if(reservation.getTables() != null) {
             reservation.getTables().stream().forEach(t -> tableViewController.setTableColor(t, Color.BLUE));
         }
+    }
+
+    private LocalDateTime getLocalDateTime() {
+        LocalDate date = datePicker.getValue();
+        if(date == null) {
+            return null;
+        }
+
+        return LocalDateTime.of(datePicker.getValue(), LocalTime.of((int) tfHour.getValue(), (int) tfMinute.getValue()));
+    }
+
+    private void displayOccupiedTables(List<Reservation> reservations) {
+        tableViewController.clear();
+
+        // remove current reservation
+        reservations.remove(reservation);
+
+        for(Reservation res : reservations) {
+            for(Table t : res.getTables()) {
+                tableViewController.setTableColor(t, Color.RED);
+                tableViewController.setTableDisable(t, true);
+            }
+        }
+    }
+
+    private void displayErrorMessage(String message, Exception e) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error Dialog");
+        alert.setHeaderText(message);
+        if(e != null) {
+            alert.setContentText(e.getMessage());
+        }
+
+        alert.showAndWait();
     }
 }

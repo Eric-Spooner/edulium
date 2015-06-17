@@ -139,6 +139,11 @@ public class ReservationOverviewController implements Initializable, Controller 
             });
         });
 
+        lvReservations.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            // set edit button disabled if reservation is bygone
+            btnEdit.setDisable(newValue.getTime().plus(newValue.getDuration()).isBefore(LocalDateTime.now()));
+        });
+
         btnClearDate.setOnAction(event -> datePickerFilter.setValue(null));
 
         lvReservations.setItems(filteredReservations);

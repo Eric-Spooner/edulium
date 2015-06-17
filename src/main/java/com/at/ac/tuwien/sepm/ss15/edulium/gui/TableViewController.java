@@ -124,6 +124,13 @@ public class TableViewController implements Initializable, Controller {
         btn.setDisable(disabled);
     }
 
+    public void clear() {
+        for(Table t : tables) {
+            setTableColor(t, Color.BLACK);
+            setTableDisable(t, false);
+        }
+    }
+
     @Override
     public void disable(boolean disabled) {
         if (disabled) {
