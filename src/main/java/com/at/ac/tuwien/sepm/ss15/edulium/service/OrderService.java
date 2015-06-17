@@ -56,7 +56,7 @@ public interface OrderService extends Service {
      * @param template template used for finding Orders
      * @throws ServiceException if an error processing the request ocurred
      */
-    List<Order> findOrder(Order template) throws ServiceException, ValidationException;
+    List<Order> findOrder(Order template) throws ServiceException;
 
     /**
      * returns all orders from the underlying datasource
