@@ -22,7 +22,20 @@ Values(2, 2, 5, 1, 2, 'waiter');
 MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn, user_ID) KEY(section_ID, number)
 Values(3, 3, 5, 1, 2, 'waiter');
 MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn, user_ID) KEY(section_ID, number)
-Values(3, 4, 15, 15, 2, 'waiter');
+Values(3, 4, 15, 3, 1, 'waiter');
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn, user_ID) KEY(section_ID, number)
+Values(3, 5, 4, 3, 3, 'waiter');
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn, user_ID) KEY(section_ID, number)
+Values(3, 6, 4, 1, 4, 'waiter');
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn, user_ID) KEY(section_ID, number)
+Values(3, 7, 4, 1, 6, 'waiter');
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn, user_ID) KEY(section_ID, number)
+Values(3, 8, 4, 1, 8, 'waiter');
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn, user_ID) KEY(section_ID, number)
+Values(3, 9, 4, 1, 9, 'waiter');
+MERGE INTO RestaurantTable(section_ID, number, seats, tableRow, tableColumn, user_ID) KEY(section_ID, number)
+Values(3, 10, 4, 1, 12, 'waiter');
+
 
 MERGE INTO MenuEntry (ID, name, price, available, description, taxRate_ID, category_ID)
        KEY(ID) Values(1, 'Schnitzel', 9, true, 'Wiener Schnitzel', 1, 2);

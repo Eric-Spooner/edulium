@@ -28,7 +28,7 @@ public class ServiceController implements Initializable, Controller {
     public void initialize(URL location, ResourceBundle resources) {
         borderPane.setCenter(tableOverviewPane);
 
-        TableOverviewController tableOverviewController = tableOverviewPane.getController(TableOverviewController.class);
+        TableOverviewController2 tableOverviewController = tableOverviewPane.getController(TableOverviewController2.class);
         MenuCategoryOverviewController menuCategoryOverviewController = menuCategoryOverviewPane.getController(MenuCategoryOverviewController.class);
         MenuEntryOverviewController menuEntryOverviewController = menuEntryOverviewPane.getController(MenuEntryOverviewController.class);
 
