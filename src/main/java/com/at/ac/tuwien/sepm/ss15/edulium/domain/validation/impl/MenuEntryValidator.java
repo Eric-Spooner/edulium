@@ -5,17 +5,17 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 
 /**
  * validator implementation for the MenuEntry domain object
  */
 class MenuEntryValidator implements Validator<MenuEntry> {
-    @Autowired
+    @Resource(name = "menuCategoryValidator")
     private Validator<MenuCategory> menuCategoryValidator;
-    @Autowired
+    @Resource(name = "taxRateValidator")
     private Validator<TaxRate> taxRateValidator;
 
     @Override

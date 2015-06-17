@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,17 +33,16 @@ import java.util.stream.Collectors;
 class DBMenuEntryDAO implements DAO<MenuEntry> {
     private static final Logger LOGGER = LogManager.getLogger(DBMenuEntryDAO.class);
 
-    @Autowired
+    @Resource(name = "dataSource")
     private DataSource dataSource;
-    @Autowired
+    @Resource(name = "menuEntryValidator")
     private Validator<MenuEntry> validator;
-    @Autowired
+    @Resource(name = "taxRateDAO")
     private DAO<TaxRate> taxRateDAO;
-    @Autowired
+    @Resource(name = "menuCategoryDAO")
     private DAO<MenuCategory> menuCategoryDAO;
-    @Autowired
+    @Resource(name = "userDAO")
     private DAO<User> userDAO;
-
 
     @Override
     public void create(MenuEntry menuEntry) throws DAOException, ValidationException {

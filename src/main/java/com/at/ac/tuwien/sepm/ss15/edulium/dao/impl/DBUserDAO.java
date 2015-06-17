@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -26,9 +27,9 @@ import java.util.stream.Collectors;
 class DBUserDAO implements DAO<User> {
     private static final Logger LOGGER = LogManager.getLogger(DBUserDAO.class);
 
-    @Autowired
+    @Resource(name = "dataSource")
     private DataSource dataSource;
-    @Autowired
+    @Resource(name = "userValidator")
     private Validator<User> validator;
 
     @PreAuthorize("isAuthenticated()")

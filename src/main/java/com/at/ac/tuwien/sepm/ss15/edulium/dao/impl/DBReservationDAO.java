@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.time.Duration;
@@ -30,13 +31,13 @@ import java.util.stream.Collectors;
 class DBReservationDAO implements ReservationDAO {
     private static final Logger LOGGER = LogManager.getLogger(DBReservationDAO.class);
 
-    @Autowired
+    @Resource(name = "dataSource")
     private DataSource dataSource;
-    @Autowired
+    @Resource(name = "userDAO")
     private DAO<User> userDAO;
-    @Autowired
+    @Resource(name = "tableDAO")
     private DAO<Table> tableDAO;
-    @Autowired
+    @Resource(name = "reservationValidator")
     private Validator<Reservation> validator;
 
     @Override
