@@ -23,6 +23,9 @@
                   <TableColumn fx:id="tableColQueudAddInfo" prefWidth="180.0" text="Additional Information" />
                   <TableColumn fx:id="tableColQueudTime" prefWidth="82.0" text="Time" />
                </columns>
+                <style>
+                    <Font size="50"/>
+                </style>
             </TableView>
             <Button cancelButton="true" layoutX="248.0" layoutY="459.0" mnemonicParsing="false" onAction="#btnQueuedToInProgress" prefHeight="72.0" prefWidth="121.0" text="&gt;&gt;" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="248.0" AnchorPane.rightAnchor="248.0" />
          </children>

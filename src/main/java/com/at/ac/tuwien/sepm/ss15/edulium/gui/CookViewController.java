@@ -7,15 +7,16 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.*;
+import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -103,12 +104,31 @@ public class CookViewController implements Initializable, Controller {
         sortedDataQueued.comparatorProperty().bind(tableViewQueued.comparatorProperty());
         tableViewQueued.setItems(sortedDataQueued);
         tableViewQueued.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
+        tableViewQueued.setStyle("-fx-font-size: 15;");
+        tableViewQueued.setRowFactory(new Callback<TableView<Order>, TableRow<Order>> () {
+            @Override
+            public TableRow<Order> call(TableView<Order> tableView) {
+                final TableRow<Order> row = new TableRow<>();
+                row.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        final int index = row.getIndex();
+                        if (index >= 0 && index < tableView.getItems().size() && tableView.getSelectionModel().isSelected(index)  ) {
+                            tableView.getSelectionModel().clearSelection();
+                            event.consume();
+                        }else if(index >= 0 && index < tableView.getItems().size()){
+                            tableView.getSelectionModel().select(index);
+                            event.consume();
+                        }
+                    }
+                });
+                return row;
+            }
+        });
         tableColQueudTisch.setCellValueFactory(p -> new SimpleObjectProperty<Long>(p.getValue().getTable().getNumber()));
         tableColQueudMenuEntry.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getMenuEntry().getName()));
         tableColQueudTime.setCellValueFactory(p -> new SimpleObjectProperty<Long>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes()));
         tableColQueudAddInfo.setCellValueFactory(new PropertyValueFactory<Order, String>("additionalInformation"));
-
         // in progress
         ordersInProgress = new PollingList<>(taskScheduler);
         ordersInProgress.setInterval(1000);
@@ -129,7 +149,26 @@ public class CookViewController implements Initializable, Controller {
         sortedDataInProgress.comparatorProperty().bind(tableViewInProgress.comparatorProperty());
         tableViewInProgress.setItems(sortedDataInProgress);
         tableViewInProgress.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
+        tableViewInProgress.setRowFactory(new Callback<TableView<Order>, TableRow<Order>> () {
+            @Override
+            public TableRow<Order> call(TableView<Order> tableView) {
+                final TableRow<Order> row = new TableRow<>();
+                row.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        final int index = row.getIndex();
+                        if (index >= 0 && index < tableView.getItems().size() && tableView.getSelectionModel().isSelected(index)  ) {
+                            tableView.getSelectionModel().clearSelection();
+                            event.consume();
+                        }else if(index >= 0 && index < tableView.getItems().size()){
+                            tableView.getSelectionModel().select(index);
+                            event.consume();
+                        }
+                    }
+                });
+                return row;
+            }
+        });
         tableColProgTisch.setCellValueFactory(p -> new SimpleObjectProperty<Long>(p.getValue().getTable().getNumber()));
         tableColProgMenuEntry.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getMenuEntry().getName()));
         tableColProgTime.setCellValueFactory(p -> new SimpleObjectProperty<Long>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes()));
@@ -160,6 +199,7 @@ public class CookViewController implements Initializable, Controller {
         tableColDeliveryTime.setCellValueFactory(p -> new SimpleObjectProperty<Long>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes()));
         tableColDeliveryAddInfo.setCellValueFactory(new PropertyValueFactory<Order, String>("additionalInformation"));
     }
+
 
     public void btnInProgressToReadyToDeliver(ActionEvent actionEvent) {
         LOGGER.info("Entered btnInProgressToReadyToDeliver");
