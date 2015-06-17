@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Domain object representing an invoice
@@ -11,6 +12,7 @@ public class Invoice {
     private LocalDateTime time;
     private BigDecimal gross;
     private User creator;
+    private List<Order> orders;
 
     /**
      * Creates a new invoice object and assigns the given identity to it
@@ -79,6 +81,20 @@ public class Invoice {
         this.creator = creator;
     }
 
+    /**
+     * @return Returns the orders of the invoice (can be null)
+     */
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    /**
+     * @param orders The orders of the invoice
+     */
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
+
     @Override
     public String toString() {
         return "Invoice{" +
@@ -86,6 +102,7 @@ public class Invoice {
                 ", time=" + time +
                 ", gross=" + gross +
                 ", creator=" + creator +
+                ", orders=" + orders +
                 "}";
     }
 
@@ -99,6 +116,7 @@ public class Invoice {
         if (identity != null ? !identity.equals(invoice.identity) : invoice.identity != null) return false;
         if (time != null ? !time.equals(invoice.time) : invoice.time != null) return false;
         if (gross != null ? gross.compareTo(invoice.gross) != 0 : invoice.gross != null) return false;
-        return !(creator != null ? !creator.equals(invoice.creator) : invoice.creator != null);
+        if (creator != null ? !creator.equals(invoice.creator) : invoice.creator != null) return false;
+        return !(orders != null ? !orders.equals(invoice.orders) : invoice.orders != null);
     }
 }
