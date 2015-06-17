@@ -44,7 +44,9 @@ class ReservationServiceImpl implements ReservationService {
         validateReservationTime(reservation);
 
         try {
-            reservation.setTables(reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables()));
+            if(reservation.getTables() == null || reservation.getTables().isEmpty()) {
+                reservation.setTables(reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables()));
+            }
             reservationDAO.create(reservation);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
