@@ -204,7 +204,6 @@ public class Order {
         result = 31 * result + (tax != null ? tax.hashCode() : 0);
         result = 31 * result + (additionalInformation != null ? additionalInformation.hashCode() : 0);
         result = 31 * result + (table != null ? table.hashCode() : 0);
-        result = 31 * result + (invoice != null ? invoice.hashCode() : 0);
         result = 31 * result + (menuEntry != null ? menuEntry.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
         return result;
