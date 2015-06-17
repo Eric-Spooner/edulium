@@ -12,10 +12,14 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -263,6 +267,18 @@ public class CookViewController implements Initializable, Controller {
         }
     }
 
-    public void btnSelectShownCats(ActionEvent actionEvent) {
+    public void btnSelectShownCats(ActionEvent actionEvent){
+        try {
+            Stage stage = new Stage();
+            stage.setTitle("Menu Categories");
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogCookViewMenCat.fxml"));
+            Scene scene = new Scene(myPane);
+            stage.setScene(scene);
+            stage.showAndWait();
+        }catch (Exception e){
+            LOGGER.error("Open the Cook View Menu Categories selection Dialog failed", e);
+            ManagerViewController.showErrorDialog("Error", "Cook View open Menu Categories Error", "Open the Cook View Menu Categories selection Dialog failed \n"  + e.toString());
+        }
+
     }
 }
