@@ -128,15 +128,19 @@ class DBInvoiceDAO implements DAO<Invoice> {
             orderValidator.validateIdentity(o);
         }
 
-        final String orderQuery = "UPDATE RestaurantOrder SET invoice_ID = ? WHERE id = ?;";
+        final String orderQuery = "UPDATE RestaurantOrder SET invoice_ID = ? WHERE id IN (" +
+                invoice.getOrders().stream().map(u -> "?").collect(Collectors.joining(", ")) + ")";
         try (PreparedStatement orderStmt = dataSource.getConnection().prepareStatement(orderQuery)) {
             orderStmt.setLong(1, invoice.getIdentity());
+
+            int index = 1;
             for (Order o : invoice.getOrders()) {
-                orderStmt.setLong(2, o.getIdentity());
-                if (orderStmt.executeUpdate() == 0) {
-                    LOGGER.error("Failed to update order entry in database, dataset not found");
-                    throw new DAOException("Failed to update order entry in database, dataset not found");
-                }
+                orderStmt.setLong(index++, o.getIdentity());
+            }
+
+            if (orderStmt.executeUpdate() == 0) {
+                LOGGER.error("Failed to update order entry in database, dataset not found");
+                throw new DAOException("Failed to update order entry in database, dataset not found");
             }
         } catch (SQLException e) {
             LOGGER.error("Failed to update order entries in database", e);
