@@ -40,13 +40,15 @@ class ReservationServiceImpl implements ReservationService {
     public void addReservation(Reservation reservation) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addReservation with parameter: " + reservation);
 
-        reservationValidator.validateForCreate(reservation);
         validateReservationTime(reservation);
 
         try {
             if(reservation.getTables() == null || reservation.getTables().isEmpty()) {
                 reservation.setTables(reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables()));
             }
+
+            reservationValidator.validateForCreate(reservation);
+
             reservationDAO.create(reservation);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);

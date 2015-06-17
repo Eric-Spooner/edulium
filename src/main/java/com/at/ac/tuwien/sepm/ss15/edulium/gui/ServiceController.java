@@ -52,6 +52,7 @@ public class ServiceController implements Initializable, Controller {
         });
 
         reservationEditViewController.onCancel(reservation -> borderPane.setCenter(reservationOverviewPane));
+        reservationEditViewController.onAccept(reservation -> borderPane.setCenter(reservationOverviewPane));
 
         menuCategoryOverviewController.setOnMenuCategoryClicked(menuCategory -> {
             menuEntryOverviewController.setMenuCategory(menuCategory);
