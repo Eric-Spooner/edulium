@@ -65,7 +65,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
             try {
                 updateOrders(invoice);
             } catch (ValidationException e) {
-                LOGGER.info("No orders set for updating their invoice id");
+                LOGGER.info("No orders set for updating their invoice id", e);
             }
         } catch (SQLException e) {
             LOGGER.error("Failed to insert invoice entry into database", e);
@@ -100,7 +100,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
             try {
                 updateOrders(invoice);
             } catch (ValidationException e) {
-                LOGGER.info("No orders set for updating their invoice id");
+                LOGGER.info("No orders set for updating their invoice id", e);
             }
         } catch (SQLException e) {
             LOGGER.error("Failed to update invoice entry in database", e);
