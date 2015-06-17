@@ -22,7 +22,7 @@ import java.util.List;
  * implementation of the Order Service
  */
 class OrderServiceImpl implements OrderService {
-    private static final Logger LOGGER = LogManager.getLogger(OrderServiceImpl.class);
+    private static final Logger LOGGER = LogManager.getLogger(TaxRateServiceImpl.class);
     @Autowired
     private DAO<Order> orderDAO;
     @Autowired
@@ -49,7 +49,7 @@ class OrderServiceImpl implements OrderService {
 
         orderValidator.validateForUpdate(order);
 
-        List<Order> preOrders = this.findOrder(Order.withIdentity(order.getIdentity()));
+        List<Order> preOrders = this.findOrder(order);
 
         if(preOrders.size()==0){
             LOGGER.error("The order, you would like to update does not exist");
@@ -57,7 +57,7 @@ class OrderServiceImpl implements OrderService {
         }else {
             Order preOrder = preOrders.get(0);
             //if the order already had an invoice it is not allowed to be changed
-            if(preOrder.getInvoice() != null){
+            if(false){ //TODO: ! Invoice.find(invoice with order).isEmpty()
                 LOGGER.error("It is not allowed to change an order with invoice");
                 throw new ServiceException("It is not allowed to change an order with invoice");
             }
@@ -145,32 +145,6 @@ class OrderServiceImpl implements OrderService {
             throw new ServiceException("An Error has occurred in the data access object");
         }
     }
-
-    @Override
-    public List<Order> getAllOrdersToPrepare(List<MenuCategory> menuCategories, Order.State state) throws
-            ServiceException, ValidationException {
-        LOGGER.debug("Entering getAllOrdersToPrepare with parameter " + menuCategories);
-
-        List<Order> retVal = new LinkedList<>();
-
-        if(menuCategories.isEmpty()){
-            return new LinkedList<>();
-        }
-
-        //Prepare dummy MenuEntries with the given Categories for finding purpose
-        for(MenuCategory category : menuCategories){
-            MenuEntry dummyEntry = new MenuEntry();
-            dummyEntry.setCategory(category);
-            Order dummyOrder = new Order();
-            dummyOrder.setMenuEntry(dummyEntry);
-            dummyOrder.setState(state);
-            for(Order order : this.findOrder(dummyOrder)){
-               if(!retVal.contains(order)) retVal.add(order);
-            }
-        }
-        return retVal;
-    }
-
     @Override
     public void markAsInProgress(Order order) throws ServiceException, ValidationException {
         LOGGER.debug("Entering markAsInProgress with parameter " + order);

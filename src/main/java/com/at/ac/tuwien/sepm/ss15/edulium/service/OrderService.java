@@ -56,7 +56,7 @@ public interface OrderService extends Service {
      * @param template template used for finding Orders
      * @throws ServiceException if an error processing the request ocurred
      */
-    List<Order> findOrder(Order template) throws ServiceException;
+    List<Order> findOrder(Order template) throws ServiceException, ValidationException;
 
     /**
      * returns all orders from the underlying datasource
@@ -72,14 +72,6 @@ public interface OrderService extends Service {
      */
     @PreAuthorize("hasRole('MANAGER')")
     List<History<Order>> getOrderHistory(Order template) throws ServiceException, ValidationException;
-
-    /**
-     * returns all Orders, which have to be cooked
-     * @return List of MenuEntries, which should be cooked
-     * @throws ServiceException
-     */
-    @PreAuthorize("hasAnyRole('COOK','SERVICE')")
-    public List<Order> getAllOrdersToPrepare(List<MenuCategory> menuCategories, Order.State state) throws ServiceException, ValidationException;
 
     /**
      * Cook uses this function, to set the state of the order to IN_PROGRESS
