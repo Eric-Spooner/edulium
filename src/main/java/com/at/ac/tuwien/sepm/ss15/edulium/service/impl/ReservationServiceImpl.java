@@ -77,9 +77,10 @@ class ReservationServiceImpl implements ReservationService {
 
         try {
             // check if reservation time or seats will be changed
-            if(reservation.getQuantity() != originalReservation.getQuantity() ||
-                    reservation.getTime() != originalReservation.getTime() ||
-                    reservation.getDuration() != originalReservation.getDuration()) {
+            if((reservation.getTables() == null || reservation.getTables().isEmpty()) &&
+                    (reservation.getQuantity() != originalReservation.getQuantity() ||
+                     reservation.getTime() != originalReservation.getTime() ||
+                     reservation.getDuration() != originalReservation.getDuration())) {
 
                 // delete tables from reservation
                 originalReservation.setTables(new ArrayList<>());
