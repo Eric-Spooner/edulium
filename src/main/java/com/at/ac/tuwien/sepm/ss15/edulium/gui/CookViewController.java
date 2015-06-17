@@ -262,4 +262,7 @@ public class CookViewController implements Initializable, Controller {
             ordersReadyForDelivery.startPolling();
         }
     }
+
+    public void btnSelectShownCats(ActionEvent actionEvent) {
+    }
 }

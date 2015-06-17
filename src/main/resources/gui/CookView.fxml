@@ -63,9 +63,14 @@
                   <TableColumn fx:id="tableColDeliveryTime" prefWidth="82.0" text="Time" />
                </columns>
                <VBox.margin>
-                  <Insets bottom="72.0" />
+                  <Insets />
                </VBox.margin>
             </TableView>
+            <Button mnemonicParsing="false" onAction="#btnSelectShownCats" prefHeight="72.0" prefWidth="170.0" text="Categories">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </Button>
          </children>
       </VBox>
    </items>
