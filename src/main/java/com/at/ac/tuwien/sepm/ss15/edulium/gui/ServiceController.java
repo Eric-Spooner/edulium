@@ -23,6 +23,8 @@ public class ServiceController implements Initializable, Controller {
     private FXMLPane menuCategoryOverviewPane;
     @Resource(name = "menuEntryOverviewPane")
     private FXMLPane menuEntryOverviewPane;
+    @Resource(name = "orderOverviewPane")
+    private FXMLPane orderOverviewPane;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -31,9 +33,11 @@ public class ServiceController implements Initializable, Controller {
         TableOverviewController tableOverviewController = tableOverviewPane.getController(TableOverviewController.class);
         MenuCategoryOverviewController menuCategoryOverviewController = menuCategoryOverviewPane.getController(MenuCategoryOverviewController.class);
         MenuEntryOverviewController menuEntryOverviewController = menuEntryOverviewPane.getController(MenuEntryOverviewController.class);
+        OrderOverviewController orderOverviewController = orderOverviewPane.getController(OrderOverviewController.class);
 
         tableOverviewController.setOnTableClicked(table -> {
-            borderPane.setCenter(menuCategoryOverviewPane);
+            orderOverviewController.setTable(table);
+            borderPane.setCenter(orderOverviewPane);
         });
 
         menuCategoryOverviewController.setOnMenuCategoryClicked(menuCategory -> {

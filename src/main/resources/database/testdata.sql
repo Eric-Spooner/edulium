@@ -62,10 +62,10 @@ KEY (id, table_section, table_number) VALUES (1, 1, 1, 1, 10, 0.01, '', 'QUEUED'
 MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, info, state)
 KEY (id, table_section, table_number) VALUES (2, 1, 1, 2, 10, 0.01, '','QUEUED');
 MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, info, state)
-KEY (id, table_section, table_number) VALUES (3, 2, 2, 3, 10, 0.01, 'Info' , 'IN_PROGRESS');
+KEY (id, table_section, table_number) VALUES (3, 1, 1, 3, 10, 0.01, 'Info' , 'IN_PROGRESS');
 MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, info, state)
-KEY (id, table_section, table_number) VALUES (4, 2, 2, 4, 10, 0.01, '','QUEUED');
+KEY (id, table_section, table_number) VALUES (4, 1, 1, 4, 10, 0.01, '','QUEUED');
 MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, info, state)
-KEY (id, table_section, table_number) VALUES (5, 3, 3, 3, 10, 0.01, 'Without salt' , 'QUEUED');
+KEY (id, table_section, table_number) VALUES (5, 1, 1, 3, 10, 0.01, 'Without salt' , 'READY_FOR_DELIVERY');
 MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, info, state)
-KEY (id, table_section, table_number) VALUES (6, 3, 4, 2, 10, 0.01, '' , 'QUEUED');
+KEY (id, table_section, table_number) VALUES (6, 1, 1, 2, 10, 0.01, '' , 'DELIVERED');
