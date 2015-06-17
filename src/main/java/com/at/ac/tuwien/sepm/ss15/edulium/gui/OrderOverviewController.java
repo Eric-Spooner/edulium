@@ -6,6 +6,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
 import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -93,8 +94,8 @@ public class OrderOverviewController implements Initializable, Controller {
     @Autowired
     private TaskScheduler taskScheduler;
 
-    @Resource(name = "tableOverviewPane")
-    private FXMLPane tableOverviewPane; // for move to table pop over
+    @Resource(name = "tableViewPane")
+    private FXMLPane tableViewPane; // for move to table pop over
 
     private PopOver cancelPopOver;
     private PopOver moveToTablePopOver;
@@ -231,12 +232,13 @@ public class OrderOverviewController implements Initializable, Controller {
         cancelPopOver = new PopOver(layout);
         cancelPopOver.setHideOnEscape(true);
         cancelPopOver.setAutoHide(true);
+        cancelPopOver.setDetachable(false);
         cancelPopOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_LEFT);
     }
 
     private void initializeMoveToTablePopOver() {
-        TableOverviewController tableOverviewController = tableOverviewPane.getController(TableOverviewController.class);
-        tableOverviewController.setOnTableClicked(table -> {
+        TableViewController tableViewController = tableViewPane.getController(TableViewController.class);
+        tableViewController.setOnTableClicked(table -> {
             try {
                 List<Order> orders = new ArrayList<Order>(); // TODO maybe replace this by a "merged observable list"
                 orders.addAll(queuedOrdersView.getSelectionModel().getSelectedItems());
@@ -265,11 +267,12 @@ public class OrderOverviewController implements Initializable, Controller {
             }
         });
 
-        tableOverviewPane.setStyle("-fx-padding: 5px;");
+        tableViewPane.setStyle("-fx-padding: 5px;");
 
-        moveToTablePopOver = new PopOver(tableOverviewPane);
+        moveToTablePopOver = new PopOver(tableViewPane);
         moveToTablePopOver.setHideOnEscape(true);
         moveToTablePopOver.setAutoHide(true);
+        moveToTablePopOver.setDetachable(false);
         moveToTablePopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
     }
 
@@ -277,6 +280,7 @@ public class OrderOverviewController implements Initializable, Controller {
         newOrderPopOver = new PopOver();
         newOrderPopOver.setHideOnEscape(true);
         newOrderPopOver.setAutoHide(true);
+        newOrderPopOver.setDetachable(false);
         newOrderPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
     }
 
@@ -320,11 +324,6 @@ public class OrderOverviewController implements Initializable, Controller {
                    !deliveredOrdersView.getSelectionModel().getSelectedItems().isEmpty()) {
             moveToTablePopOver.show(moveToTableButton);
         }
-    }
-
-    @FXML
-    public void onBackButtonClicked(ActionEvent actionEvent) {
-
     }
 
     @FXML
@@ -413,6 +412,10 @@ public class OrderOverviewController implements Initializable, Controller {
                 }
             }
         });
+    }
+
+    public void setOnBackButtonAction(EventHandler<ActionEvent> event) {
+        backButton.setOnAction(event);
     }
 
     @Override
