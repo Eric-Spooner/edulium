@@ -59,5 +59,4 @@
     <import resource="gui/Spring-TableOverviewPane.xml" />
     <import resource="gui/Spring-OrderOverviewPane.xml" />
 
-
 </beans>
