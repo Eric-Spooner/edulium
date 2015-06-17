@@ -663,7 +663,7 @@ public class TestInvoiceService extends AbstractServiceTest {
     }
 
     @Test
-    @WithMockUser(username = "servicetester", roles = {"SERVICE"})
+    @WithMockUser(username = "servicetester", roles = {"MANAGER"})
     public void testGetHistory_shouldReturnHistory() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Invoice res = new Invoice();
@@ -682,7 +682,7 @@ public class TestInvoiceService extends AbstractServiceTest {
     }
 
     @Test(expected = ServiceException.class)
-    @WithMockUser(username = "servicetester", roles={"SERVICE"})
+    @WithMockUser(username = "servicetester", roles={"MANAGER"})
     public void testGetReservationHistory_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Invoice res = new Invoice();

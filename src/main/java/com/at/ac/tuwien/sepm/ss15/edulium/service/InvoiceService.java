@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
+@PreAuthorize("isAuthenticated()")
 public interface InvoiceService extends Service {
 
     /**
@@ -63,5 +64,6 @@ public interface InvoiceService extends Service {
      * @throws ServiceException If the history of the object couldn't be retrieved
      * @throws ValidationException If the object doesn't pass the validation
      */
+    @PreAuthorize("hasRole('MANAGER')")
     List<History<Invoice>> getInvoiceHistory(Invoice invoice) throws ServiceException, ValidationException;
 }
