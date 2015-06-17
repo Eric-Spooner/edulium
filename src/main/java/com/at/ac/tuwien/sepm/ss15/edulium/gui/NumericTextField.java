@@ -1,6 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 
 /**
  * Created by phili on 6/17/15.
@@ -16,10 +17,9 @@ public class NumericTextField extends TextField
     {
         if (validate(text))
         {
-            String buffer = getText();
-            super.replaceText(start, end, text);
-            if(getValue() < minValue || getValue() > maxValue) {
-                setText(buffer);
+            String newText = replaceBetween(start, end, text);
+            if(newText.isEmpty() || (Double.valueOf(newText) >= minValue && Double.valueOf(newText) <= maxValue)) {
+                super.replaceText(start, end, text);
             }
         }
     }
@@ -29,8 +29,30 @@ public class NumericTextField extends TextField
     {
         if (validate(text))
         {
-            super.replaceSelection(text);
+            String newText = replaceCurrentSelection(text);
+            if(newText.isEmpty() || (Double.valueOf(newText) >= minValue && Double.valueOf(newText) <= maxValue)) {
+                super.replaceSelection(text);
+            }
         }
+    }
+
+    private String replaceBetween(int start, int end, String text) {
+        String originalText = getText();
+        String preString = originalText.substring(0, start);
+        String postString = originalText.substring(end, originalText.length());
+
+        return preString + text + postString;
+    }
+
+    private String replaceCurrentSelection(String text) {
+        int start = getSelection().getStart();
+        int end = getSelection().getEnd();
+
+        String originalText = getText();
+        String preString = originalText.substring(0, start);
+        String postString = originalText.substring(end, originalText.length());
+
+        return preString + text + postString;
     }
 
     private boolean validate(String text)
