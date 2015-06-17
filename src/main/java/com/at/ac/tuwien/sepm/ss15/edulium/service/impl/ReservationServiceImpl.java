@@ -82,9 +82,8 @@ class ReservationServiceImpl implements ReservationService {
                     reservation.getDuration() != originalReservation.getDuration()) {
 
                 // delete tables from reservation
-                Reservation tmpRes = Reservation.withIdentity(reservation.getIdentity());
-                tmpRes.setTables(new ArrayList<>());
-                reservationDAO.update(tmpRes);
+                originalReservation.setTables(new ArrayList<>());
+                reservationDAO.update(originalReservation);
 
                 // get new tables
                 reservation.setTables(reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables()));
