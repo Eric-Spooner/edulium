@@ -32,7 +32,7 @@ public class DialogCookViewCategories implements Initializable {
 
     private static Stage thisStage;
     private static LinkedList<MenuCategory> checkedCategories;
-    private ObservableList<MenuCategory> menuCategories;
+    private static ObservableList<MenuCategory> menuCategories;
     private static MenuService menuService;
 
     @FXML
@@ -43,6 +43,9 @@ public class DialogCookViewCategories implements Initializable {
     }
     public static void setMenuService(MenuService menuService) {
         DialogCookViewCategories.menuService = menuService;
+    }
+    public static LinkedList<MenuCategory> getCheckedCategories() {
+        return checkedCategories;
     }
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -60,7 +63,6 @@ public class DialogCookViewCategories implements Initializable {
         }
 
     }
-
 
     public void btnBackClicked(ActionEvent actionEvent) {
         thisStage.close();
