@@ -30,6 +30,7 @@ import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -127,17 +128,30 @@ public class ReservationOverviewController implements Initializable, Controller 
 
         filteredReservations = new FilteredList<>(reservations);
 
+        Predicate<Reservation> filterPredicate = new Predicate<Reservation>() {
+            @Override
+            public boolean test(Reservation reservation) {
+                boolean containsName = reservation.getName().contains(tfNameFilter.getText());
+
+                LocalDate dateFilter = datePickerFilter.getValue();
+                if(dateFilter != null) {
+                    return reservation.getTime().toLocalDate().isEqual(dateFilter) && containsName;
+                } else {
+                    return reservation.getTime().plus(reservation.getDuration()).isAfter(LocalDateTime.now()) && containsName;
+                }
+            }
+        };
+
+        filteredReservations.setPredicate(filterPredicate);
+
         tfNameFilter.textProperty().addListener((observable, oldValue, newValue) -> {
-            filteredReservations.setPredicate(reservation -> reservation.getName().contains(newValue));
+            filteredReservations.setPredicate(null);
+            filteredReservations.setPredicate(filterPredicate);
         });
 
         datePickerFilter.valueProperty().addListener((observable1, oldValue1, newValue) -> {
-            filteredReservations.setPredicate(reservation -> {
-                if (newValue == null) {
-                    return true;
-                }
-                return reservation.getTime().toLocalDate().isEqual(newValue);
-            });
+            filteredReservations.setPredicate(null);
+            filteredReservations.setPredicate(filterPredicate);
         });
 
         lvReservations.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
