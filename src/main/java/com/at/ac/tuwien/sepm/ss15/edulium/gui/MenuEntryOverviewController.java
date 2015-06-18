@@ -43,7 +43,7 @@ public class MenuEntryOverviewController implements Initializable, Controller {
         private MenuEntry menuEntry = null;
 
         public UserButtonCell() {
-            button.setPrefSize(240, 100);
+            button.setPrefSize(220, 80);
             button.setStyle("-fx-font-size: 18px;");
             button.setOnAction(e -> onMenuEntryClicked(menuEntry));
 
@@ -71,11 +71,10 @@ public class MenuEntryOverviewController implements Initializable, Controller {
 
         GridView<MenuEntry> gridView = new GridView<>(sortedMenuEntries);
         gridView.setCellFactory(view -> new UserButtonCell());
-        gridView.setCellWidth(240);
-        gridView.setCellHeight(100);
+        gridView.setCellWidth(220);
+        gridView.setCellHeight(80);
 
         scrollPane.setContent(gridView);
-        scrollPane.setStyle("-fx-font-size: 40px;");
     }
 
     public void setMenuCategory(MenuCategory menuCategory)
