@@ -88,13 +88,11 @@ public interface InvoiceService extends Service {
      * @return The list of matched sections
      * @throws ServiceException If the data couldn't be retrieved
      */
-    @PreAuthorize("hasRole('SERVICE')")
     List<Instalment> findInstalments(Instalment instalment) throws ServiceException;
 
     /**
      * @return Returns all stored sections
      * @throws ServiceException If the data couldn't be retrieved
      */
-    @PreAuthorize("hasRole('SERVICE')")
     List<Instalment> getAllInstalments() throws ServiceException;
 }

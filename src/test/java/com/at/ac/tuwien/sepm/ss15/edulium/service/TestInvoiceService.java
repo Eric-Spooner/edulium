@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Instalment;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
@@ -32,7 +33,11 @@ public class TestInvoiceService extends AbstractServiceTest {
     @Mock
     private DAO<Invoice> invoiceDAO;
     @Mock
+    private DAO<Instalment> instalmentDAO;
+    @Mock
     private Validator<Invoice> invoiceValidator;
+    @Mock
+    private Validator<Instalment> instalmentValidator;
 
     private User creator1;
     private User creator2;
@@ -701,5 +706,96 @@ public class TestInvoiceService extends AbstractServiceTest {
 
         // WHEN
         invoiceService.getInvoiceHistory(res);
+    }
+
+    @Test
+    @WithMockUser(username = "servicetester", roles = {"SERVICE"})
+    public void testAddInstalment_shouldAddInstalment() throws ServiceException, ValidationException, DAOException {
+        // PREPARE
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(creator1);
+
+        // GIVEN
+        Instalment instalment = new Instalment();
+        instalment.setInvoice(invoice);
+        instalment.setTime(LocalDateTime.now());
+        instalment.setType("CASH");
+        instalment.setAmount(new BigDecimal("22"));
+        instalment.setPaymentInfo("Payment info");
+
+        // WHEN
+        invoiceService.addInstalment(instalment);
+
+        // THEN
+        verify(instalmentDAO).create(instalment);
+    }
+
+    @Test(expected = ValidationException.class)
+    @WithMockUser(username = "servicetester", roles = {"SERVICE"})
+    public void testAddInstalment_shouldFailWithNullObject() throws ValidationException, ServiceException {
+        // PREPARE
+        doThrow(new ValidationException("")).when(instalmentValidator).validateForCreate(null);
+
+        // WHEN/THEN
+        invoiceService.addInstalment(null);
+    }
+
+    @Test(expected = ValidationException.class)
+    @WithMockUser(username = "servicetester", roles = {"SERVICE"})
+    public void testAddInstalment_shouldFailWithEmptyObject() throws ValidationException, ServiceException {
+        // PREPARE
+        Instalment instalment = new Instalment();
+        doThrow(new ValidationException("")).when(instalmentValidator).validateForCreate(instalment);
+
+        // WHEN/THEN
+        invoiceService.addInstalment(instalment);
+    }
+
+    @Test(expected = ValidationException.class)
+    @WithMockUser(username = "servicetester", roles = {"SERVICE"})
+    public void testAddInstalment_shouldFailWithNoInvoice() throws ValidationException, ServiceException {
+        // PREPARE
+        Instalment instalment = new Instalment();
+        instalment.setTime(LocalDateTime.now());
+        instalment.setType("CASH");
+        instalment.setAmount(new BigDecimal("22"));
+        instalment.setPaymentInfo("Payment info");
+        doThrow(new ValidationException("")).when(instalmentValidator).validateForCreate(instalment);
+
+        // WHEN/THEN
+        invoiceService.addInstalment(instalment);
+    }
+
+    @Test(expected = ValidationException.class)
+    @WithMockUser(username = "servicetester", roles = {"SERVICE"})
+    public void testAddInstalment_shouldFailWithIncompleteObject() throws ValidationException, ServiceException {
+        // PREPARE
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15.6"));
+        invoice.setCreator(creator1);
+
+        // GIVEN
+        // missing time and payment info
+        Instalment instalment = new Instalment();
+        instalment.setInvoice(invoice);
+        instalment.setType("CASH");
+        instalment.setAmount(new BigDecimal("22"));
+        doThrow(new ValidationException("")).when(instalmentValidator).validateForCreate(instalment);
+
+        // WHEN/THEN
+        invoiceService.addInstalment(instalment);
+    }
+
+    @Test(expected = AccessDeniedException.class)
+    @WithMockUser(username = "servicetester", roles = {"COOK"})
+    public void testAddInstalment_shouldFailWithoutPermission() throws ServiceException, ValidationException {
+        // GIVEN
+        Instalment instalment = new Instalment();
+
+        // WHEN/THEN
+        invoiceService.addInstalment(instalment);
     }
 }
