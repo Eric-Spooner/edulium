@@ -15,43 +15,39 @@ import java.util.Map;
  */
 public class GridView<T> extends GridPane {
 
-    private Callback<T, GridCell> callback;
+    private Callback<GridView, GridCell> cellFactory;
     private Map<T, Node> nodeMap = new HashMap<>();
 
-    public static class GridCell {
+    public static abstract class GridCell<ItemType> {
         private Node node;
         private int xPos;
         private int yPos;
 
-        public GridCell(Node node, int x, int y) {
-            this.node = node;
-            this.xPos = x;
-            this.yPos = y;
-        }
-
-        public int getY() {
+        protected int getY() {
             return yPos;
         }
 
-        public void setY(int yPos) {
+        protected void setY(int yPos) {
             this.yPos = yPos;
         }
 
-        public int getX() {
+        protected int getX() {
             return xPos;
         }
 
-        public void setX(int xPos) {
+        protected void setX(int xPos) {
             this.xPos = xPos;
         }
 
-        public Node getNode() {
+        protected Node getNode() {
             return node;
         }
 
-        public void setNode(Node node) {
+        protected void setNode(Node node) {
             this.node = node;
         }
+
+        protected abstract void updateItem(ItemType item);
     }
 
     public void setItems(ObservableList<T> items) {
@@ -75,8 +71,8 @@ public class GridView<T> extends GridPane {
         }
     }
 
-    public final void setCellFactory(Callback<T, GridCell> value) {
-        callback = value;
+    public final void setCellFactory(Callback<GridView, GridCell> cellFactory) {
+        this.cellFactory = cellFactory;
     }
 
     public Node getNode(T item) {
@@ -84,11 +80,12 @@ public class GridView<T> extends GridPane {
     }
 
     private void addCellItem(T item) {
-        if(callback == null) {
+        if (cellFactory == null) {
             return;
         }
 
-        GridCell cellItem = callback.call(item);
+        GridCell cellItem = cellFactory.call(this);
+        cellItem.updateItem(item);
         nodeMap.put(item, cellItem.getNode());
 
         add(cellItem.getNode(), cellItem.getX(), cellItem.getY());
