@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -19,9 +20,10 @@ import java.util.List;
  */
 class TaxRateServiceImpl implements TaxRateService {
     private static final Logger LOGGER = LogManager.getLogger(TaxRateServiceImpl.class);
-    @Autowired
+
+    @Resource(name = "taxRateDAO")
     private DAO<TaxRate> taxRateDAO;
-    @Autowired
+    @Resource(name = "taxRateValidator")
     private Validator<TaxRate> taxRateValidator;
 
     @Override
