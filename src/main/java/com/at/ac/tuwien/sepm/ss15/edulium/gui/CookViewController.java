@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
@@ -277,6 +278,26 @@ public class CookViewController implements Initializable, Controller {
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
+            ordersQueued.setSupplier(new Supplier<List<Order>>() {
+                @Override
+                public List<Order> get() {
+                    try {
+                        Order matcher = new Order();
+                        matcher.setState(Order.State.QUEUED);
+                        LinkedList<Order> orders = new LinkedList<Order>();
+                        for(Order order: orderService.findOrder(matcher)){
+                            if(DialogCookViewCategories.getCheckedCategories().contains(order.getMenuEntry().getCategory())){
+                                orders.add(order);
+                            };
+                        }
+                        return orders;
+                    } catch (ServiceException e) {
+                        LOGGER.error("Getting all queued orders via order supplier has failed", e);
+                        return null;
+                    }
+                }
+            });
+
         }catch (Exception e){
             LOGGER.error("Open the Cook View Menu Categories selection Dialog failed", e);
             ManagerViewController.showErrorDialog("Error", "Cook View open Menu Categories Error", "Open the Cook View Menu Categories selection Dialog failed \n"  + e.toString());
