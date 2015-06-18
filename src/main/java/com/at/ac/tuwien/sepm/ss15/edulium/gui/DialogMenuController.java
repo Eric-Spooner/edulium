@@ -113,7 +113,7 @@ public class DialogMenuController implements Initializable{
             inMenuMenuEntries = observableArrayList(menu.getEntries());
         }catch (Exception e){
             ManagerViewController.showErrorDialog
-                    ("Error", "Refreshing View", "An Error occured during initializing the View");
+                    ("Error", "Refreshing View", "An Error occured during initializing the View /n" + e.toString());
         }
         if(menu.getName() != null) textFieldName.setText(menu.getName());
         tableViewData.setItems(allMenuEntries);
@@ -159,7 +159,7 @@ public class DialogMenuController implements Initializable{
             }
         }catch (Exception e){
             ManagerViewController.showErrorDialog
-                    ("Error", "Menu Service Error", "The Service was unable to handle the required Menu action");
+                    ("Error", "Menu Service Error", "The Service was unable to handle the required Menu action/n" + e.toString());
             LOGGER.error("The Service was unable to handle the required Menu action " + e);
             return;
         }
@@ -209,11 +209,11 @@ public class DialogMenuController implements Initializable{
             menu.setEntries(list);
             inMenuMenuEntries.setAll(menu.getEntries());
         } catch (NumberFormatException e) {
-            ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must be a number");
+            ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must be a number/n" + e.toString());
             LOGGER.info("Dialog Menu Add Button Clicked Price must be number " + e);
         } catch (Exception e) {
             ManagerViewController.showErrorDialog
-                    ("Error", "Data Validation", "An Error occured during adding MenuEntry");
+                    ("Error", "Data Validation", "An Error occured during adding MenuEntry/n" + e.toString());
             LOGGER.info("Dialog Menu Add Button Menu Entry handling Error" + e);
         }
     }
