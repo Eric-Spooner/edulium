@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="140.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.DialogFilterStatisticsController">
+    <children>
+        <CheckBox layoutX="15.0" layoutY="19.0" mnemonicParsing="false" text="from" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0" />
+        <CheckBox layoutX="15.0" layoutY="55.0" mnemonicParsing="false" text="until" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="60.0" />
+        <DatePicker layoutX="93.0" layoutY="16.0" prefHeight="25.0" prefWidth="200.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
+        <DatePicker layoutX="93.0" layoutY="52.0" prefHeight="25.0" prefWidth="200.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="60.0" />
+        <Button layoutX="15.0" layoutY="102.0" mnemonicParsing="false" text="Filter!" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="100.0" />
+        <Button layoutX="161.0" layoutY="102.0" mnemonicParsing="false" text="Cancel" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+    </children>
+</AnchorPane>
