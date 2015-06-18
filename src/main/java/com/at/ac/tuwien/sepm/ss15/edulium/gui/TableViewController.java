@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,8 @@ public class TableViewController implements Initializable, Controller {
     private PollingList<Table> tables;
     private PollingList<Section> sections;
     private Consumer<Table> tableClickedConsumer = null;
-
     private Map<Section, GridView<Table>> sectionsMap = new HashMap<>();
+    private Boolean showSeats = false;
 
     private class SectionListCell extends ListCell<Section> {
         @Override
@@ -54,8 +55,12 @@ public class TableViewController implements Initializable, Controller {
             GridView<Table> gridView = new GridView<>();
             gridView.setCellFactory(table -> {
                 Button button = new Button();
-                button.setText(table.getNumber().toString());
-                button.setFont(new Font(20.0));
+                if(showSeats) {
+                    button.setText(table.getSeats().toString());
+                } else {
+                    button.setText(table.getNumber().toString());
+                }
+                button.setFont(new Font(25.0));
                 button.setOnAction(e -> onTableClicked(table));
                 return new GridView.GridCell(button, table.getColumn(), table.getRow());
             });
@@ -110,16 +115,28 @@ public class TableViewController implements Initializable, Controller {
         scrollPane.setStyle("-fx-font-size: 40px;");
     }
 
+    public void showSeats(boolean showSeats) {
+        this.showSeats = showSeats;
+    }
+
     public void setOnTableClicked(Consumer<Table> tableConsumer) {
         this.tableClickedConsumer = tableConsumer;
     }
 
     public void setTableColor(Table t, Color c) {
+        if(!sectionsMap.containsKey(t.getSection())) {
+            return;
+        }
+
         Button btn = (Button) sectionsMap.get(t.getSection()).getNode(t);
         btn.setTextFill(c);
     }
 
     public void setTableDisable(Table t, boolean disabled) {
+        if(!sectionsMap.containsKey(t.getSection())) {
+            return;
+        }
+
         Button btn = (Button) sectionsMap.get(t.getSection()).getNode(t);
         btn.setDisable(disabled);
     }

@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ReservationService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.collections.transformation.FilteredList;
@@ -141,7 +142,9 @@ public class ReservationOverviewController implements Initializable, Controller 
 
         lvReservations.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             // set edit button disabled if reservation is bygone
-            btnEdit.setDisable(newValue.getTime().plus(newValue.getDuration()).isBefore(LocalDateTime.now()));
+            boolean disable = newValue.getTime().plus(newValue.getDuration()).isBefore(LocalDateTime.now());
+            btnEdit.setDisable(disable);
+            btnDelete.setDisable(disable);
         });
 
         btnClearDate.setOnAction(event -> datePickerFilter.setValue(null));
@@ -165,5 +168,25 @@ public class ReservationOverviewController implements Initializable, Controller 
     @FXML
     public void on_btnEdit_clicked() {
         editConsumer.accept(lvReservations.getSelectionModel().getSelectedItem());
+    }
+
+    @FXML
+    public void on_btnDelete_clicked() {
+        try {
+            reservationService.cancelReservation(lvReservations.getSelectionModel().getSelectedItem());
+        } catch (ServiceException | ValidationException e) {
+            displayErrorMessage("error cancelling reservation", e);
+        }
+    }
+
+    private void displayErrorMessage(String message, Exception e) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error Dialog");
+        alert.setHeaderText(message);
+        if(e != null) {
+            alert.setContentText(e.getMessage());
+        }
+
+        alert.showAndWait();
     }
 }

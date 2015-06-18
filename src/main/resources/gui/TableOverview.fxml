@@ -5,11 +5,16 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.ScrollPane?>
 
+<?import javafx.scene.text.Font?>
 <BorderPane fx:id="borderPane" prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.TableOverviewController">
    <bottom>
       <Pane prefHeight="52.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="btnReservation" layoutX="6.0" layoutY="6.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="75.0" text="Reservations" />
+            <Button fx:id="btnReservation" layoutX="6.0" layoutY="6.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Reservations" >
+            <font>
+               <Font size="15.0" />
+            </font>
+            </Button>
          </children>
       </Pane>
    </bottom>

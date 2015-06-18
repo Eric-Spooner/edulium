@@ -6,41 +6,75 @@
 <?import javafx.scene.control.ScrollPane?>
 
 <?import com.at.ac.tuwien.sepm.ss15.edulium.gui.NumericTextField?>
+<?import javafx.scene.text.Font?>
 <BorderPane fx:id="borderPane" prefHeight="278.0" prefWidth="466.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.ReservationEditViewController">
     <bottom>
         <Pane prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="btnSave" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnSave_clicked" prefHeight="40.0" prefWidth="75.0" text="Save" />
-            <Button fx:id="btnAutoCreate" layoutX="348.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_autoCreate_clicked" prefHeight="40.0" prefWidth="110.0" text="Auto-Create" />
+            <Label fx:id="lblSeats" alignment="CENTER" text="0 / 0"/>
          </children>
         </Pane>
     </bottom>
    <top>
-      <Pane prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <HBox prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER" spacing="20.0">
          <children>
-            <Button fx:id="btnCancel" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnCancel_clicked" prefHeight="40.0" prefWidth="75.0" text="Cancel" />
+            <Button fx:id="btnSave" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnSave_clicked" prefHeight="40.0" prefWidth="75.0" text="Save" >
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
+            <Button fx:id="btnAutoCreate" layoutX="348.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_autoCreate_clicked" prefHeight="40.0" prefWidth="120.0" text="Auto-Create" >
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Button>
+            <Button fx:id="btnCancel" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnCancel_clicked" prefHeight="40.0" prefWidth="120.0" text="Cancel" >
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
          </children>
-      </Pane>
+      </HBox>
    </top>
    <center>
-      <SplitPane fx:id="splitPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <SplitPane fx:id="splitPane" prefHeight="200.0" prefWidth="200.0" dividerPositions="0.7" BorderPane.alignment="CENTER">
          <items>
             <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <Label text="Name:" />
-                  <TextField fx:id="tfName" />
-                  <Label text="Quantity:" />
-                  <NumericTextField fx:id="tfQuantity" />
-                  <Label text="Duration" />
-                  <NumericTextField fx:id="tfDuration" />
-                  <Label text="Date:" />
-                  <DatePicker fx:id="datePicker" />
-                  <Label text="Time:" />
+                  <Label text="Name:" >
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="tfName" prefHeight="30.0"/>
+                  <Label text="Quantity:" >
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <NumericTextField fx:id="tfQuantity" prefHeight="30.0" />
+                  <Label text="Duration" >
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <NumericTextField fx:id="tfDuration" prefHeight="30.0" />
+                  <Label text="Date:" >
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <DatePicker fx:id="datePicker" prefHeight="30.0" />
+                  <Label text="Time:" >
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <NumericTextField fx:id="tfHour" prefHeight="25.0" prefWidth="45.0" />
+                        <NumericTextField fx:id="tfHour" prefHeight="30.0" prefWidth="45.0" />
                         <Label prefHeight="22.0" prefWidth="7.0" text=":" />
-                        <NumericTextField fx:id="tfMinute" prefHeight="25.0" prefWidth="46.0" />
+                        <NumericTextField fx:id="tfMinute" prefHeight="30.0" prefWidth="46.0" />
                      </children>
                   </HBox>
                </children>
