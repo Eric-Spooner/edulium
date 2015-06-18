@@ -99,6 +99,7 @@ public class ReservationEditViewController implements Initializable, Controller 
                 LocalDateTime dateTime = getLocalDateTime();
 
                 if(tfDuration.isEmpty() || dateTime == null) {
+                    updateSeatsLabel();
                     btnSave.setDisable(true);
                     return;
                 }
@@ -123,8 +124,6 @@ public class ReservationEditViewController implements Initializable, Controller 
         tfMinute.textProperty().addListener(changeListener);
         tfName.textProperty().addListener(changeListener);
         tfQuantity.textProperty().addListener(changeListener);
-
-        lblSeats.setFont(new Font(30));
 
         tfHour.setMinMax(0, 24);
         tfMinute.setMinMax(0, 60);

@@ -44,7 +44,7 @@
       </Pane>
    </top>
    <center>
-      <SplitPane fx:id="listViewReservationView" dividerPositions="0.65" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <SplitPane fx:id="listViewReservationView" dividerPositions="0.8" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <items>
             <ListView fx:id="lvReservations" prefHeight="200.0" prefWidth="200.0" />
             <VBox prefHeight="176.0" prefWidth="120.0">
