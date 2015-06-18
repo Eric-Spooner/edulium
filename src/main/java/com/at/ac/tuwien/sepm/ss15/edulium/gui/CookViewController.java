@@ -9,6 +9,8 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -36,6 +38,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
+
+import static javafx.collections.FXCollections.observableArrayList;
 
 /**
  * Controller used for the Cook View
@@ -95,8 +99,6 @@ public class CookViewController implements Initializable, Controller {
         }catch (ServiceException e ){
             LOGGER.error("Getting all MenuCategories has failed", e);
         }
-
-
         // queued
         ordersQueued = new PollingList<>(taskScheduler);
         ordersQueued.setInterval(1000);
@@ -106,15 +108,19 @@ public class CookViewController implements Initializable, Controller {
                 try {
                     Order matcher = new Order();
                     matcher.setState(Order.State.QUEUED);
-                    return orderService.findOrder(matcher);
+                    List<Order> orders =  orderService.findOrder(matcher);
+                    for(Order order:orders) {
+                        if (!checkedCategories.contains(order.getMenuEntry().getCategory())) {
+                            orders.remove(order);
+                        }
+                    }
+                    return orders;
                 } catch (ServiceException e) {
                     LOGGER.error("Getting all queued orders via order supplier has failed", e);
                     return null;
                 }
             }
         });
-
-
         SortedList<Order> sortedDataQueued = new SortedList<>(ordersQueued);
         sortedDataQueued.comparatorProperty().bind(tableViewQueued.comparatorProperty());
         tableViewQueued.setItems(sortedDataQueued);

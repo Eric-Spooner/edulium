@@ -92,7 +92,7 @@ public class MenuViewController implements Initializable, Controller {
             DialogMenuController.setMenu(tableViewMenu.getSelectionModel().getSelectedItem());
             stage.setTitle("Update Menu");
             ApplicationContext context = EduliumApplicationContext.getContext();
-            AnchorPane myPane = context.getBean("menuDialogPane", FXMLPane.class);
+            FXMLPane myPane = context.getBean("menuDialogPane", FXMLPane.class);
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();

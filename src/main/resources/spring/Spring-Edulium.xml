@@ -61,5 +61,4 @@
     <import resource="gui/Spring-OrderOverviewPane.xml" />
     <import resource="gui/Spring-MenuDialogPane.xml" />
 
-
 </beans>
