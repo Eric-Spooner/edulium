@@ -271,9 +271,10 @@ public class CookViewController implements Initializable, Controller {
         try {
             Stage stage = new Stage();
             stage.setTitle("Menu Categories");
+            DialogCookViewCategories.setThisStage(stage);
+            DialogCookViewCategories.setMenuService(menuService);
             AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogCookViewMenCat.fxml"));
             Scene scene = new Scene(myPane);
-            DialogCookViewCategories.setThisStage(stage);
             stage.setScene(scene);
             stage.showAndWait();
         }catch (Exception e){
