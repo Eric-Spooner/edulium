@@ -68,6 +68,10 @@ public class TableViewController implements Initializable, Controller {
 
                 setX(table.getColumn());
                 setY(table.getRow());
+
+                button.setVisible(true);
+            } else {
+                button.setVisible(false);
             }
         }
     }
