@@ -28,8 +28,8 @@ import static javafx.collections.FXCollections.observableList;
 /**
  * Dialog Controller Cook View Categories
  */
-public class DialogCookViewCategories implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(DialogCookViewCategories.class);
+public class DialogCookviewCategories implements Initializable {
+    private static final Logger LOGGER = LogManager.getLogger(DialogCookviewCategories.class);
 
     private static Stage thisStage;
     private static LinkedList<MenuCategory> checkedCategories;
@@ -40,13 +40,13 @@ public class DialogCookViewCategories implements Initializable {
     private CheckListView<MenuCategory> listMenuCats;
 
     public static void setCheckedCategories(LinkedList<MenuCategory> checkedCategories) {
-        DialogCookViewCategories.checkedCategories = checkedCategories;
+        DialogCookviewCategories.checkedCategories = checkedCategories;
     }
     public static void setThisStage(Stage thisStage) {
-        DialogCookViewCategories.thisStage = thisStage;
+        DialogCookviewCategories.thisStage = thisStage;
     }
     public static void setMenuService(MenuService menuService) {
-        DialogCookViewCategories.menuService = menuService;
+        DialogCookviewCategories.menuService = menuService;
     }
     public static LinkedList<MenuCategory> getCheckedCategories() {
         return checkedCategories;
