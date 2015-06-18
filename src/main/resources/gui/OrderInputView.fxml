@@ -32,7 +32,7 @@
       </VBox>
       <VBox alignment="TOP_CENTER" HBox.hgrow="ALWAYS">
          <children>
-            <HBox alignment="TOP_CENTER" spacing="5.0" VBox.vgrow="NEVER">
+            <HBox alignment="TOP_CENTER" spacing="33.0" VBox.vgrow="NEVER">
                <children>
                   <Button fx:id="orderButton" mnemonicParsing="false" onAction="#onOrderButtonClicked" text="Order">
                      <font>
