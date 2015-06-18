@@ -798,4 +798,263 @@ public class TestInvoiceService extends AbstractServiceTest {
         // WHEN/THEN
         invoiceService.addInstalment(instalment);
     }
+
+
+    @Test
+    @WithMockUser(username = "servicetester", roles = {"SERVICE"})
+    public void testFindInstalment_shouldFindInstalmentsByIdentity() throws DAOException, ServiceException {
+        // PREPARE
+        // Invoice 1
+        Invoice inv1 = new Invoice();
+        inv1.setIdentity(1L);
+        inv1.setTime(LocalDateTime.now());
+        inv1.setGross(new BigDecimal("51.6"));
+        inv1.setCreator(creator1);
+
+        // Invoice 2
+        Invoice inv2 = new Invoice();
+        inv2.setIdentity(2L);
+        inv2.setTime(LocalDateTime.now());
+        inv2.setGross(new BigDecimal("30"));
+        inv2.setCreator(creator2);
+
+        // invoice 3
+        Invoice inv3 = new Invoice();
+        inv3.setIdentity(3L);
+        inv3.setTime(LocalDateTime.now());
+        inv3.setGross(new BigDecimal("1.6"));
+        inv3.setCreator(creator3);
+
+        Instalment inst1 = new Instalment();
+        inst1.setIdentity(1L); // after creation
+        inst1.setInvoice(inv1);
+        inst1.setTime(LocalDateTime.now());
+        inst1.setType("CASH");
+        inst1.setAmount(new BigDecimal("22"));
+        inst1.setPaymentInfo("Payment info");
+
+        Instalment inst2 = new Instalment();
+        inst2.setIdentity(2L); // after creation
+        inst2.setInvoice(inv2);
+        inst2.setTime(LocalDateTime.now());
+        inst2.setType("CREDIT_CARD");
+        inst2.setAmount(new BigDecimal("19"));
+        inst2.setPaymentInfo("Payment info");
+
+        Instalment inst3 = new Instalment();
+        inst3.setIdentity(3L); // after creation
+        inst3.setInvoice(inv3);
+        inst3.setTime(LocalDateTime.now());
+        inst3.setType("CASH");
+        inst3.setAmount(new BigDecimal("13"));
+        inst3.setPaymentInfo("Payment info");
+
+        // matcher 1
+        Instalment m1 = Instalment.withIdentity(1L);
+        // matcher 2
+        Instalment m2 = Instalment.withIdentity(2L);
+        // matcher 3
+        Instalment m3 = Instalment.withIdentity(3L);
+
+        when(instalmentDAO.find(m1)).thenReturn(Collections.singletonList(inst1));
+        when(instalmentDAO.find(m2)).thenReturn(Collections.singletonList(inst2));
+        when(instalmentDAO.find(m3)).thenReturn(Collections.singletonList(inst3));
+
+        // WHEN
+        List<Instalment> instalments = invoiceService.findInstalments(m1);
+        // THEN
+        verify(instalmentDAO).find(m1);
+        assertEquals(1, instalments.size());
+        assertTrue(instalments.contains(inst1));
+
+        // WHEN
+        instalments = invoiceService.findInstalments(m2);
+        // THEN
+        verify(instalmentDAO).find(m2);
+        assertEquals(1, instalments.size());
+        assertTrue(instalments.contains(inst2));
+
+        // WHEN
+        instalments = invoiceService.findInstalments(m3);
+        // THEN
+        verify(instalmentDAO).find(m3);
+        assertEquals(1, instalments.size());
+        assertTrue(instalments.contains(inst3));
+    }
+
+    @Test
+    @WithMockUser(username = "servicetester", roles = {"SERVICE"})
+    public void testFindInstalment_shouldFindInstalmentsByInvoice() throws DAOException, ServiceException {
+        // PREPARE
+        // Invoice 1
+        Invoice inv1 = new Invoice();
+        inv1.setIdentity(1L);
+        inv1.setTime(LocalDateTime.now());
+        inv1.setGross(new BigDecimal("51.6"));
+        inv1.setCreator(creator1);
+
+        // Invoice 2
+        Invoice inv2 = new Invoice();
+        inv2.setIdentity(2L);
+        inv2.setTime(LocalDateTime.now());
+        inv2.setGross(new BigDecimal("30"));
+        inv2.setCreator(creator2);
+
+        // invoice 3
+        Invoice inv3 = new Invoice();
+        inv3.setIdentity(3L);
+        inv3.setTime(LocalDateTime.now());
+        inv3.setGross(new BigDecimal("1.6"));
+        inv3.setCreator(creator3);
+
+        Instalment inst1 = new Instalment();
+        inst1.setIdentity(1L); // after creation
+        inst1.setInvoice(inv1);
+        inst1.setTime(LocalDateTime.now());
+        inst1.setType("CASH");
+        inst1.setAmount(new BigDecimal("22"));
+        inst1.setPaymentInfo("Payment info");
+
+        Instalment inst2 = new Instalment();
+        inst2.setIdentity(2L); // after creation
+        inst2.setInvoice(inv2);
+        inst2.setTime(LocalDateTime.now());
+        inst2.setType("CREDIT_CARD");
+        inst2.setAmount(new BigDecimal("19"));
+        inst2.setPaymentInfo("Payment info");
+
+        Instalment inst3 = new Instalment();
+        inst3.setIdentity(3L); // after creation
+        inst3.setInvoice(inv3);
+        inst3.setTime(LocalDateTime.now());
+        inst3.setType("CASH");
+        inst3.setAmount(new BigDecimal("13"));
+        inst3.setPaymentInfo("Payment info");
+
+        // matcher 1
+        Instalment m1 = new Instalment();
+        m1.setInvoice(inv1);
+        // matcher 2
+        Instalment m2 = Instalment.withIdentity(2L);
+        m2.setInvoice(inv2);
+        // matcher 3
+        Instalment m3 = Instalment.withIdentity(3L);
+        m3.setInvoice(inv3);
+
+        when(instalmentDAO.find(m1)).thenReturn(Collections.singletonList(inst1));
+        when(instalmentDAO.find(m2)).thenReturn(Collections.singletonList(inst2));
+        when(instalmentDAO.find(m3)).thenReturn(Collections.singletonList(inst3));
+
+        // WHEN
+        List<Instalment> instalments = invoiceService.findInstalments(m1);
+        // THEN
+        verify(instalmentDAO).find(m1);
+        assertEquals(1, instalments.size());
+        assertTrue(instalments.contains(inst1));
+
+        // WHEN
+        instalments = invoiceService.findInstalments(m2);
+        // THEN
+        verify(instalmentDAO).find(m2);
+        assertEquals(1, instalments.size());
+        assertTrue(instalments.contains(inst2));
+
+        // WHEN
+        instalments = invoiceService.findInstalments(m3);
+        // THEN
+        verify(instalmentDAO).find(m3);
+        assertEquals(1, instalments.size());
+        assertTrue(instalments.contains(inst3));
+    }
+
+    @Test
+    @WithMockUser(username = "servicetester", roles = {"SERVICE"})
+    public void testFindInstalments_shouldReturnEmptyListWhenSearchingNull() throws DAOException, ServiceException {
+        // PREPARE
+        when(instalmentDAO.find(null)).thenReturn(new ArrayList<>());
+
+        // WHEN/THEN
+        List<Instalment> instalments = invoiceService.findInstalments(null);
+        verify(instalmentDAO).find(null);
+        assertTrue(instalments.isEmpty());
+    }
+
+    @Test
+    @WithMockUser(username = "servicetester", roles = {"SERVICE"})
+    public void testFindInstalments_shouldReturnEmptyListWhenNoObjectIsStored() throws ServiceException, DAOException {
+        // WHEN/THEN
+        Long identity = 1L;
+
+        while(!invoiceService.findInstalments(Instalment.withIdentity(identity)).isEmpty()) {
+            identity++;
+        }
+
+        when(instalmentDAO.find(Instalment.withIdentity(identity))).thenReturn(new ArrayList<>());
+
+        List<Instalment> instalments = invoiceService.findInstalments(Instalment.withIdentity(identity));
+        verify(instalmentDAO, atLeast(2)).find(Instalment.withIdentity(identity));
+        assertTrue(instalments.isEmpty());
+    }
+
+    @Test
+    @WithMockUser(username = "servicetester", roles = {"SERVICE"})
+    public void testGetAllInstalments_shouldReturnAllInvoices() throws DAOException, ServiceException {
+        // PREPARE
+        // Invoice 1
+        Invoice inv1 = new Invoice();
+        inv1.setIdentity(1L);
+        inv1.setTime(LocalDateTime.now());
+        inv1.setGross(new BigDecimal("51.6"));
+        inv1.setCreator(creator1);
+
+        // Invoice 2
+        Invoice inv2 = new Invoice();
+        inv2.setIdentity(2L);
+        inv2.setTime(LocalDateTime.now());
+        inv2.setGross(new BigDecimal("30"));
+        inv2.setCreator(creator2);
+
+        // invoice 3
+        Invoice inv3 = new Invoice();
+        inv3.setIdentity(3L);
+        inv3.setTime(LocalDateTime.now());
+        inv3.setGross(new BigDecimal("1.6"));
+        inv3.setCreator(creator3);
+
+        Instalment inst1 = new Instalment();
+        inst1.setIdentity(1L); // after creation
+        inst1.setInvoice(inv1);
+        inst1.setTime(LocalDateTime.now());
+        inst1.setType("CASH");
+        inst1.setAmount(new BigDecimal("22"));
+        inst1.setPaymentInfo("Payment info");
+
+        Instalment inst2 = new Instalment();
+        inst2.setIdentity(2L); // after creation
+        inst2.setInvoice(inv2);
+        inst2.setTime(LocalDateTime.now());
+        inst2.setType("CREDIT_CARD");
+        inst2.setAmount(new BigDecimal("19"));
+        inst2.setPaymentInfo("Payment info");
+
+        Instalment inst3 = new Instalment();
+        inst3.setIdentity(3L); // after creation
+        inst3.setInvoice(inv3);
+        inst3.setTime(LocalDateTime.now());
+        inst3.setType("CASH");
+        inst3.setAmount(new BigDecimal("13"));
+        inst3.setPaymentInfo("Payment info");
+
+        when(instalmentDAO.getAll()).thenReturn(Arrays.asList(inst1, inst2, inst3));
+
+        // WHEN
+        List<Instalment> instalments = invoiceService.getAllInstalments();
+
+        // THEN
+        verify(instalmentDAO).getAll();
+        assertEquals(3, instalments.size());
+        assertTrue(instalments.contains(inst1));
+        assertTrue(instalments.contains(inst2));
+        assertTrue(instalments.contains(inst3));
+    }
 }
