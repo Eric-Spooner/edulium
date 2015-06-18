@@ -96,6 +96,8 @@ public class OrderOverviewController implements Initializable, Controller {
 
     @Resource(name = "tableViewPane")
     private FXMLPane tableViewPane; // for move to table pop over
+    @Resource(name = "orderInputPane")
+    private FXMLPane orderInputPane;
 
     private PopOver cancelPopOver;
     private PopOver moveToTablePopOver;
@@ -202,10 +204,10 @@ public class OrderOverviewController implements Initializable, Controller {
                     orderService.cancelOrder(order);
                 }
             } catch (ValidationException | ServiceException e) {
-                LOGGER.error("Cancel order did not work", e);
+                LOGGER.error("Cancel orders did not work", e);
 
                 Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Cancel order failed");
+                alert.setTitle("Cancel orders failed");
                 alert.setContentText(e.toString());
 
                 alert.showAndWait();
@@ -251,10 +253,10 @@ public class OrderOverviewController implements Initializable, Controller {
                     orderService.updateOrder(order);
                 }
             } catch (ValidationException | ServiceException e) {
-                LOGGER.error("Cancel order did not work", e);
+                LOGGER.error("Move orders did not work", e);
 
                 Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Cancel order failed");
+                alert.setTitle("Move orders failed");
                 alert.setContentText(e.toString());
 
                 alert.showAndWait();
@@ -273,14 +275,21 @@ public class OrderOverviewController implements Initializable, Controller {
         moveToTablePopOver.setHideOnEscape(true);
         moveToTablePopOver.setAutoHide(true);
         moveToTablePopOver.setDetachable(false);
+        moveToTablePopOver.setMinSize(1200, 700);
         moveToTablePopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
     }
 
     private void initializeNewOrderPopOver() {
-        newOrderPopOver = new PopOver();
+        OrderInputController orderInputController = orderInputPane.getController(OrderInputController.class);
+        orderInputController.setOnDone(action -> newOrderPopOver.hide());
+
+        orderInputPane.setStyle("-fx-padding: 5px;");
+
+        newOrderPopOver = new PopOver(orderInputPane);
         newOrderPopOver.setHideOnEscape(true);
         newOrderPopOver.setAutoHide(true);
         newOrderPopOver.setDetachable(false);
+        newOrderPopOver.setMinSize(1200, 700);
         newOrderPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
     }
 
@@ -412,6 +421,9 @@ public class OrderOverviewController implements Initializable, Controller {
                 }
             }
         });
+
+        OrderInputController orderInputController = orderInputPane.getController(OrderInputController.class);
+        orderInputController.setTable(table);
     }
 
     public void setOnBackButtonAction(EventHandler<ActionEvent> event) {

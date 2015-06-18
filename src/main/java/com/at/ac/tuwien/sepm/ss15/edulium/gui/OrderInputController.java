@@ -1,0 +1,235 @@
+package com.at.ac.tuwien.sepm.ss15.edulium.gui;
+
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import javafx.collections.*;
+import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.net.URL;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+@Component
+public class OrderInputController  implements Initializable, Controller {
+    private static final Logger LOGGER = LogManager.getLogger(OrderInputController.class);
+
+    private enum ScreenType {
+        MenuCategoryScreen,
+        MenuEntryScreen
+    }
+
+    @FXML
+    private ListView<Order> ordersView;
+    @FXML
+    private ScrollPane scrollPane;
+    @FXML
+    private Button orderButton;
+    @FXML
+    private Button cancelButton;
+    @FXML
+    private Button backButton;
+    @FXML
+    private Label headerLabel;
+
+    private class OrderCell extends ListCell<Order> {
+        private final Label nameLabel;
+        private final Label additionalInformationLabel;
+        private final Label amountLabel;
+        private final Button increaseAmountButton;
+        private final Button decreaseAmountButton;
+        private final HBox layout;
+        private Order order = null;
+
+        public OrderCell() {
+            nameLabel = new Label();
+
+            additionalInformationLabel = new Label();
+            additionalInformationLabel.setStyle("-fx-font-size: 14px;");
+
+            VBox labelLayout = new VBox();
+            labelLayout.getChildren().setAll(nameLabel, additionalInformationLabel);
+
+            amountLabel = new Label();
+
+            increaseAmountButton = new Button();
+            increaseAmountButton.setText("+");
+            increaseAmountButton.setMinSize(40, 40);
+            increaseAmountButton.setOnAction(action -> orders.computeIfPresent(order, (key, amount) -> amount + 1));
+
+            decreaseAmountButton = new Button();
+            decreaseAmountButton.setText("-");
+            decreaseAmountButton.setMinSize(40, 40);
+            decreaseAmountButton.setOnAction(action -> orders.computeIfPresent(order, (key, amount) -> amount == 1 ? null : amount - 1));
+
+            layout = new HBox();
+            layout.setSpacing(5);
+            layout.getChildren().setAll(increaseAmountButton, decreaseAmountButton, amountLabel, labelLayout);
+
+            setGraphic(layout);
+        }
+
+        @Override
+        protected void updateItem(Order item, boolean empty) {
+            super.updateItem(item, empty);
+
+            order = item;
+
+            if (order != null) {
+                nameLabel.setText(order.getMenuEntry().getName());
+                additionalInformationLabel.setText(order.getAdditionalInformation());
+                amountLabel.setText(orders.get(order).toString());
+                layout.setVisible(true);
+            } else {
+                layout.setVisible(false);
+            }
+        }
+    }
+
+    @Resource(name = "menuCategoryOverviewPane")
+    private FXMLPane menuCategoryOverviewPane;
+    private MenuCategoryOverviewController menuCategoryOverviewController;
+
+    @Resource(name = "menuEntryOverviewPane")
+    private FXMLPane menuEntryOverviewPane;
+    private MenuEntryOverviewController menuEntryOverviewController;
+
+    @Autowired
+    private OrderService orderService;
+
+    private Table table;
+
+    private ObservableMap<Order, Integer> orders = FXCollections.observableHashMap();
+    private ObservableList<Order> displayedOrders = FXCollections.observableArrayList();
+
+    private EventHandler<ActionEvent> doneEventHandler;
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        menuCategoryOverviewController = menuCategoryOverviewPane.getController(MenuCategoryOverviewController.class);
+        menuEntryOverviewController = menuEntryOverviewPane.getController(MenuEntryOverviewController.class);
+
+        menuCategoryOverviewController.setOnMenuCategoryClicked(menuCategory -> {
+            menuEntryOverviewController.setMenuCategory(menuCategory);
+            showScreen(ScreenType.MenuEntryScreen);
+            headerLabel.setText(menuCategory.getName());
+        });
+
+        menuEntryOverviewController.setOnMenuEntryClicked(menuEntry -> {
+            Order order = new Order();
+            order.setMenuEntry(menuEntry);
+            order.setBrutto(menuEntry.getPrice());
+            order.setTax(menuEntry.getTaxRate().getValue());
+            order.setState(Order.State.QUEUED);
+            order.setTable(table);
+            order.setAdditionalInformation("blablabla");
+
+            orders.compute(order, (key, amount) -> (amount == null) ? 1 : amount + 1);
+        });
+
+        // put all keys of the orders map into a list so that we can use it in the list view
+        orders.addListener((MapChangeListener<Order, Integer>) change -> {
+            displayedOrders.removeAll(change.getKey());
+            if (change.wasAdded()) {
+                displayedOrders.add(change.getKey());
+            }
+        });
+
+        // sort the displayed orders by name
+        SortedList<Order> sortedDisplayedOrders = new SortedList<>(displayedOrders);
+        sortedDisplayedOrders.setComparator((o1, o2) -> o1.getMenuEntry().getName().compareToIgnoreCase(o2.getMenuEntry().getName()));
+
+        ordersView.setCellFactory(view -> new OrderCell());
+        ordersView.setItems(sortedDisplayedOrders);
+        ordersView.setStyle("-fx-font-size: 18px;");
+
+        showScreen(ScreenType.MenuCategoryScreen);
+    }
+
+    @FXML
+    private void onOrderButtonClicked(ActionEvent actionEvent) {
+        try {
+            for (Map.Entry<Order, Integer> entry : orders.entrySet()) {
+                Order order = entry.getKey();
+                order.setTime(LocalDateTime.now());
+
+                Integer amount = entry.getValue();
+                for (int i = 0; i < amount; i++) {
+                    orderService.addOrder(order);
+                }
+            }
+        } catch (ValidationException | ServiceException e) {
+            LOGGER.error("Adding orders did not work", e);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Adding orders failed");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+        }
+
+        doneEventHandler.handle(actionEvent);
+        reset();
+    }
+
+    @FXML
+    private void onCancelButtonClicked(ActionEvent actionEvent) {
+        doneEventHandler.handle(actionEvent);
+        reset();
+    }
+
+    @FXML
+    private void onBackButtonClicked(ActionEvent actionEvent) {
+        showScreen(ScreenType.MenuCategoryScreen);
+    }
+
+    private void showScreen(ScreenType screenType) {
+        switch (screenType) {
+            case MenuEntryScreen:
+                scrollPane.setContent(menuEntryOverviewPane);
+                backButton.setDisable(false);
+                break;
+            case MenuCategoryScreen:
+            default:
+                scrollPane.setContent(menuCategoryOverviewPane);
+                backButton.setDisable(true);
+                headerLabel.setText("All Categories");
+        }
+    }
+
+    public void setTable(Table table) {
+        this.table = table;
+        reset();
+    }
+
+    private void reset() {
+        showScreen(ScreenType.MenuCategoryScreen);
+        orders.clear();
+        displayedOrders.clear();
+    }
+
+    public void setOnDone(EventHandler<ActionEvent> doneEventHandler) {
+        this.doneEventHandler = doneEventHandler;
+    }
+
+    @Override
+    public void disable(boolean disabled) {
+        menuCategoryOverviewController.disable(disabled);
+        menuEntryOverviewController.disable(disabled);
+    }
+}

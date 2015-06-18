@@ -11,7 +11,7 @@
    <children>
       <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
          <children>
-            <Button fx:id="backButton" cancelButton="true" mnemonicParsing="false" text="Back" HBox.hgrow="NEVER">
+            <Button fx:id="backButton" mnemonicParsing="false" text="Back" HBox.hgrow="NEVER">
                <font>
                   <Font size="18.0" />
                </font>
@@ -40,7 +40,7 @@
                <HBox.margin>
                   <Insets />
                </HBox.margin></Button>
-            <Button fx:id="newOrderButton" defaultButton="true" mnemonicParsing="false" onAction="#onNewOrderButtonClicked" text="New Order" HBox.hgrow="NEVER">
+            <Button fx:id="newOrderButton" mnemonicParsing="false" onAction="#onNewOrderButtonClicked" text="New Order" HBox.hgrow="NEVER">
                <font>
                   <Font size="18.0" />
                </font>
