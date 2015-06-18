@@ -2,26 +2,35 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.ImmutableDAO;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Instalment;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ImmutableValidator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 class InvoiceServiceImpl implements InvoiceService {
     private static final Logger LOGGER = LogManager.getLogger(InteriorServiceImpl.class);
 
-    @Autowired
+    @Resource(name = "invoiceDAO")
     DAO<Invoice> invoiceDAO;
-    @Autowired
+
+    @Resource(name = "instalmentDAO")
+    ImmutableDAO<Instalment> instalmentDAO;
+
+    @Resource(name = "invoiceValidator")
     Validator<Invoice> invoiceValidator;
+
+    @Resource(name = "instalmentValidator")
+    ImmutableValidator<Instalment> instalmentValidator;
 
     @Override
     public void addInvoice(Invoice invoice) throws ServiceException, ValidationException {
@@ -90,6 +99,40 @@ class InvoiceServiceImpl implements InvoiceService {
             return invoiceDAO.getHistory(invoice);
         } catch (DAOException e) {
             throw new ServiceException("Could not get invoice history", e);
+        }
+    }
+
+    @Override
+    public void addInstalment(Instalment instalment) throws ServiceException, ValidationException {
+        LOGGER.debug("Entering addInstalment with parameters: " + instalment);
+        instalmentValidator.validateForCreate(instalment);
+
+        try {
+            instalmentDAO.create(instalment);
+        } catch (DAOException e) {
+            throw new ServiceException("Could not add instalment", e);
+        }
+    }
+
+    @Override
+    public List<Instalment> findInstalments(Instalment instalment) throws ServiceException {
+        LOGGER.debug("Entering findInstalment with parameters: " + instalment);
+
+        try {
+            return instalmentDAO.find(instalment);
+        } catch (DAOException e) {
+            throw new ServiceException("Could not find instalments", e);
+        }
+    }
+
+    @Override
+    public List<Instalment> getAllInstalments() throws ServiceException {
+        LOGGER.debug("Entering getAllInstalments");
+
+        try {
+            return instalmentDAO.getAll();
+        } catch (DAOException e) {
+            throw new ServiceException("Could not get all instalments", e);
         }
     }
 }
