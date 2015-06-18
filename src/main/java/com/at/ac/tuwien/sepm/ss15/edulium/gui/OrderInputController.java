@@ -121,6 +121,10 @@ public class OrderInputController  implements Initializable, Controller {
     private FXMLPane menuOverviewPane;
     private MenuOverviewController menuOverviewController;
 
+    @Resource(name = "menuDetailsPane")
+    private FXMLPane menuDetailsPane;
+    private MenuDetailsController menuDetailsController;
+
     @Autowired
     private OrderService orderService;
 
@@ -143,6 +147,7 @@ public class OrderInputController  implements Initializable, Controller {
         menuCategoryOverviewController = menuCategoryOverviewPane.getController(MenuCategoryOverviewController.class);
         menuEntryOverviewController = menuEntryOverviewPane.getController(MenuEntryOverviewController.class);
         menuOverviewController = menuOverviewPane.getController(MenuOverviewController.class);
+        menuDetailsController = menuDetailsPane.getController(MenuDetailsController.class);
 
         menuCategoryOverviewController.setOnMenuCategoryClicked(menuCategory -> {
             menuEntryOverviewController.setMenuCategory(menuCategory);
@@ -151,7 +156,7 @@ public class OrderInputController  implements Initializable, Controller {
         });
 
         menuOverviewController.setOnMenuClicked(menu -> {
-            //menuDetailsController.setMenu(menu);
+            menuDetailsController.setMenu(menu);
             showScreen(ScreenType.MenuDetailsScreen);
             headerLabel.setText(menu.getName());
         });
@@ -256,7 +261,7 @@ public class OrderInputController  implements Initializable, Controller {
                 backButton.setUserData(ScreenType.MenuCategoryScreen);
                 break;
             case MenuDetailsScreen:
-                //scrollPane.setContent(menuDetailsPane);
+                scrollPane.setContent(menuDetailsPane);
                 backButton.setDisable(false);
                 backButton.setUserData(ScreenType.MenuScreen);
                 break;

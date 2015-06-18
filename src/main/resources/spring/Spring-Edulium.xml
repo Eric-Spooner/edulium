@@ -66,5 +66,6 @@
     <import resource="gui/Spring-MenuCategoryOverviewPane.xml" />
     <import resource="gui/Spring-MenuEntryOverviewPane.xml" />
     <import resource="gui/Spring-MenuOverviewPane.xml" />
+    <import resource="gui/Spring-MenuDetailsPane.xml" />
 
 </beans>
