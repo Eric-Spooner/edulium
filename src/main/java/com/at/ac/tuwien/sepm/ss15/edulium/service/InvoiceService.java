@@ -1,5 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Instalment;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
@@ -66,4 +67,34 @@ public interface InvoiceService extends Service {
      */
     @PreAuthorize("hasRole('MANAGER')")
     List<History<Invoice>> getInvoiceHistory(Invoice invoice) throws ServiceException, ValidationException;
+
+    /**
+     * Adds an instalment object to the underlying datasource.
+     *
+     * Sets the identity parameter of instalment if the data was stored
+     * successfully and a new identity has been generated in the underlying
+     * datasource
+     * @param instalment Object to store
+     * @throws ServiceException If the object couldn't be stored
+     * @throws ValidationException If the object doesn't pass the validation
+     */
+    @PreAuthorize("hasRole('SERVICE')")
+    void addInstalment(Instalment instalment) throws  ServiceException, ValidationException;
+
+    /**
+     * Returns all sections which parameters match the
+     * parameters of the parameter object.
+     * @param instalment Object used for matching
+     * @return The list of matched sections
+     * @throws ServiceException If the data couldn't be retrieved
+     */
+    @PreAuthorize("hasRole('SERVICE')")
+    List<Instalment> findInstalments(Instalment instalment) throws ServiceException;
+
+    /**
+     * @return Returns all stored sections
+     * @throws ServiceException If the data couldn't be retrieved
+     */
+    @PreAuthorize("hasRole('SERVICE')")
+    List<Instalment> getAllInstalments() throws ServiceException;
 }

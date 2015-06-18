@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Instalment;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
@@ -91,5 +92,22 @@ class InvoiceServiceImpl implements InvoiceService {
         } catch (DAOException e) {
             throw new ServiceException("Could not get invoice history", e);
         }
+    }
+
+    @Override
+    public void addInstalment(Instalment instalment) throws ServiceException, ValidationException {
+        // TODO
+    }
+
+    @Override
+    public List<Instalment> findInstalments(Instalment instalment) throws ServiceException {
+        // TODO
+        return null;
+    }
+
+    @Override
+    public List<Instalment> getAllInstalments() throws ServiceException {
+        // TODO
+        return null;
     }
 }
