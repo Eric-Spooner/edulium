@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 
@@ -17,6 +18,9 @@ public class GridView<T> extends GridPane {
 
     private Callback<GridView, GridCell> cellFactory;
     private Map<T, Node> nodeMap = new HashMap<>();
+
+    private int rows = 1;
+    private int cols = 1;
 
     public static abstract class GridCell<ItemType> {
         private Node node;
@@ -88,31 +92,29 @@ public class GridView<T> extends GridPane {
         cellItem.updateItem(item);
         nodeMap.put(item, cellItem.getNode());
 
-        add(cellItem.getNode(), cellItem.getX(), cellItem.getY());
-
-        /*
         // add dummy elements to add rows
-        for(; rows < cellItem.getY(); rows++) {
-            final Button dummy = new Button();
-            dummy.minHeightProperty().bind(((Button) cellItem.getNode()).heightProperty());
-            dummy.minWidthProperty().bind(((Button) cellItem.getNode()).widthProperty());
-            dummy.setVisible(false);
-            add(dummy, 0, rows);
+        for (; rows < cellItem.getY(); rows++) {
+            GridCell dummyCellItem = cellFactory.call(this);
+            dummyCellItem.updateItem(null);
+            dummyCellItem.setX(1);
+            dummyCellItem.setY(rows);
+            add(dummyCellItem.getNode(), dummyCellItem.getX(), dummyCellItem.getY());
         }
 
         // add dummy elements to add columns
-        for(; cols < cellItem.getX(); cols++) {
-            final Pane dummy = new Pane();
-            dummy.minWidthProperty().bind(((Button) cellItem.getNode()).widthProperty());
-            dummy.minHeightProperty().bind(((Button) cellItem.getNode()).heightProperty());
-            dummy.setVisible(false);
-            add(dummy, cols, 0);
+        for (; cols < cellItem.getX(); cols++) {
+            GridCell dummyCellItem = cellFactory.call(this);
+            dummyCellItem.updateItem(null);
+            dummyCellItem.setX(cols);
+            dummyCellItem.setY(1);
+            add(dummyCellItem.getNode(), dummyCellItem.getX(), dummyCellItem.getY());
         }
 
-        for(ColumnConstraints c : getColumnConstraints()) {
-            c.setPercentWidth(100.0/ (double) getColumnConstraints().size());
+        add(cellItem.getNode(), cellItem.getX(), cellItem.getY());
+
+        for (ColumnConstraints c : getColumnConstraints()) {
+            c.setPercentWidth(100.0 / (double)getColumnConstraints().size());
         }
-        */
     }
 
     private void removeCellItem(T item) {
