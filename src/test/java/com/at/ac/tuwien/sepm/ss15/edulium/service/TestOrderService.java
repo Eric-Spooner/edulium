@@ -138,11 +138,13 @@ public class TestOrderService extends AbstractServiceTest {
         Mockito.when(orderDAO.find(order)).thenReturn(Arrays.asList(order));
 
         // WHEN
-        order.setAdditionalInformation("hallo");
-        orderService.updateOrder(order);
+        Order order2 = createOrder(BigDecimal.valueOf(500),"Order Information new", BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.QUEUED, 1);
+        order2.setIdentity(order.getIdentity());
+        orderService.updateOrder(order2);
 
         // THEN
-        Mockito.verify(orderDAO).update(order);
+        Mockito.verify(orderDAO).update(order2);
     }
 
     @Test(expected = ValidationException.class)
