@@ -134,6 +134,9 @@ public class OrderInputController  implements Initializable, Controller {
 
     private EventHandler<ActionEvent> doneEventHandler;
 
+    private ToggleButton menuCategoryScreenButton;
+    private ToggleButton menuScreenButton;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initializeHeaderButtons();
@@ -190,13 +193,14 @@ public class OrderInputController  implements Initializable, Controller {
     }
 
     private void initializeHeaderButtons() {
-        ToggleButton menuCategoryScreenButton = new ToggleButton();
+        menuCategoryScreenButton = new ToggleButton();
         menuCategoryScreenButton.setText("Categories");
-        menuCategoryScreenButton.setSelected(true);
+        menuCategoryScreenButton.setMinHeight(33);
         menuCategoryScreenButton.setOnAction(action -> showScreen(ScreenType.MenuCategoryScreen));
 
-        ToggleButton menuScreenButton = new ToggleButton();
+        menuScreenButton = new ToggleButton();
         menuScreenButton.setText("Menus");
+        menuScreenButton.setMinHeight(33);
         menuScreenButton.setOnAction(action -> showScreen(ScreenType.MenuScreen));
 
         SegmentedButton headerButtons = new SegmentedButton();
@@ -268,12 +272,14 @@ public class OrderInputController  implements Initializable, Controller {
             case MenuScreen:
                 scrollPane.setContent(menuOverviewPane);
                 backButton.setDisable(true);
+                menuScreenButton.setSelected(true);
                 headerLabel.setText("All Menus");
                 break;
             case MenuCategoryScreen:
             default:
                 scrollPane.setContent(menuCategoryOverviewPane);
                 backButton.setDisable(true);
+                menuCategoryScreenButton.setSelected(true);
                 headerLabel.setText("All Categories");
         }
     }
