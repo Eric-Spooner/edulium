@@ -17,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.SegmentedButton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +33,9 @@ public class OrderInputController  implements Initializable, Controller {
 
     private enum ScreenType {
         MenuCategoryScreen,
-        MenuEntryScreen
+        MenuEntryScreen,
+        MenuScreen,
+        MenuDetailsScreen
     }
 
     @FXML
@@ -47,6 +50,8 @@ public class OrderInputController  implements Initializable, Controller {
     private Button backButton;
     @FXML
     private Label headerLabel;
+    @FXML
+    private HBox headerLayout;
 
     private class OrderCell extends ListCell<Order> {
         private final Label nameLabel;
@@ -112,6 +117,10 @@ public class OrderInputController  implements Initializable, Controller {
     private FXMLPane menuEntryOverviewPane;
     private MenuEntryOverviewController menuEntryOverviewController;
 
+    @Resource(name = "menuOverviewPane")
+    private FXMLPane menuOverviewPane;
+    private MenuOverviewController menuOverviewController;
+
     @Autowired
     private OrderService orderService;
 
@@ -123,13 +132,28 @@ public class OrderInputController  implements Initializable, Controller {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        initializeHeaderButtons();
+        initializeControllers();
+        initializeOrdersView();
+
+        showScreen(ScreenType.MenuCategoryScreen);
+    }
+
+    private void initializeControllers() {
         menuCategoryOverviewController = menuCategoryOverviewPane.getController(MenuCategoryOverviewController.class);
         menuEntryOverviewController = menuEntryOverviewPane.getController(MenuEntryOverviewController.class);
+        menuOverviewController = menuOverviewPane.getController(MenuOverviewController.class);
 
         menuCategoryOverviewController.setOnMenuCategoryClicked(menuCategory -> {
             menuEntryOverviewController.setMenuCategory(menuCategory);
             showScreen(ScreenType.MenuEntryScreen);
             headerLabel.setText(menuCategory.getName());
+        });
+
+        menuOverviewController.setOnMenuClicked(menu -> {
+            //menuDetailsController.setMenu(menu);
+            showScreen(ScreenType.MenuDetailsScreen);
+            headerLabel.setText(menu.getName());
         });
 
         menuEntryOverviewController.setOnMenuEntryClicked(menuEntry -> {
@@ -139,7 +163,9 @@ public class OrderInputController  implements Initializable, Controller {
 
             orders.compute(order, (key, amount) -> (amount == null) ? 1 : amount + 1);
         });
+    }
 
+    private void initializeOrdersView() {
         // put all keys of the orders map into a list so that we can use it in the list view
         ObservableList<Order> displayedOrders = FXCollections.observableArrayList();
         orders.addListener((MapChangeListener<Order, Integer>) change -> {
@@ -156,8 +182,24 @@ public class OrderInputController  implements Initializable, Controller {
         ordersView.setCellFactory(view -> new OrderCell());
         ordersView.setItems(sortedDisplayedOrders);
         ordersView.setStyle("-fx-font-size: 18px;");
+    }
 
-        showScreen(ScreenType.MenuCategoryScreen);
+    private void initializeHeaderButtons() {
+        ToggleButton menuCategoryScreenButton = new ToggleButton();
+        menuCategoryScreenButton.setText("Categories");
+        menuCategoryScreenButton.setSelected(true);
+        menuCategoryScreenButton.setOnAction(action -> showScreen(ScreenType.MenuCategoryScreen));
+
+        ToggleButton menuScreenButton = new ToggleButton();
+        menuScreenButton.setText("Menus");
+        menuScreenButton.setOnAction(action -> showScreen(ScreenType.MenuScreen));
+
+        SegmentedButton headerButtons = new SegmentedButton();
+        headerButtons.setStyle("-fx-font-size: 18px;");
+        headerButtons.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
+        headerButtons.getButtons().setAll(menuCategoryScreenButton, menuScreenButton);
+
+        headerLayout.getChildren().add(headerButtons);
     }
 
     @FXML
@@ -203,7 +245,7 @@ public class OrderInputController  implements Initializable, Controller {
 
     @FXML
     private void onBackButtonClicked(ActionEvent actionEvent) {
-        showScreen(ScreenType.MenuCategoryScreen);
+        showScreen((ScreenType)backButton.getUserData());
     }
 
     private void showScreen(ScreenType screenType) {
@@ -211,6 +253,17 @@ public class OrderInputController  implements Initializable, Controller {
             case MenuEntryScreen:
                 scrollPane.setContent(menuEntryOverviewPane);
                 backButton.setDisable(false);
+                backButton.setUserData(ScreenType.MenuCategoryScreen);
+                break;
+            case MenuDetailsScreen:
+                //scrollPane.setContent(menuDetailsPane);
+                backButton.setDisable(false);
+                backButton.setUserData(ScreenType.MenuScreen);
+                break;
+            case MenuScreen:
+                scrollPane.setContent(menuOverviewPane);
+                backButton.setDisable(true);
+                headerLabel.setText("All Menus");
                 break;
             case MenuCategoryScreen:
             default:

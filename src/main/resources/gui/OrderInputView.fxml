@@ -10,14 +10,14 @@
    <children>
       <VBox>
          <children>
-            <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
+            <HBox fx:id="headerLayout" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
                <children>
                   <Button fx:id="backButton" mnemonicParsing="false" onAction="#onBackButtonClicked" text="Back">
                      <font>
                         <Font size="18.0" />
                      </font>
                   </Button>
-                  <Label fx:id="headerLabel" text="Label">
+                  <Label fx:id="headerLabel" maxWidth="1.7976931348623157E308" text="Label" HBox.hgrow="ALWAYS">
                      <font>
                         <Font size="24.0" />
                      </font>
