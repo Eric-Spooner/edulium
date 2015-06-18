@@ -91,9 +91,11 @@ public class OrderInputController  implements Initializable, Controller {
             order = item;
 
             if (order != null) {
+                Integer amount = orders.get(order);
+
                 nameLabel.setText(order.getMenuEntry().getName());
                 additionalInformationLabel.setText(order.getAdditionalInformation());
-                amountLabel.setText(orders.get(order).toString());
+                amountLabel.setText(amount == null ? "-" : amount.toString());
                 layout.setVisible(true);
             } else {
                 layout.setVisible(false);
