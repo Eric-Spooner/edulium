@@ -4,13 +4,13 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 
 class InvoiceValidator implements Validator<Invoice> {
 
-    @Autowired
+    @Resource(name = "userValidator")
     private Validator<User> userValidator;
 
     /**

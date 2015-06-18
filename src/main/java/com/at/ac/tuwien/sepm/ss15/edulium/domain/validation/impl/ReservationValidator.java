@@ -6,11 +6,13 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
+
 /**
  * validator implementation for the Reservation domain object
  */
 class ReservationValidator implements Validator<Reservation> {
-    @Autowired
+    @Resource(name = "tableValidator")
     private Validator<Table> tableValidator;
 
     @Override

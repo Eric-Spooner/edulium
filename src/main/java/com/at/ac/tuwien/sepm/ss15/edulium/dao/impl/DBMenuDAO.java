@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -28,13 +29,13 @@ import java.util.stream.Collectors;
 class DBMenuDAO implements DAO<Menu> {
     private static final Logger LOGGER = LogManager.getLogger(DBMenuDAO.class);
 
-    @Autowired
+    @Resource(name = "dataSource")
     private DataSource dataSource;
-    @Autowired
+    @Resource(name = "menuValidator")
     private Validator<Menu> validator;
-    @Autowired
+    @Resource(name = "menuEntryDAO")
     private DAO<MenuEntry> menuEntryDAO;
-    @Autowired
+    @Resource(name = "userDAO")
     private DAO<User> userDAO;
 
     @Override

@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -22,14 +23,13 @@ import java.util.stream.Collectors;
  * Database implementation of the DAO interface for Instalment objects
  */
 class DBInstalmentDAO implements ImmutableDAO<Instalment> {
-
     private static final Logger LOGGER = LogManager.getLogger(DBInstalmentDAO.class);
 
-    @Autowired
+    @Resource(name = "dataSource")
     private DataSource dataSource;
-    @Autowired
+    @Resource(name = "invoiceDAO")
     private DAO<Invoice> invoiceDAO;
-    @Autowired
+    @Resource(name = "instalmentValidator")
     private ImmutableValidator<Instalment> instalmentValidator;
 
     /**
