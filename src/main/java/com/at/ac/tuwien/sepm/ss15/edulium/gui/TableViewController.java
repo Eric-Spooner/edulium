@@ -43,6 +43,35 @@ public class TableViewController implements Initializable, Controller {
     private Map<Section, GridView<Table>> sectionsMap = new HashMap<>();
     private Boolean showSeats = false;
 
+    private class TableGridCell extends GridView.GridCell<Table> {
+        private final Button button;
+        private Table table;
+
+        public TableGridCell() {
+            button = new Button();
+            button.setFont(new Font(25.0));
+            button.setOnAction(e -> onTableClicked(table));
+
+            setNode(button);
+        }
+
+        @Override
+        protected void updateItem(Table table) {
+            this.table = table;
+
+            if (table != null) {
+                if(showSeats) {
+                    button.setText(table.getSeats().toString());
+                } else {
+                    button.setText(table.getNumber().toString());
+                }
+
+                setX(table.getColumn());
+                setY(table.getRow());
+            }
+        }
+    }
+
     private class SectionListCell extends ListCell<Section> {
         @Override
         public void updateItem(Section item, boolean empty) {
@@ -53,17 +82,7 @@ public class TableViewController implements Initializable, Controller {
             }
 
             GridView<Table> gridView = new GridView<>();
-            gridView.setCellFactory(table -> {
-                Button button = new Button();
-                if(showSeats) {
-                    button.setText(table.getSeats().toString());
-                } else {
-                    button.setText(table.getNumber().toString());
-                }
-                button.setFont(new Font(25.0));
-                button.setOnAction(e -> onTableClicked(table));
-                return new GridView.GridCell(button, table.getColumn(), table.getRow());
-            });
+            gridView.setCellFactory(view -> new TableGridCell());
 
             gridView.setItems(tables.filtered(table -> table.getSection().equals(item)));
 
