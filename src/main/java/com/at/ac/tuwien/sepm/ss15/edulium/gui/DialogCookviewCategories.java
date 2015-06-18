@@ -52,6 +52,7 @@ public class DialogCookViewCategories implements Initializable {
         try {
             menuCategories = observableArrayList(menuService.getAllMenuCategories());
             listMenuCats.setItems(menuCategories);
+            checkedCategories.forEach(order -> listMenuCats.getCheckModel().check(order));
             listMenuCats.getCheckModel().getCheckedItems().addListener(new ListChangeListener<MenuCategory>() {
                 public void onChanged(ListChangeListener.Change<? extends MenuCategory> c) {
                     checkedCategories.clear();
