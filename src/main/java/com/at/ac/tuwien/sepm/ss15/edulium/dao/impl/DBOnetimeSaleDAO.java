@@ -40,26 +40,7 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
 
         validator.validateForCreate(onetimeSale);
 
-        //Create Sale
-        final String saleQuery = "INSERT INTO Sale (name, deleted) VALUES (?, ?)";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, onetimeSale.getName());
-            stmt.setBoolean(2, false);
-            stmt.executeUpdate();
-
-            ResultSet key = stmt.getGeneratedKeys();
-            if (key.next()) {
-                onetimeSale.setIdentity(key.getLong(1));
-            }
-            key.close();
-        } catch (SQLException e) {
-            LOGGER.error("Inserting sale into database failed", e);
-            throw new DAOException("Inserting sale into database failed", e);
-        }
-
-        updateSaleAssoc(onetimeSale, dataSource, LOGGER);
-        generateSaleHistory(onetimeSale, dataSource, LOGGER);
+        super.create(onetimeSale);
 
         //Create OnetimeSale
         final String query = "INSERT INTO OnetimeSale (sale_ID, fromTime, toTime) VALUES (?, ?, ?)";
@@ -84,24 +65,7 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
 
         validator.validateForUpdate(onetimeSale);
 
-        //Update Sale
-        final String saleQuery = "UPDATE Sale SET name = ? WHERE ID = ?";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery)) {
-            stmt.setString(1, onetimeSale.getName());
-            stmt.setLong(2, onetimeSale.getIdentity());
-
-            if (stmt.executeUpdate() == 0) {
-                LOGGER.error("Updating sale in database failed, sale not found");
-                throw new DAOException("Updating sale in database failed, sale not found");
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Updating sale in database failed", e);
-            throw new DAOException("Updating sale in database failed", e);
-        }
-
-        updateSaleAssoc(onetimeSale, dataSource, LOGGER);
-        generateSaleHistory(onetimeSale, dataSource, LOGGER);
+        super.update(onetimeSale);
 
         //Update OnetimeSale
         final String query = "UPDATE OnetimeSale SET fromTime = ?, toTime = ? WHERE sale_ID = ?";
@@ -129,24 +93,7 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
 
         validator.validateForDelete(onetimeSale);
 
-        //Delete Sale
-        final String saleQuery = "UPDATE Sale SET deleted = true WHERE ID = ?";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery)) {
-            stmt.setLong(1, onetimeSale.getIdentity());
-
-            if (stmt.executeUpdate() == 0) {
-                LOGGER.error("Deleting sale from database failed, sale not found");
-                throw new DAOException("Deleting sale from database failed, sale not found");
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Deleting sale from database failed", e);
-            throw new DAOException("Deleting sale from database failed", e);
-        }
-
-        generateSaleHistory(onetimeSale, dataSource, LOGGER);
-
-        generateHistory(onetimeSale);
+        super.delete(onetimeSale);
     }
 
     @Override
@@ -160,7 +107,7 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
         final String query = "SELECT * FROM OnetimeSale WHERE sale_ID = ISNULL(?, sale_ID)" +
                 " AND fromTime = ISNULL(?, fromTime)"+
                 " AND toTime = ISNULL(?, toTime)"+
-                " AND EXISTS (SELECT * FROM Sale WHERE OnetimeSale.sale_ID = Sale.ID AND name = ISNULL(?, name))";
+                " AND EXISTS (SELECT * FROM Sale WHERE OnetimeSale.sale_ID = Sale.ID AND name = ISNULL(?, name) AND deleted = false)";
 
         final List<OnetimeSale> onetimeSales = new ArrayList<>();
 
@@ -172,10 +119,9 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
-                if (addNameToSale(onetimeSaleFromResult, dataSource, menuEntryDAO)) {
-                    onetimeSales.add(onetimeSaleFromResult);
-                }
+                OnetimeSale sale = onetimeSaleFromResultSet(result);
+                setSaleParameters(sale);
+                onetimeSales.add(sale);
             }
         } catch (SQLException e) {
             LOGGER.error("Searching for onetimeSales failed", e);
@@ -189,7 +135,7 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
     public List<OnetimeSale> getAll() throws DAOException {
         LOGGER.debug("Entering getAll");
 
-        final String query = "SELECT * FROM OnetimeSale";
+        final String query = "SELECT * FROM OnetimeSale WHERE EXISTS (SELECT * FROM Sale WHERE OnetimeSale.sale_ID = Sale.ID AND deleted = false)";
 
         final List<OnetimeSale> onetimeSales = new ArrayList<>();
 
@@ -197,10 +143,8 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
-                boolean notDeleted = addNameToSale(onetimeSaleFromResult, dataSource, menuEntryDAO);
-                if (notDeleted){
-                    onetimeSales.add(onetimeSaleFromResult);
-                }
+                setSaleParameters(onetimeSaleFromResult);
+                onetimeSales.add(onetimeSaleFromResult);
             }
         } catch (SQLException e) {
             LOGGER.error("Searching for all onetimeSales failed", e);
@@ -263,7 +207,7 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
-                addNameToSale(onetimeSaleFromResult, dataSource, menuEntryDAO);
+                setSaleParameters(onetimeSaleFromResult);
                 populatedOnetimeSales.add(onetimeSaleFromResult);
             }
         } catch (SQLException e) {

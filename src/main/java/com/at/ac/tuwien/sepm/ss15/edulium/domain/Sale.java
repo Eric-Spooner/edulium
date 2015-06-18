@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * Abstract domain object representing a Sale
@@ -10,7 +11,7 @@ import java.util.Hashtable;
 public abstract class Sale {
     protected Long identity = null;
     protected String name = null;
-    protected Hashtable<MenuEntry, BigDecimal> entries = null;
+    protected List<MenuEntry> entries = null;
 
     /**
      * @return the identity of the sale (can be null)
@@ -54,16 +55,28 @@ public abstract class Sale {
      *
      * @return the entries of the sale with the new price
      */
-    public Hashtable<MenuEntry, BigDecimal> getEntries() {
+    public List<MenuEntry> getEntries() {
         return entries;
     }
 
 
     /**
-     * sets the entries/price list of the sale
+     * sets the list of the sale, where the entries have the sale price set
      * @param entries the entries list
      */
-    public void setEntries(Hashtable<MenuEntry, BigDecimal> entries) {
+    public void setEntries(List<MenuEntry> entries) {
         this.entries = entries;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Sale sale = (Sale) o;
+
+        if (identity != null ? !identity.equals(sale.identity) : sale.identity != null) return false;
+        if (name != null ? !name.equals(sale.name) : sale.name != null) return false;
+        return !(entries != null ? !entries.equals(sale.entries) : sale.entries != null);
     }
 }

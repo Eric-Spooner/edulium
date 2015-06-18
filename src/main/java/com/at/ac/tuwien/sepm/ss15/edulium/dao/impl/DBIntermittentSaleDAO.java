@@ -41,30 +41,11 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
 
         validator.validateForCreate(intermittentSale);
 
-        //Save Sale
-        final String saleQuery = "INSERT INTO Sale (name, deleted) VALUES (?, ?)";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery)) {
-            stmt.setString(1, intermittentSale.getName());
-            stmt.setBoolean(2, false);
-
-            stmt.executeUpdate();
-
-            ResultSet key = stmt.getGeneratedKeys();
-            if (key.next()) {
-                intermittentSale.setIdentity(key.getLong(1));
-            }
-            key.close();
-        } catch (SQLException e) {
-            LOGGER.error("Inserting sale into database failed", e);
-            throw new DAOException("Inserting sale into database failed", e);
-        }
-
-        updateSaleAssoc(intermittentSale, dataSource, LOGGER);
-        generateSaleHistory(intermittentSale, dataSource, LOGGER);
+        super.create(intermittentSale);
 
         //Save IntermittentSale
-        final String query = "INSERT INTO IntermittentSale (sale_ID, monday, tuesday, wednesday, thursday, friday, saturday, sunday, fromDayTime, duration, enabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        final String query = "INSERT INTO IntermittentSale (sale_ID, monday, tuesday, wednesday, thursday, friday, saturday, sunday, fromDayTime, duration, enabled) " +
+                             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, intermittentSale.getIdentity());
@@ -75,7 +56,7 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
             stmt.setBoolean(6, intermittentSale.getFriday());
             stmt.setBoolean(7, intermittentSale.getSaturday());
             stmt.setBoolean(8, intermittentSale.getSunday());
-            stmt.setTimestamp(9, Timestamp.valueOf(intermittentSale.getFromDayTime()));
+            stmt.setTime(9, Time.valueOf(intermittentSale.getFromDayTime()));
             stmt.setInt(10, intermittentSale.getDuration());
             stmt.setBoolean(11, intermittentSale.getEnabled());
 
@@ -94,27 +75,11 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
 
         validator.validateForUpdate(intermittentSale);
 
-        //Save Sale
-        final String saleQuery = "UPDATE Sale SET name = ? WHERE ID = ?";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery)) {
-            stmt.setString(1, intermittentSale.getName());
-            stmt.setLong(2, intermittentSale.getIdentity());
-
-            if (stmt.executeUpdate() == 0) {
-                LOGGER.error("Updating sale in database failed, sale not found");
-                throw new DAOException("Updating sale in database failed, sale not found");
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Updating sale in database failed", e);
-            throw new DAOException("Updating sale in database failed", e);
-        }
-
-        updateSaleAssoc(intermittentSale, dataSource, LOGGER);
-        generateSaleHistory(intermittentSale, dataSource, LOGGER);
+        super.update(intermittentSale);
 
         //Save IntermittentSale
-        final String query = "UPDATE IntermittentSale SET monday = ?, tuesday = ?, wednesday = ?, thursday = ?, friday = ?, saturday = ?, sunday = ?, fromDayTime = ?, duration = ?, enabled = ? WHERE sale_ID = ?";
+        final String query = "UPDATE IntermittentSale SET monday = ?, tuesday = ?, wednesday = ?, thursday = ?, friday = ?, " +
+                "saturday = ?, sunday = ?, fromDayTime = ?, duration = ?, enabled = ? WHERE sale_ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setBoolean(1, intermittentSale.getMonday());
@@ -124,7 +89,7 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
             stmt.setBoolean(5, intermittentSale.getFriday());
             stmt.setBoolean(6, intermittentSale.getSaturday());
             stmt.setBoolean(7, intermittentSale.getSunday());
-            stmt.setTimestamp(8, Timestamp.valueOf(intermittentSale.getFromDayTime()));
+            stmt.setTime(8, Time.valueOf(intermittentSale.getFromDayTime()));
             stmt.setInt(9, intermittentSale.getDuration());
             stmt.setBoolean(10, intermittentSale.getEnabled());
             stmt.setLong(11, intermittentSale.getIdentity());
@@ -147,24 +112,7 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
 
         validator.validateForDelete(intermittentSale);
 
-        //Delete Sale
-        final String saleQuery = "UPDATE Sale SET deleted = true WHERE ID = ?";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery)) {
-            stmt.setLong(1, intermittentSale.getIdentity());
-
-            if (stmt.executeUpdate() == 0) {
-                LOGGER.error("Deleting sale from database failed, sale not found");
-                throw new DAOException("Deleting sale from database failed, sale not found");
-            }
-        } catch (SQLException e) {
-            LOGGER.error("Deleting sale from database failed", e);
-            throw new DAOException("Deleting sale from database failed", e);
-        }
-
-        generateSaleHistory(intermittentSale, dataSource, LOGGER);
-
-        generateHistory(intermittentSale);
+        super.delete(intermittentSale);
     }
 
     @Override
@@ -186,7 +134,7 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
                 " AND fromDayTime = ISNULL(?, fromDayTime)"+
                 " AND duration = ISNULL(?, duration)"+
                 " AND enabled = ISNULL(?, enabled)"+
-                " AND EXISTS (SELECT * FROM Sale WHERE IntermittentSale.sale_ID = Sale.ID AND name = ISNULL(?, name))";
+                " AND EXISTS (SELECT * FROM Sale WHERE IntermittentSale.sale_ID = Sale.ID AND name = ISNULL(?, name) AND deleted = false)";
 
         final List<IntermittentSale> intermittentSales = new ArrayList<>();
 
@@ -199,17 +147,16 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
             stmt.setObject(6, intermittentSale.getFriday());
             stmt.setObject(7, intermittentSale.getSaturday());
             stmt.setObject(8, intermittentSale.getSunday());
-            stmt.setObject(9, intermittentSale.getFromDayTime()==null ? null : Timestamp.valueOf(intermittentSale.getFromDayTime()));
+            stmt.setObject(9, intermittentSale.getFromDayTime() == null ? null : Time.valueOf(intermittentSale.getFromDayTime()));
             stmt.setObject(10, intermittentSale.getDuration());
             stmt.setObject(11, intermittentSale.getEnabled());
             stmt.setObject(12, intermittentSale.getName());
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                IntermittentSale intermittentSaleFromResult = intermittentSaleFromResultSet(result);
-                if (addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO)){
-                    intermittentSales.add(intermittentSaleFromResult);
-                }
+                IntermittentSale sale = intermittentSaleFromResultSet(result);
+                setSaleParameters(sale);
+                intermittentSales.add(sale);
             }
         } catch (SQLException e) {
             LOGGER.error("Searching for intermittentSales failed", e);
@@ -223,17 +170,17 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
     public List<IntermittentSale> getAll() throws DAOException {
         LOGGER.debug("Entering getAll");
 
-        final String query = "SELECT * FROM IntermittentSale";
+        final String query = "SELECT * FROM IntermittentSale WHERE EXISTS (SELECT * FROM Sale WHERE IntermittentSale.sale_ID = Sale.ID AND deleted = false)";
 
         final List<IntermittentSale> intermittentSales = new ArrayList<>();
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             ResultSet result = stmt.executeQuery();
+
             while (result.next()) {
-                IntermittentSale intermittentSaleFromResult = intermittentSaleFromResultSet(result);
-                if (addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO)) {
-                    intermittentSales.add(intermittentSaleFromResult);
-                }
+                IntermittentSale sale = intermittentSaleFromResultSet(result);
+                setSaleParameters(sale);
+                intermittentSales.add(sale);
             }
         } catch (SQLException e) {
             LOGGER.error("Searching for all intermittentSales failed", e);
@@ -296,9 +243,9 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
-                IntermittentSale intermittentSaleFromResult = intermittentSaleFromResultSet(result);
-                addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO);
-                populatedIntermittentSales.add(intermittentSaleFromResult);
+                IntermittentSale intermittentSale = intermittentSaleFromResultSet(result);
+                setSaleParameters(intermittentSale);
+                populatedIntermittentSales.add(intermittentSale);
             }
         } catch (SQLException e) {
             LOGGER.error("Populating intermittentSales failed", e);
@@ -351,7 +298,7 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
         intermittentSale.setFriday(result.getBoolean("friday"));
         intermittentSale.setSaturday(result.getBoolean("saturday"));
         intermittentSale.setSunday(result.getBoolean("sunday"));
-        intermittentSale.setFromDayTime(result.getTimestamp("fromDayTime").toLocalDateTime());
+        intermittentSale.setFromDayTime(result.getTime("fromDayTime").toLocalTime());
         intermittentSale.setDuration(result.getInt("duration"));
         intermittentSale.setEnabled(result.getBoolean("enabled"));
         return intermittentSale;

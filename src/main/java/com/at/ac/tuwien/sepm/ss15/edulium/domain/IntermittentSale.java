@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /**
  * Domain object representing an intermittentSale
@@ -14,7 +15,7 @@ public class IntermittentSale extends Sale {
     private Boolean friday = null;
     private Boolean saturday = null;
     private Boolean sunday = null;
-    private LocalDateTime fromDayTime = null;
+    private LocalTime fromDayTime = null;
     private Integer duration = null;
     private Boolean enabled = null;
 
@@ -137,14 +138,14 @@ public class IntermittentSale extends Sale {
     /**
      * @return Returns the dateTime when the intermittentSale starts.
      */
-    public LocalDateTime getFromDayTime() {
+    public LocalTime getFromDayTime() {
         return fromDayTime;
     }
 
     /**
      * @param fromDayTime Sets the dateTime when the intermittentSale starts.
      */
-    public void setFromDayTime(LocalDateTime fromDayTime) {
+    public void setFromDayTime(LocalTime fromDayTime) {
         this.fromDayTime = fromDayTime;
     }
 
@@ -203,73 +204,16 @@ public class IntermittentSale extends Sale {
 
         IntermittentSale that = (IntermittentSale) o;
 
-        if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
-        if (enabled != null ? !enabled.equals(that.enabled) : that.enabled != null) return false;
-        if (friday != null ? !friday.equals(that.friday) : that.friday != null) return false;
-        if (fromDayTime==null) {
-            if (that.fromDayTime!=null) {
-                return false;
-            }
-        } else {
-            if (that.fromDayTime==null) {
-                return false;
-            } else {
-                if (fromDayTime.getHour() != that.fromDayTime.getHour()) {
-                    return false;
-                }
-                if (fromDayTime.getMinute() != that.fromDayTime.getMinute()) {
-                    return false;
-                }
-            }
-        }
         if (monday != null ? !monday.equals(that.monday) : that.monday != null) return false;
-        if (saturday != null ? !saturday.equals(that.saturday) : that.saturday != null) return false;
-        if (sunday != null ? !sunday.equals(that.sunday) : that.sunday != null) return false;
-        if (thursday != null ? !thursday.equals(that.thursday) : that.thursday != null) return false;
         if (tuesday != null ? !tuesday.equals(that.tuesday) : that.tuesday != null) return false;
         if (wednesday != null ? !wednesday.equals(that.wednesday) : that.wednesday != null) return false;
-        if (entries == null && that.entries != null) {
-            return false;
-        } else {
-            if (that.entries==null) {
-                return false;
-            }
-            boolean sameKeySet = true;
-            if (entries.keySet().size() != that.entries.keySet().size()) {
-                sameKeySet = false;
-            } else {
-                for (MenuEntry e : entries.keySet()) {
-                    boolean equality = false;
-                    for (MenuEntry e2 : that.entries.keySet()) {
-                        if (e.equals(e2)) {
-                            equality = true;
-                        }
-                    }
-                    if (!equality) {
-                        sameKeySet=false;
-                    }
-                }
-            }
-            if (sameKeySet) {
-                for (MenuEntry e : entries.keySet()) {
-                    MenuEntry e2 = null;
-                    for (MenuEntry et : that.entries.keySet()) {
-                        if (e.equals(et)) {
-                            e2 = et;
-                        }
-                    }
-                    if (entries.get(e).compareTo(that.entries.get(e2)) != 0) {
-                        return false;
-                    }
-                }
-            } else {
-                return false;
-            }
-        }
-        if (identity != null ? !identity.equals(that.identity) : that.identity != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-
-        return true;
+        if (thursday != null ? !thursday.equals(that.thursday) : that.thursday != null) return false;
+        if (friday != null ? !friday.equals(that.friday) : that.friday != null) return false;
+        if (saturday != null ? !saturday.equals(that.saturday) : that.saturday != null) return false;
+        if (sunday != null ? !sunday.equals(that.sunday) : that.sunday != null) return false;
+        if (fromDayTime != null ? !fromDayTime.equals(that.fromDayTime) : that.fromDayTime != null) return false;
+        if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
+        return !(enabled != null ? !enabled.equals(that.enabled) : that.enabled != null);
     }
 
     @Override

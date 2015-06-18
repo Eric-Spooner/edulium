@@ -52,15 +52,19 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         return entry;
     }
 
-    private Hashtable<MenuEntry, BigDecimal> createRandomEntries() throws ValidationException, DAOException {
-        MenuEntry entry = createMenuEntry(new Long((int)(Math.random()*999999999)),"entry", "desc", "cat", 20, 0.2, true);
-        BigDecimal bigDecimal = new BigDecimal(10);
-        Hashtable<MenuEntry, BigDecimal> hashtable = new Hashtable<>();
-        hashtable.put(entry, bigDecimal);
-        return hashtable;
+    private List<MenuEntry> createRandomEntries() throws ValidationException, DAOException {
+        int count = 1 + (int) Math.random() * 10;
+        List<MenuEntry> entries = new ArrayList();
+
+        for(int i = 0; i < count; i++) {
+            MenuEntry entry = createMenuEntry(Long.valueOf((long)Math.random() * 99), "entry", "desc", "cat", 20, 0.2, true);
+            entries.add(entry);
+        }
+
+        return entries;
     }
 
-    private OnetimeSale createOnetimeSale(Long identity, String name, LocalDateTime fromTime, LocalDateTime toTime, Hashtable<MenuEntry, BigDecimal> entries) {
+    private OnetimeSale createOnetimeSale(Long identity, String name, LocalDateTime fromTime, LocalDateTime toTime, List<MenuEntry> entries) {
         OnetimeSale onetimeSale = new OnetimeSale();
         onetimeSale.setIdentity(identity);
         onetimeSale.setName(name);
