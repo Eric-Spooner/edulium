@@ -56,6 +56,8 @@ public class ReservationOverviewController implements Initializable, Controller 
     @FXML
     private Button btnClearDate;
 
+    private AlertPopOver cancelPopOver;
+
     @Autowired
     private TaskScheduler taskScheduler;
     @FXML
@@ -126,6 +128,41 @@ public class ReservationOverviewController implements Initializable, Controller 
             }
         });
 
+        initializeFiltering();
+        initializeCancelPopOver();
+
+        btnClearDate.setOnAction(event -> datePickerFilter.setValue(null));
+        lvReservations.setItems(filteredReservations);
+        lvReservations.setCellFactory(param -> new ReservationListCell());
+    }
+
+    public void setOnBackButtonAction(EventHandler<ActionEvent> event) {
+        btnBack.setOnAction(event);
+    }
+
+    public void setOnEditConsumer(Consumer<Reservation> consumer) {
+        editConsumer = consumer;
+    }
+
+    public void setOnAddButtonAction(EventHandler<ActionEvent> event) {
+        btnAdd.setOnAction(event);
+    }
+
+    @FXML
+    public void on_btnEdit_clicked() {
+        editConsumer.accept(lvReservations.getSelectionModel().getSelectedItem());
+    }
+
+    @FXML
+    public void on_btnDelete_clicked() {
+        if(cancelPopOver.isShowing()) {
+            cancelPopOver.hide();
+        } else {
+            cancelPopOver.show(btnDelete);
+        }
+    }
+
+    private void initializeFiltering() {
         filteredReservations = new FilteredList<>(reservations);
 
         Predicate<Reservation> filterPredicate = new Predicate<Reservation>() {
@@ -160,37 +197,24 @@ public class ReservationOverviewController implements Initializable, Controller 
             btnEdit.setDisable(disable);
             btnDelete.setDisable(disable);
         });
-
-        btnClearDate.setOnAction(event -> datePickerFilter.setValue(null));
-
-        lvReservations.setItems(filteredReservations);
-        lvReservations.setCellFactory(param -> new ReservationListCell());
     }
 
-    public void setOnBackButtonAction(EventHandler<ActionEvent> event) {
-        btnBack.setOnAction(event);
-    }
+    private void initializeCancelPopOver() {
+        cancelPopOver = new AlertPopOver();
+        cancelPopOver.getLabel().setText("Do you really want to cancel\nthe current changes?");
+        cancelPopOver.getOkButton().setText("Yes");
+        cancelPopOver.getCancelButton().setText("No");
 
-    public void setOnEditConsumer(Consumer<Reservation> consumer) {
-        editConsumer = consumer;
-    }
+        cancelPopOver.getOkButton().setOnAction(event -> {
+            cancelPopOver.hide();
+            try {
+                reservationService.cancelReservation(lvReservations.getSelectionModel().getSelectedItem());
+            } catch (ServiceException | ValidationException e) {
+                displayErrorMessage("error cancelling reservation", e);
+            }
+        });
 
-    public void setOnAddButtonAction(EventHandler<ActionEvent> event) {
-        btnAdd.setOnAction(event);
-    }
-
-    @FXML
-    public void on_btnEdit_clicked() {
-        editConsumer.accept(lvReservations.getSelectionModel().getSelectedItem());
-    }
-
-    @FXML
-    public void on_btnDelete_clicked() {
-        try {
-            reservationService.cancelReservation(lvReservations.getSelectionModel().getSelectedItem());
-        } catch (ServiceException | ValidationException e) {
-            displayErrorMessage("error cancelling reservation", e);
-        }
+        cancelPopOver.getCancelButton().setOnAction(event -> cancelPopOver.hide());
     }
 
     private void displayErrorMessage(String message, Exception e) {

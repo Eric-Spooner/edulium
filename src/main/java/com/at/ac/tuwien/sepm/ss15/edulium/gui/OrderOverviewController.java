@@ -99,7 +99,7 @@ public class OrderOverviewController implements Initializable, Controller {
     @Resource(name = "orderInputPane")
     private FXMLPane orderInputPane;
 
-    private PopOver cancelPopOver;
+    private AlertPopOver cancelPopOver;
     private PopOver moveToTablePopOver;
     private PopOver newOrderPopOver;
 
@@ -193,12 +193,12 @@ public class OrderOverviewController implements Initializable, Controller {
     }
 
     private void initializeCancelPopOver() {
-        Label cancelLabel = new Label();
-        cancelLabel.setText("Do you really want to cancel\nthe selected orders?");
+        cancelPopOver = new AlertPopOver();
+        cancelPopOver.getLabel().setText("Do you really want to cancel\nthe selected orders?");
+        cancelPopOver.getOkButton().setText("Yes");
+        cancelPopOver.getCancelButton().setText("No");
 
-        Button yesButton = new Button();
-        yesButton.setText("Yes");
-        yesButton.setOnAction(action -> {
+        cancelPopOver.getOkButton().setOnAction(action -> {
             try {
                 for (Order order : queuedOrdersView.getSelectionModel().getSelectedItems()) {
                     orderService.cancelOrder(order);
@@ -217,25 +217,7 @@ public class OrderOverviewController implements Initializable, Controller {
             }
         });
 
-        Button noButton = new Button();
-        noButton.setText("No");
-        noButton.setOnAction(action -> cancelPopOver.hide());
-
-        HBox buttonLayout = new HBox();
-        buttonLayout.setAlignment(Pos.TOP_CENTER);
-        buttonLayout.setSpacing(5);
-        buttonLayout.getChildren().setAll(yesButton, noButton);
-
-        VBox layout = new VBox();
-        layout.setSpacing(5);
-        layout.setStyle("-fx-font-size: 18px; -fx-padding: 10px;");
-        layout.getChildren().setAll(cancelLabel, buttonLayout);
-
-        cancelPopOver = new PopOver(layout);
-        cancelPopOver.setHideOnEscape(true);
-        cancelPopOver.setAutoHide(true);
-        cancelPopOver.setDetachable(false);
-        cancelPopOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_LEFT);
+        cancelPopOver.getCancelButton().setOnAction(action -> cancelPopOver.hide());
     }
 
     private void initializeMoveToTablePopOver() {

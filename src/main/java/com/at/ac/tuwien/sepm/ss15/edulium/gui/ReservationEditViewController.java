@@ -54,6 +54,8 @@ public class ReservationEditViewController implements Initializable, Controller 
     @FXML
     private Label lblSeats;
 
+    private AlertPopOver cancelPopOver;
+
     @Autowired
     private ReservationService reservationService;
 
@@ -127,6 +129,8 @@ public class ReservationEditViewController implements Initializable, Controller 
 
         tfHour.setMinMax(0, 24);
         tfMinute.setMinMax(0, 60);
+
+        initializeCancelPopOver();
     }
 
     public void setReservation(Reservation reservation) {
@@ -194,7 +198,25 @@ public class ReservationEditViewController implements Initializable, Controller 
 
     @FXML
     public void on_btnCancel_clicked() {
-        onCanceledConsumer.accept(reservation);
+        if(cancelPopOver.isShowing()) {
+            cancelPopOver.hide();
+        } else {
+            cancelPopOver.show(btnCancel);
+        }
+    }
+
+    private void initializeCancelPopOver() {
+        cancelPopOver= new AlertPopOver();
+        cancelPopOver.getLabel().setText("Do you really want to cancel\nthe current changes?");
+        cancelPopOver.getOkButton().setText("Yes");
+        cancelPopOver.getCancelButton().setText("No");
+
+        cancelPopOver.getOkButton().setOnAction(event -> {
+            cancelPopOver.hide();
+            onCanceledConsumer.accept(reservation);
+        });
+
+        cancelPopOver.getCancelButton().setOnAction(event -> cancelPopOver.hide());
     }
 
     private void setReservationData() {
