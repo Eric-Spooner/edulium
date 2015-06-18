@@ -51,10 +51,7 @@ public class MenuCategory {
 
     @Override
     public String toString() {
-        return "MenuCategory{" +
-                "identity=" + identity +
-                ", name='" + name + '\'' +
-                '}';
+        return name;
     }
 
     @Override
