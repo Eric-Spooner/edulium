@@ -15,6 +15,7 @@ import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.CheckListView;
+import sun.awt.image.ImageWatched;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -36,8 +37,11 @@ public class DialogCookViewCategories implements Initializable {
     private static MenuService menuService;
 
     @FXML
-    CheckListView<MenuCategory> listMenuCats;
+    private CheckListView<MenuCategory> listMenuCats;
 
+    public static void setCheckedCategories(LinkedList<MenuCategory> checkedCategories) {
+        DialogCookViewCategories.checkedCategories = checkedCategories;
+    }
     public static void setThisStage(Stage thisStage) {
         DialogCookViewCategories.thisStage = thisStage;
     }
