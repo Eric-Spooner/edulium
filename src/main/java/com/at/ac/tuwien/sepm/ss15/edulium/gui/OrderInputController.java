@@ -143,7 +143,7 @@ public class OrderInputController  implements Initializable, Controller {
         initializeControllers();
         initializeOrdersView();
 
-        showScreen(ScreenType.MenuCategoryScreen);
+        reset();
     }
 
     private void initializeControllers() {
@@ -193,6 +193,14 @@ public class OrderInputController  implements Initializable, Controller {
     }
 
     private void initializeHeaderButtons() {
+        // disable order button if there are no orders
+        orders.addListener(new MapChangeListener<Order, Integer>() {
+            @Override
+            public void onChanged(Change<? extends Order, ? extends Integer> change) {
+                orderButton.setDisable(orders.isEmpty());
+            }
+        });
+
         menuCategoryScreenButton = new ToggleButton();
         menuCategoryScreenButton.setText("Categories");
         menuCategoryScreenButton.setMinHeight(33);
@@ -291,6 +299,7 @@ public class OrderInputController  implements Initializable, Controller {
 
     private void reset() {
         showScreen(ScreenType.MenuCategoryScreen);
+        orderButton.setDisable(true);
         orders.clear();
     }
 
