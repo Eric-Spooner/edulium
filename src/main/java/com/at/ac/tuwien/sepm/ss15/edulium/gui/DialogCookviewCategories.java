@@ -18,6 +18,7 @@ import org.controlsfx.control.CheckListView;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.ResourceBundle;
 
 import static javafx.collections.FXCollections.observableArrayList;
@@ -30,7 +31,7 @@ public class DialogCookViewCategories implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(DialogCookViewCategories.class);
 
     private static Stage thisStage;
-    private static ArrayList<MenuCategory> checkedCategories;
+    private static LinkedList<MenuCategory> checkedCategories;
     private ObservableList<MenuCategory> menuCategories;
     private static MenuService menuService;
 
@@ -43,7 +44,6 @@ public class DialogCookViewCategories implements Initializable {
     public static void setMenuService(MenuService menuService) {
         DialogCookViewCategories.menuService = menuService;
     }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
@@ -51,7 +51,8 @@ public class DialogCookViewCategories implements Initializable {
             listMenuCats.setItems(menuCategories);
             listMenuCats.getCheckModel().getCheckedItems().addListener(new ListChangeListener<MenuCategory>() {
                 public void onChanged(ListChangeListener.Change<? extends MenuCategory> c) {
-                    System.out.println(listMenuCats.getCheckModel().getCheckedItems());
+                    checkedCategories.clear();
+                    checkedCategories.addAll(listMenuCats.getCheckModel().getCheckedItems());
                 }
             });
         }catch (Exception e){
