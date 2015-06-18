@@ -1,5 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Component;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -84,9 +86,17 @@ public class CookViewController implements Initializable, Controller {
     private PollingList<Order> ordersQueued;
     private PollingList<Order> ordersInProgress;
     private PollingList<Order> ordersReadyForDelivery;
+    private List<MenuCategory> checkedCategories;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        try {
+            checkedCategories = menuService.getAllMenuCategories();
+        }catch (ServiceException e ){
+            LOGGER.error("Getting all MenuCategories has failed", e);
+        }
+
+
         // queued
         ordersQueued = new PollingList<>(taskScheduler);
         ordersQueued.setInterval(1000);
@@ -272,32 +282,14 @@ public class CookViewController implements Initializable, Controller {
         try {
             Stage stage = new Stage();
             stage.setTitle("Menu Categories");
-            DialogCookViewCategories.setThisStage(stage);
-            DialogCookViewCategories.setMenuService(menuService);
+            DialogCookviewCategories.setCheckedCategories(checkedCategories);
+            DialogCookviewCategories.setThisStage(stage);
+            DialogCookviewCategories.setMenuService(menuService);
             AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogCookViewMenCat.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
-            ordersQueued.setSupplier(new Supplier<List<Order>>() {
-                @Override
-                public List<Order> get() {
-                    try {
-                        Order matcher = new Order();
-                        matcher.setState(Order.State.QUEUED);
-                        LinkedList<Order> orders = new LinkedList<Order>();
-                        for(Order order: orderService.findOrder(matcher)){
-                            if(DialogCookViewCategories.getCheckedCategories().contains(order.getMenuEntry().getCategory())){
-                                orders.add(order);
-                            };
-                        }
-                        return orders;
-                    } catch (ServiceException e) {
-                        LOGGER.error("Getting all queued orders via order supplier has failed", e);
-                        return null;
-                    }
-                }
-            });
-
+            checkedCategories = DialogCookviewCategories.getCheckedCategories();
         }catch (Exception e){
             LOGGER.error("Open the Cook View Menu Categories selection Dialog failed", e);
             ManagerViewController.showErrorDialog("Error", "Cook View open Menu Categories Error", "Open the Cook View Menu Categories selection Dialog failed \n"  + e.toString());

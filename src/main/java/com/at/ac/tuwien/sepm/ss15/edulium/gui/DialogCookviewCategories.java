@@ -7,23 +7,17 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.CheckListView;
-import sun.awt.image.ImageWatched;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static javafx.collections.FXCollections.observableArrayList;
-import static javafx.collections.FXCollections.observableList;
 
 /**
  * Dialog Controller Cook View Categories
@@ -32,14 +26,14 @@ public class DialogCookviewCategories implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(DialogCookviewCategories.class);
 
     private static Stage thisStage;
-    private static LinkedList<MenuCategory> checkedCategories;
+    private static List<MenuCategory> checkedCategories;
     private static ObservableList<MenuCategory> menuCategories;
     private static MenuService menuService;
 
     @FXML
     private CheckListView<MenuCategory> listMenuCats;
 
-    public static void setCheckedCategories(LinkedList<MenuCategory> checkedCategories) {
+    public static void setCheckedCategories(List<MenuCategory> checkedCategories) {
         DialogCookviewCategories.checkedCategories = checkedCategories;
     }
     public static void setThisStage(Stage thisStage) {
@@ -48,7 +42,7 @@ public class DialogCookviewCategories implements Initializable {
     public static void setMenuService(MenuService menuService) {
         DialogCookviewCategories.menuService = menuService;
     }
-    public static LinkedList<MenuCategory> getCheckedCategories() {
+    public static List<MenuCategory> getCheckedCategories() {
         return checkedCategories;
     }
     @Override
