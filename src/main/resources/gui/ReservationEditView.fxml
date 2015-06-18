@@ -18,14 +18,9 @@
    <top>
       <HBox prefHeight="50.0" prefWidth="200.0" BorderPane.alignment="CENTER" spacing="20.0">
          <children>
-            <Button fx:id="btnSave" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnSave_clicked" prefHeight="40.0" prefWidth="75.0" text="Save" >
+            <Button fx:id="btnSave" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnSave_clicked" prefHeight="40.0" prefWidth="80.0" text="Save" >
                <font>
                   <Font size="18.0" />
-               </font>
-            </Button>
-            <Button fx:id="btnAutoCreate" layoutX="348.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_autoCreate_clicked" prefHeight="40.0" prefWidth="120.0" text="Auto-Create" >
-               <font>
-                  <Font size="16.0" />
                </font>
             </Button>
             <Button fx:id="btnCancel" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnCancel_clicked" prefHeight="40.0" prefWidth="120.0" text="Cancel" >
