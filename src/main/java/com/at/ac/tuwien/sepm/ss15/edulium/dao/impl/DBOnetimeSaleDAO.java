@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * H2 Database Implementation of the OnetimeSaleDAO interface
  */
-class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
+class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
     private static final Logger LOGGER = LogManager.getLogger(DBOnetimeSaleDAO.class);
 
     @Autowired
@@ -33,7 +33,6 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
     private DAO<MenuEntry> menuEntryDAO;
     @Autowired
     private Validator<OnetimeSale> validator;
-
 
     @Override
     public void create(OnetimeSale onetimeSale) throws DAOException, ValidationException {
@@ -59,8 +58,8 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
             throw new DAOException("Inserting sale into database failed", e);
         }
 
-        DBAbstractSaleDAO.updateSaleAssoc(onetimeSale, dataSource, LOGGER);
-        DBAbstractSaleDAO.generateSaleHistory(onetimeSale, dataSource, LOGGER);
+        updateSaleAssoc(onetimeSale, dataSource, LOGGER);
+        generateSaleHistory(onetimeSale, dataSource, LOGGER);
 
         //Create OnetimeSale
         final String query = "INSERT INTO OnetimeSale (sale_ID, fromTime, toTime) VALUES (?, ?, ?)";
@@ -101,8 +100,8 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
             throw new DAOException("Updating sale in database failed", e);
         }
 
-        DBAbstractSaleDAO.updateSaleAssoc(onetimeSale, dataSource, LOGGER);
-        DBAbstractSaleDAO.generateSaleHistory(onetimeSale, dataSource, LOGGER);
+        updateSaleAssoc(onetimeSale, dataSource, LOGGER);
+        generateSaleHistory(onetimeSale, dataSource, LOGGER);
 
         //Update OnetimeSale
         final String query = "UPDATE OnetimeSale SET fromTime = ?, toTime = ? WHERE sale_ID = ?";
@@ -145,7 +144,7 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
             throw new DAOException("Deleting sale from database failed", e);
         }
 
-        DBAbstractSaleDAO.generateSaleHistory(onetimeSale, dataSource, LOGGER);
+        generateSaleHistory(onetimeSale, dataSource, LOGGER);
 
         generateHistory(onetimeSale);
     }
@@ -174,7 +173,7 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
-                if (DBAbstractSaleDAO.addNameToSale(onetimeSaleFromResult, dataSource, menuEntryDAO)) {
+                if (addNameToSale(onetimeSaleFromResult, dataSource, menuEntryDAO)) {
                     onetimeSales.add(onetimeSaleFromResult);
                 }
             }
@@ -198,7 +197,7 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
-                boolean notDeleted = DBAbstractSaleDAO.addNameToSale(onetimeSaleFromResult, dataSource, menuEntryDAO);
+                boolean notDeleted = addNameToSale(onetimeSaleFromResult, dataSource, menuEntryDAO);
                 if (notDeleted){
                     onetimeSales.add(onetimeSaleFromResult);
                 }
@@ -264,7 +263,7 @@ class DBOnetimeSaleDAO implements DAO<OnetimeSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
-                DBAbstractSaleDAO.addNameToSale(onetimeSaleFromResult, dataSource, menuEntryDAO);
+                addNameToSale(onetimeSaleFromResult, dataSource, menuEntryDAO);
                 populatedOnetimeSales.add(onetimeSaleFromResult);
             }
         } catch (SQLException e) {

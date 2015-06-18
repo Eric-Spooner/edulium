@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
 import org.apache.logging.log4j.Logger;
@@ -18,7 +19,7 @@ import java.util.List;
 /**
  * This is a helper class for the H2 Database implementations DBIntermittentSaleDAO and DBOnetimeSaleDAO
  */
-public class DBAbstractSaleDAO {
+abstract class DBAbstractSaleDAO<T> implements DAO<T> {
     /**
      * This function is used, to update/create Sale Assoc Entries
      * All SaleAssoc with the SaleID are disabled, the one, which are used are enabled again and the rest is added
@@ -26,7 +27,7 @@ public class DBAbstractSaleDAO {
      *
      * @param sale Sale Is used to identify the SaleAssoc
      */
-    public static void updateSaleAssoc(Sale sale, DataSource dataSource, Logger LOGGER) throws DAOException {
+    public void updateSaleAssoc(Sale sale, DataSource dataSource, Logger LOGGER) throws DAOException {
         // At first, look if the
         // disable all SaleAssoc for now, the update sql query will re-enable all valid
         // associations
@@ -65,7 +66,7 @@ public class DBAbstractSaleDAO {
      * @param sale updated dataset
      * @throws DAOException if an error accessing the database occurred
      */
-    public static void generateSaleHistory(Sale sale, DataSource dataSource, Logger LOGGER) throws DAOException {
+    public void generateSaleHistory(Sale sale, DataSource dataSource, Logger LOGGER) throws DAOException {
         LOGGER.debug("Entering generateHistory with parameters: " + sale);
 
         final String query = "INSERT INTO SaleHistory " +
@@ -91,7 +92,7 @@ public class DBAbstractSaleDAO {
      * @throws SQLException if an error accessing the database occurred
      * @return true if the Sale was not deleted yet.
      */
-    public static boolean addNameToSale(Sale sale, DataSource dataSource, DAO<MenuEntry> menuEntryDAO) throws SQLException, DAOException {
+    public boolean addNameToSale(Sale sale, DataSource dataSource, DAO<MenuEntry> menuEntryDAO) throws SQLException, DAOException {
         // Get name
         final String saleQuery = "SELECT * FROM Sale WHERE ID = ?";
         PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery);

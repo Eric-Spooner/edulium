@@ -4,6 +4,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 /**
  * H2 Database Implementation of the IntermittentSaleDAO interface
  */
-class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
+class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
     private static final Logger LOGGER = LogManager.getLogger(DBIntermittentSaleDAO.class);
 
     @Autowired
@@ -33,7 +34,6 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
     private DAO<MenuEntry> menuEntryDAO;
     @Autowired
     private Validator<IntermittentSale> validator;
-
 
     @Override
     public void create(IntermittentSale intermittentSale) throws DAOException, ValidationException {
@@ -60,8 +60,8 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             throw new DAOException("Inserting sale into database failed", e);
         }
 
-        DBAbstractSaleDAO.updateSaleAssoc(intermittentSale, dataSource, LOGGER);
-        DBAbstractSaleDAO.generateSaleHistory(intermittentSale, dataSource, LOGGER);
+        updateSaleAssoc(intermittentSale, dataSource, LOGGER);
+        generateSaleHistory(intermittentSale, dataSource, LOGGER);
 
         //Save IntermittentSale
         final String query = "INSERT INTO IntermittentSale (sale_ID, monday, tuesday, wednesday, thursday, friday, saturday, sunday, fromDayTime, duration, enabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -110,8 +110,8 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             throw new DAOException("Updating sale in database failed", e);
         }
 
-        DBAbstractSaleDAO.updateSaleAssoc(intermittentSale, dataSource, LOGGER);
-        DBAbstractSaleDAO.generateSaleHistory(intermittentSale, dataSource, LOGGER);
+        updateSaleAssoc(intermittentSale, dataSource, LOGGER);
+        generateSaleHistory(intermittentSale, dataSource, LOGGER);
 
         //Save IntermittentSale
         final String query = "UPDATE IntermittentSale SET monday = ?, tuesday = ?, wednesday = ?, thursday = ?, friday = ?, saturday = ?, sunday = ?, fromDayTime = ?, duration = ?, enabled = ? WHERE sale_ID = ?";
@@ -162,7 +162,7 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             throw new DAOException("Deleting sale from database failed", e);
         }
 
-        DBAbstractSaleDAO.generateSaleHistory(intermittentSale, dataSource, LOGGER);
+        generateSaleHistory(intermittentSale, dataSource, LOGGER);
 
         generateHistory(intermittentSale);
     }
@@ -207,7 +207,7 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 IntermittentSale intermittentSaleFromResult = intermittentSaleFromResultSet(result);
-                if (DBAbstractSaleDAO.addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO)){
+                if (addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO)){
                     intermittentSales.add(intermittentSaleFromResult);
                 }
             }
@@ -231,7 +231,7 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 IntermittentSale intermittentSaleFromResult = intermittentSaleFromResultSet(result);
-                if (DBAbstractSaleDAO.addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO)) {
+                if (addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO)) {
                     intermittentSales.add(intermittentSaleFromResult);
                 }
             }
@@ -297,7 +297,7 @@ class DBIntermittentSaleDAO implements DAO<IntermittentSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 IntermittentSale intermittentSaleFromResult = intermittentSaleFromResultSet(result);
-                DBAbstractSaleDAO.addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO);
+                addNameToSale(intermittentSaleFromResult, dataSource, menuEntryDAO);
                 populatedIntermittentSales.add(intermittentSaleFromResult);
             }
         } catch (SQLException e) {
