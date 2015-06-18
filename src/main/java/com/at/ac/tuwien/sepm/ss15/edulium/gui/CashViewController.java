@@ -15,12 +15,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.TaskScheduler;
 
+import java.math.BigDecimal;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -46,11 +45,20 @@ public class CashViewController implements Initializable, Controller {
     private TableView<Order> tableViewOrders;
     @FXML
     private TableColumn<Order, String> tableColOrdersName;
+    @FXML
+    private TableColumn<Order, String> tableColOrdersPrice;
 
     @FXML
     private TableView<Order> tableViewInvoice;
     @FXML
     private TableColumn<Order, String> tableColInvoiceName;
+    @FXML
+    private TableColumn<Order, String> tableColInvoicePrice;
+
+    @FXML
+    private Text ordersLb;
+    @FXML
+    private Label totalLb;
 
     @Autowired
     private MenuService menuService;
@@ -79,14 +87,19 @@ public class CashViewController implements Initializable, Controller {
             LOGGER.error("Could not retrieve orders", e);
         }
 
+        ordersLb.setText(ordersLb.getText() + " TABLE " + selectedTable.getNumber());
+        totalLb.setText(" 0.00");
+
         tableViewInvoice.setStyle("-fx-font-size: 18px;");
         tableViewOrders.setStyle("-fx-font-size: 18px;");
 
         tableViewOrders.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         tableColOrdersName.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getMenuEntry().getName()));
+        tableColOrdersPrice.setCellValueFactory(p -> new SimpleStringProperty(String.valueOf(p.getValue().getMenuEntry().getPrice())));
 
         tableViewInvoice.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         tableColInvoiceName.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getMenuEntry().getName()));
+        tableColInvoicePrice.setCellValueFactory(p -> new SimpleStringProperty(String.valueOf(p.getValue().getMenuEntry().getPrice())));
     }
 
     public void btnToInvoiceClicked(ActionEvent actionEvent) {
@@ -104,6 +117,7 @@ public class CashViewController implements Initializable, Controller {
             tableViewInvoice.setItems(FXCollections.observableArrayList(orderList));
             tableViewOrders.setItems(FXCollections.observableArrayList(removeList));
         }
+        setTotalPrice();
     }
 
     public void btnAllToInvoiceClicked(ActionEvent event) {
@@ -116,6 +130,7 @@ public class CashViewController implements Initializable, Controller {
         orderList.addAll(tableViewInvoice.getItems());
         tableViewInvoice.setItems(FXCollections.observableArrayList(orderList));
         tableViewOrders.setItems(FXCollections.observableArrayList(removeList));
+        setTotalPrice();
     }
 
     public void btnToOrdersClicked(ActionEvent actionEvent) {
@@ -133,7 +148,7 @@ public class CashViewController implements Initializable, Controller {
             tableViewOrders.setItems(FXCollections.observableArrayList(orderList));
             tableViewInvoice.setItems(FXCollections.observableArrayList(removeList));
         }
-
+        setTotalPrice();
     }
 
     public void btnOKClicked(ActionEvent event) {
@@ -142,6 +157,19 @@ public class CashViewController implements Initializable, Controller {
 
     public static void setSelectedTable(Table table) {
         CashViewController.selectedTable = table;
+    }
+
+    private void setTotalPrice() {
+        BigDecimal total = new BigDecimal(0);
+
+        for (Order order : tableViewInvoice.getItems()) {
+            total = total.add(order.getMenuEntry().getPrice());
+        }
+
+        if(total.equals(0))
+            totalLb.setText(" 0.00");
+        else
+            totalLb.setText(" "+String.valueOf(total));
     }
 
     @Override
