@@ -2,10 +2,12 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.ImmutableDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Instalment;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ImmutableValidator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.junit.Before;
@@ -33,11 +35,11 @@ public class TestInvoiceService extends AbstractServiceTest {
     @Mock
     private DAO<Invoice> invoiceDAO;
     @Mock
-    private DAO<Instalment> instalmentDAO;
+    private ImmutableDAO<Instalment> instalmentDAO;
     @Mock
     private Validator<Invoice> invoiceValidator;
     @Mock
-    private Validator<Instalment> instalmentValidator;
+    private ImmutableValidator<Instalment> instalmentValidator;
 
     private User creator1;
     private User creator2;
@@ -67,6 +69,8 @@ public class TestInvoiceService extends AbstractServiceTest {
         MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(getTargetObject(invoiceService), "invoiceDAO", invoiceDAO);
         ReflectionTestUtils.setField(getTargetObject(invoiceService), "invoiceValidator", invoiceValidator);
+        ReflectionTestUtils.setField(getTargetObject(invoiceService), "instalmentDAO", instalmentDAO);
+        ReflectionTestUtils.setField(getTargetObject(invoiceService), "instalmentValidator", instalmentValidator);
     }
 
     @Test
@@ -713,6 +717,7 @@ public class TestInvoiceService extends AbstractServiceTest {
     public void testAddInstalment_shouldAddInstalment() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         Invoice invoice = new Invoice();
+        invoice.setIdentity(1L);
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
