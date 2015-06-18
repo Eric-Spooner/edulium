@@ -1,26 +1,21 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.controlsfx.control.CheckListView;
 
-import java.awt.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -36,11 +31,11 @@ public class DialogCookViewCategories implements Initializable {
 
     private static Stage thisStage;
     private static ArrayList<MenuCategory> checkedCategories;
-    private ObservableList<MenuCategory> observableList;
+    private ObservableList<MenuCategory> menuCategories;
     private static MenuService menuService;
 
     @FXML
-    ListView<MenuCategory> listMenuCats;
+    CheckListView<MenuCategory> listMenuCats;
 
     public static void setThisStage(Stage thisStage) {
         DialogCookViewCategories.thisStage = thisStage;
@@ -49,41 +44,16 @@ public class DialogCookViewCategories implements Initializable {
         DialogCookViewCategories.menuService = menuService;
     }
 
-    private class MenuCategoryCheckCell extends ListCell<MenuCategory> {
-        private CheckBox checkbox = new CheckBox();
-        private MenuCategory menuCategory = null;
-
-        public MenuCategoryCheckCell() {
-            checkbox.setText(menuCategory.getName());
-            setGraphic(checkbox);
-        }
-    }
-
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            observableList = observableArrayList(menuService.getAllMenuCategories());
-            listMenuCats.setItems(observableList);
-            listMenuCats.setCellFactory(new Callback<ListView<MenuCategory>, ListCell<MenuCategory>>(){
-
-                @Override
-                public ListCell<MenuCategory> call(ListView<MenuCategory> p) {
-
-                    ListCell<MenuCategory> cell = new ListCell<MenuCategory>(){
-                        @Override
-                        protected void updateItem(MenuCategory t, boolean bln) {
-                            super.updateItem(t, bln);
-                            if (t != null) {
-                                setText(t.getName());
-                            }
-                        }
-                    };
-
-                    return cell;
+            menuCategories = observableArrayList(menuService.getAllMenuCategories());
+            listMenuCats.setItems(menuCategories);
+            listMenuCats.getCheckModel().getCheckedItems().addListener(new ListChangeListener<MenuCategory>() {
+                public void onChanged(ListChangeListener.Change<? extends MenuCategory> c) {
+                    System.out.println(listMenuCats.getCheckModel().getCheckedItems());
                 }
             });
-
         }catch (Exception e){
             LOGGER.error("Cook View Dialog initialize failed" + e);
         }
