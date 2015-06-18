@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * Abstract domain object representing a Sale
@@ -10,7 +11,7 @@ import java.util.Hashtable;
 public abstract class Sale {
     protected Long identity = null;
     protected String name = null;
-    protected Hashtable<MenuEntry, BigDecimal> entries = null;
+    protected List<MenuEntry> entries = null;
 
     /**
      * @return the identity of the sale (can be null)
@@ -54,7 +55,7 @@ public abstract class Sale {
      *
      * @return the entries of the sale with the new price
      */
-    public Hashtable<MenuEntry, BigDecimal> getEntries() {
+    public List<MenuEntry> getEntries() {
         return entries;
     }
 
@@ -63,7 +64,7 @@ public abstract class Sale {
      * sets the entries/price list of the sale
      * @param entries the entries list
      */
-    public void setEntries(Hashtable<MenuEntry, BigDecimal> entries) {
+    public void setEntries(List<MenuEntry> entries) {
         this.entries = entries;
     }
 }

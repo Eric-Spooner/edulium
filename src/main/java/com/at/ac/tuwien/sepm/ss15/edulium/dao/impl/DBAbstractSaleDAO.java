@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -46,10 +47,10 @@ public class DBAbstractSaleDAO {
                         "KEY (sale_ID, menuEntry_ID) VALUES (?, ?, ?, false)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryUpdateSaleAssoc)) {
-            for (MenuEntry entry : sale.getEntries().keySet()) {
+            for (MenuEntry entry : sale.getEntries()) {
                 stmt.setLong(1, sale.getIdentity());
                 stmt.setLong(2, entry.getIdentity());
-                stmt.setBigDecimal(3, sale.getEntries().get(entry));
+                stmt.setBigDecimal(3, entry.getPrice());
                 stmt.addBatch();
             }
             stmt.executeBatch();
@@ -107,10 +108,12 @@ public class DBAbstractSaleDAO {
         PreparedStatement stmt2 = dataSource.getConnection().prepareStatement(entriesQuery);
         stmt2.setObject(1, sale.getIdentity());
         ResultSet result2 = stmt2.executeQuery();
-        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
+        List<MenuEntry> entries = new ArrayList<>();
         while (result2.next()) {
             List<MenuEntry> entriesList = menuEntryDAO.find(MenuEntry.withIdentity(result2.getLong("menuEntry_ID")));
-            entries.put(entriesList.get(0), result2.getBigDecimal("salePrice"));
+            BigDecimal price = result2.getBigDecimal("salePrice");
+            entriesList.get(0).setPrice(price);
+            entries.add(entriesList.get(0));
         }
         sale.setEntries(entries);
         // Return false if deleted

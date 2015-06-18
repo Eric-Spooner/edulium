@@ -74,36 +74,15 @@ public class OnetimeSale extends Sale {
             if (that.entries==null) {
                 return false;
             }
-            boolean sameKeySet = true;
-            if (entries.keySet().size() != that.entries.keySet().size()) {
-                sameKeySet = false;
-            } else {
-                for (MenuEntry e : entries.keySet()) {
-                    boolean equality = false;
-                    for (MenuEntry e2 : that.entries.keySet()) {
-                        if (e.equals(e2)) {
-                            equality = true;
-                        }
-                    }
-                    if (!equality) {
-                        sameKeySet=false;
-                    }
+            for (MenuEntry e : entries) {
+                if (! that.entries.contains(e)) {
+                    return false;
                 }
             }
-            if (sameKeySet) {
-                for (MenuEntry e : entries.keySet()) {
-                    MenuEntry e2 = null;
-                    for (MenuEntry et : that.entries.keySet()) {
-                        if (e.equals(et)) {
-                            e2 = et;
-                        }
-                    }
-                    if (entries.get(e).compareTo(that.entries.get(e2)) != 0) {
-                        return false;
-                    }
+            for (MenuEntry e : that.entries) {
+                if (! entries.contains(e)) {
+                    return false;
                 }
-            } else {
-                return false;
             }
         }
         if (identity != null ? !identity.equals(that.identity) : that.identity != null) return false;

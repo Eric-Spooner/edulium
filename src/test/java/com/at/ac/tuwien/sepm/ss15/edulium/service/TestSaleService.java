@@ -18,6 +18,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
@@ -591,8 +592,9 @@ public class TestSaleService extends AbstractServiceTest {
         entry.setAvailable(true);
         menuService.addMenuEntry(entry);
         BigDecimal bigDecimal = new BigDecimal(10);
-        Hashtable<MenuEntry, BigDecimal> entries = new Hashtable<>();
-        entries.put(entry, bigDecimal);
+        List<MenuEntry> entries = new ArrayList<>();
+        entry.setPrice(bigDecimal);
+        entries.add(entry);
 
         //Create onetimeSale
         OnetimeSale onetimeSale = new OnetimeSale();

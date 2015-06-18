@@ -50,15 +50,16 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         return entry;
     }
 
-    private Hashtable<MenuEntry, BigDecimal> createRandomEntries() throws ValidationException, DAOException {
+    private List<MenuEntry> createRandomEntries() throws ValidationException, DAOException {
         MenuEntry entry = createMenuEntry(new Long((int)(Math.random()*999999999)),"entry", "desc", "cat", 20, 0.2, true);
         BigDecimal bigDecimal = new BigDecimal(10);
-        Hashtable<MenuEntry, BigDecimal> hashtable = new Hashtable<>();
-        hashtable.put(entry, bigDecimal);
-        return hashtable;
+        List<MenuEntry> list = new ArrayList<>();
+        entry.setPrice(bigDecimal);
+        list.add(entry);
+        return list;
     }
 
-    private IntermittentSale createIntermittentSale(Long identity, String name, Hashtable<MenuEntry, BigDecimal> entries, Integer duration, Boolean enabled, LocalDateTime fromDayTime, Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday, Boolean saturday, Boolean sunday) {
+    private IntermittentSale createIntermittentSale(Long identity, String name, List<MenuEntry> entries, Integer duration, Boolean enabled, LocalDateTime fromDayTime, Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday, Boolean saturday, Boolean sunday) {
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(identity);
         intermittentSale.setName(name);
