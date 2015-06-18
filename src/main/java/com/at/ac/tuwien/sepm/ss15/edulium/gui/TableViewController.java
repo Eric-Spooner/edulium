@@ -50,6 +50,7 @@ public class TableViewController implements Initializable, Controller {
         public TableGridCell() {
             button = new Button();
             button.setFont(new Font(25.0));
+            button.setMinSize(65, 65);
             button.setOnAction(e -> onTableClicked(table));
 
             setNode(button);
