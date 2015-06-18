@@ -1,5 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
@@ -117,7 +118,6 @@ public class OrderInputController  implements Initializable, Controller {
     private Table table;
 
     private ObservableMap<Order, Integer> orders = FXCollections.observableHashMap();
-    private ObservableList<Order> displayedOrders = FXCollections.observableArrayList();
 
     private EventHandler<ActionEvent> doneEventHandler;
 
@@ -135,16 +135,13 @@ public class OrderInputController  implements Initializable, Controller {
         menuEntryOverviewController.setOnMenuEntryClicked(menuEntry -> {
             Order order = new Order();
             order.setMenuEntry(menuEntry);
-            order.setBrutto(menuEntry.getPrice());
-            order.setTax(menuEntry.getTaxRate().getValue());
-            order.setState(Order.State.QUEUED);
-            order.setTable(table);
             order.setAdditionalInformation("blablabla");
 
             orders.compute(order, (key, amount) -> (amount == null) ? 1 : amount + 1);
         });
 
         // put all keys of the orders map into a list so that we can use it in the list view
+        ObservableList<Order> displayedOrders = FXCollections.observableArrayList();
         orders.addListener((MapChangeListener<Order, Integer>) change -> {
             displayedOrders.removeAll(change.getKey());
             if (change.wasAdded()) {
@@ -167,8 +164,17 @@ public class OrderInputController  implements Initializable, Controller {
     private void onOrderButtonClicked(ActionEvent actionEvent) {
         try {
             for (Map.Entry<Order, Integer> entry : orders.entrySet()) {
-                Order order = entry.getKey();
+                MenuEntry menuEntry = entry.getKey().getMenuEntry();
+                String additionalInformation = entry.getKey().getAdditionalInformation();
+
+                Order order = new Order();
+                order.setMenuEntry(menuEntry);
                 order.setTime(LocalDateTime.now());
+                order.setBrutto(menuEntry.getPrice());
+                order.setTax(menuEntry.getTaxRate().getValue());
+                order.setState(Order.State.QUEUED);
+                order.setTable(table);
+                order.setAdditionalInformation(additionalInformation);
 
                 Integer amount = entry.getValue();
                 for (int i = 0; i < amount; i++) {
@@ -222,7 +228,6 @@ public class OrderInputController  implements Initializable, Controller {
     private void reset() {
         showScreen(ScreenType.MenuCategoryScreen);
         orders.clear();
-        displayedOrders.clear();
     }
 
     public void setOnDone(EventHandler<ActionEvent> doneEventHandler) {
