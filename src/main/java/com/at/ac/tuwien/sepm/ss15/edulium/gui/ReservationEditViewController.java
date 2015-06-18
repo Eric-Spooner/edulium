@@ -19,7 +19,6 @@ import javafx.scene.text.Font;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
-import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -29,13 +28,11 @@ import java.util.*;
 import java.util.function.Consumer;
 
 /**
- * Created by phili on 6/17/15.
+ * Controller for the ReservationEditViewPane
  */
 public class ReservationEditViewController implements Initializable, Controller {
     enum Mode {EDIT, ADD}
 
-    @FXML
-    private Button btnAutoCreate;
     @FXML
     private Button btnCancel;
     @FXML
@@ -92,6 +89,7 @@ public class ReservationEditViewController implements Initializable, Controller 
                 reservation.getTables().add(table);
                 tableViewController.setTableColor(table, Color.BLUE);
             }
+
             updateSeatsLabel();
         });
 
@@ -101,15 +99,14 @@ public class ReservationEditViewController implements Initializable, Controller 
                 LocalDateTime dateTime = getLocalDateTime();
 
                 if(tfDuration.isEmpty() || dateTime == null) {
+                    updateSeatsLabel();
                     btnSave.setDisable(true);
-                    btnAutoCreate.setDisable(true);
                     return;
                 }
 
                 boolean disable = dateTime.isBefore(LocalDateTime.now()) || tfDuration.isEmpty() || tfName.getText().isEmpty() || tfQuantity.isEmpty();
 
                 btnSave.setDisable(disable);
-                btnAutoCreate.setDisable(disable);
 
                 try {
                     List<Reservation> reservations = reservationService.findReservationBetween(dateTime, dateTime.plusHours((int) tfDuration.getValue()));
@@ -127,8 +124,6 @@ public class ReservationEditViewController implements Initializable, Controller 
         tfMinute.textProperty().addListener(changeListener);
         tfName.textProperty().addListener(changeListener);
         tfQuantity.textProperty().addListener(changeListener);
-
-        lblSeats.setFont(new Font(30));
 
         tfHour.setMinMax(0, 24);
         tfMinute.setMinMax(0, 60);
@@ -164,7 +159,6 @@ public class ReservationEditViewController implements Initializable, Controller 
             displayReservationData();
         } else {
             btnSave.setDisable(true);
-            btnAutoCreate.setDisable(true);
             reservation.setTables(new ArrayList<>());
         }
 
@@ -179,14 +173,38 @@ public class ReservationEditViewController implements Initializable, Controller 
         onCanceledConsumer = consumer;
     }
 
-    public void setReservationData() {
+    @FXML
+    public void on_btnSave_clicked() {
+        setReservationData();
+
+        try {
+            if (mode == Mode.ADD) {
+                // add mode: add reservation
+                reservationService.addReservation(reservation);
+            } else if (mode == Mode.EDIT){
+                // edit mode: update reservation
+                reservationService.updateReservation(reservation);
+            }
+        } catch (ServiceException | ValidationException e) {
+            displayErrorMessage("error adding/editing reservation", e);
+        }
+
+        onAcceptedConsumer.accept(reservation);
+    }
+
+    @FXML
+    public void on_btnCancel_clicked() {
+        onCanceledConsumer.accept(reservation);
+    }
+
+    private void setReservationData() {
         reservation.setName(tfName.getText());
         reservation.setDuration(Duration.ofHours((long) tfDuration.getValue()));
         reservation.setQuantity((int) tfQuantity.getValue());
         reservation.setTime(getLocalDateTime());
     }
 
-    public void displayReservationData() {
+    private void displayReservationData() {
         if (reservation.getName() != null) {
             tfName.setText(reservation.getName());
         }
@@ -206,7 +224,7 @@ public class ReservationEditViewController implements Initializable, Controller 
             datePicker.setValue(dateTime.toLocalDate());
         }
 
-        // delay setting table colors; wait for tableview to load tables
+        // delay setting table colors; workaround: wait for tableview to load tables
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
@@ -218,69 +236,6 @@ public class ReservationEditViewController implements Initializable, Controller 
 
         Timer timer = new Timer();
         timer.schedule(task, 100);
-
-    }
-
-    @FXML
-    public void on_btnSave_clicked() {
-        setReservationData();
-
-        try {
-            if (mode == Mode.ADD && reservation.getIdentity() == null) {
-                // add reservation
-                reservationService.addReservation(reservation);
-            } else if (reservation.getIdentity() != null) {
-                // if in EDIT or ADD mode with set identity -> update
-                reservationService.updateReservation(reservation);
-            }
-        } catch (ServiceException | ValidationException e) {
-            displayErrorMessage("error adding/editing reservation", e);
-        }
-
-        onAcceptedConsumer.accept(reservation);
-    }
-
-    @FXML
-    public void on_btnCancel_clicked() {
-        try {
-            if (mode == Mode.ADD && reservation.getIdentity() != null) {
-                // reservation was added because of the auto create function
-                reservationService.cancelReservation(reservation);
-            } else if (mode == Mode.EDIT) {
-                // reset reservation to previous state
-                reservationService.updateReservation(reservationCopy);
-            }
-        } catch (ServiceException | ValidationException e) {
-            displayErrorMessage("error cancelling request", e);
-        }
-
-        onCanceledConsumer.accept(reservation);
-    }
-
-    @FXML
-    public void on_autoCreate_clicked() {
-        // delete tables
-        reservation.getTables().clear();
-        tableViewController.clear();
-
-        setReservationData();
-
-        // add reservation, so that the tables are automatically set
-        try {
-            if(mode == Mode.ADD) {
-                reservationService.addReservation(reservation);
-            } else {
-                reservationService.updateReservation(reservation);
-            }
-        } catch (ServiceException | ValidationException e) {
-            displayErrorMessage("Could not find any free Tables", e);
-        }
-
-        // display selected tables
-        if(reservation.getTables() != null) {
-            reservation.getTables().stream().forEach(t -> tableViewController.setTableColor(t, Color.BLUE));
-        }
-        updateSeatsLabel();
     }
 
     private void updateSeatsLabel() {
