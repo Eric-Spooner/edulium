@@ -96,7 +96,7 @@ public class GridView<T> extends GridPane {
         for (; rows < cellItem.getY(); rows++) {
             GridCell dummyCellItem = cellFactory.call(this);
             dummyCellItem.updateItem(null);
-            dummyCellItem.setX(0);
+            dummyCellItem.setX(1);
             dummyCellItem.setY(rows);
             add(dummyCellItem.getNode(), dummyCellItem.getX(), dummyCellItem.getY());
         }
@@ -106,7 +106,7 @@ public class GridView<T> extends GridPane {
             GridCell dummyCellItem = cellFactory.call(this);
             dummyCellItem.updateItem(null);
             dummyCellItem.setX(cols);
-            dummyCellItem.setY(0);
+            dummyCellItem.setY(1);
             add(dummyCellItem.getNode(), dummyCellItem.getX(), dummyCellItem.getY());
         }
 
