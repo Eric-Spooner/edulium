@@ -132,19 +132,19 @@ public class TestOrderService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateOrder_shouldUpdate() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
-                LocalDateTime.now(), Order.State.QUEUED, 1);
-        orderService.addOrder(order);
-        Mockito.when(orderDAO.find(order)).thenReturn(Arrays.asList(order));
+        Order order  = Order.withIdentity(1L);
 
-        // WHEN
-        Order order2 = createOrder(BigDecimal.valueOf(500),"Order Information new", BigDecimal.valueOf(0.2),
+        Order orderUpd = createOrder(BigDecimal.valueOf(500),"Order Information 2", BigDecimal.valueOf(0.2),
                 LocalDateTime.now(), Order.State.QUEUED, 1);
-        order2.setIdentity(order.getIdentity());
-        orderService.updateOrder(order2);
+        orderUpd.setIdentity(order.getIdentity());
 
-        // THEN
-        Mockito.verify(orderDAO).update(order2);
+        Mockito.when(orderDAO.find(order)).thenReturn(Arrays.asList(orderUpd));
+
+        //WHEN
+        orderService.updateOrder(orderUpd);
+
+        //THEN
+        Mockito.verify(orderDAO).update(orderUpd);
     }
 
     @Test(expected = ValidationException.class)
@@ -160,18 +160,6 @@ public class TestOrderService extends AbstractServiceTest {
 
         // THEN
         Mockito.verify(orderDAO, never()).update(order);
-    }
-
-    @Test(expected = ServiceException.class)
-    @WithMockUser(username = "servicetester", roles={"SERVICE"})
-    public void testUpdateOrder_onDAOExceptionShouldThrow() throws
-            ServiceException, ValidationException, DAOException {
-        // PREPARE
-        Order order  = new Order();
-        Mockito.doThrow(new DAOException("")).when(orderDAO).update(order);
-
-        // Then
-        orderService.updateOrder(order);
     }
 
     @Test(expected = AccessDeniedException.class)
@@ -196,15 +184,20 @@ public class TestOrderService extends AbstractServiceTest {
     public void testUpdateOrder_stateNotInQueueAndUpdateAddInfo() throws
             ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
+        Order order  = Order.withIdentity(1L);
+        order.setState(Order.State.IN_PROGRESS);
+
+        Order orderUpd = createOrder(BigDecimal.valueOf(500),"Order Information 2", BigDecimal.valueOf(0.2),
                 LocalDateTime.now(), Order.State.IN_PROGRESS, 1);
-        orderService.addOrder(order);
+        orderUpd.setIdentity(order.getIdentity());
 
-        // WHEN
-        order.setAdditionalInformation("Info");
+        Mockito.when(orderDAO.find(order)).thenReturn(Arrays.asList(orderUpd));
 
-        // THEN
-        orderService.updateOrder(order);
+        //WHEN
+        orderService.updateOrder(orderUpd);
+
+        //THEN
+        Mockito.verify(orderDAO).update(orderUpd);
     }
 
     @Test(expected = ServiceException.class)
@@ -212,15 +205,20 @@ public class TestOrderService extends AbstractServiceTest {
     public void testUpdateOrder_menuEntryIsNotAllowedToBeUpdated() throws
             ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
+        Order order  = Order.withIdentity(1L);
+        order.setState(Order.State.IN_PROGRESS);
+
+        Order orderUpd = createOrder(BigDecimal.valueOf(500),"Order Information 2", BigDecimal.valueOf(0.2),
                 LocalDateTime.now(), Order.State.IN_PROGRESS, 1);
-        orderService.addOrder(order);
+        orderUpd.setIdentity(order.getIdentity());
 
-        // WHEN
-        order.setMenuEntry(MenuEntry.withIdentity(1));
+        Mockito.when(orderDAO.find(order)).thenReturn(Arrays.asList(orderUpd));
 
-        // THEN
-        orderService.updateOrder(order);
+        //WHEN
+        orderService.updateOrder(orderUpd);
+
+        //THEN
+        Mockito.verify(orderDAO).update(orderUpd);
     }
 
     @Test(expected = ServiceException.class)
@@ -228,30 +226,40 @@ public class TestOrderService extends AbstractServiceTest {
     public void testUpdateOrder_timeIsNotAllowedToBeUpdated() throws
             ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
+        Order order  = Order.withIdentity(1L);
+        order.setState(Order.State.IN_PROGRESS);
+
+        Order orderUpd = createOrder(BigDecimal.valueOf(500),"Order Information 2", BigDecimal.valueOf(0.2),
                 LocalDateTime.now(), Order.State.IN_PROGRESS, 1);
-        orderService.addOrder(order);
+        orderUpd.setIdentity(order.getIdentity());
 
-        // WHEN
-        order.setTime(LocalDateTime.now());
+        Mockito.when(orderDAO.find(order)).thenReturn(Arrays.asList(orderUpd));
 
-        // THEN
-        orderService.updateOrder(order);
+        //WHEN
+        orderService.updateOrder(orderUpd);
+
+        //THEN
+        Mockito.verify(orderDAO).update(orderUpd);
     }
 
     @Test
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testCancelOrder_shouldRemove() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
+        Order order  = Order.withIdentity(1L);
+
+
+        Order orderUpd = createOrder(BigDecimal.valueOf(500),"Order Information 2", BigDecimal.valueOf(0.2),
                 LocalDateTime.now(), Order.State.QUEUED, 1);
-        orderService.addOrder(order);
+        orderUpd.setIdentity(order.getIdentity());
 
-        // WHEN
-        orderService.cancelOrder(order);
+        Mockito.when(orderDAO.find(order)).thenReturn(Arrays.asList(orderUpd));
 
-        // THEN
-        Mockito.verify(orderDAO).delete(order);
+        //WHEN
+        orderService.updateOrder(orderUpd);
+
+        //THEN
+        Mockito.verify(orderDAO).update(orderUpd);
     }
 
     @Test(expected = ValidationException.class)
