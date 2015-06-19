@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
 
@@ -20,7 +21,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     private static final Logger LOGGER = LogManager.getLogger(StatisticsServiceImpl.class);
 
     @Override
-    public HashMap<MenuEntry, Long> getPopularDishes(LocalTime fromDate, LocalTime toDate) throws ValidationException, ServiceException {
+    public HashMap<MenuEntry, Long> getPopularDishes(LocalDate fromDate, LocalDate toDate) throws ValidationException, ServiceException {
         LOGGER.debug("Entering getPopularDishes with parameters: " + fromDate + ", " + toDate);
 
         HashMap<MenuEntry, Long> popularDishes = new HashMap<>();
@@ -51,14 +52,14 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public HashMap<LocalTime, BigDecimal> getIncomeDevelopment(LocalTime fromDate, LocalTime toDate) throws ValidationException, ServiceException {
+    public HashMap<LocalDate, BigDecimal> getIncomeDevelopment(LocalDate fromDate, LocalDate toDate) throws ValidationException, ServiceException {
         LOGGER.debug("Entering getIncomeDevelopment with parameters: " + fromDate + ", " + toDate);
 
-        HashMap<LocalTime, BigDecimal> incomeChart = new HashMap<>();
+        HashMap<LocalDate, BigDecimal> incomeChart = new HashMap<>();
 
         //dummy data for GUI testing, TODO: replace by real service
-        incomeChart.put(fromDate == null ? LocalTime.now() : fromDate, new BigDecimal(56.4));
-        incomeChart.put(toDate == null ? LocalTime.now() : toDate, new BigDecimal(66.4));
+        incomeChart.put(fromDate == null ? LocalDate.parse("2015-06-14") : fromDate, new BigDecimal(56.4));
+        incomeChart.put(toDate == null ? LocalDate.parse("2015-06-15") : toDate, new BigDecimal(66.4));
 
         return incomeChart;
     }

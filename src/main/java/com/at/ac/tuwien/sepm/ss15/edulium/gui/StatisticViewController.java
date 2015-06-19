@@ -1,9 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.StatisticsService;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
@@ -14,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.net.URL;
-import java.time.LocalTime;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
@@ -43,10 +40,10 @@ public class StatisticViewController implements Initializable, Controller {
 
     private void updateChart() {
         try {
-            HashMap<LocalTime, BigDecimal> incomeDevelopment = statisticsService.getIncomeDevelopment(null,null);
+            HashMap<LocalDate, BigDecimal> incomeDevelopment = statisticsService.getIncomeDevelopment(null,null);
             XYChart.Series series = new XYChart.Series();
-            series.setName("My portfolio");
-            for (LocalTime t : incomeDevelopment.keySet()) {
+            series.setName("Daily Revenue");
+            for (LocalDate t : incomeDevelopment.keySet()) {
                 series.getData().add(new XYChart.Data(t.toString(),incomeDevelopment.get(t)));
             }
             totalIncomeChart.getData().add(series);
