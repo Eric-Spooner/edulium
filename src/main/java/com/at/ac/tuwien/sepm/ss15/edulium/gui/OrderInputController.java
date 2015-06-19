@@ -197,7 +197,13 @@ public class OrderInputController  implements Initializable, Controller {
 
         // sort the displayed orders by name
         SortedList<OrderBase> sortedDisplayedOrders = new SortedList<>(displayedOrders);
-        sortedDisplayedOrders.setComparator((o1, o2) -> o1.getTitle().compareToIgnoreCase(o2.getTitle()));
+        sortedDisplayedOrders.setComparator((o1, o2) -> {
+            int result = o1.getTitle().compareToIgnoreCase(o2.getTitle());
+            if (result == 0) {
+                result = o1.getAdditionalInformation().compareToIgnoreCase(o2.getAdditionalInformation());
+            }
+            return result;
+        });
 
         ordersView.setCellFactory(view -> new OrderCell());
         ordersView.setItems(sortedDisplayedOrders);
