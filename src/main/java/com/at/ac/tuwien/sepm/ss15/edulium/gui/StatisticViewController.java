@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
+import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -40,11 +42,11 @@ public class StatisticViewController implements Initializable, Controller {
 
     private void updateChart() {
         try {
-            HashMap<LocalDate, BigDecimal> incomeDevelopment = statisticsService.getIncomeDevelopment(null,null);
+            List<Pair<LocalDate, BigDecimal>> incomeDevelopment = statisticsService.getIncomeDevelopment(null,null);
             XYChart.Series series = new XYChart.Series();
             series.setName("Daily Revenue");
-            for (LocalDate t : incomeDevelopment.keySet()) {
-                series.getData().add(new XYChart.Data(t.toString(),incomeDevelopment.get(t)));
+            for (Pair<LocalDate, BigDecimal> p : incomeDevelopment) {
+                series.getData().add(new XYChart.Data(p.getKey().toString(), p.getValue().doubleValue()));
             }
             totalIncomeChart.getData().add(series);
         } catch (Exception e) {
