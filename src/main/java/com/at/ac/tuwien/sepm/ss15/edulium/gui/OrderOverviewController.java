@@ -203,6 +203,8 @@ public class OrderOverviewController implements Initializable, Controller {
                 for (Order order : queuedOrdersView.getSelectionModel().getSelectedItems()) {
                     orderService.cancelOrder(order);
                 }
+
+                queuedOrdersView.getSelectionModel().clearSelection();
             } catch (ValidationException | ServiceException e) {
                 LOGGER.error("Cancel orders did not work", e);
 
@@ -234,6 +236,8 @@ public class OrderOverviewController implements Initializable, Controller {
                     order.setTable(table);
                     orderService.updateOrder(order);
                 }
+
+                clearSelection();
             } catch (ValidationException | ServiceException e) {
                 LOGGER.error("Move orders did not work", e);
 
@@ -290,6 +294,8 @@ public class OrderOverviewController implements Initializable, Controller {
             for (Order order : readyForDeliveryOrdersView.getSelectionModel().getSelectedItems()) {
                 orderService.markAsDelivered(order);
             }
+
+            readyForDeliveryOrdersView.getSelectionModel().clearSelection();
         } catch (ValidationException | ServiceException e) {
             LOGGER.error("Putting State to Delivered did not work", e);
 
@@ -328,6 +334,10 @@ public class OrderOverviewController implements Initializable, Controller {
 
     @FXML
     public void onClearSelectionButtonClicked(ActionEvent actionEvent) {
+        clearSelection();
+    }
+
+    private void clearSelection() {
         queuedOrdersView.getSelectionModel().clearSelection();
         inProgressOrdersView.getSelectionModel().clearSelection();
         readyForDeliveryOrdersView.getSelectionModel().clearSelection();
