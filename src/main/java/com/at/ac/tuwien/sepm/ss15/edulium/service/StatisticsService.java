@@ -1,12 +1,14 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.statistics.MenuEntryRevenue;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import javafx.util.Pair;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Service interface for statistics
@@ -22,7 +24,7 @@ public interface StatisticsService extends Service {
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
     @PreAuthorize("hasRole('MANAGER')")
-    HashMap<MenuEntry, Long> getPopularDishes(LocalDate fromDate, LocalDate toDate) throws ValidationException, ServiceException;
+    List<MenuEntryRevenue> getPopularDishes(LocalDate fromDate, LocalDate toDate) throws ValidationException, ServiceException;
 
     /**
      * Get the chart data of the total daily income over the given time period.
@@ -33,5 +35,5 @@ public interface StatisticsService extends Service {
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
     @PreAuthorize("hasRole('MANAGER')")
-    HashMap<LocalDate, BigDecimal> getIncomeDevelopment(LocalDate fromDate, LocalDate toDate) throws ValidationException, ServiceException;
+    List<Pair<LocalDate, BigDecimal>> getIncomeDevelopment(LocalDate fromDate, LocalDate toDate) throws ValidationException, ServiceException;
 }
