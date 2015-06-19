@@ -73,7 +73,7 @@ public class MenuDetailsController implements Initializable, Controller {
                 for (MenuEntry menuEntry : menuEntries.get(menuCategory)) {
                     ToggleButton menuEntryButton = new ToggleButton();
                     menuEntryButton.setText(menuEntry.getName());
-                    menuEntryButton.setMinHeight(33);
+                    menuEntryButton.setMinHeight(60);
                     menuEntryButton.setUserData(menuEntry);
 
                     menuEntryButtons.getButtons().add(menuEntryButton);
