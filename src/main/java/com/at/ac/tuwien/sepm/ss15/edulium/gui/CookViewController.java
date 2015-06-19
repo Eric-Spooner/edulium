@@ -8,8 +8,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -28,13 +26,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
@@ -91,6 +86,9 @@ public class CookViewController implements Initializable, Controller {
     private PollingList<Order> ordersInProgress;
     private PollingList<Order> ordersReadyForDelivery;
     private List<MenuCategory> checkedCategories;
+    private FilteredList<Order> ordersQueuedFiltered;
+    private FilteredList<Order> ordersInProgressFiltered;
+    private FilteredList<Order> ordersReadyForDeliverFiltered;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -108,20 +106,16 @@ public class CookViewController implements Initializable, Controller {
                 try {
                     Order matcher = new Order();
                     matcher.setState(Order.State.QUEUED);
-                    List<Order> orders =  orderService.findOrder(matcher);
-                    for(Order order:orders) {
-                        if (!checkedCategories.contains(order.getMenuEntry().getCategory())) {
-                            orders.remove(order);
-                        }
-                    }
-                    return orders;
+                    return orderService.findOrder(matcher);
                 } catch (ServiceException e) {
                     LOGGER.error("Getting all queued orders via order supplier has failed", e);
                     return null;
                 }
             }
         });
-        SortedList<Order> sortedDataQueued = new SortedList<>(ordersQueued);
+        ordersQueuedFiltered = new FilteredList<Order>(ordersQueued);
+        ordersQueuedFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
+        SortedList<Order> sortedDataQueued = new SortedList<>(ordersQueuedFiltered);
         sortedDataQueued.comparatorProperty().bind(tableViewQueued.comparatorProperty());
         tableViewQueued.setItems(sortedDataQueued);
         tableViewQueued.setStyle("-fx-font-size: 25px;");
@@ -166,7 +160,9 @@ public class CookViewController implements Initializable, Controller {
                 }
             }
         });
-        SortedList<Order> sortedDataInProgress = new SortedList<>(ordersInProgress);
+        ordersInProgressFiltered = new FilteredList<Order>(ordersInProgress);
+        ordersInProgressFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
+        SortedList<Order> sortedDataInProgress = new SortedList<>(ordersInProgressFiltered);
         sortedDataInProgress.comparatorProperty().bind(tableViewInProgress.comparatorProperty());
         tableViewInProgress.setItems(sortedDataInProgress);
         tableViewInProgress.setStyle("-fx-font-size: 25px;");
@@ -212,7 +208,9 @@ public class CookViewController implements Initializable, Controller {
                 }
             }
         });
-        SortedList<Order> sortedDataReady = new SortedList<>(ordersReadyForDelivery);
+        ordersReadyForDeliverFiltered = new FilteredList<Order>(ordersReadyForDelivery);
+        ordersReadyForDeliverFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
+        SortedList<Order> sortedDataReady = new SortedList<>(ordersReadyForDeliverFiltered);
         sortedDataReady.comparatorProperty().bind(tableViewInProgress.comparatorProperty());
         tableViewReadyForDelivery.setItems(sortedDataReady);
         tableViewReadyForDelivery.setStyle("-fx-font-size: 25px;");
@@ -296,6 +294,9 @@ public class CookViewController implements Initializable, Controller {
             stage.setScene(scene);
             stage.showAndWait();
             checkedCategories = DialogCookviewCategories.getCheckedCategories();
+            ordersQueuedFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
+            ordersReadyForDeliverFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
+            ordersInProgressFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
         }catch (Exception e){
             LOGGER.error("Open the Cook View Menu Categories selection Dialog failed", e);
             ManagerViewController.showErrorDialog("Error", "Cook View open Menu Categories Error", "Open the Cook View Menu Categories selection Dialog failed \n"  + e.toString());

@@ -54,6 +54,7 @@ public class DialogCookviewCategories implements Initializable {
         try {
             menuCategories = observableArrayList(menuService.getAllMenuCategories());
             listMenuCats.setItems(menuCategories);
+            listMenuCats.setStyle("-fx-font-size: 25px;");
             checkedCategories.forEach(order -> listMenuCats.getCheckModel().check(order));
             listMenuCats.getCheckModel().getCheckedItems().addListener(new ListChangeListener<MenuCategory>() {
                 public void onChanged(ListChangeListener.Change<? extends MenuCategory> c) {
