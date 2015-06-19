@@ -33,9 +33,10 @@ public class MenuDetailsController implements Initializable, Controller {
     private Consumer<Menu> menuAcceptedConsumer = null;
 
     private ObservableMap<MenuCategory, List<MenuEntry>> menuEntries = FXCollections.observableHashMap();
-    private Set<MenuEntry> selectedMenuEntries = new HashSet<>();
+    private Map<MenuCategory, MenuEntry> selectedMenuEntries = new HashMap<>();
 
     private class MenuCategoryCell extends ListCell<MenuCategory> {
+        private MenuCategory menuCategory;
         private VBox layout = new VBox();
         private Label menuCategoryNameLabel = new Label();
         private SegmentedButton menuEntryButtons = new SegmentedButton();
@@ -47,14 +48,9 @@ public class MenuDetailsController implements Initializable, Controller {
             menuEntryButtons.setStyle("-fx-font-size: 18px;");
             menuEntryButtons.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
             menuEntryButtons.getToggleGroup().selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
-                if (oldValue != null) {
-                    MenuEntry oldMenuEntry = (MenuEntry) oldValue.getUserData();
-                    selectedMenuEntries.remove(oldMenuEntry);
-                }
-
                 if (newValue != null) {
-                    MenuEntry newMenuEntry = (MenuEntry) newValue.getUserData();
-                    selectedMenuEntries.add(newMenuEntry);
+                    MenuEntry menuEntry = (MenuEntry) newValue.getUserData();
+                    selectedMenuEntries.put(menuCategory, menuEntry);
                 }
             });
 
@@ -66,6 +62,8 @@ public class MenuDetailsController implements Initializable, Controller {
         @Override
         public void updateItem(MenuCategory menuCategory, boolean empty) {
             super.updateItem(menuCategory, empty);
+
+            this.menuCategory = menuCategory;
 
             if (menuCategory != null) {
                 menuCategoryNameLabel.setText(menuCategory.getName());
@@ -137,7 +135,7 @@ public class MenuDetailsController implements Initializable, Controller {
         if (menuAcceptedConsumer != null) {
             Menu configuredMenu = new Menu();
             configuredMenu.setName(menu.getName());
-            configuredMenu.setEntries(new ArrayList<>(selectedMenuEntries));
+            configuredMenu.setEntries(new ArrayList<>(selectedMenuEntries.values()));
 
             menuAcceptedConsumer.accept(configuredMenu);
         }
