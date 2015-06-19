@@ -52,6 +52,8 @@ public class OrderOverviewController implements Initializable, Controller {
     @FXML
     private Button clearSelectionButton;
     @FXML
+    private Button selectAllButton;
+    @FXML
     private Label headerLabel;
 
     private class OrderCell extends ListCell<Order> {
@@ -335,6 +337,14 @@ public class OrderOverviewController implements Initializable, Controller {
     @FXML
     public void onClearSelectionButtonClicked(ActionEvent actionEvent) {
         clearSelection();
+    }
+
+    @FXML
+    public void onSelectAllButtonClicked(ActionEvent actionEvent) {
+        queuedOrdersView.getSelectionModel().selectAll();
+        inProgressOrdersView.getSelectionModel().selectAll();
+        readyForDeliveryOrdersView.getSelectionModel().selectAll();
+        deliveredOrdersView.getSelectionModel().selectAll();
     }
 
     private void clearSelection() {

@@ -33,6 +33,11 @@
                   <Insets />
                </HBox.margin>
             </Button>
+            <Button fx:id="selectAllButton" mnemonicParsing="false" onAction="#onSelectAllButtonClicked" text="Select All">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
             <Button fx:id="moveToTableButton" mnemonicParsing="false" onAction="#onMoveToTableButtonClicked" text="Move Orders" HBox.hgrow="NEVER">
                <font>
                   <Font size="18.0" />
