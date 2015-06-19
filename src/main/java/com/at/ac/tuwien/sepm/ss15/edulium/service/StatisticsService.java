@@ -25,7 +25,7 @@ public interface StatisticsService extends Service {
     HashMap<MenuEntry, Long> getPopularDishes(LocalTime fromDate, LocalTime toDate) throws ValidationException, ServiceException;
 
     /**
-     * Get the chart data of the total income over the given time period.
+     * Get the chart data of the total daily income over the given time period.
      * @param fromDate the beginning of the period. A null value means unbounded.
      * @param toDate the end of the period. A null value means unbounded.
      * @return the chart data (Date, Income)
