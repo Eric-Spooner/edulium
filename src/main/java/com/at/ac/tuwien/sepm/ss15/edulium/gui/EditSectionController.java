@@ -76,7 +76,7 @@ public class EditSectionController implements Initializable {
             sectionName = section.getName();
             Table tableMatcher = new Table();
             tableMatcher.setSection(section);
-            for(Table table : interiorService.findTables(tableMatcher)) {System.out.println("AA");
+            for(Table table : interiorService.findTables(tableMatcher)) {
                 Rect rect = new Rect(table.getColumn()*FACT, table.getRow()*FACT, TABLE_SIZE, TABLE_SIZE, interiorService);
                 rect.setNumber(table.getNumber());
                 rect.setSeats(table.getSeats());
@@ -88,7 +88,7 @@ public class EditSectionController implements Initializable {
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources){ System.out.println(sectionId);
+    public void initialize(URL location, ResourceBundle resources){
         LOGGER.info("Initializing Add Section Controller");
         initTables();
         seatsTF.setText("6");

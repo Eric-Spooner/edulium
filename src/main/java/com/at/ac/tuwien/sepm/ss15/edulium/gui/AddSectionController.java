@@ -300,7 +300,6 @@ public class AddSectionController implements Initializable {
                     table.setSection(section);
                     table.setColumn((int) (rect.getX() / FACT));
                     table.setRow((int)(rect.getY()/FACT));
-                    System.out.println(table.getColumn() + ","+table.getRow());
                     interiorService.addTable(table);
                 }
                 updateCanvas.update();

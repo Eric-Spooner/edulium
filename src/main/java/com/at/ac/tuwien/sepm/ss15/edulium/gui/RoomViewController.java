@@ -105,7 +105,6 @@ public class RoomViewController implements Initializable, Controller {
 
     }
 
-    //TODO think of a better solution
     public class UpdateCanvas {
         public void update() {
             drawCanvas();
