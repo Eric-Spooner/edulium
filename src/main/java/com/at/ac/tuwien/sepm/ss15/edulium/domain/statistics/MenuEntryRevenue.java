@@ -27,6 +27,27 @@ public class MenuEntryRevenue {
     }
 
     /**
+     * @return the menuEntry ID
+     */
+    public Long getMenuEntryId() {
+        return entry.getIdentity();
+    }
+
+    /**
+     * @return the menuEntry name
+     */
+    public String getMenuEntryName() {
+        return entry.getName();
+    }
+
+    /**
+     * @return the menuEntry price
+     */
+    public BigDecimal getMenuEntryPrice() {
+        return entry.getPrice();
+    }
+
+    /**
      * @return the number of items sold
      */
     public Long getSoldNumber() {
