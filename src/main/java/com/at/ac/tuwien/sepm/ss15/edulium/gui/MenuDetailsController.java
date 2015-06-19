@@ -8,6 +8,7 @@ import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -16,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.SegmentedButton;
 
+import javax.swing.event.ChangeListener;
 import java.net.URL;
 import java.util.*;
 import java.util.function.Consumer;
@@ -26,21 +28,35 @@ public class MenuDetailsController implements Initializable, Controller {
     @FXML
     private ListView categoriesView;
 
-    private Consumer<Menu> menuClickedConsumer = null;
+    private Menu menu;
+
+    private Consumer<Menu> menuAcceptedConsumer = null;
 
     private ObservableMap<MenuCategory, List<MenuEntry>> menuEntries = FXCollections.observableHashMap();
+    private Set<MenuEntry> selectedMenuEntries = new HashSet<>();
 
     private class MenuCategoryCell extends ListCell<MenuCategory> {
         private VBox layout = new VBox();
         private Label menuCategoryNameLabel = new Label();
         private SegmentedButton menuEntryButtons = new SegmentedButton();
-        private Menu menu = null;
 
         public MenuCategoryCell() {
             menuCategoryNameLabel.setStyle("-fx-font-size: 18px;");
 
+            menuEntryButtons.setToggleGroup(new PersistentButtonToggleGroup());
             menuEntryButtons.setStyle("-fx-font-size: 18px;");
             menuEntryButtons.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
+            menuEntryButtons.getToggleGroup().selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+                if (oldValue != null) {
+                    MenuEntry oldMenuEntry = (MenuEntry) oldValue.getUserData();
+                    selectedMenuEntries.remove(oldMenuEntry);
+                }
+
+                if (newValue != null) {
+                    MenuEntry newMenuEntry = (MenuEntry) newValue.getUserData();
+                    selectedMenuEntries.add(newMenuEntry);
+                }
+            });
 
             layout.getChildren().setAll(menuCategoryNameLabel, menuEntryButtons);
 
@@ -54,14 +70,21 @@ public class MenuDetailsController implements Initializable, Controller {
             if (menuCategory != null) {
                 menuCategoryNameLabel.setText(menuCategory.getName());
 
+                // add a button for each menu entry in the current category
                 menuEntryButtons.getButtons().clear();
                 for (MenuEntry menuEntry : menuEntries.get(menuCategory)) {
                     ToggleButton menuEntryButton = new ToggleButton();
                     menuEntryButton.setText(menuEntry.getName());
-                    menuEntryButton.setSelected(true);
+                    menuEntryButton.setMinHeight(33);
+                    menuEntryButton.setUserData(menuEntry);
 
                     menuEntryButtons.getButtons().add(menuEntryButton);
                 }
+
+                assert !menuEntryButtons.getButtons().isEmpty();
+
+                // select the first button in the group
+                menuEntryButtons.getButtons().get(0).setSelected(true);
 
                 layout.setVisible(true);
             } else {
@@ -90,25 +113,33 @@ public class MenuDetailsController implements Initializable, Controller {
     }
 
     public void setMenu(Menu menu) {
+        this.menu = menu;
+
+        menuEntries.clear();
+        selectedMenuEntries.clear();
+
         HashMap<MenuCategory, List<MenuEntry>> tempMenuEntries = new HashMap<>();
         for (MenuEntry menuEntry : menu.getEntries()) {
             tempMenuEntries.computeIfAbsent(menuEntry.getCategory(), category -> new ArrayList<MenuEntry>());
             tempMenuEntries.get(menuEntry.getCategory()).add(menuEntry);
         }
 
-        menuEntries.clear();
         tempMenuEntries.forEach((category, entries) -> menuEntries.put(category, entries));
     }
 
-    public void setOnMenuClicked(Consumer<Menu> menuClickedConsumer)
+    public void setOnMenuAccepted(Consumer<Menu> menuAcceptedConsumer)
     {
-        this.menuClickedConsumer = menuClickedConsumer;
+        this.menuAcceptedConsumer = menuAcceptedConsumer;
     }
 
-    private void onMenuClicked(Menu menu)
-    {
-        if (menuClickedConsumer != null) {
-            menuClickedConsumer.accept(menu);
+    @FXML
+    private void onAcceptButtonClicked(ActionEvent actionEvent) {
+        if (menuAcceptedConsumer != null) {
+            Menu configuredMenu = new Menu();
+            configuredMenu.setName(menu.getName());
+            configuredMenu.setEntries(new ArrayList<>(selectedMenuEntries));
+
+            menuAcceptedConsumer.accept(configuredMenu);
         }
     }
 

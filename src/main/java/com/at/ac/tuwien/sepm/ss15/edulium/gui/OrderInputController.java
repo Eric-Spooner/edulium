@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
@@ -24,8 +25,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class OrderInputController  implements Initializable, Controller {
@@ -39,7 +40,7 @@ public class OrderInputController  implements Initializable, Controller {
     }
 
     @FXML
-    private ListView<Order> ordersView;
+    private ListView<OrderBase> ordersView;
     @FXML
     private ScrollPane scrollPane;
     @FXML
@@ -53,14 +54,14 @@ public class OrderInputController  implements Initializable, Controller {
     @FXML
     private HBox headerLayout;
 
-    private class OrderCell extends ListCell<Order> {
+    private class OrderCell extends ListCell<OrderBase> {
         private final Label nameLabel;
         private final Label additionalInformationLabel;
         private final Label amountLabel;
         private final Button increaseAmountButton;
         private final Button decreaseAmountButton;
         private final HBox layout;
-        private Order order = null;
+        private OrderBase order = null;
 
         public OrderCell() {
             nameLabel = new Label();
@@ -91,7 +92,7 @@ public class OrderInputController  implements Initializable, Controller {
         }
 
         @Override
-        protected void updateItem(Order item, boolean empty) {
+        protected void updateItem(OrderBase item, boolean empty) {
             super.updateItem(item, empty);
 
             order = item;
@@ -99,7 +100,7 @@ public class OrderInputController  implements Initializable, Controller {
             if (order != null) {
                 Integer amount = orders.get(order);
 
-                nameLabel.setText(order.getMenuEntry().getName());
+                nameLabel.setText(order.getTitle());
                 additionalInformationLabel.setText(order.getAdditionalInformation());
                 amountLabel.setText(amount == null ? "-" : amount.toString());
                 layout.setVisible(true);
@@ -130,7 +131,7 @@ public class OrderInputController  implements Initializable, Controller {
 
     private Table table;
 
-    private ObservableMap<Order, Integer> orders = FXCollections.observableHashMap();
+    private ObservableMap<OrderBase, Integer> orders = FXCollections.observableHashMap();
 
     private EventHandler<ActionEvent> doneEventHandler;
 
@@ -169,14 +170,25 @@ public class OrderInputController  implements Initializable, Controller {
             order.setMenuEntry(menuEntry);
             order.setAdditionalInformation("blablabla");
 
-            orders.compute(order, (key, amount) -> (amount == null) ? 1 : amount + 1);
+            orders.compute(new OrderSingleMenuEntry(order), (key, amount) -> (amount == null) ? 1 : amount + 1);
+        });
+
+        menuDetailsController.setOnMenuAccepted(configuredMenu -> {
+            List<Order> entries = new ArrayList<>();
+            for (MenuEntry menuEntry : configuredMenu.getEntries()) {
+                Order order = new Order();
+                order.setMenuEntry(menuEntry);
+                order.setAdditionalInformation(configuredMenu.getName() + " - " + "blablabla");
+                entries.add(order);
+            }
+            orders.compute(new OrderMenu(configuredMenu, entries), (key, amount) -> (amount == null) ? 1 : amount + 1);
         });
     }
 
     private void initializeOrdersView() {
         // put all keys of the orders map into a list so that we can use it in the list view
-        ObservableList<Order> displayedOrders = FXCollections.observableArrayList();
-        orders.addListener((MapChangeListener<Order, Integer>) change -> {
+        ObservableList<OrderBase> displayedOrders = FXCollections.observableArrayList();
+        orders.addListener((MapChangeListener<OrderBase, Integer>) change -> {
             displayedOrders.removeAll(change.getKey());
             if (change.wasAdded()) {
                 displayedOrders.add(change.getKey());
@@ -184,8 +196,8 @@ public class OrderInputController  implements Initializable, Controller {
         });
 
         // sort the displayed orders by name
-        SortedList<Order> sortedDisplayedOrders = new SortedList<>(displayedOrders);
-        sortedDisplayedOrders.setComparator((o1, o2) -> o1.getMenuEntry().getName().compareToIgnoreCase(o2.getMenuEntry().getName()));
+        SortedList<OrderBase> sortedDisplayedOrders = new SortedList<>(displayedOrders);
+        sortedDisplayedOrders.setComparator((o1, o2) -> o1.getTitle().compareToIgnoreCase(o2.getTitle()));
 
         ordersView.setCellFactory(view -> new OrderCell());
         ordersView.setItems(sortedDisplayedOrders);
@@ -194,9 +206,9 @@ public class OrderInputController  implements Initializable, Controller {
 
     private void initializeHeaderButtons() {
         // disable order button if there are no orders
-        orders.addListener(new MapChangeListener<Order, Integer>() {
+        orders.addListener(new MapChangeListener<OrderBase, Integer>() {
             @Override
-            public void onChanged(Change<? extends Order, ? extends Integer> change) {
+            public void onChanged(Change<? extends OrderBase, ? extends Integer> change) {
                 orderButton.setDisable(orders.isEmpty());
             }
         });
@@ -212,6 +224,7 @@ public class OrderInputController  implements Initializable, Controller {
         menuScreenButton.setOnAction(action -> showScreen(ScreenType.MenuScreen));
 
         SegmentedButton headerButtons = new SegmentedButton();
+        headerButtons.setToggleGroup(new PersistentButtonToggleGroup());
         headerButtons.setStyle("-fx-font-size: 18px;");
         headerButtons.getStyleClass().add(SegmentedButton.STYLE_CLASS_DARK);
         headerButtons.getButtons().setAll(menuCategoryScreenButton, menuScreenButton);
@@ -222,22 +235,24 @@ public class OrderInputController  implements Initializable, Controller {
     @FXML
     private void onOrderButtonClicked(ActionEvent actionEvent) {
         try {
-            for (Map.Entry<Order, Integer> entry : orders.entrySet()) {
-                MenuEntry menuEntry = entry.getKey().getMenuEntry();
-                String additionalInformation = entry.getKey().getAdditionalInformation();
+            for (Map.Entry<OrderBase, Integer> entry : orders.entrySet()) {
+                for (Order o : entry.getKey().getOrders()) { // a menu can contain more than one order
+                    MenuEntry menuEntry = o.getMenuEntry();
+                    String additionalInformation = o.getAdditionalInformation();
 
-                Order order = new Order();
-                order.setMenuEntry(menuEntry);
-                order.setTime(LocalDateTime.now());
-                order.setBrutto(menuEntry.getPrice());
-                order.setTax(menuEntry.getTaxRate().getValue());
-                order.setState(Order.State.QUEUED);
-                order.setTable(table);
-                order.setAdditionalInformation(additionalInformation);
+                    Order order = new Order();
+                    order.setMenuEntry(menuEntry);
+                    order.setTime(LocalDateTime.now());
+                    order.setBrutto(menuEntry.getPrice());
+                    order.setTax(menuEntry.getTaxRate().getValue());
+                    order.setState(Order.State.QUEUED);
+                    order.setTable(table);
+                    order.setAdditionalInformation(additionalInformation);
 
-                Integer amount = entry.getValue();
-                for (int i = 0; i < amount; i++) {
-                    orderService.addOrder(order);
+                    Integer amount = entry.getValue();
+                    for (int i = 0; i < amount; i++) {
+                        orderService.addOrder(order);
+                    }
                 }
             }
         } catch (ValidationException | ServiceException e) {
@@ -311,5 +326,95 @@ public class OrderInputController  implements Initializable, Controller {
     public void disable(boolean disabled) {
         menuCategoryOverviewController.disable(disabled);
         menuEntryOverviewController.disable(disabled);
+    }
+
+    // we want to show normal orders and menus in the ordersView
+    private interface OrderBase {
+        String getTitle();
+        String getAdditionalInformation();
+        List<Order> getOrders();
+    }
+
+    // wrapper for a single menu entry order
+    private class OrderSingleMenuEntry implements OrderBase {
+        private Order order;
+
+        public OrderSingleMenuEntry(Order order) {
+            this.order = order;
+        }
+
+        @Override
+        public String getTitle() {
+            return order.getMenuEntry().getName();
+        }
+
+        @Override
+        public String getAdditionalInformation() {
+            return order.getAdditionalInformation();
+        }
+
+        @Override
+        public List<Order> getOrders() {
+            return Arrays.asList(order);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof OrderSingleMenuEntry)) return false;
+
+            OrderSingleMenuEntry that = (OrderSingleMenuEntry) o;
+
+            return !(order != null ? !order.equals(that.order) : that.order != null);
+        }
+
+        @Override
+        public int hashCode() {
+            return order != null ? order.hashCode() : 0;
+        }
+    }
+
+    // wrapper for a complete menu which can consist of multiple orders
+    private class OrderMenu implements OrderBase {
+        private Menu menu;
+        private List<Order> chosenOrders;
+
+        public OrderMenu(Menu menu, List<Order> chosenOrders) {
+            this.menu = menu;
+            this.chosenOrders = chosenOrders;
+        }
+
+        @Override
+        public String getTitle() {
+            return menu.getName();
+        }
+
+        @Override
+        public String getAdditionalInformation() {
+            return chosenOrders.stream().map(o -> o.getMenuEntry().getName()).collect(Collectors.joining(", "));
+        }
+
+        @Override
+        public List<Order> getOrders() {
+            return chosenOrders;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof OrderMenu)) return false;
+
+            OrderMenu orderMenu = (OrderMenu) o;
+
+            if (menu != null ? !menu.equals(orderMenu.menu) : orderMenu.menu != null) return false;
+            return !(chosenOrders != null ? !chosenOrders.equals(orderMenu.chosenOrders) : orderMenu.chosenOrders != null);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = menu != null ? menu.hashCode() : 0;
+            result = 31 * result + (chosenOrders != null ? chosenOrders.hashCode() : 0);
+            return result;
+        }
     }
 }

@@ -1,8 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.control.ScrollPane?>
 
 
-<ListView fx:id="categoriesView" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.MenuDetailsController" />
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.MenuDetailsController">
+   <children>
+      <ListView fx:id="categoriesView" VBox.vgrow="ALWAYS" />
+      <HBox alignment="TOP_CENTER" spacing="33.0" VBox.vgrow="NEVER">
+         <children>
+            <Button fx:id="acceptButton" mnemonicParsing="false" onAction="#onAcceptButtonClicked" text="Add">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
+         </children>
+         <VBox.margin>
+            <Insets bottom="5.0" top="5.0" />
+         </VBox.margin>
+      </HBox>
+   </children>
+</VBox>
