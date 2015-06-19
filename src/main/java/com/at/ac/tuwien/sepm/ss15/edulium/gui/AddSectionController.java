@@ -40,13 +40,15 @@ public class AddSectionController implements Initializable {
     private boolean moveTable = false;
     private boolean removeTable = false;
     private boolean updateTable = false;
-    private static final int FACT = 10;
+    private static final int FACT = 40;
     private static final int TABLE_SIZE = 40;
     private static InteriorService interiorService;
     private static Stage thisStage;
     private static RoomViewController.UpdateCanvas updateCanvas;
     private static ArrayList<Rect> rects = new ArrayList<Rect>();
     private Rect movingRect;
+    private int prevX = 0;
+    private int prevY = 0;
 
     @FXML
     private Canvas canvas;
@@ -94,7 +96,7 @@ public class AddSectionController implements Initializable {
                                 }
                             }
 
-                            Rect rect = new Rect(Math.max(((((int) t.getX()) - TABLE_SIZE / 2) / FACT) * FACT, 0), Math.max(((((int) t.getY()) - TABLE_SIZE / 2) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
+                            Rect rect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
                             for (Rect iteratingRect : rects) {
                                 if (iteratingRect.getRect(rect.getX() + 1, rect.getY() + 1) != null ||
                                         iteratingRect.getRect(rect.getX() + TABLE_SIZE - 1, rect.getY() + 1) != null ||
@@ -141,7 +143,7 @@ public class AddSectionController implements Initializable {
                             }
                         }
                     }
-                } catch(NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     showErrorDialog("Error", "Invalid value", "Only valid numbers are allowed!");
                 }
             }
@@ -154,8 +156,22 @@ public class AddSectionController implements Initializable {
                     drawCanvas();
                     GraphicsContext gc = canvas.getGraphicsContext2D();
                     gc.setStroke(Color.GRAY);
-                    gc.strokeRoundRect(Math.max(((((int)t.getX())-TABLE_SIZE/2)/FACT)*FACT, 0), Math.max(((((int)t.getY())-TABLE_SIZE/2)/FACT)*FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
+                    gc.strokeRoundRect(Math.max(((((int)t.getX()))/FACT)*FACT, 0), Math.max(((((int)t.getY()))/FACT)*FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
                     gc.setStroke(Color.BLACK);
+                }
+            }
+        });
+
+        canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent t) {
+                if(moveTable) {
+                    if(movingRect != null) {
+                        Rect movedRect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
+                        movedRect.setNumber(movingRect.getNumber());
+                        rects.add(movedRect);
+                        movingRect = null;
+                    }
                 }
             }
         });
@@ -166,17 +182,48 @@ public class AddSectionController implements Initializable {
                 if(moveTable) {
                     for (Rect rect : rects) {
                         if (rect.getRect(t.getX(), t.getY()) != null) {
-                            movingRect = rect;
+                            if(movingRect == null) {
+                                movingRect = rect;
+                            }
                         }
                     }
 
-                    if(movingRect != null) {
-                        Rect movedRect = new Rect(Math.max(((((int) t.getX()) - TABLE_SIZE / 2) / FACT) * FACT, 0), Math.max(((((int) t.getY()) - TABLE_SIZE / 2) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
-                        movedRect.setNumber(movingRect.getNumber());
+                    if(rects.contains(movingRect))
                         rects.remove(movingRect);
-                        rects.add(movedRect);
+
+                    if(movingRect != null) {
                         drawCanvas();
+                        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+                        boolean intersectsWithExistingTable = false;
+                        for (Rect iteratingRect : rects) {
+                            if (iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) != null ||
+                                    iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) != null ||
+                                    iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1) != null ||
+                                    iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1) != null) {
+                                intersectsWithExistingTable = true;
+                            }
+                        }
+
+                        if (intersectsWithExistingTable) {
+                            gc.strokeRoundRect(Math.max(((((int) prevX)) / FACT) * FACT, 0), Math.max(((((int) prevY)) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
+                            gc.fillText(String.valueOf(movingRect.getNumber()), Math.max(((((int) prevX)) / FACT) * FACT, 0) + TABLE_SIZE / 4, Math.max(((((int) prevY)) / FACT) * FACT, 0) + TABLE_SIZE / 1.5);
+                        } else {
+                            gc.strokeRoundRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
+                            gc.fillText(String.valueOf(movingRect.getNumber()), Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE / 4, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE / 1.5);
+                            prevX = Math.max(((((int) t.getX())) / FACT) * FACT, 0);
+                            prevY = Math.max(((((int) t.getY())) / FACT) * FACT, 0);
+                        }
                     }
+                    /*if(movingRect != null) {
+                        Rect movedRect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
+                        movedRect.setNumber(movingRect.getNumber());
+                        if(rects.contains(movingRect)) {
+                            if (rects.remove(movingRect))
+                                rects.add(movedRect);
+                        }
+                        drawCanvas();
+                    }*/
                 }
             }
         });
@@ -253,6 +300,7 @@ public class AddSectionController implements Initializable {
                     table.setSection(section);
                     table.setColumn((int) (rect.getX() / FACT));
                     table.setRow((int)(rect.getY()/FACT));
+                    System.out.println(table.getColumn() + ","+table.getRow());
                     interiorService.addTable(table);
                 }
                 updateCanvas.update();
@@ -275,7 +323,6 @@ public class AddSectionController implements Initializable {
         }
     }
 
-    //TODO think of a better solution
     public class UpdateCanvas {
         public void update() {
             drawCanvas();

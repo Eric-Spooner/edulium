@@ -55,7 +55,7 @@ public class RoomViewController implements Initializable, Controller {
     private double scaleY = 1.0;
     private long clickedSectionId = -1;
 
-    private final int FACT = 10;
+    private final int FACT = 40;
     private final int CANVAS_PADDING = 20;
     private final int TABLE_SIZE = 40;
     private final int SECTION_OFFSET = 40;
@@ -203,7 +203,7 @@ public class RoomViewController implements Initializable, Controller {
                 stage.setScene(scene);
                 stage.showAndWait();
             } catch (IOException e) {
-                LOGGER.error("Unable to Load Edit Section" + e);
+                LOGGER.error("Unable to Load Edit Section" + e);System.out.println(e);
             }
         }
     }
