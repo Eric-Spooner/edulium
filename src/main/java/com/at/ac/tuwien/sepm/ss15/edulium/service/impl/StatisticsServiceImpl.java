@@ -57,8 +57,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         HashMap<LocalTime, BigDecimal> incomeChart = new HashMap<>();
 
         //dummy data for GUI testing, TODO: replace by real service
-        incomeChart.put(fromDate, new BigDecimal(56.4));
-        incomeChart.put(toDate, new BigDecimal(56.4));
+        incomeChart.put(fromDate == null ? LocalTime.now() : fromDate, new BigDecimal(56.4));
+        incomeChart.put(toDate == null ? LocalTime.now() : toDate, new BigDecimal(66.4));
 
         return incomeChart;
     }

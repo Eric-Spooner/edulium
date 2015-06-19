@@ -43,6 +43,7 @@
     <import resource="service/Spring-InteriorService.xml" />
     <import resource="service/Spring-OrderService.xml" />
     <import resource="service/Spring-ReservationService.xml" />
+    <import resource="service/Spring-StatisticsService.xml" />
 
     <!-- GUI beans -->
     <import resource="gui/Spring-LoginPane.xml" />
