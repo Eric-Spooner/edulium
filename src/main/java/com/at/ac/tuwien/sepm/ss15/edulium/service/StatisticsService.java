@@ -14,7 +14,7 @@ import java.util.HashMap;
 @PreAuthorize("isAuthenticated()")
 public interface StatisticsService extends Service {
     /**
-     * Get a list of popular dishes and drinks, ordered descending by total income, over the given period.
+     * Get a list of popular dishes and drinks, ordered descending by total revenue, over the given period.
      * @param fromDate the beginning of the period. A null value means unbounded.
      * @param toDate the end of the period. A null value means unbounded.
      * @return the list of popular dishes/drinks along with the number of sold items.
