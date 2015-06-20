@@ -56,7 +56,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setBrutto(BigDecimal.valueOf(1));
         order.setTax(BigDecimal.valueOf(1));
         order.setTime(LocalDateTime.now());
-        order.setInvoice(Invoice.withIdentity(1));
         order.setAdditionalInformation("");
         order.setState(Order.State.QUEUED);
 
@@ -90,7 +89,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(BigDecimal.valueOf(0));
         order.setTime(LocalDateTime.now());
-        order.setInvoice(Invoice.withIdentity(1));
         order.setState(Order.State.QUEUED);
 
         // WHEN
@@ -106,7 +104,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setTax(BigDecimal.valueOf(0));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
-        order.setInvoice(Invoice.withIdentity(1));
         order.setState(Order.State.QUEUED);
 
         // WHEN
@@ -122,7 +119,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setTax(BigDecimal.valueOf(0));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
-        order.setInvoice(Invoice.withIdentity(1));
         order.setState(Order.State.QUEUED);
 
         // WHEN
@@ -138,7 +134,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
-        order.setInvoice(Invoice.withIdentity(1));
         order.setState(Order.State.QUEUED);
 
         // WHEN
@@ -154,7 +149,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setBrutto(BigDecimal.valueOf(1));
         order.setTax(BigDecimal.valueOf(1));
         order.setTime(LocalDateTime.now());
-        order.setInvoice(Invoice.withIdentity(1));
         order.setAdditionalInformation("");
 
         // WHEN
@@ -170,7 +164,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(BigDecimal.valueOf(0));
         order.setAdditionalInformation("Info");
-        order.setInvoice(Invoice.withIdentity(1));
         order.setState(Order.State.QUEUED);
 
         // WHEN
@@ -185,7 +178,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setMenuEntry(createMenuEntry("name", "desc", "cat", 50, 0.02, true));
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(BigDecimal.valueOf(0));
-        order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
         order.setState(Order.State.QUEUED);
@@ -202,7 +194,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setMenuEntry(new MenuEntry());
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(BigDecimal.valueOf(0));
-        order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
         order.setState(Order.State.QUEUED);
@@ -220,7 +211,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setMenuEntry(new MenuEntry());
         order.setBrutto(BigDecimal.valueOf(-1));
         order.setTax(BigDecimal.valueOf(0));
-        order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
         order.setState(Order.State.QUEUED);
@@ -238,7 +228,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setMenuEntry(new MenuEntry());
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(null);
-        order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
         order.setState(Order.State.QUEUED);
@@ -256,7 +245,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setMenuEntry(new MenuEntry());
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(BigDecimal.valueOf(-1));
-        order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
         order.setState(Order.State.QUEUED);
@@ -276,7 +264,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setTax(BigDecimal.valueOf(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
-        order.setInvoice(Invoice.withIdentity(1));
         order.setState(Order.State.IN_PROGRESS);
 
         // WHEN
@@ -293,7 +280,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setTax(BigDecimal.valueOf(0));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
-        order.setInvoice(Invoice.withIdentity(1));
         order.setState(Order.State.IN_PROGRESS);
 
         // WHEN
@@ -311,7 +297,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setTax(BigDecimal.valueOf(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
-        order.setInvoice(Invoice.withIdentity(1));
 
         // WHEN
         orderValidator.validateForUpdate(order);
@@ -334,7 +319,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setMenuEntry(createMenuEntry("name", "desc", "cat", 50, 0.02, true));
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(BigDecimal.valueOf(0));
-        order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
         order.setState(Order.State.IN_PROGRESS);
@@ -351,7 +335,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setMenuEntry(new MenuEntry());
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(BigDecimal.valueOf(0));
-        order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
         order.setState(Order.State.IN_PROGRESS);
@@ -369,7 +352,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setMenuEntry(new MenuEntry());
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(null);
-        order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
         order.setState(Order.State.IN_PROGRESS);
@@ -387,7 +369,6 @@ public class TestOrderValidator extends AbstractDomainTest {
         order.setMenuEntry(new MenuEntry());
         order.setBrutto(BigDecimal.valueOf(0));
         order.setTax(BigDecimal.valueOf(-1));
-        order.setInvoice(Invoice.withIdentity(1));
         order.setTime(LocalDateTime.now());
         order.setAdditionalInformation("Info");
         order.setState(Order.State.IN_PROGRESS);

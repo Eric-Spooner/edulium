@@ -44,19 +44,17 @@ class DBOrderDAO implements DAO<Order> {
     public void create(Order order) throws DAOException, ValidationException {
         LOGGER.debug("entering create with parameters " + order);
         validator.validateForCreate(order);
-        final String query = "INSERT INTO RestaurantOrder (invoice_ID, table_section, table_number, menuEntry_ID, " +
-                "orderTime, brutto, tax, info, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        final String query = "INSERT INTO RestaurantOrder (table_section, table_number, menuEntry_ID, " +
+                "orderTime, brutto, tax, info, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            Invoice invoice = order.getInvoice();
-            stmt.setObject(1, invoice == null ? null : invoice.getIdentity());
-            stmt.setLong(2, order.getTable().getSection().getIdentity());
-            stmt.setLong(3, order.getTable().getNumber());
-            stmt.setLong(4, order.getMenuEntry().getIdentity());
-            stmt.setTimestamp(5, Timestamp.valueOf(order.getTime()));
-            stmt.setBigDecimal(6, order.getBrutto());
-            stmt.setBigDecimal(7, order.getTax());
-            stmt.setString(8, order.getAdditionalInformation());
-            stmt.setString(9, order.getState().toString());
+            stmt.setLong(1, order.getTable().getSection().getIdentity());
+            stmt.setLong(2, order.getTable().getNumber());
+            stmt.setLong(3, order.getMenuEntry().getIdentity());
+            stmt.setTimestamp(4, Timestamp.valueOf(order.getTime()));
+            stmt.setBigDecimal(5, order.getBrutto());
+            stmt.setBigDecimal(6, order.getTax());
+            stmt.setString(7, order.getAdditionalInformation());
+            stmt.setString(8, order.getState().toString());
             stmt.executeUpdate();
 
             ResultSet key = stmt.getGeneratedKeys();
@@ -77,24 +75,19 @@ class DBOrderDAO implements DAO<Order> {
 
         validator.validateForUpdate(order);
 
-        final String query = "UPDATE RestaurantOrder SET invoice_ID = ?, table_section = ?, table_number = ?," +
+        final String query = "UPDATE RestaurantOrder SET table_section = ?, table_number = ?," +
                 " menuEntry_ID = ?, orderTime = ?, brutto = ?, tax = ?, info = ?, state = ? WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            if(order.getInvoice() == null){
-                stmt.setNull(1, Types.BIGINT);
-            }else {
-                stmt.setLong(1, order.getInvoice().getIdentity());
-            }
-            stmt.setLong(2, order.getTable().getSection().getIdentity());
-            stmt.setLong(3, order.getTable().getNumber());
-            stmt.setLong(4, order.getMenuEntry().getIdentity());
-            stmt.setTimestamp(5, Timestamp.valueOf(order.getTime()));
-            stmt.setBigDecimal(6, order.getBrutto());
-            stmt.setBigDecimal(7, order.getTax());
-            stmt.setString(8, order.getAdditionalInformation());
-            stmt.setString(9, order.getState().toString());
-            stmt.setLong(10, order.getIdentity());
+            stmt.setLong(1, order.getTable().getSection().getIdentity());
+            stmt.setLong(2, order.getTable().getNumber());
+            stmt.setLong(3, order.getMenuEntry().getIdentity());
+            stmt.setTimestamp(4, Timestamp.valueOf(order.getTime()));
+            stmt.setBigDecimal(5, order.getBrutto());
+            stmt.setBigDecimal(6, order.getTax());
+            stmt.setString(7, order.getAdditionalInformation());
+            stmt.setString(8, order.getState().toString());
+            stmt.setLong(9, order.getIdentity());
             stmt.executeUpdate();
 
 
@@ -147,7 +140,6 @@ class DBOrderDAO implements DAO<Order> {
                 "brutto = ISNULL(?, brutto) AND " +
                 "info = ISNULL(?, info) AND " +
                 "orderTime = ISNULL(?, orderTime) AND " +
-                "CASE WHEN (? IS NULL) THEN TRUE ELSE invoice_ID = ? END AND " +
                 "table_section = ISNULL(?, table_section) AND " +
                 "table_number = ISNULL(?, table_number) AND " +
                 "menuEntry_ID = ISNULL(?, menuEntry_ID) AND " +
@@ -162,24 +154,16 @@ class DBOrderDAO implements DAO<Order> {
             stmt.setObject(3, order.getBrutto());
             stmt.setObject(4, order.getAdditionalInformation());
             stmt.setObject(5, order.getTime() == null ? null : Timestamp.valueOf(order.getTime()));
-            if(order.getInvoice() == null) {
+            if (order.getTable() == null) {
                 stmt.setNull(6, Types.VARCHAR);
                 stmt.setNull(7, Types.VARCHAR);
-            }
-            else {
-                stmt.setObject(6, order.getInvoice().getIdentity());
-                stmt.setObject(7, order.getInvoice().getIdentity());
-            }
-            if (order.getTable() == null) {
-                stmt.setNull(8, Types.VARCHAR);
-                stmt.setNull(9, Types.VARCHAR);
             } else {
                 Table table = order.getTable();
-                stmt.setObject(8, table.getSection() == null ? null : table.getSection().getIdentity());
-                stmt.setLong(9, table.getNumber());
+                stmt.setObject(6, table.getSection() == null ? null : table.getSection().getIdentity());
+                stmt.setLong(7, table.getNumber());
             }
-            stmt.setObject(10, order.getMenuEntry() == null ? null : order.getMenuEntry().getIdentity());
-            stmt.setObject(11, order.getState() == null ? null : order.getState().toString());
+            stmt.setObject(8, order.getMenuEntry() == null ? null : order.getMenuEntry().getIdentity());
+            stmt.setObject(9, order.getState() == null ? null : order.getState().toString());
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
@@ -331,15 +315,6 @@ class DBOrderDAO implements DAO<Order> {
             throw new DAOException("retrieving Table failed");
         }
         order.setTable(tables.get(0));
-
-        if (result.getObject("invoice_ID") != null) {
-            final List<Invoice> invoices = invoiceDAO.populate(Arrays.asList(Invoice.withIdentity(result.getLong("invoice_ID"))));
-            if (invoices.size() != 1) {
-                LOGGER.error("retrieving Invoice failed");
-                throw new DAOException("retrieving Invoice failed");
-            }
-            order.setInvoice(invoices.get(0));
-        }
         return order;
     }
 
