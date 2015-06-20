@@ -54,7 +54,6 @@ public class StatisticViewController implements Initializable, Controller {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            updateChart();
             menuEntries = observableArrayList(statisticsService.getPopularDishes(null, null));
             popularDishesTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
             popularDishesTable.setItems(menuEntries);
@@ -63,6 +62,7 @@ public class StatisticViewController implements Initializable, Controller {
             popularDishesColMenuEntryPrice.setCellValueFactory(new PropertyValueFactory<>("MenuEntryPrice"));
             popularDishesColNumberSold.setCellValueFactory(new PropertyValueFactory<>("SoldNumber"));
             popularDishesColRevenue.setCellValueFactory(new PropertyValueFactory<>("Revenue"));
+            updateChart();
         } catch (Exception e) {
             LOGGER.error("Initialize Statistics View Failed due to" + e);
         }
