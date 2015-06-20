@@ -141,6 +141,7 @@ class OrderServiceImpl implements OrderService {
             throw new ServiceException("An Error has occurred in the data access object");
         }
     }
+
     @Override
     public void markAsInProgress(Order order) throws ServiceException, ValidationException {
         LOGGER.debug("Entering markAsInProgress with parameter " + order);
