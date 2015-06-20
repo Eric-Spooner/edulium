@@ -81,9 +81,7 @@ class ReservationValidator implements Validator<Reservation> {
         if (reservation.getTables() == null) {
             throw new ValidationException("tables must not be null");
         }
-        if (reservation.getTables().isEmpty()) {
-            throw new ValidationException("tables must not be empty");
-        }
+
         for (Table table : reservation.getTables()) {
             tableValidator.validateIdentity(table);
         }

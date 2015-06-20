@@ -90,8 +90,8 @@ public class MainWindowController implements Initializable, Controller {
                 borderPane.setCenter(cookViewPane);
                 break;
             case ServiceScreen:
-                FXMLPane tablesOverviewPane = context.getBean("tableOverviewPane", FXMLPane.class);
-                borderPane.setCenter(tablesOverviewPane);
+                FXMLPane serviceViewPane = context.getBean("serviceViewPane", FXMLPane.class);
+                borderPane.setCenter(serviceViewPane);
                 break;
             case LoginScreen:
             default:

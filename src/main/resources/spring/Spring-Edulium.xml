@@ -57,8 +57,16 @@
     <import resource="gui/Spring-TaxRateViewPane.xml" />
     <import resource="gui/Spring-RoomViewPane.xml" />
     <import resource="gui/Spring-StatisticViewPane.xml" />
-    <import resource="gui/Spring-TableOverviewPane.xml" />
-    <import resource="gui/Spring-OrderOverviewPane.xml" />
-
+    <import resource="gui/service/Spring-TableOverviewPane.xml" />
+    <import resource="gui/service/Spring-ReservationOverviewPane.xml" />
+    <import resource="gui/service/Spring-ReservationEditViewPane.xml" />
+    <import resource="gui/service/Spring-TableViewPane.xml" />
+    <import resource="gui/service/Spring-OrderOverviewPane.xml" />
+    <import resource="gui/service/Spring-OrderInputPane.xml" />
+    <import resource="gui/service/Spring-ServiceViewPane.xml" />
+    <import resource="gui/service/Spring-MenuCategoryOverviewPane.xml" />
+    <import resource="gui/service/Spring-MenuEntryOverviewPane.xml" />
+    <import resource="gui/service/Spring-MenuOverviewPane.xml" />
+    <import resource="gui/service/Spring-MenuDetailsPane.xml" />
 
 </beans>

@@ -4,10 +4,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="orderOverviewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.OrderOverviewController" scope="prototype" />
+    <bean id="menuDetailsController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.service.MenuDetailsController" scope="prototype" />
 
-    <bean id="orderOverviewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/OrderOverview.fxml" />
+    <bean id="menuDetailsPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
+        <constructor-arg name="fxml" value="gui/service/MenuDetails.fxml" />
     </bean>
 
 </beans>

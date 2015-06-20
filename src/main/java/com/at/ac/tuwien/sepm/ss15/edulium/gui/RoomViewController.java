@@ -55,7 +55,7 @@ public class RoomViewController implements Initializable, Controller {
     private double scaleY = 1.0;
     private long clickedSectionId = -1;
 
-    private final int FACT = 10;
+    private final int FACT = 40;
     private final int CANVAS_PADDING = 20;
     private final int TABLE_SIZE = 40;
     private final int SECTION_OFFSET = 40;
@@ -66,8 +66,6 @@ public class RoomViewController implements Initializable, Controller {
     private InteriorService interiorService;
     @Autowired
     private TaskScheduler taskScheduler;
-
-
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -107,7 +105,6 @@ public class RoomViewController implements Initializable, Controller {
 
     }
 
-    //TODO think of a better solution
     public class UpdateCanvas {
         public void update() {
             drawCanvas();
@@ -122,12 +119,27 @@ public class RoomViewController implements Initializable, Controller {
         int rowHeight = 0;
         int x = CANVAS_PADDING;
         int y = CANVAS_PADDING;
-        tablesCanvas.setWidth(scrollPaneLeft.getWidth()-20);
+        int canvasWidth = (int)scrollPaneLeft.getWidth()-20;
+        //tablesCanvas.setWidth(scrollPaneLeft.getWidth()-20);
 
         gc.clearRect(0, 0, tablesCanvas.getWidth(), tablesCanvas.getHeight());
 
+        // Set canvas width to width of biggest section
         try {
             for (Section section : interiorService.getAllSections()) {
+                if(SECTION_PADDING*scaleX+CANVAS_PADDING*scaleX+calculateWidth(section)*scaleX > canvasWidth) {
+                    canvasWidth = (int)(SECTION_PADDING*scaleX+CANVAS_PADDING*scaleX+calculateWidth(section)*scaleX);
+                }
+            }
+        } catch(ServiceException e) {
+            ManagerViewController.showErrorDialog("Error", "Error", e.getMessage());
+        }
+
+        tablesCanvas.setWidth(canvasWidth);
+
+        try {
+            for (Section section : interiorService.getAllSections()) {
+                // Draw section in a new line if there is not enough space
                 if(firstSection) {
                     firstSection = false;
                 } else {
@@ -205,7 +217,7 @@ public class RoomViewController implements Initializable, Controller {
                 stage.setScene(scene);
                 stage.showAndWait();
             } catch (IOException e) {
-                LOGGER.error("Unable to Load Edit Section" + e);
+                LOGGER.error("Unable to Load Edit Section" + e);System.out.println(e);
             }
         }
     }
@@ -295,6 +307,4 @@ public class RoomViewController implements Initializable, Controller {
     public void disable(boolean disabled) {
 
     }
-
-
 }

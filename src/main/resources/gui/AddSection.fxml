@@ -11,12 +11,9 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="827.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.AddSectionController">
    <children>
       <ScrollPane layoutX="14.0" layoutY="14.0" prefHeight="576.0" prefWidth="649.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="164.0" AnchorPane.topAnchor="14.0">
-        <content>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0">
-               <children>
-                  <Canvas fx:id="canvas" height="576.0" width="645.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
-               </children></AnchorPane>
-        </content>
+         <content>
+            <Canvas fx:id="canvas" height="565.0" width="638.0" />
+         </content>
       </ScrollPane>
       <Button layoutX="693.0" layoutY="95.0" mnemonicParsing="false" onAction="#addTableButtonClicked" prefHeight="25.0" prefWidth="103.0" text="Add Table" AnchorPane.rightAnchor="31.0" AnchorPane.topAnchor="95.0" />
       <TextField fx:id="seatsTF" layoutX="749.0" layoutY="53.0" prefHeight="25.0" prefWidth="47.0" AnchorPane.rightAnchor="31.0" AnchorPane.topAnchor="53.0" />

@@ -45,7 +45,7 @@ class DBOrderDAO implements DAO<Order> {
         LOGGER.debug("entering create with parameters " + order);
         validator.validateForCreate(order);
         final String query = "INSERT INTO RestaurantOrder (table_section, table_number, menuEntry_ID, " +
-                "orderTime, brutto, tax, info, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "orderTime, brutto, tax, info, state) VALUES (?, ?, ?, ?, ?, ?, ISNULL(?, ''), ?)";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setLong(1, order.getTable().getSection().getIdentity());
             stmt.setLong(2, order.getTable().getNumber());
@@ -76,7 +76,7 @@ class DBOrderDAO implements DAO<Order> {
         validator.validateForUpdate(order);
 
         final String query = "UPDATE RestaurantOrder SET table_section = ?, table_number = ?," +
-                " menuEntry_ID = ?, orderTime = ?, brutto = ?, tax = ?, info = ?, state = ? WHERE ID = ?";
+                " menuEntry_ID = ?, orderTime = ?, brutto = ?, tax = ?, info = ISNULL(?, ''), state = ? WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, order.getTable().getSection().getIdentity());
