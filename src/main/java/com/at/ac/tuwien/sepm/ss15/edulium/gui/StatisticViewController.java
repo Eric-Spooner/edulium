@@ -1,7 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.statistics.MenuEntryRevenue;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.StatisticsService;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -56,7 +55,6 @@ public class StatisticViewController implements Initializable, Controller {
     public void initialize(URL location, ResourceBundle resources) {
         try {
             updateChart();
-
             menuEntries = observableArrayList(statisticsService.getPopularDishes(null, null));
             popularDishesTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
             popularDishesTable.setItems(menuEntries);
