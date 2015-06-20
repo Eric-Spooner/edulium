@@ -18,11 +18,14 @@
             </Text>
             <TableView fx:id="tableViewQueued" layoutX="11.0" layoutY="54.0" prefHeight="399.0" prefWidth="516.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="54.0" VBox.vgrow="ALWAYS">
                <columns>
-                  <TableColumn fx:id="tableColQueudTisch" prefWidth="67.0" text="Tisch" />
+                  <TableColumn fx:id="tableColQueudTisch" prefWidth="67.0" text="Table" />
                   <TableColumn fx:id="tableColQueudMenuEntry" prefWidth="186.0" text="Menu Entry" />
                   <TableColumn fx:id="tableColQueudAddInfo" prefWidth="180.0" text="Additional Information" />
                   <TableColumn fx:id="tableColQueudTime" prefWidth="82.0" text="Time" />
                </columns>
+                <style>
+                    <Font size="50" />
+                </style>
             </TableView>
             <Button cancelButton="true" layoutX="248.0" layoutY="459.0" mnemonicParsing="false" onAction="#btnQueuedToInProgress" prefHeight="72.0" prefWidth="121.0" text="&gt;&gt;" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="248.0" AnchorPane.rightAnchor="248.0" />
          </children>
@@ -36,7 +39,7 @@
             </Text>
             <TableView fx:id="tableViewInProgress" layoutX="10.0" layoutY="54.0" prefHeight="399.0" prefWidth="516.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="54.0" VBox.vgrow="ALWAYS">
                <columns>
-                  <TableColumn fx:id="tableColProgTisch" prefWidth="67.0" text="Tisch" />
+                  <TableColumn fx:id="tableColProgTisch" prefWidth="67.0" text="Table" />
                   <TableColumn fx:id="tableColProgMenuEntry" prefWidth="186.0" text="Menu Entry" />
                   <TableColumn fx:id="tableColProgAddInfo" prefWidth="180.0" text="Additional Information" />
                   <TableColumn fx:id="tableColProgTime" prefWidth="82.0" text="Time" />
@@ -60,9 +63,14 @@
                   <TableColumn fx:id="tableColDeliveryTime" prefWidth="82.0" text="Time" />
                </columns>
                <VBox.margin>
-                  <Insets bottom="72.0" />
+                  <Insets />
                </VBox.margin>
             </TableView>
+            <Button mnemonicParsing="false" onAction="#btnSelectShownCats" prefHeight="72.0" prefWidth="170.0" text="Categories">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </Button>
          </children>
       </VBox>
    </items>

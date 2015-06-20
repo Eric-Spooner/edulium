@@ -22,6 +22,7 @@ import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.TaskScheduler;
 
 import java.io.IOException;
@@ -90,14 +91,13 @@ public class MenuViewController implements Initializable, Controller {
             DialogMenuController.setDialogEnumeration(DialogEnumeration.UPDATE);
             DialogMenuController.setMenu(tableViewMenu.getSelectionModel().getSelectedItem());
             stage.setTitle("Update Menu");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
+            ApplicationContext context = EduliumApplicationContext.getContext();
+            FXMLPane myPane = context.getBean("menuDialogPane", FXMLPane.class);
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
             menus.setAll(menuService.getAllMenus());
             DialogMenuController.resetDialog();
-        }catch (IOException e){
-            LOGGER.error("Add Menu Button Click did not work");
         }catch (Exception e){
             LOGGER.error("Loading the Menus failed" + e);
         }
