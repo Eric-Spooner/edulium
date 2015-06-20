@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
 import static javafx.collections.FXCollections.observableArrayList;
 
 /**
- * Controller used for the Manager View
+ * Controller used for Add section window
  */
 @Component
 public class AddSectionController implements Initializable {

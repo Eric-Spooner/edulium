@@ -39,7 +39,7 @@ import java.util.ResourceBundle;
 import static javafx.collections.FXCollections.observableArrayList;
 
 /**
- * Created by - on 12.06.2015.
+ * Controller used for Room view in Manager Window
  */
 public class RoomViewController implements Initializable, Controller {
     private static final Logger LOGGER = LogManager.getLogger(RoomViewController.class);
