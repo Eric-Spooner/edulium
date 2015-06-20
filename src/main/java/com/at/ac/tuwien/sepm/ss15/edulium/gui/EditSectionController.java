@@ -34,7 +34,7 @@ import static javafx.collections.FXCollections.observableArrayList;
  */
 @Component
 public class EditSectionController implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(AddSectionController.class);
+    private static final Logger LOGGER = LogManager.getLogger(EditSectionController.class);
 
     private boolean createTable = false;
     private boolean moveTable = false;
@@ -89,7 +89,7 @@ public class EditSectionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources){
-        LOGGER.info("Initializing Add Section Controller");
+        LOGGER.info("Initializing Edit Section Controller");
         initTables();
         seatsTF.setText("6");
         numberTF.setText("1");
