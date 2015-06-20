@@ -35,5 +35,5 @@ public interface StatisticsService extends Service {
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
     @PreAuthorize("hasRole('MANAGER')")
-    List<Pair<LocalDate, BigDecimal>> getIncomeDevelopment(LocalDate fromDate, LocalDate toDate) throws ValidationException, ServiceException;
+    List<Pair<LocalDate, BigDecimal>> getRevenueDevelopment(LocalDate fromDate, LocalDate toDate) throws ValidationException, ServiceException;
 }

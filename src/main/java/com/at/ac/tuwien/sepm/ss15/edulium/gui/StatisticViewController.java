@@ -76,7 +76,7 @@ public class StatisticViewController implements Initializable, Controller {
 
     private void updateChart() {
         try {
-            List<Pair<LocalDate, BigDecimal>> incomeDevelopment = statisticsService.getIncomeDevelopment(null,null);
+            List<Pair<LocalDate, BigDecimal>> incomeDevelopment = statisticsService.getRevenueDevelopment(null, null);
             XYChart.Series series = new XYChart.Series();
             series.setName("Daily Revenue");
             for (Pair<LocalDate, BigDecimal> p : incomeDevelopment) {
