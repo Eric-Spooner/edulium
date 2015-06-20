@@ -35,7 +35,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         LOGGER.debug("Entering getPopularDishes with parameters: " + fromDate + ", " + toDate);
 
         //Get orders and count popular dishes/drinks
-        List<Order> orders = orderService.findOrderBetween(fromDate==null ? null : fromDate.atStartOfDay(), toDate==null ? null : toDate.atStartOfDay());
+        List<Order> orders = orderService.findOrderBetween(fromDate==null ? null : fromDate.atStartOfDay(), toDate==null ? null : toDate.atTime(23,59));
         HashMap<MenuEntry, Long> occurrences = new HashMap<>();
         for (Order order : orders) {
             MenuEntry menuEntry = order.getMenuEntry();
@@ -64,7 +64,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         LOGGER.debug("Entering getRevenueDevelopment with parameters: " + fromDate + ", " + toDate);
 
         //Get invoices and count revenue
-        List<Invoice> invoices = invoiceService.findInvoiceBetween(fromDate==null ? null : fromDate.atStartOfDay(), toDate==null ? null : toDate.atStartOfDay());
+        List<Invoice> invoices = invoiceService.findInvoiceBetween(fromDate==null ? null : fromDate.atStartOfDay(), toDate==null ? null : toDate.atTime(23,59));
         HashMap<LocalDate, BigDecimal> revenueDevelopment = new HashMap<>();
         for (Invoice invoice : invoices) {
             LocalDate date = invoice.getTime().toLocalDate();
