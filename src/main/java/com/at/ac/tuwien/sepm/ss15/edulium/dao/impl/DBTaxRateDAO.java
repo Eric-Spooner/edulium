@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -30,11 +31,11 @@ import java.util.stream.Collectors;
 class DBTaxRateDAO implements DAO<TaxRate> {
     private static final Logger LOGGER = LogManager.getLogger(DBTaxRateDAO.class);
 
-    @Autowired
+    @Resource(name = "dataSource")
     private DataSource dataSource;
-    @Autowired
+    @Resource(name = "userDAO")
     private DAO<User> userDAO;
-    @Autowired
+    @Resource(name = "taxRateValidator")
     private Validator<TaxRate> validator;
 
     @Override

@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.ReservationDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
@@ -15,9 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,16 +28,16 @@ import java.util.stream.Collectors;
  * H2 Database Implementation of the ReservationDAO interface
  */
 @PreAuthorize("isAuthenticated()")
-class DBReservationDAO implements DAO<Reservation> {
+class DBReservationDAO implements ReservationDAO {
     private static final Logger LOGGER = LogManager.getLogger(DBReservationDAO.class);
 
-    @Autowired
+    @Resource(name = "dataSource")
     private DataSource dataSource;
-    @Autowired
+    @Resource(name = "userDAO")
     private DAO<User> userDAO;
-    @Autowired
+    @Resource(name = "tableDAO")
     private DAO<Table> tableDAO;
-    @Autowired
+    @Resource(name = "reservationValidator")
     private Validator<Reservation> validator;
 
     @Override
@@ -193,6 +196,40 @@ class DBReservationDAO implements DAO<Reservation> {
                 LOGGER.error("Searching for reservations failed", e);
                 throw new DAOException("Searching for reservations failed", e);
             }
+        }
+
+        return reservations;
+    }
+
+    @Override
+    public List<Reservation> findBetween(LocalDateTime from, LocalDateTime to) throws DAOException, ValidationException {
+        LOGGER.debug("Entering findBetween with parameters " + from + " / " + to);
+
+        if(from == null || to == null) {
+            LOGGER.error("parameter 'start' or 'duration' is null");
+            throw new ValidationException("parameter 'start' or 'duration' is null");
+        }
+
+        final String query = "SELECT * FROM Reservation WHERE deleted = false AND " +
+                "reservationTime < ? AND DATEADD('MILLISECOND', duration, reservationTime) > ?";
+
+        final List<Reservation> reservations = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setTimestamp(1, Timestamp.valueOf(to));
+            stmt.setTimestamp(2, Timestamp.valueOf(from));
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                try {
+                    reservations.add(reservationFromResultSet(result));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Searching for reservations failed", e);
+            throw new DAOException("Searching for reservations failed", e);
         }
 
         return reservations;

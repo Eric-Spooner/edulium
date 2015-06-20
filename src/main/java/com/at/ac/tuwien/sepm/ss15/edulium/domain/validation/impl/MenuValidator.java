@@ -7,11 +7,13 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
+
 /**
  * validator implementation for the Menu domain object
  */
 class MenuValidator implements Validator<Menu> {
-    @Autowired
+    @Resource(name = "menuEntryValidator")
     private Validator<MenuEntry> menuEntryValidator;
 
     @Override

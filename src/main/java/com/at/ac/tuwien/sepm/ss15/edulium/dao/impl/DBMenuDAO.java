@@ -12,15 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import javax.annotation.Resource;
 import javax.sql.DataSource;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -30,13 +29,13 @@ import java.util.stream.Collectors;
 class DBMenuDAO implements DAO<Menu> {
     private static final Logger LOGGER = LogManager.getLogger(DBMenuDAO.class);
 
-    @Autowired
+    @Resource(name = "dataSource")
     private DataSource dataSource;
-    @Autowired
+    @Resource(name = "menuValidator")
     private Validator<Menu> validator;
-    @Autowired
+    @Resource(name = "menuEntryDAO")
     private DAO<MenuEntry> menuEntryDAO;
-    @Autowired
+    @Resource(name = "userDAO")
     private DAO<User> userDAO;
 
     @Override
@@ -284,8 +283,9 @@ class DBMenuDAO implements DAO<Menu> {
      */
     private List<MenuEntry> getResultMenuEntries(Menu menu) throws DAOException, ValidationException, SQLException{
         List<MenuEntry> entries = new LinkedList<>();
+        HashMap<Long, BigDecimal> menuPrices = new HashMap<>();
 
-        String query = "SELECT menuEntry_ID FROM MenuAssoc WHERE " +
+        String query = "SELECT menuEntry_ID, menuPrice FROM MenuAssoc WHERE " +
                 "menu_ID = ? AND " +
                 "disabled = false";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
@@ -293,14 +293,25 @@ class DBMenuDAO implements DAO<Menu> {
 
             ResultSet resultEntries = stmt.executeQuery();
             while (resultEntries.next()) {
+                Long identity = resultEntries.getLong("menuEntry_ID");
+                BigDecimal price = resultEntries.getBigDecimal("menuPrice");
+
                 // we populate the list of menu entries before we return it - so the identity of a menu entry is enough for now
-                entries.add(MenuEntry.withIdentity(resultEntries.getLong("menuEntry_ID")));
+                entries.add(MenuEntry.withIdentity(identity));
+
+                // store the special menu price so that we can override the regular price afterwards
+                menuPrices.put(identity, price);
             }
         } catch (SQLException e) {
             LOGGER.error("searching for menu entries failed", e);
             throw new DAOException("searching for menu entries failed", e);
         }
-        return menuEntryDAO.populate(entries);
+
+        // populate all menu entries and set the special menu prices afterwards
+        entries = menuEntryDAO.populate(entries);
+        entries.forEach(entry -> entry.setPrice(menuPrices.get(entry.getIdentity())));
+
+        return entries;
     }
 
     /**
