@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="menuCategoryOverviewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.service.MenuCategoryOverviewController" scope="prototype" />
+
+    <bean id="menuCategoryOverviewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
+        <constructor-arg name="fxml" value="gui/service/MenuCategoryOverview.fxml" />
+    </bean>
+
+</beans>
