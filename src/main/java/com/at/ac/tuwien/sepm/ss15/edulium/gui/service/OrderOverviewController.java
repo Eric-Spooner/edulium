@@ -1,11 +1,14 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
+import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.AlertPopOver;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -23,7 +26,9 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
 @Component
@@ -105,16 +110,9 @@ public class OrderOverviewController implements Initializable, Controller {
     private PopOver newOrderPopOver;
 
     private PollingList<Order> queuedOrders;
-    private SortedList<Order> sortedQueuedOrders;
-
     private PollingList<Order> inProgressOrders;
-    private SortedList<Order> sortedInProgressOrders;
-
     private PollingList<Order> readyForDeliveryOrders;
-    private SortedList<Order> sortedReadyForDeliveryOrders;
-
     private PollingList<Order> deliveredOrders;
-    private SortedList<Order> sortedDeliveredOrders;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -135,18 +133,15 @@ public class OrderOverviewController implements Initializable, Controller {
         queuedOrders = new PollingList<>(taskScheduler);
         queuedOrders.setInterval(1000);
 
-        sortedQueuedOrders = new SortedList<>(queuedOrders);
+        SortedList<Order> sortedQueuedOrders = new SortedList<>(queuedOrders);
         sortedQueuedOrders.setComparator((c1, c2) -> c1.getMenuEntry().getName().compareToIgnoreCase(c2.getMenuEntry().getName()));
 
         queuedOrdersView.setItems(sortedQueuedOrders);
         queuedOrdersView.setCellFactory(view -> new OrderCell());
         queuedOrdersView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        queuedOrdersView.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<Order>() {
-            @Override
-            public void onChanged(Change<? extends Order> c) {
-                cancelButton.setDisable(c.getList().isEmpty());
-            }
+        queuedOrdersView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<Order>) c -> {
+            cancelButton.setDisable(c.getList().isEmpty());
         });
     }
 
@@ -154,7 +149,7 @@ public class OrderOverviewController implements Initializable, Controller {
         inProgressOrders = new PollingList<>(taskScheduler);
         inProgressOrders.setInterval(1000);
 
-        sortedInProgressOrders = new SortedList<>(inProgressOrders);
+        SortedList<Order> sortedInProgressOrders = new SortedList<>(inProgressOrders);
         sortedInProgressOrders.setComparator((c1, c2) -> c1.getMenuEntry().getName().compareToIgnoreCase(c2.getMenuEntry().getName()));
 
         inProgressOrdersView.setItems(sortedInProgressOrders);
@@ -166,18 +161,15 @@ public class OrderOverviewController implements Initializable, Controller {
         readyForDeliveryOrders = new PollingList<>(taskScheduler);
         readyForDeliveryOrders.setInterval(1000);
 
-        sortedReadyForDeliveryOrders = new SortedList<>(readyForDeliveryOrders);
+        SortedList<Order> sortedReadyForDeliveryOrders = new SortedList<>(readyForDeliveryOrders);
         sortedReadyForDeliveryOrders.setComparator((c1, c2) -> c1.getMenuEntry().getName().compareToIgnoreCase(c2.getMenuEntry().getName()));
 
         readyForDeliveryOrdersView.setItems(sortedReadyForDeliveryOrders);
         readyForDeliveryOrdersView.setCellFactory(view -> new OrderCell());
         readyForDeliveryOrdersView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        readyForDeliveryOrdersView.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<Order>() {
-            @Override
-            public void onChanged(Change<? extends Order> c) {
-                deliverButton.setDisable(c.getList().isEmpty());
-            }
+        readyForDeliveryOrdersView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<Order>) c -> {
+            deliverButton.setDisable(c.getList().isEmpty());
         });
     }
 
@@ -185,7 +177,7 @@ public class OrderOverviewController implements Initializable, Controller {
         deliveredOrders = new PollingList<>(taskScheduler);
         deliveredOrders.setInterval(1000);
 
-        sortedDeliveredOrders = new SortedList<>(deliveredOrders);
+        SortedList<Order> sortedDeliveredOrders = new SortedList<>(deliveredOrders);
         sortedDeliveredOrders.setComparator((c1, c2) -> c1.getMenuEntry().getName().compareToIgnoreCase(c2.getMenuEntry().getName()));
 
         deliveredOrdersView.setItems(sortedDeliveredOrders);
@@ -227,7 +219,7 @@ public class OrderOverviewController implements Initializable, Controller {
         TableViewController tableViewController = tableViewPane.getController(TableViewController.class);
         tableViewController.setOnTableClicked(table -> {
             try {
-                List<Order> orders = new ArrayList<Order>(); // TODO maybe replace this by a "merged observable list"
+                List<Order> orders = new ArrayList<>(); // TODO maybe replace this by a "merged observable list"
                 orders.addAll(queuedOrdersView.getSelectionModel().getSelectedItems());
                 orders.addAll(inProgressOrdersView.getSelectionModel().getSelectedItems());
                 orders.addAll(readyForDeliveryOrdersView.getSelectionModel().getSelectedItems());
@@ -363,63 +355,51 @@ public class OrderOverviewController implements Initializable, Controller {
 
         headerLabel.setText("Table " + table.getNumber() + " in " + table.getSection().getName());
 
-        queuedOrders.setSupplier(new Supplier<List<Order>>() {
-            @Override
-            public List<Order> get() {
-                try {
-                    Order matcher = new Order();
-                    matcher.setTable(table);
-                    matcher.setState(Order.State.QUEUED);
-                    return orderService.findOrder(matcher);
-                } catch (ServiceException e) {
-                    LOGGER.error("Finding orders via order supplier has failed", e);
-                    return null;
-                }
+        queuedOrders.setSupplier(() -> {
+            try {
+                Order matcher = new Order();
+                matcher.setTable(table);
+                matcher.setState(Order.State.QUEUED);
+                return orderService.findOrder(matcher);
+            } catch (ServiceException e) {
+                LOGGER.error("Finding orders via order supplier has failed", e);
+                return null;
             }
         });
 
-        inProgressOrders.setSupplier(new Supplier<List<Order>>() {
-            @Override
-            public List<Order> get() {
-                try {
-                    Order matcher = new Order();
-                    matcher.setTable(table);
-                    matcher.setState(Order.State.IN_PROGRESS);
-                    return orderService.findOrder(matcher);
-                } catch (ServiceException e) {
-                    LOGGER.error("Finding orders via order supplier has failed", e);
-                    return null;
-                }
+        inProgressOrders.setSupplier(() -> {
+            try {
+                Order matcher = new Order();
+                matcher.setTable(table);
+                matcher.setState(Order.State.IN_PROGRESS);
+                return orderService.findOrder(matcher);
+            } catch (ServiceException e) {
+                LOGGER.error("Finding orders via order supplier has failed", e);
+                return null;
             }
         });
 
-        readyForDeliveryOrders.setSupplier(new Supplier<List<Order>>() {
-            @Override
-            public List<Order> get() {
-                try {
-                    Order matcher = new Order();
-                    matcher.setTable(table);
-                    matcher.setState(Order.State.READY_FOR_DELIVERY);
-                    return orderService.findOrder(matcher);
-                } catch (ServiceException e) {
-                    LOGGER.error("Finding orders via order supplier has failed", e);
-                    return null;
-                }
+        readyForDeliveryOrders.setSupplier(() -> {
+            try {
+                Order matcher = new Order();
+                matcher.setTable(table);
+                matcher.setState(Order.State.READY_FOR_DELIVERY);
+                return orderService.findOrder(matcher);
+            } catch (ServiceException e) {
+                LOGGER.error("Finding orders via order supplier has failed", e);
+                return null;
             }
         });
 
-        deliveredOrders.setSupplier(new Supplier<List<Order>>() {
-            @Override
-            public List<Order> get() {
-                try {
-                    Order matcher = new Order();
-                    matcher.setTable(table);
-                    matcher.setState(Order.State.DELIVERED);
-                    return orderService.findOrder(matcher);
-                } catch (ServiceException e) {
-                    LOGGER.error("Finding orders via order supplier has failed", e);
-                    return null;
-                }
+        deliveredOrders.setSupplier(() -> {
+            try {
+                Order matcher = new Order();
+                matcher.setTable(table);
+                matcher.setState(Order.State.DELIVERED);
+                return orderService.findOrder(matcher);
+            } catch (ServiceException e) {
+                LOGGER.error("Finding orders via order supplier has failed", e);
+                return null;
             }
         });
 

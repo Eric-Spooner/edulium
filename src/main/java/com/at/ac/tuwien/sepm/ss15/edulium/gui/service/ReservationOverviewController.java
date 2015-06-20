@@ -2,8 +2,8 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.AlertPopOver;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
+import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.AlertPopOver;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ReservationService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
@@ -164,17 +164,14 @@ public class ReservationOverviewController implements Initializable, Controller 
     private void initializeFiltering() {
         filteredReservations = new FilteredList<>(reservations);
 
-        Predicate<Reservation> filterPredicate = new Predicate<Reservation>() {
-            @Override
-            public boolean test(Reservation reservation) {
-                boolean containsName = reservation.getName().contains(tfNameFilter.getText());
+        Predicate<Reservation> filterPredicate = reservation -> {
+            boolean containsName = reservation.getName().contains(tfNameFilter.getText());
 
-                LocalDate dateFilter = datePickerFilter.getValue();
-                if(dateFilter != null) {
-                    return reservation.getTime().toLocalDate().isEqual(dateFilter) && containsName;
-                } else {
-                    return reservation.getTime().plus(reservation.getDuration()).isAfter(LocalDateTime.now()) && containsName;
-                }
+            LocalDate dateFilter = datePickerFilter.getValue();
+            if(dateFilter != null) {
+                return reservation.getTime().toLocalDate().isEqual(dateFilter) && containsName;
+            } else {
+                return reservation.getTime().plus(reservation.getDuration()).isAfter(LocalDateTime.now()) && containsName;
             }
         };
 

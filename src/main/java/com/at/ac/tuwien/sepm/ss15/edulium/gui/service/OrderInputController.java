@@ -1,16 +1,19 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PersistentButtonToggleGroup;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
-import javafx.collections.*;
+import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -134,7 +137,7 @@ public class OrderInputController  implements Initializable, Controller {
 
     private Table table;
 
-    private ObservableMap<OrderBase, Integer> orders = FXCollections.observableHashMap();
+    private final ObservableMap<OrderBase, Integer> orders = FXCollections.observableHashMap();
 
     private EventHandler<ActionEvent> doneEventHandler;
 
@@ -215,11 +218,8 @@ public class OrderInputController  implements Initializable, Controller {
 
     private void initializeHeaderButtons() {
         // disable order button if there are no orders
-        orders.addListener(new MapChangeListener<OrderBase, Integer>() {
-            @Override
-            public void onChanged(Change<? extends OrderBase, ? extends Integer> change) {
-                orderButton.setDisable(orders.isEmpty());
-            }
+        orders.addListener((MapChangeListener<OrderBase, Integer>) change -> {
+            orderButton.setDisable(orders.isEmpty());
         });
 
         menuCategoryScreenButton = new ToggleButton();
@@ -346,7 +346,7 @@ public class OrderInputController  implements Initializable, Controller {
 
     // wrapper for a single menu entry order
     private class OrderSingleMenuEntry implements OrderBase {
-        private Order order;
+        private final Order order;
 
         public OrderSingleMenuEntry(Order order) {
             this.order = order;
@@ -364,7 +364,7 @@ public class OrderInputController  implements Initializable, Controller {
 
         @Override
         public List<Order> getOrders() {
-            return Arrays.asList(order);
+            return Collections.singletonList(order);
         }
 
         @Override
@@ -385,8 +385,8 @@ public class OrderInputController  implements Initializable, Controller {
 
     // wrapper for a complete menu which can consist of multiple orders
     private class OrderMenu implements OrderBase {
-        private Menu menu;
-        private List<Order> chosenOrders;
+        private final Menu menu;
+        private final List<Order> chosenOrders;
 
         public OrderMenu(Menu menu, List<Order> chosenOrders) {
             this.menu = menu;

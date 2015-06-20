@@ -13,7 +13,10 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,14 +36,14 @@ public class MenuDetailsController implements Initializable, Controller {
 
     private Consumer<Menu> menuAcceptedConsumer = null;
 
-    private ObservableMap<MenuCategory, List<MenuEntry>> menuEntries = FXCollections.observableHashMap();
-    private Map<MenuCategory, MenuEntry> selectedMenuEntries = new HashMap<>();
+    private final ObservableMap<MenuCategory, List<MenuEntry>> menuEntries = FXCollections.observableHashMap();
+    private final Map<MenuCategory, MenuEntry> selectedMenuEntries = new HashMap<>();
 
     private class MenuCategoryCell extends ListCell<MenuCategory> {
         private MenuCategory menuCategory;
-        private VBox layout = new VBox();
-        private Label menuCategoryNameLabel = new Label();
-        private SegmentedButton menuEntryButtons = new SegmentedButton();
+        private final VBox layout = new VBox();
+        private final Label menuCategoryNameLabel = new Label();
+        private final SegmentedButton menuEntryButtons = new SegmentedButton();
 
         public MenuCategoryCell() {
             menuCategoryNameLabel.setStyle("-fx-font-size: 18px;");
@@ -119,11 +122,11 @@ public class MenuDetailsController implements Initializable, Controller {
 
         HashMap<MenuCategory, List<MenuEntry>> tempMenuEntries = new HashMap<>();
         for (MenuEntry menuEntry : menu.getEntries()) {
-            tempMenuEntries.computeIfAbsent(menuEntry.getCategory(), category -> new ArrayList<MenuEntry>());
+            tempMenuEntries.computeIfAbsent(menuEntry.getCategory(), category -> new ArrayList<>());
             tempMenuEntries.get(menuEntry.getCategory()).add(menuEntry);
         }
 
-        tempMenuEntries.forEach((category, entries) -> menuEntries.put(category, entries));
+        tempMenuEntries.forEach(menuEntries::put);
     }
 
     public void setOnMenuAccepted(Consumer<Menu> menuAcceptedConsumer)

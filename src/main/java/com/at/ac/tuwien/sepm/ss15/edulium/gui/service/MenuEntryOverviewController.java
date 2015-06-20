@@ -41,7 +41,7 @@ public class MenuEntryOverviewController implements Initializable, Controller {
     private Consumer<MenuEntry> menuEntryClickedConsumer = null;
 
     private class UserButtonCell extends GridCell<MenuEntry> {
-        private Button button = new Button();
+        private final Button button = new Button();
         private MenuEntry menuEntry = null;
 
         public UserButtonCell() {
@@ -81,21 +81,18 @@ public class MenuEntryOverviewController implements Initializable, Controller {
 
     public void setMenuCategory(MenuCategory menuCategory)
     {
-        menuEntries.setSupplier(new Supplier<List<MenuEntry>>() {
-            @Override
-            public List<MenuEntry> get() {
-                try {
-                    if (menuCategory == null) {
-                        return menuService.getAllMenuEntries();
-                    } else {
-                        MenuEntry matcher = new MenuEntry();
-                        matcher.setCategory(menuCategory);
-                        return menuService.findMenuEntry(matcher);
-                    }
-                } catch (ServiceException e) {
-                    LOGGER.error("Finding menu entries via menu entry supplier has failed", e);
-                    return null;
+        menuEntries.setSupplier(() -> {
+            try {
+                if (menuCategory == null) {
+                    return menuService.getAllMenuEntries();
+                } else {
+                    MenuEntry matcher = new MenuEntry();
+                    matcher.setCategory(menuCategory);
+                    return menuService.findMenuEntry(matcher);
                 }
+            } catch (ServiceException e) {
+                LOGGER.error("Finding menu entries via menu entry supplier has failed", e);
+                return null;
             }
         });
     }

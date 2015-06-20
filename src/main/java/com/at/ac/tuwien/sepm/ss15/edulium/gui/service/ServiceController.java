@@ -1,7 +1,8 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
+import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.BorderPane;

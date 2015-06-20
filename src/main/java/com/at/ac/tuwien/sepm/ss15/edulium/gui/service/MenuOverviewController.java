@@ -12,7 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.controlsfx.control.*;
+import org.controlsfx.control.GridCell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 
@@ -39,7 +39,7 @@ public class MenuOverviewController implements Initializable, Controller {
     private Consumer<Menu> menuClickedConsumer = null;
 
     private class MenuCell extends GridCell<Menu> {
-        private Button button = new Button();
+        private final Button button = new Button();
         private Menu menu = null;
 
         public MenuCell() {
@@ -63,15 +63,12 @@ public class MenuOverviewController implements Initializable, Controller {
     public void initialize(URL location, ResourceBundle resources) {
         menus = new PollingList<>(taskScheduler);
         menus.setInterval(1000);
-        menus.setSupplier(new Supplier<List<Menu>>() {
-            @Override
-            public List<Menu> get() {
-                try {
-                    return menuService.getAllMenus();
-                } catch (ServiceException e) {
-                    LOGGER.error("Getting all menus via menu supplier has failed", e);
-                    return null;
-                }
+        menus.setSupplier(() -> {
+            try {
+                return menuService.getAllMenus();
+            } catch (ServiceException e) {
+                LOGGER.error("Getting all menus via menu supplier has failed", e);
+                return null;
             }
         });
 

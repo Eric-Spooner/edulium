@@ -40,7 +40,7 @@ public class MenuCategoryOverviewController implements Initializable, Controller
     private Consumer<MenuCategory> menuCategoryClickedConsumer = null;
 
     private class UserButtonCell extends GridCell<MenuCategory> {
-        private Button button = new Button();
+        private final Button button = new Button();
         private MenuCategory menuCategory = null;
 
         public UserButtonCell() {
@@ -64,15 +64,12 @@ public class MenuCategoryOverviewController implements Initializable, Controller
     public void initialize(URL location, ResourceBundle resources) {
         menuCategories = new PollingList<>(taskScheduler);
         menuCategories.setInterval(1000);
-        menuCategories.setSupplier(new Supplier<List<MenuCategory>>() {
-            @Override
-            public List<MenuCategory> get() {
-                try {
-                    return menuService.getAllMenuCategories();
-                } catch (ServiceException e) {
-                    LOGGER.error("Getting all menu categories via menu category supplier has failed", e);
-                    return null;
-                }
+        menuCategories.setSupplier(() -> {
+            try {
+                return menuService.getAllMenuCategories();
+            } catch (ServiceException e) {
+                LOGGER.error("Getting all menu categories via menu category supplier has failed", e);
+                return null;
             }
         });
 

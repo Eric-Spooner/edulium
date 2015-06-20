@@ -3,7 +3,8 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
+import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.AlertPopOver;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.NumericTextField;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ReservationService;
@@ -64,7 +65,7 @@ public class ReservationEditViewController implements Initializable, Controller 
     private Consumer<Reservation> onAcceptedConsumer;
     private Consumer<Reservation> onCanceledConsumer;
     private Reservation reservation;
-    private Reservation reservationCopy = new Reservation();
+    private final Reservation reservationCopy = new Reservation();
     private Mode mode;
 
     @Override
@@ -93,28 +94,25 @@ public class ReservationEditViewController implements Initializable, Controller 
             updateSeatsLabel();
         });
 
-        ChangeListener<Object> changeListener = new ChangeListener<Object>() {
-            @Override
-            public void changed(ObservableValue<?> observable, Object oldValue, Object newValue) {
-                LocalDateTime dateTime = getLocalDateTime();
+        ChangeListener<Object> changeListener = (observable, oldValue, newValue) -> {
+            LocalDateTime dateTime = getLocalDateTime();
 
-                if(tfDuration.isEmpty() || dateTime == null) {
-                    updateSeatsLabel();
-                    btnSave.setDisable(true);
-                    return;
-                }
+            if(tfDuration.isEmpty() || dateTime == null) {
+                updateSeatsLabel();
+                btnSave.setDisable(true);
+                return;
+            }
 
-                boolean disable = dateTime.isBefore(LocalDateTime.now()) || tfDuration.isEmpty() || tfName.getText().isEmpty() || tfQuantity.isEmpty();
+            boolean disable = dateTime.isBefore(LocalDateTime.now()) || tfDuration.isEmpty() || tfName.getText().isEmpty() || tfQuantity.isEmpty();
 
-                btnSave.setDisable(disable);
+            btnSave.setDisable(disable);
 
-                try {
-                    List<Reservation> reservations = reservationService.findReservationBetween(dateTime, dateTime.plusHours((int) tfDuration.getValue()));
-                    displayOccupiedTables(reservations);
+            try {
+                List<Reservation> reservations = reservationService.findReservationBetween(dateTime, dateTime.plusHours((int) tfDuration.getValue()));
+                displayOccupiedTables(reservations);
 
-                } catch (ServiceException | ValidationException e) {
-                    displayErrorMessage("error retrieving reservations", e);
-                }
+            } catch (ServiceException | ValidationException e) {
+                displayErrorMessage("error retrieving reservations", e);
             }
         };
 

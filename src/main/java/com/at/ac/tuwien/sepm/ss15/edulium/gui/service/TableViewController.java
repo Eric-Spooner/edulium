@@ -10,7 +10,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.apache.logging.log4j.LogManager;
@@ -19,7 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 /**
@@ -39,7 +41,7 @@ public class TableViewController implements Initializable, Controller {
     private PollingList<Table> tables;
     private PollingList<Section> sections;
     private Consumer<Table> tableClickedConsumer = null;
-    private Map<Section, GridView<Table>> sectionsMap = new HashMap<>();
+    private final Map<Section, GridView<Table>> sectionsMap = new HashMap<>();
     private Boolean showSeats = false;
 
     private class TableGridCell extends GridView.GridCell<Table> {
