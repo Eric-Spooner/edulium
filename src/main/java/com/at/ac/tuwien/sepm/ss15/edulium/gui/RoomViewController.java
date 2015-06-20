@@ -217,7 +217,7 @@ public class RoomViewController implements Initializable, Controller {
                 stage.setScene(scene);
                 stage.showAndWait();
             } catch (IOException e) {
-                LOGGER.error("Unable to Load Edit Section" + e);System.out.println(e);
+                LOGGER.error("Unable to Load Edit Section" + e);
             }
         }
     }
