@@ -4,6 +4,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -72,6 +73,17 @@ public interface OrderService extends Service {
      */
     @PreAuthorize("hasRole('MANAGER')")
     List<History<Order>> getOrderHistory(Order template) throws ServiceException, ValidationException;
+
+
+    /**
+     * The function is used to get the User, who submitted the Order
+     *
+     * @param order, the submitter is asked for
+     * @return the user, the order submitted
+     * @throws ServiceException
+     * @throws ValidationException
+     */
+    User getOrderSubmitter(Order order) throws ServiceException, ValidationException;
 
     /**
      * Cook uses this function, to set the state of the order to IN_PROGRESS
