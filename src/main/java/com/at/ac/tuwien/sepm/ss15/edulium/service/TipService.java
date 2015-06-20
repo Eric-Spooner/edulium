@@ -14,5 +14,4 @@ public interface TipService extends Service {
      * @param invoice the invoice, where the tip is included
      */
     public void calculateTheTipAndMatchItToUser(Invoice invoice);
-
 }
