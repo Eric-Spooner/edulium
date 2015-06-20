@@ -6,7 +6,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.impl.InteriorServiceImpl;
 import com.sun.xml.internal.ws.server.ServerRtException;
 import org.h2.command.dml.Update;
 import org.junit.Before;

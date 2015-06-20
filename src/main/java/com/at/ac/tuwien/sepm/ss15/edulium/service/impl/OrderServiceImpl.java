@@ -2,12 +2,14 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
@@ -15,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import sun.security.validator.ValidatorException;
 
+import javax.annotation.Resource;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,9 +26,11 @@ import java.util.List;
  */
 class OrderServiceImpl implements OrderService {
     private static final Logger LOGGER = LogManager.getLogger(TaxRateServiceImpl.class);
-    @Autowired
+    @Resource(name = "invoiceService")
+    private InvoiceService invoiceService;
+    @Resource(name = "orderDAO")
     private DAO<Order> orderDAO;
-    @Autowired
+    @Resource(name = "orderValidator")
     private Validator<Order> orderValidator;
 
 
@@ -42,7 +47,6 @@ class OrderServiceImpl implements OrderService {
             throw new ServiceException("An Error has occurred in the data access object");
         }
     }
-
     @Override
     public void updateOrder(Order order) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addOrder with parameter: " + order);
@@ -57,7 +61,11 @@ class OrderServiceImpl implements OrderService {
         }else {
             Order preOrder = preOrders.get(0);
             //if the order already had an invoice it is not allowed to be changed
-            if(false){ //TODO: ! Invoice.find(invoice with order).isEmpty()
+            List<Order> list = new LinkedList<>();
+            list.add(order);
+            Invoice invoice = new Invoice();
+            invoice.setOrders(list);
+            if(invoiceService.findInvoices(invoice).size()>0){
                 LOGGER.error("It is not allowed to change an order with invoice");
                 throw new ServiceException("It is not allowed to change an order with invoice");
             }
@@ -78,7 +86,6 @@ class OrderServiceImpl implements OrderService {
                     throw new ServiceException("It is not allowed to change the time of the order");
                 }
             }
-
             try {
                 orderDAO.update(order);
             } catch (DAOException e) {
