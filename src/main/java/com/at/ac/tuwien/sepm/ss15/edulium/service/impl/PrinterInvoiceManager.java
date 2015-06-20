@@ -12,6 +12,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class PrinterInvoiceManager implements InvoiceManager {
     private static final Logger LOGGER = LogManager.getLogger(PrinterInvoiceManager.class);
@@ -22,12 +24,16 @@ public class PrinterInvoiceManager implements InvoiceManager {
      */
     @Override
     public void manageInvoice(Invoice invoice) throws ServiceException {
-        String filePath = "target/" + "temp" + ".pdf"; // replace temp with invoice.getTime()
+        String filePath = "target/last_invoice.pdf";
 
-        generatePDF(invoice, filePath);
-        viewPDF(filePath);
-        printPDF(filePath);
+        // delete the last generated PDF
         deletePDF(filePath);
+        // generate new PDF and place it in the provided directory
+        generatePDF(invoice, filePath);
+        // temporary opening of the PDF
+        viewPDF(filePath);
+        // send PDF to printer and print it out
+        printPDF(filePath);
     }
 
     public void generatePDF(Invoice invoice, String filePath) throws ServiceException {
@@ -38,7 +44,7 @@ public class PrinterInvoiceManager implements InvoiceManager {
             PdfWriter.getInstance(document, file);
             document.open();
             // TODO: Generate the actual content of the pdf
-            document.add(new Paragraph("Hello World!"));
+            document.add(new Paragraph("Hello World #2!"));
             document.close();
         } catch (DocumentException e) {
             LOGGER.error("An error occurred while generating the PDF", e);
@@ -56,7 +62,7 @@ public class PrinterInvoiceManager implements InvoiceManager {
                     file.close();
                 }
             } catch (IOException e) {
-                LOGGER.error("An error occurred when closing the output stream", e);
+                LOGGER.error("An error occurred while trying to close the output stream", e);
             }
         }
     }
@@ -78,6 +84,11 @@ public class PrinterInvoiceManager implements InvoiceManager {
     }
 
     public void deletePDF(String filePath) throws ServiceException {
-        // TODO: Delete the file after printing it
+        try {
+            Files.deleteIfExists(Paths.get(filePath));
+        } catch (IOException e) {
+            LOGGER.error("An I/O error occurred while trying to delete the PDF", e);
+            throw new ServiceException("An I/O error occurred while trying to delete the PDF", e);
+        }
     }
 }
