@@ -89,7 +89,7 @@ public class EditSectionController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources){
-        LOGGER.info("Initializing Add Section Controller");
+        LOGGER.info("Initializing Edit Section Controller");
         initTables();
         seatsTF.setText("6");
         numberTF.setText("1");
