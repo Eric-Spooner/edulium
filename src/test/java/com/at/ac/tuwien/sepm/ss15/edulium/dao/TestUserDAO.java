@@ -8,6 +8,7 @@ import org.junit.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user.setIdentity("warty");
         user.setName("Warty Warthog");
         user.setRole("manager");
+        user.setTip(new BigDecimal("0.00"));
 
         // WHEN
         userDAO.create(user);
@@ -47,6 +49,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user1.setIdentity("quantal");
         user1.setName("Quantal Quetzal");
         user1.setRole("bugfixer");
+        user1.setTip(new BigDecimal("0.00"));
 
         try {
             userDAO.create(user1);
@@ -62,6 +65,9 @@ public class TestUserDAO extends AbstractDAOTest {
         user2.setIdentity(user1.getIdentity());
         user2.setName("Trusty Tahr");
         user2.setRole("tester");
+        user2.setTip(new BigDecimal("0.00"));
+
+
 
         // WHEN
         userDAO.create(user2);
@@ -73,6 +79,7 @@ public class TestUserDAO extends AbstractDAOTest {
         User user = new User();
         user.setName("Jaunty Jackalope");
         user.setRole("tester");
+        user.setTip(new BigDecimal("0.00"));
 
         // WHEN
         userDAO.create(user);
@@ -94,6 +101,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user.setIdentity("maverick");
         user.setName("Maverick Meerkat");
         user.setRole("manager");
+        user.setTip(BigDecimal.valueOf(0));
 
         // check if user is stored
         userDAO.create(user);
@@ -104,6 +112,7 @@ public class TestUserDAO extends AbstractDAOTest {
         updatedUser.setIdentity(user.getIdentity());
         updatedUser.setName("Dapper Drake");
         updatedUser.setRole("waiter");
+        updatedUser.setTip(new BigDecimal("0.00"));
 
         // WHEN
         userDAO.update(updatedUser);
@@ -121,6 +130,7 @@ public class TestUserDAO extends AbstractDAOTest {
         User user = new User();
         user.setName("Oneiric Ocelot");
         user.setRole("thrower");
+        user.setTip(BigDecimal.valueOf(0));
 
         // WHEN
         userDAO.update(user);
@@ -151,6 +161,7 @@ public class TestUserDAO extends AbstractDAOTest {
 
         user.setName("Feisty Fawn");
         user.setRole("developer");
+        user.setTip(BigDecimal.valueOf(0));
 
         // WHEN
         userDAO.update(user);
@@ -165,6 +176,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user.setIdentity("gutsy");
         user.setName("Gutsy Gibbon");
         user.setRole("garbageman");
+        user.setTip(BigDecimal.valueOf(0));
 
         // check if user is stored
         userDAO.create(user);
@@ -219,6 +231,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user1.setIdentity("hardy");
         user1.setName("Hardy Heron");
         user1.setRole("manager");
+        user1.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user1);
         assertEquals(1, userDAO.find(user1).size());
@@ -228,6 +241,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user2.setIdentity("intrepid");
         user2.setName("Intrepid Ibex");
         user2.setRole("manager");
+        user2.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user2);
         assertEquals(1, userDAO.find(user2).size());
@@ -237,6 +251,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user3.setIdentity("precise");
         user3.setName("Intrepid Ibex");
         user3.setRole("developer");
+        user3.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user3);
         assertEquals(1, userDAO.find(user3).size());
@@ -270,6 +285,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user1.setIdentity("hardy");
         user1.setName("Hardy Heron");
         user1.setRole("manager");
+        user1.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user1);
         assertEquals(1, userDAO.find(user1).size());
@@ -279,6 +295,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user2.setIdentity("intrepid");
         user2.setName("Intrepid Ibex");
         user2.setRole("manager");
+        user2.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user2);
         assertEquals(1, userDAO.find(user2).size());
@@ -288,6 +305,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user3.setIdentity("precise");
         user3.setName("Intrepid Ibex");
         user3.setRole("developer");
+        user3.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user3);
         assertEquals(1, userDAO.find(user3).size());
@@ -320,6 +338,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user1.setIdentity("hardy");
         user1.setName("Hardy Heron");
         user1.setRole("tester");
+        user1.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user1);
         assertEquals(1, userDAO.find(user1).size());
@@ -329,6 +348,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user2.setIdentity("intrepid");
         user2.setName("Intrepid Ibex");
         user2.setRole("tester");
+        user2.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user2);
         assertEquals(1, userDAO.find(user2).size());
@@ -338,6 +358,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user3.setIdentity("precise");
         user3.setName("Intrepid Ibex");
         user3.setRole("developer");
+        user3.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user3);
         assertEquals(1, userDAO.find(user3).size());
@@ -403,6 +424,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user1.setIdentity("hardy");
         user1.setName("Hardy Heron");
         user1.setRole("manager");
+        user1.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user1);
         assertEquals(1, userDAO.find(user1).size());
@@ -412,6 +434,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user2.setIdentity("intrepid");
         user2.setName("Intrepid Ibex");
         user2.setRole("manager");
+        user2.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user2);
         assertEquals(1, userDAO.find(user2).size());
@@ -421,6 +444,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user3.setIdentity("precise");
         user3.setName("Intrepid Ibex");
         user3.setRole("developer");
+        user3.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user3);
         assertEquals(1, userDAO.find(user3).size());
@@ -493,6 +517,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user1.setIdentity("identity");
         user1.setName("user");
         user1.setRole("user_role");
+        user1.setTip(BigDecimal.valueOf(0));
         LocalDateTime createTime = LocalDateTime.now();
         userDAO.create(user1);
 
@@ -500,6 +525,7 @@ public class TestUserDAO extends AbstractDAOTest {
         User user2 = User.withIdentity(user1.getIdentity());
         user2.setName("update");
         user2.setRole("update_role");
+        user2.setTip(BigDecimal.valueOf(0));
         LocalDateTime updateTime = LocalDateTime.now();
         userDAO.update(user2);
 
@@ -546,6 +572,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user1.setIdentity("hardy");
         user1.setName("Hardy Heron");
         user1.setRole("manager");
+        user1.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user1);
         assertEquals(1, userDAO.find(user1).size());
@@ -555,6 +582,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user2.setIdentity("intrepid");
         user2.setName("Intrepid Ibex");
         user2.setRole("manager");
+        user2.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user2);
         assertEquals(1, userDAO.find(user2).size());
@@ -564,6 +592,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user3.setIdentity("precise");
         user3.setName("Intrepid Ibex");
         user3.setRole("developer");
+        user3.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user3);
         assertEquals(1, userDAO.find(user3).size());
@@ -592,6 +621,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user1.setIdentity("hardy");
         user1.setName("Hardy Heron");
         user1.setRole("manager");
+        user1.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user1);
         assertEquals(1, userDAO.find(user1).size());
@@ -603,6 +633,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user2.setIdentity("intrepid");
         user2.setName("Intrepid Ibex");
         user2.setRole("manager");
+        user2.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user2);
         assertEquals(1, userDAO.find(user2).size());
@@ -614,6 +645,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user3.setIdentity("precise");
         user3.setName("Intrepid Ibex");
         user3.setRole("developer");
+        user3.setTip(BigDecimal.valueOf(0));
 
         userDAO.create(user3);
         assertEquals(1, userDAO.find(user3).size());
