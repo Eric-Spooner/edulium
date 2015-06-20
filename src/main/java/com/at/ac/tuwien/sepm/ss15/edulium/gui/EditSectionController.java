@@ -34,7 +34,7 @@ import static javafx.collections.FXCollections.observableArrayList;
  */
 @Component
 public class EditSectionController implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(AddSectionController.class);
+    private static final Logger LOGGER = LogManager.getLogger(EditSectionController.class);
 
     private boolean createTable = false;
     private boolean moveTable = false;
