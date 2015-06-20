@@ -13,7 +13,6 @@ public class Order {
     private BigDecimal tax = null;
     private String additionalInformation = null;
     private Table table = null;
-    private Invoice invoice = null;
     private MenuEntry menuEntry = null;
     private State state = null;
 
@@ -148,22 +147,6 @@ public class Order {
         this.menuEntry = menueEntry;
     }
 
-    /**
-     *
-     * @return the invoice of the order
-     */
-    public Invoice getInvoice() {
-        return invoice;
-    }
-
-    /**
-     * sets the invoice of the order
-     * @param invoice
-     */
-    public void setInvoice(Invoice invoice) {
-        this.invoice = invoice;
-    }
-
     /*
      * @return the state of the order
      */
@@ -190,7 +173,6 @@ public class Order {
             return false;
         if (brutto != null ? (brutto.compareTo(order.getBrutto())!=0) : order.brutto != null) return false;
         if (identity != null ? !identity.equals(order.identity) : order.identity != null) return false;
-        if (invoice != null ? !invoice.equals(order.invoice) : order.invoice != null) return false;
         if (menuEntry != null ? !menuEntry.equals(order.menuEntry) : order.menuEntry != null) return false;
         if (table != null ? !table.equals(order.table) : order.table != null) return false;
         if (tax != null ? (tax.compareTo(order.getTax())!=0) : order.brutto != null) return false;
@@ -209,7 +191,6 @@ public class Order {
                 ", tax=" + tax +
                 ", additionalInformation='" + additionalInformation + '\'' +
                 ", table=" + table +
-                ", invoice=" + invoice +
                 ", menuEntry=" + menuEntry +
                 ", state=" + state +
                 '}';
