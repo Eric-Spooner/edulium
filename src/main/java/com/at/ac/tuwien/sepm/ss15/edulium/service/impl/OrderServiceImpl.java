@@ -2,10 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
@@ -152,6 +149,14 @@ class OrderServiceImpl implements OrderService {
             throw new ServiceException("An Error has occurred in the data access object");
         }
     }
+
+    @Override
+    public User getOrderSubmitter(Order order) throws ServiceException, ValidationException {
+        orderValidator.validateIdentity(order);
+        History<Order> history =  this.getOrderHistory(order).get(0);
+        return history.getUser();
+    }
+
     @Override
     public void markAsInProgress(Order order) throws ServiceException, ValidationException {
         LOGGER.debug("Entering markAsInProgress with parameter " + order);
