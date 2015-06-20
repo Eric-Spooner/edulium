@@ -175,6 +175,7 @@ public class EditSectionController implements Initializable {
                 } catch (NumberFormatException e) {
                     showErrorDialog("Error", "Invalid value", "Only valid numbers are allowed!");
                 }
+                drawCanvas();
             }
         });
 
@@ -340,6 +341,18 @@ public class EditSectionController implements Initializable {
 
     private void drawCanvas() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        int maxX = (int)canvas.getWidth();
+        int maxY = (int)canvas.getHeight();
+        for(Rect rect : rects) {
+            if(rect.getX()+rect.getW() > maxX-120)
+                maxX = (int)(rect.getX()+rect.getW()+120);
+            if(rect.getY()+rect.getH() > maxY-120)
+                maxY = (int)(rect.getY()+rect.getH()+120);
+        }
+        canvas.setWidth(maxX);
+        canvas.setHeight(maxY);
+
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         for(Rect rect : rects) {

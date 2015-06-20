@@ -119,12 +119,27 @@ public class RoomViewController implements Initializable, Controller {
         int rowHeight = 0;
         int x = CANVAS_PADDING;
         int y = CANVAS_PADDING;
-        tablesCanvas.setWidth(scrollPaneLeft.getWidth()-20);
+        int canvasWidth = (int)scrollPaneLeft.getWidth()-20;
+        //tablesCanvas.setWidth(scrollPaneLeft.getWidth()-20);
 
         gc.clearRect(0, 0, tablesCanvas.getWidth(), tablesCanvas.getHeight());
 
+        // Set canvas width to width of biggest section
         try {
             for (Section section : interiorService.getAllSections()) {
+                if(SECTION_PADDING*scaleX+CANVAS_PADDING*scaleX+calculateWidth(section)*scaleX > canvasWidth) {
+                    canvasWidth = (int)(SECTION_PADDING*scaleX+CANVAS_PADDING*scaleX+calculateWidth(section)*scaleX);
+                }
+            }
+        } catch(ServiceException e) {
+            ManagerViewController.showErrorDialog("Error", "Error", e.getMessage());
+        }
+
+        tablesCanvas.setWidth(canvasWidth);
+
+        try {
+            for (Section section : interiorService.getAllSections()) {
+                // Draw section in a new line if there is not enough space
                 if(firstSection) {
                     firstSection = false;
                 } else {
@@ -292,6 +307,4 @@ public class RoomViewController implements Initializable, Controller {
     public void disable(boolean disabled) {
 
     }
-
-
 }
