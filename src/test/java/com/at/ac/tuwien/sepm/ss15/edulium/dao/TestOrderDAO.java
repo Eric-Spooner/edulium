@@ -658,4 +658,42 @@ public class TestOrderDAO extends AbstractDAOTest {
         // WHEN
         List<Order> result = orderDAO.populate(invalidOrders);
     }
+
+    @Test
+    public void testCreate_shouldAddOrderWithoutAdditionalInformation() throws DAOException, ValidationException {
+        // GIVEN
+        Order order = createOrder(BigDecimal.valueOf(500), null, BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.IN_PROGRESS);
+        // WHEN
+        orderDAO.create(order);
+
+        // THEN
+        // try to find the user and compare it
+        List<Order> storedObjects = orderDAO.find(Order.withIdentity(order.getIdentity()));
+        assertEquals(1, storedObjects.size());
+        assertEquals(order, storedObjects.get(0));
+    }
+
+    @Test
+    public void testUpdate_shouldUpdateOrderWithoutAdditionalInformation() throws DAOException, ValidationException {
+        //  GIVEN
+        Order order= createOrder(BigDecimal.valueOf(500), null, BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.IN_PROGRESS);
+        orderDAO.create(order);
+
+        // check if entry is stored
+        assertEquals(1, orderDAO.find(Order.withIdentity(order.getIdentity())).size());
+
+        // WHEN
+        Order order2 = createOrder(BigDecimal.valueOf(1000), null,
+                BigDecimal.valueOf(0.02), LocalDateTime.now(), Order.State.READY_FOR_DELIVERY);
+        order2.setIdentity(order.getIdentity());
+        orderDAO.update(order2);
+
+        // THEN
+        // check if entry was updatedupdatedMenu
+        List<Order> storedObjects = orderDAO.find(Order.withIdentity(order2.getIdentity()));
+        assertEquals(1, storedObjects.size());
+        assertEquals(order2, storedObjects.get(0));
+    }
 }

@@ -42,11 +42,15 @@ class ReservationServiceImpl implements ReservationService {
     public void addReservation(Reservation reservation) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addReservation with parameter: " + reservation);
 
-        reservationValidator.validateForCreate(reservation);
         validateReservationTime(reservation);
 
         try {
-            reservation.setTables(reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables()));
+            if(reservation.getTables() == null || reservation.getTables().isEmpty()) {
+                reservation.setTables(reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables()));
+            }
+
+            reservationValidator.validateForCreate(reservation);
+
             reservationDAO.create(reservation);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
@@ -75,14 +79,14 @@ class ReservationServiceImpl implements ReservationService {
 
         try {
             // check if reservation time or seats will be changed
-            if(reservation.getQuantity() != originalReservation.getQuantity() ||
-                    reservation.getTime() != originalReservation.getTime() ||
-                    reservation.getDuration() != originalReservation.getDuration()) {
+            if((reservation.getTables() == null || reservation.getTables().isEmpty()) &&
+                    (reservation.getQuantity() != originalReservation.getQuantity() ||
+                     reservation.getTime() != originalReservation.getTime() ||
+                     reservation.getDuration() != originalReservation.getDuration())) {
 
                 // delete tables from reservation
-                Reservation tmpRes = Reservation.withIdentity(reservation.getIdentity());
-                tmpRes.setTables(new ArrayList<>());
-                reservationDAO.update(tmpRes);
+                originalReservation.setTables(new ArrayList<>());
+                reservationDAO.update(originalReservation);
 
                 // get new tables
                 reservation.setTables(reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables()));

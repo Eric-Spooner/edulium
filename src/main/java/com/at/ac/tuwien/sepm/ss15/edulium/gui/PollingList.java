@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 import javafx.application.Platform;
 import javafx.collections.ObservableListBase;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
 
 import java.util.*;
@@ -27,8 +28,15 @@ public class PollingList<E> extends ObservableListBase<E> {
         @Override
         public void run() {
             assert supplier != null;
+            List<E> suppliedElementsList = null;
 
-            List<E> suppliedElementsList = supplier.get();
+            try {
+                suppliedElementsList = supplier.get();
+            } catch (AuthenticationCredentialsNotFoundException e) {
+                stopPolling();
+                return;
+            }
+
             if (suppliedElementsList == null) {
                 return;
             }

@@ -67,8 +67,6 @@ public class RoomViewController implements Initializable, Controller {
     @Autowired
     private TaskScheduler taskScheduler;
 
-
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         drawCanvas();

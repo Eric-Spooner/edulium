@@ -59,6 +59,16 @@
     <import resource="gui/Spring-RoomViewPane.xml" />
     <import resource="gui/Spring-StatisticViewPane.xml" />
     <import resource="gui/Spring-TableOverviewPane.xml" />
+    <import resource="gui/Spring-ReservationOverviewPane.xml" />
+    <import resource="gui/Spring-ReservationEditViewPane.xml" />
+    <import resource="gui/Spring-TableViewPane.xml" />
     <import resource="gui/Spring-OrderOverviewPane.xml" />
+<<<<<<< HEAD
+=======
+    <import resource="gui/Spring-OrderInputPane.xml" />
+    <import resource="gui/Spring-ServiceViewPane.xml" />
+    <import resource="gui/Spring-MenuCategoryOverviewPane.xml" />
+    <import resource="gui/Spring-MenuEntryOverviewPane.xml" />
+>>>>>>> remotes/origin/gui/service
 
 </beans>

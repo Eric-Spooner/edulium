@@ -19,7 +19,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -483,88 +482,4 @@ public class TestOrderService extends AbstractServiceTest {
         // THEN
         Mockito.verify(orderDAO).update(order1);
     }
-
-    @Test
-    @WithMockUser(username = "servicetester", roles = {"COOK"})
-    public void testGetAllOrdersToPrepare_withCookShouldDeliverEntries()
-            throws ServiceException, ValidationException, DAOException {
-
-        //PREPARE
-        Order order1 = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
-                LocalDateTime.now(), Order.State.QUEUED, 1);
-        Order order2 = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
-                LocalDateTime.now(), Order.State.QUEUED, 2);
-        Order order3 = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
-                LocalDateTime.now(), Order.State.QUEUED, 3);
-
-        //WHEN
-        orderService.addOrder(order1);
-        orderService.addOrder(order2);
-        orderService.addOrder(order3);
-        Mockito.when(orderDAO.getAll()).thenReturn(Arrays.asList(order1, order2, order3));
-
-        //THEN
-        List<MenuCategory> listMenuCategories = new LinkedList<>();
-        listMenuCategories.add(MenuCategory.withIdentity(1));
-        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories, Order.State.QUEUED).size()==1);
-        listMenuCategories.add(MenuCategory.withIdentity(2));
-        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories, Order.State.QUEUED).size()==2);
-        listMenuCategories.add(MenuCategory.withIdentity(3));
-        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories, Order.State.QUEUED).size()==3);
-    }
-
-    @Test
-    @WithMockUser(username = "servicetester", roles = {"SERVICE"})
-    public void testGetAllOrdersToPrepare_withServiceShouldDeliverEntries()
-            throws ServiceException, ValidationException, DAOException {
-
-        //PREPARE
-        Order order1 = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
-                LocalDateTime.now(), Order.State.QUEUED, 1);
-        Order order2 = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
-                LocalDateTime.now(), Order.State.QUEUED, 2);
-        Order order3 = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
-                LocalDateTime.now(), Order.State.QUEUED, 3);
-
-        //WHEN
-        orderService.addOrder(order1);
-        orderService.addOrder(order2);
-        orderService.addOrder(order3);
-        Mockito.when(orderDAO.getAll()).thenReturn(Arrays.asList(order1, order2, order3));
-
-        //THEN
-        List<MenuCategory> listMenuCategories = new LinkedList<>();
-        listMenuCategories.add(MenuCategory.withIdentity(1));
-        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories, Order.State.QUEUED).size()==1);
-        listMenuCategories.add(MenuCategory.withIdentity(2));
-        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories, Order.State.QUEUED).size()==2);
-        listMenuCategories.add(MenuCategory.withIdentity(3));
-        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories, Order.State.QUEUED).size()==3);
-    }
-
-    @Test
-    @WithMockUser(username = "servicetester", roles = {"SERVICE"})
-    public void testGetAllOrdersToPrepare_shouldDeliverEmptyList()
-            throws ServiceException, ValidationException, DAOException {
-
-        //PREPARE
-        Order order1 = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
-                LocalDateTime.now(), Order.State.QUEUED, 1);
-        Order order2 = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
-                LocalDateTime.now(), Order.State.QUEUED, 2);
-        Order order3 = createOrder(BigDecimal.valueOf(500),"Order Information", BigDecimal.valueOf(0.2),
-                LocalDateTime.now(), Order.State.QUEUED, 3);
-
-        //WHEN
-        orderService.addOrder(order1);
-        orderService.addOrder(order2);
-        orderService.addOrder(order3);
-        Mockito.when(orderDAO.getAll()).thenReturn(Arrays.asList(order1, order2, order3));
-
-        //THEN
-        List<MenuCategory> listMenuCategories = new LinkedList<>();
-        listMenuCategories.add(MenuCategory.withIdentity(4));
-        assertTrue(orderService.getAllOrdersToPrepare(listMenuCategories, Order.State.QUEUED).size() == 0);
-    }
-
 }

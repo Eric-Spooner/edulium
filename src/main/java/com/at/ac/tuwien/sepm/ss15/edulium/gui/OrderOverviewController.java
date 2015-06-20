@@ -3,292 +3,427 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
+import javafx.collections.ListChangeListener;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Scene;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
+import javafx.scene.text.Font;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.PopOver;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Supplier;
 
-/**
- * Controller used for the Manager View
- */
 @Component
 public class OrderOverviewController implements Initializable, Controller {
     private static final Logger LOGGER = LogManager.getLogger(OrderOverviewController.class);
 
+    @FXML
+    private ListView<Order> queuedOrdersView;
+    @FXML
+    private ListView<Order> inProgressOrdersView;
+    @FXML
+    private ListView<Order> readyForDeliveryOrdersView;
+    @FXML
+    private ListView<Order> deliveredOrdersView;
+    @FXML
+    private Button cancelButton;
+    @FXML
+    private Button deliverButton;
+    @FXML
+    private Button moveToTableButton;
+    @FXML
+    private Button backButton;
+    @FXML
+    private Button newOrderButton;
+    @FXML
+    private Button clearSelectionButton;
+    @FXML
+    private Label headerLabel;
+
+    private class OrderCell extends ListCell<Order> {
+        private final Label nameLabel;
+        private final Label additionalInformationLabel;
+        private Order order = null;
+
+        public OrderCell() {
+            VBox layout = new VBox();
+
+            nameLabel = new Label();
+            nameLabel.setStyle("-fx-font-size: 18px;");
+
+            additionalInformationLabel = new Label();
+            additionalInformationLabel.setStyle("-fx-font-size: 14px;");
+
+            layout.getChildren().setAll(nameLabel, additionalInformationLabel);
+
+            setGraphic(layout);
+        }
+
+        @Override
+        protected void updateItem(Order item, boolean empty) {
+            super.updateItem(item, empty);
+
+            order = item;
+
+            if (order != null) {
+                nameLabel.setText(order.getMenuEntry().getName());
+                additionalInformationLabel.setText(order.getAdditionalInformation());
+            } else {
+                nameLabel.setText("");
+                additionalInformationLabel.setText("");
+            }
+        }
+    }
+
     @Autowired
     private OrderService orderService;
     @Autowired
-    private MenuService menuService;
-    @Autowired
-    private InteriorService interiorService;
+    private TaskScheduler taskScheduler;
 
-    private int ordersRow = 0;
-    private LinkedList<OrderEntry> orderEntries = new LinkedList<>();
-    private static Table table = null;
-    private static Stage thisStage;
+    @Resource(name = "tableViewPane")
+    private FXMLPane tableViewPane; // for move to table pop over
+    @Resource(name = "orderInputPane")
+    private FXMLPane orderInputPane;
 
-    @FXML
-    private GridPane categoriesGP;
-    @FXML
-    private GridPane ordersGP;
-    @FXML
-    private VBox entriesVB;
-    @FXML
-    private AnchorPane orderAnchor;
-    @FXML
-    private ScrollPane ordersSP;
-    @FXML
-    private Label tableNumberLabel;
+    private AlertPopOver cancelPopOver;
+    private PopOver moveToTablePopOver;
+    private PopOver newOrderPopOver;
+
+    private PollingList<Order> queuedOrders;
+    private SortedList<Order> sortedQueuedOrders;
+
+    private PollingList<Order> inProgressOrders;
+    private SortedList<Order> sortedInProgressOrders;
+
+    private PollingList<Order> readyForDeliveryOrders;
+    private SortedList<Order> sortedReadyForDeliveryOrders;
+
+    private PollingList<Order> deliveredOrders;
+    private SortedList<Order> sortedDeliveredOrders;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        ApplicationContext context = EduliumApplicationContext.getContext();
+        initializeQueuedOrders();
+        initializeInProgressOrders();
+        initializeReadyForDeliveryOrders();
+        initializeDeliveredOrders();
 
-        ordersSP.setStyle("-fx-font-size: 40px;");
+        initializeCancelPopOver();
+        initializeMoveToTablePopOver();
+        initializeNewOrderPopOver();
 
-        ordersGP.setVgap(4);
-        ordersGP.setHgap(4);
+        cancelButton.setDisable(true);
+        deliverButton.setDisable(true);
+    }
 
-        orderEntries.clear();
-        tableNumberLabel.setText(String.valueOf(table.getNumber()));
+    private void initializeQueuedOrders() {
+        queuedOrders = new PollingList<>(taskScheduler);
+        queuedOrders.setInterval(1000);
 
-        try {
-            categoriesGP.setVgap(4);
-            categoriesGP.setHgap(150);
-            int row = 0;
-            int col = 0;
-            for (MenuCategory menuCategory : menuService.getAllMenuCategories()) {
-                Button buttonCategory = new Button();
-                buttonCategory.setText(menuCategory.getName());
-                buttonCategory.setPrefSize(240, 40);
-                buttonCategory.setMinWidth(140);
-                buttonCategory.setStyle("-fx-font-size: 18px;");
-                buttonCategory.setOnAction(new EventHandler<ActionEvent>() {
-                    public void handle(ActionEvent t) {
-                        entriesVB.getChildren().clear();
-                        MenuEntry matcher = new MenuEntry();
-                        matcher.setCategory(menuCategory);
-                        try {
-                            int i = 0;
-                            for (MenuEntry entry : menuService.findMenuEntry(matcher)) {
-                                Button buttonEntry = new Button();
-                                buttonEntry.setText(entry.getName());
-                                buttonEntry.setPrefSize(240, 40);
-                                buttonEntry.setMinWidth(140);
-                                buttonEntry.setStyle("-fx-font-size: 18px;");
-                                buttonEntry.setOnAction(new EventHandler<ActionEvent>() {
-                                    public void handle(ActionEvent t) {
-                                        // Check if entry already in orders, then increase amount
-                                        for (OrderEntry orderEntry : orderEntries) {
-                                            if (orderEntry.getEntryId().equals(entry.getIdentity())) {
-                                                orderEntry.setAmountLabelText(String.valueOf(Integer.valueOf(orderEntry.getAmountLabelText()) + 1));
-                                                return;
-                                            }
-                                        }
-                                        if (ordersGP.getRowConstraints().size() <= ordersRow) {
-                                            Separator sepVert1 = new Separator();
-                                            ordersGP.setRowSpan(sepVert1, ordersRow);
-                                        }
-                                        ordersGP.setMinHeight((ordersRow + 1) * 44);
-                                        if (!orderEntries.isEmpty()) {
-                                            orderAnchor.setMinHeight(orderEntries.get(orderEntries.size() - 1).getRow() * 44 + 120);
-                                            orderAnchor.setMaxHeight(orderEntries.get(orderEntries.size() - 1).getRow() * 44 + 120);
-                                        }
-                                        Label amountOrdered = new Label();
-                                        amountOrdered.setText("1");
-                                        amountOrdered.setStyle("-fx-font-size: 18px;");
-                                        ordersGP.add(amountOrdered, 0, ordersRow);
-                                        OrderEntry orderEntry = new OrderEntry();
-                                        orderEntry.setAmountLabel(amountOrdered);
-                                        orderEntry.setAmountLabelText("1");
-                                        orderEntry.setEntryId(entry.getIdentity());
-                                        orderEntry.setRow(ordersRow);
-                                        orderEntries.add(orderEntry);
-                                        Button buttonPlus = new Button();
-                                        buttonPlus.setText("+");
-                                        buttonPlus.setPrefSize(40, 40);
-                                        buttonPlus.setMinWidth(40);
-                                        buttonPlus.setStyle("-fx-font-size: 18px;");
-                                        buttonPlus.setOnAction(new EventHandler<ActionEvent>() {
-                                            public void handle(ActionEvent t) {
-                                                //amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) + 1));
-                                                orderEntry.setAmountLabelText(String.valueOf(Integer.valueOf(orderEntry.getAmountLabelText()) + 1));
-                                            }
-                                        });
-                                        ordersGP.add(buttonPlus, 1, ordersRow);
-                                        Button buttonMinus = new Button();
-                                        buttonMinus.setText("-");
-                                        buttonMinus.setPrefSize(40, 40);
-                                        buttonMinus.setMinWidth(40);
-                                        buttonMinus.setStyle("-fx-font-size: 18px;");
-                                        buttonMinus.setOnAction(new EventHandler<ActionEvent>() {
-                                            public void handle(ActionEvent t) {
-                                                // Remove order if amount = 1 and "-" pressed
-                                                if (Integer.valueOf(amountOrdered.getText()) <= 1) {
-                                                    orderEntries.remove(orderEntry);
-                                                    List<Node> children = new LinkedList<Node>(ordersGP.getChildren());
-                                                    for (Node node : children) {
-                                                        int nodeRow = GridPane.getRowIndex(node);
-                                                        if (nodeRow == orderEntry.getRow()) {
-                                                            ordersGP.getChildren().remove(node);
-                                                        } else if (nodeRow > orderEntry.getRow()) {
-                                                            ordersGP.setRowIndex(node, nodeRow - 1);
-                                                        }
-                                                    }
-                                                    for (OrderEntry oe : orderEntries) {
-                                                        if (oe.getRow() > orderEntry.getRow()) {
-                                                            oe.setRow(oe.getRow() - 1);
-                                                        }
-                                                    }
-                                                    ordersGP.getRowConstraints().get(0).setMaxHeight(44);
-                                                    orderAnchor.setMinHeight(orderEntries.get(orderEntries.size() - 1).getRow() * 44 + 88);
-                                                    orderAnchor.setMaxHeight(orderEntries.get(orderEntries.size() - 1).getRow() * 44 + 88);
-                                                    ordersRow--;
-                                                } else {
-                                                    //amountOrdered.setText(String.valueOf(Integer.valueOf(amountOrdered.getText()) - 1));
-                                                    orderEntry.setAmountLabelText(String.valueOf(Integer.valueOf(orderEntry.getAmountLabelText()) - 1));
-                                                }
-                                            }
-                                        });
-                                        ordersGP.add(buttonMinus, 2, ordersRow);
-                                        Text entryName = new Text();
-                                        entryName.setText(entry.getName());
-                                        entryName.setStyle("-fx-font-size: 18px;");
-                                        ordersGP.add(entryName, 3, ordersRow);
-                                        ordersRow++;
-                                    }
-                                });
-                                entriesVB.getChildren().add(i, buttonEntry);
-                                i++;
-                            }
-                        } catch (ServiceException e) {
-                            showErrorDialog("Error", "Cannot retrieve menus", "There is a problem with accessing the database " + e);
-                        }
-                    }
-                });
+        sortedQueuedOrders = new SortedList<>(queuedOrders);
+        sortedQueuedOrders.setComparator((c1, c2) -> c1.getMenuEntry().getName().compareToIgnoreCase(c2.getMenuEntry().getName()));
 
-                if (categoriesGP.getRowConstraints().size() <= row) {
-                    Separator sepVert1 = new Separator();
-                    categoriesGP.setRowSpan(sepVert1, row);
-                }
-                categoriesGP.add(buttonCategory, col, row);
-                if (col == 1) row++;
-                //col = (col == 0) ? 1 : 0;
-                if (col++ == 1)
-                    col = 0;
+        queuedOrdersView.setItems(sortedQueuedOrders);
+        queuedOrdersView.setCellFactory(view -> new OrderCell());
+        queuedOrdersView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        queuedOrdersView.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<Order>() {
+            @Override
+            public void onChanged(Change<? extends Order> c) {
+                cancelButton.setDisable(c.getList().isEmpty());
             }
-        } catch (ServiceException e) {
-            showErrorDialog("Error", "Cannot retrieve menus", "There is a problem with accessing the database " + e);
-        }
+        });
     }
 
-    public static void setStage(Stage stage) {
-        OrderOverviewController.thisStage = stage;
+    private void initializeInProgressOrders() {
+        inProgressOrders = new PollingList<>(taskScheduler);
+        inProgressOrders.setInterval(1000);
+
+        sortedInProgressOrders = new SortedList<>(inProgressOrders);
+        sortedInProgressOrders.setComparator((c1, c2) -> c1.getMenuEntry().getName().compareToIgnoreCase(c2.getMenuEntry().getName()));
+
+        inProgressOrdersView.setItems(sortedInProgressOrders);
+        inProgressOrdersView.setCellFactory(view -> new OrderCell());
+        inProgressOrdersView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
-    public static void setSelectedTable(Table table) {
-        OrderOverviewController.table = table;
+    private void initializeReadyForDeliveryOrders() {
+        readyForDeliveryOrders = new PollingList<>(taskScheduler);
+        readyForDeliveryOrders.setInterval(1000);
+
+        sortedReadyForDeliveryOrders = new SortedList<>(readyForDeliveryOrders);
+        sortedReadyForDeliveryOrders.setComparator((c1, c2) -> c1.getMenuEntry().getName().compareToIgnoreCase(c2.getMenuEntry().getName()));
+
+        readyForDeliveryOrdersView.setItems(sortedReadyForDeliveryOrders);
+        readyForDeliveryOrdersView.setCellFactory(view -> new OrderCell());
+        readyForDeliveryOrdersView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        readyForDeliveryOrdersView.getSelectionModel().getSelectedItems().addListener(new ListChangeListener<Order>() {
+            @Override
+            public void onChanged(Change<? extends Order> c) {
+                deliverButton.setDisable(c.getList().isEmpty());
+            }
+        });
     }
 
-    public void backButtonClicked(ActionEvent event) {
-        thisStage.close();
+    private void initializeDeliveredOrders() {
+        deliveredOrders = new PollingList<>(taskScheduler);
+        deliveredOrders.setInterval(1000);
+
+        sortedDeliveredOrders = new SortedList<>(deliveredOrders);
+        sortedDeliveredOrders.setComparator((c1, c2) -> c1.getMenuEntry().getName().compareToIgnoreCase(c2.getMenuEntry().getName()));
+
+        deliveredOrdersView.setItems(sortedDeliveredOrders);
+        deliveredOrdersView.setCellFactory(view -> new OrderCell());
+        deliveredOrdersView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
-    public void commitButtonClicked(ActionEvent event) {
-        //String out = new String();
-        for (OrderEntry entry : orderEntries) {
-            MenuEntry matcher = new MenuEntry();
-            matcher.setIdentity(entry.getEntryId());
-            MenuEntry en = null;
+    private void initializeCancelPopOver() {
+        cancelPopOver = new AlertPopOver();
+        cancelPopOver.getLabel().setText("Do you really want to cancel\nthe selected orders?");
+        cancelPopOver.getOkButton().setText("Yes");
+        cancelPopOver.getCancelButton().setText("No");
+
+        cancelPopOver.getOkButton().setOnAction(action -> {
             try {
-                en = menuService.findMenuEntry(matcher).get(0);
-
-                for(int i = 0; i < Integer.valueOf(entry.getAmountLabelText()); i++) {
-                    Order order = new Order();
-                    order.setTable(table);
-                    order.setMenuEntry(en);
-                    order.setBrutto(en.getPrice());
-                    order.setTax(en.getTaxRate().getValue());
-                    order.setAdditionalInformation("No additional information"); //TODO additional information?
-                    order.setTime(LocalDateTime.now());
-                    order.setState(Order.State.QUEUED);
-                    orderService.addOrder(order);
+                for (Order order : queuedOrdersView.getSelectionModel().getSelectedItems()) {
+                    orderService.cancelOrder(order);
                 }
-            } catch (ServiceException e) {
-                showErrorDialog("Error", "Cannot store order", "There is a problem with accessing the database " + e);
-            } catch (ValidationException e) {
-                showErrorDialog("Error", "Cannot store order", "There is a problem with accessing the database " + e);
+            } catch (ValidationException | ServiceException e) {
+                LOGGER.error("Cancel orders did not work", e);
+
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Cancel orders failed");
+                alert.setContentText(e.toString());
+
+                alert.showAndWait();
+            } finally {
+                queuedOrders.immediateUpdate();
+                cancelPopOver.hide();
             }
-            //out += en.getName() + ", " + entry.getAmountLabelText() + "," + entry.getRow() + "\n";
+        });
+
+        cancelPopOver.getCancelButton().setOnAction(action -> cancelPopOver.hide());
+    }
+
+    private void initializeMoveToTablePopOver() {
+        TableViewController tableViewController = tableViewPane.getController(TableViewController.class);
+        tableViewController.setOnTableClicked(table -> {
+            try {
+                List<Order> orders = new ArrayList<Order>(); // TODO maybe replace this by a "merged observable list"
+                orders.addAll(queuedOrdersView.getSelectionModel().getSelectedItems());
+                orders.addAll(inProgressOrdersView.getSelectionModel().getSelectedItems());
+                orders.addAll(readyForDeliveryOrdersView.getSelectionModel().getSelectedItems());
+                orders.addAll(deliveredOrdersView.getSelectionModel().getSelectedItems());
+
+                for (Order order : orders) {
+                    order.setTable(table);
+                    orderService.updateOrder(order);
+                }
+            } catch (ValidationException | ServiceException e) {
+                LOGGER.error("Move orders did not work", e);
+
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Move orders failed");
+                alert.setContentText(e.toString());
+
+                alert.showAndWait();
+            } finally {
+                queuedOrders.immediateUpdate();
+                inProgressOrders.immediateUpdate();
+                readyForDeliveryOrders.immediateUpdate();
+                deliveredOrders.immediateUpdate();
+                moveToTablePopOver.hide();
+            }
+        });
+
+        tableViewPane.setStyle("-fx-padding: 5px;");
+
+        moveToTablePopOver = new PopOver(tableViewPane);
+        moveToTablePopOver.setHideOnEscape(true);
+        moveToTablePopOver.setAutoHide(true);
+        moveToTablePopOver.setDetachable(false);
+        moveToTablePopOver.setMinSize(1200, 700);
+        moveToTablePopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
+    }
+
+    private void initializeNewOrderPopOver() {
+        OrderInputController orderInputController = orderInputPane.getController(OrderInputController.class);
+        orderInputController.setOnDone(action -> newOrderPopOver.hide());
+
+        orderInputPane.setStyle("-fx-padding: 5px;");
+
+        newOrderPopOver = new PopOver(orderInputPane);
+        newOrderPopOver.setHideOnEscape(true);
+        newOrderPopOver.setAutoHide(true);
+        newOrderPopOver.setDetachable(false);
+        newOrderPopOver.setMinSize(1200, 700);
+        newOrderPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
+    }
+
+    @FXML
+    public void onCancelButtonClicked(ActionEvent actionEvent) {
+        if (cancelPopOver.isShowing()) {
+            cancelPopOver.hide();
+        } else {
+            cancelPopOver.show(cancelButton);
         }
-        //System.out.println(out);
-        thisStage.close();
+    }
+
+    @FXML
+    public void onDeliverButtonClicked(ActionEvent actionEvent) {
+        try {
+            for (Order order : readyForDeliveryOrdersView.getSelectionModel().getSelectedItems()) {
+                orderService.markAsDelivered(order);
+            }
+        } catch (ValidationException | ServiceException e) {
+            LOGGER.error("Putting State to Delivered did not work", e);
+
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Putting State to Delivered");
+            alert.setHeaderText("The State shifting did not work");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+        } finally {
+            readyForDeliveryOrders.immediateUpdate();
+            deliveredOrders.immediateUpdate();
+        }
+    }
+
+    @FXML
+    public void onMoveToTableButtonClicked(ActionEvent actionEvent) {
+        if (moveToTablePopOver.isShowing()) {
+            moveToTablePopOver.hide();
+        } else if (!queuedOrdersView.getSelectionModel().getSelectedItems().isEmpty() ||
+                   !inProgressOrdersView.getSelectionModel().getSelectedItems().isEmpty() ||
+                   !readyForDeliveryOrdersView.getSelectionModel().getSelectedItems().isEmpty() ||
+                   !deliveredOrdersView.getSelectionModel().getSelectedItems().isEmpty()) {
+            moveToTablePopOver.show(moveToTableButton);
+        }
+    }
+
+    @FXML
+    public void onNewOrderButtonClicked(ActionEvent actionEvent) {
+        if (newOrderPopOver.isShowing()) {
+            newOrderPopOver.hide();
+        } else {
+            newOrderPopOver.show(newOrderButton);
+        }
+    }
+
+    @FXML
+    public void onClearSelectionButtonClicked(ActionEvent actionEvent) {
+        queuedOrdersView.getSelectionModel().clearSelection();
+        inProgressOrdersView.getSelectionModel().clearSelection();
+        readyForDeliveryOrdersView.getSelectionModel().clearSelection();
+        deliveredOrdersView.getSelectionModel().clearSelection();
+    }
+
+    /**
+     *
+     * @param table (must not be null)
+     */
+    public void setTable(Table table)
+    {
+        assert table != null;
+
+        headerLabel.setText("Table " + table.getNumber() + " in " + table.getSection().getName());
+
+        queuedOrders.setSupplier(new Supplier<List<Order>>() {
+            @Override
+            public List<Order> get() {
+                try {
+                    Order matcher = new Order();
+                    matcher.setTable(table);
+                    matcher.setState(Order.State.QUEUED);
+                    return orderService.findOrder(matcher);
+                } catch (ServiceException e) {
+                    LOGGER.error("Finding orders via order supplier has failed", e);
+                    return null;
+                }
+            }
+        });
+
+        inProgressOrders.setSupplier(new Supplier<List<Order>>() {
+            @Override
+            public List<Order> get() {
+                try {
+                    Order matcher = new Order();
+                    matcher.setTable(table);
+                    matcher.setState(Order.State.IN_PROGRESS);
+                    return orderService.findOrder(matcher);
+                } catch (ServiceException e) {
+                    LOGGER.error("Finding orders via order supplier has failed", e);
+                    return null;
+                }
+            }
+        });
+
+        readyForDeliveryOrders.setSupplier(new Supplier<List<Order>>() {
+            @Override
+            public List<Order> get() {
+                try {
+                    Order matcher = new Order();
+                    matcher.setTable(table);
+                    matcher.setState(Order.State.READY_FOR_DELIVERY);
+                    return orderService.findOrder(matcher);
+                } catch (ServiceException e) {
+                    LOGGER.error("Finding orders via order supplier has failed", e);
+                    return null;
+                }
+            }
+        });
+
+        deliveredOrders.setSupplier(new Supplier<List<Order>>() {
+            @Override
+            public List<Order> get() {
+                try {
+                    Order matcher = new Order();
+                    matcher.setTable(table);
+                    matcher.setState(Order.State.DELIVERED);
+                    return orderService.findOrder(matcher);
+                } catch (ServiceException e) {
+                    LOGGER.error("Finding orders via order supplier has failed", e);
+                    return null;
+                }
+            }
+        });
+
+        OrderInputController orderInputController = orderInputPane.getController(OrderInputController.class);
+        orderInputController.setTable(table);
+    }
+
+    public void setOnBackButtonAction(EventHandler<ActionEvent> event) {
+        backButton.setOnAction(event);
     }
 
     @Override
     public void disable(boolean disabled) {
-
-    }
-
-    private class OrderEntry {
-        private Label amountLb;
-        private Long EntryId;
-        private int row;
-
-        public int getRow() {
-            return row;
+        if (disabled) {
+            queuedOrders.stopPolling();
+            inProgressOrders.stopPolling();
+            readyForDeliveryOrders.stopPolling();
+            deliveredOrders.stopPolling();
+        } else {
+            queuedOrders.startPolling();
+            inProgressOrders.startPolling();
+            readyForDeliveryOrders.startPolling();
+            deliveredOrders.startPolling();
         }
-
-        public void setRow(int row) {
-            this.row = row;
-        }
-
-        public String getAmountLabelText() {
-            return amountLb.getText();
-        }
-
-        public void setAmountLabel(Label amountLb) {
-            this.amountLb = amountLb;
-        }
-
-        public void setAmountLabelText(String amount) {
-            this.amountLb.setText(amount);
-        }
-
-        public Long getEntryId() {
-            return EntryId;
-        }
-
-        public void setEntryId(Long entryId) {
-            EntryId = entryId;
-        }
-    }
-
-    public static void showErrorDialog(String title, String head, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(head);
-        alert.setContentText(content);
-
-        alert.showAndWait();
     }
 }
