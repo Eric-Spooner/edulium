@@ -33,13 +33,9 @@ class DBOrderDAO implements DAO<Order> {
     private Validator<Order> validator;
     @Resource(name = "userDAO")
     private DAO<User> userDAO;
-<<<<<<< HEAD
     @Resource(name = "invoiceDAO")
     private DAO<Invoice> invoiceDAO;
     @Resource(name = "tableDAO")
-=======
-    @Autowired
->>>>>>> remotes/origin/gui/service
     private DAO<Table> tableDAO;
     @Resource(name = "menuEntryDAO")
     private DAO<MenuEntry> menuEntryDAO;
