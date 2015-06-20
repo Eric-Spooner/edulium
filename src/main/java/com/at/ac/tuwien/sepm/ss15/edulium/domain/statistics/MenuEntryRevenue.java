@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 /**
  * domain object representing a entry in the menu, together with the number of sold items and revenue
  */
-public class MenuEntryRevenue {
+public class MenuEntryRevenue implements Comparable<MenuEntryRevenue> {
     private MenuEntry entry;
     private Long soldNumber;
 
@@ -70,4 +70,8 @@ public class MenuEntryRevenue {
         return entry.getPrice().multiply(sold);
     }
 
+    @Override
+    public int compareTo(MenuEntryRevenue menuEntryRevenue) {
+        return this.getRevenue().compareTo(menuEntryRevenue.getRevenue());
+    }
 }

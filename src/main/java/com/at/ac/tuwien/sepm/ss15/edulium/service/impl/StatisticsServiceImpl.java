@@ -15,9 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 /**
  * implementation of the StatisticsService
@@ -56,6 +55,8 @@ public class StatisticsServiceImpl implements StatisticsService {
             popularDishes.add(menuEntryRevenue);
         }
 
+        Collections.sort(popularDishes, Collections.reverseOrder());
+
         return popularDishes;
     }
 
@@ -64,8 +65,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         LOGGER.debug("Entering getRevenueDevelopment with parameters: " + fromDate + ", " + toDate);
 
         //Get invoices and count revenue
-        List<Invoice> invoices = invoiceService.findInvoiceBetween(fromDate==null ? null : fromDate.atStartOfDay(), toDate==null ? null : toDate.atTime(23,59));
-        HashMap<LocalDate, BigDecimal> revenueDevelopment = new HashMap<>();
+        List<Invoice> invoices = invoiceService.findInvoiceBetween(fromDate==null ? null : fromDate.atStartOfDay(), toDate==null ? null : toDate.atTime(23, 59));
+        TreeMap<LocalDate, BigDecimal> revenueDevelopment = new TreeMap<>();
         for (Invoice invoice : invoices) {
             LocalDate date = invoice.getTime().toLocalDate();
             if (revenueDevelopment.containsKey(date)) {
@@ -73,6 +74,15 @@ public class StatisticsServiceImpl implements StatisticsService {
                 revenueDevelopment.put(date, oldValue.add(invoice.getGross()));
             } else {
                 revenueDevelopment.put(date, invoice.getGross());
+            }
+        }
+
+        //Fill dates with 0 values to create consistent chart
+        LocalDate firstDate = revenueDevelopment.firstKey();
+        LocalDate lastDate = revenueDevelopment.lastKey();
+        for (LocalDate localDate = firstDate.plus(1, ChronoUnit.DAYS); localDate.isBefore(lastDate) ;localDate = localDate.plus(1, ChronoUnit.DAYS)) {
+            if (! revenueDevelopment.containsKey(localDate)) {
+                revenueDevelopment.put(localDate, new BigDecimal(0));
             }
         }
 
