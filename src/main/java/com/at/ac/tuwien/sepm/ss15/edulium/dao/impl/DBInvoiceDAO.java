@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.InvoiceDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +27,7 @@ import java.util.stream.Collectors;
  * Database implementation of the DAO interface for Invoice objects
  */
 @PreAuthorize("isAuthenticated()")
-class DBInvoiceDAO implements DAO<Invoice> {
+class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
     private static final Logger LOGGER = LogManager.getLogger(DBInvoiceDAO.class);
 
     @Resource(name = "dataSource")
@@ -210,6 +212,35 @@ class DBInvoiceDAO implements DAO<Invoice> {
         } catch (SQLException e) {
             LOGGER.error("Failed to retrieve data from the database", e);
             throw new DAOException("Failed to retrieve data from the database", e);
+        }
+
+        return results;
+    }
+
+    @Override
+    public List<Invoice> findBetween(LocalDateTime from, LocalDateTime to) throws DAOException, ValidationException {
+        LOGGER.debug("entering findBetween with parameters "+from+", "+to);
+
+        final List<Invoice> results = new ArrayList<>();
+
+        final String query = "SELECT * FROM Invoice WHERE canceled = FALSE" +
+                " AND invoiceTime >= ISNULL(?, invoiceTime)" +
+                " AND invoiceTime <= ISNULL(?, invoiceTime)";
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setObject(1, from != null ? Timestamp.valueOf(from) : null);
+            stmt.setObject(2, to != null ? Timestamp.valueOf(to) : null);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                try {
+                    results.add(parseResult(rs));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + rs + "' failed", e);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Failed to retreive all invoice entries from the database", e);
+            throw new DAOException("Failed to retreive all invoice entries from the database", e);
         }
 
         return results;

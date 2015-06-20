@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.InvoiceDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
@@ -13,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 class InvoiceServiceImpl implements InvoiceService {
@@ -20,6 +22,8 @@ class InvoiceServiceImpl implements InvoiceService {
 
     @Autowired
     DAO<Invoice> invoiceDAO;
+    @Autowired
+    InvoiceDAO findBetweenInvoiceDAO;
     @Autowired
     Validator<Invoice> invoiceValidator;
 
@@ -65,6 +69,17 @@ class InvoiceServiceImpl implements InvoiceService {
 
         try {
             return invoiceDAO.find(invoice);
+        } catch (DAOException e) {
+            throw new ServiceException("Could not find invoices", e);
+        }
+    }
+
+    @Override
+    public List<Invoice> findInvoiceBetween(LocalDateTime from, LocalDateTime to) throws ServiceException, ValidationException {
+        LOGGER.debug("Entering findInvoicesBetween with parameters: " + from + ", "+ to);
+
+        try {
+            return findBetweenInvoiceDAO.findBetween(from, to);
         } catch (DAOException e) {
             throw new ServiceException("Could not find invoices", e);
         }
