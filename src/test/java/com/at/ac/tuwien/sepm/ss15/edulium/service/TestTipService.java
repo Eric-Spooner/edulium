@@ -96,4 +96,25 @@ public class TestTipService extends AbstractServiceTest {
             assertEquals(1, userList.size());
             assertTrue(BigDecimal.valueOf(20).compareTo(userList.get(0).getTip()) != 0);
         }
+
+        @Test
+        @WithMockUser(username = "servicetester", roles={"SERVICE"})
+        public void testCalcTipAndMatchUser_shouldWorkWithMultipleUsers() throws ServiceException {
+            //PREPARE
+            //The used data is in the testdata.sql file already prepared
+            assertEquals(1, invoiceService.findInvoices(Invoice.withIdentity(1)).size());
+            Invoice invoice = invoiceService.findInvoices(Invoice.withIdentity(1)).get(0);
+
+            //WHEN
+            tipService.calculateTheTipPerUserAndMatchItToUser(invoice, BigDecimal.valueOf(100));
+
+            //THEN
+            List<User> userList = userService.findUsers(User.withIdentity("servicetester"));
+            assertEquals(1, userList.size());
+            assertTrue(BigDecimal.valueOf(50).compareTo(userList.get(0).getTip()) != 0);
+
+            userList = userService.findUsers(User.withIdentity("daotester"));
+            assertEquals(1, userList.size());
+            assertTrue(BigDecimal.valueOf(50).compareTo(userList.get(0).getTip()) != 0);
+        }
 }

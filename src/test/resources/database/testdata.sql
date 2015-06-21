@@ -1,4 +1,4 @@
-MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('daotester', 'DAO Testuser', 'admin', 0);
+MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('daotester', 'DAO Testuser', 'manager', 0);
 MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('servicetester', 'Service Testuser', 'manager', 0);
 
 MERGE INTO RestaurantSection (ID, name) KEY(ID) VALUES(1, 'Garden');
@@ -51,7 +51,24 @@ MERGE INTO Menu(ID,name) KEY(ID) VALUES (4, 'Bananen Menu');
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (4,3,3);
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (4,4,0.5);
 
-MERGE INTO Invoice(ID, invoiceTime, brutto, user_ID) KEY(ID) VALUES(1, TIME.NOW, )
+MERGE INTO Invoice(ID, invoiceTime, brutto, user_ID) KEY(ID) VALUES(1, CURRENT_TIMESTAMP, 100, 'daotester');
 
-MERGE INTO RestaurantOrder(ID, invoice_ID,  table_section, table_number BIGINT, menuEntry_ID, orderTime, brutto
-    tax, info TEXT, state) KEY(table_section, table_number) VLAUES(1, )
+MERGE INTO RestaurantOrder(ID, invoice_ID,  table_section, table_number, menuEntry_ID, orderTime, brutto,
+    tax, state) KEY(ID, table_section, table_number) VALUES (1, 1, 1, 1, 1,
+    CURRENT_TIMESTAMP, 100, 0.01, 'DELIVERED');
+MERGE INTO RestaurantOrder(ID, invoice_ID,  table_section, table_number, menuEntry_ID, orderTime, brutto,
+     tax, state) KEY(ID, table_section, table_number) VALUES (2, 1, 1, 1, 1,
+     CURRENT_TIMESTAMP, 100, 0.01, 'DELIVERED');
+MERGE INTO RestaurantOrder(ID, invoice_ID,  table_section, table_number, menuEntry_ID, orderTime, brutto,
+    tax, state) KEY(ID, table_section, table_number) VALUES (3, 1, 1, 1, 1,
+    CURRENT_TIMESTAMP, 100, 0.01, 'DELIVERED');
+
+MERGE INTO RestaurantOrderHistory(ID, invoice_ID, table_section, table_number, menuEntry_ID, orderTime, brutto, tax,
+     info, state, canceled,changeTime,  changeUser,changeNr) KEY(ID, changeNr, table_section, table_number)
+     VALUES (1, 1, 1, 1, 1, CURRENT_TIMESTAMP, 100, 0.01, '', 'DELIVERED', FALSE, CURRENT_TIMESTAMP, 'daotester',1);
+MERGE INTO RestaurantOrderHistory(ID, invoice_ID, table_section, table_number, menuEntry_ID, orderTime, brutto, tax,
+     info, state, canceled,changeTime,  changeUser,changeNr) KEY(ID, changeNr, table_section, table_number)
+     VALUES (2, 1, 1, 1, 1, CURRENT_TIMESTAMP, 100, 0.01, '', 'DELIVERED', FALSE, CURRENT_TIMESTAMP, 'servicetester',1);
+MERGE INTO RestaurantOrderHistory(ID, invoice_ID, table_section, table_number, menuEntry_ID, orderTime, brutto, tax,
+     info, state, canceled,changeTime,changeUser,changeNr) KEY(ID, changeNr, table_section, table_number)
+     VALUES (3, 1, 1, 1, 1, CURRENT_TIMESTAMP, 100, 0.01, '', 'DELIVERED', FALSE, CURRENT_TIMESTAMP, 'daotester',1);
