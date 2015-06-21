@@ -113,7 +113,7 @@ public class IntermittentSale extends Sale {
     @Override
     public boolean isAt(LocalDateTime time) {
         // Same day of the week?
-        if(!daysOfSale.contains(time.getDayOfWeek())) {
+        if(daysOfSale == null || !daysOfSale.contains(time.getDayOfWeek())) {
             return false;
         }
 

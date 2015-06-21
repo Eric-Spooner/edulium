@@ -25,7 +25,11 @@ public class TestIntermittentSale {
         IntermittentSale intermittentSale1 = new IntermittentSale();
         intermittentSale1.setIdentity(123L);
         intermittentSale1.setDuration(Duration.ofMinutes(60));
-        intermittentSale1.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+
+        HashSet<DayOfWeek> saleDays = new HashSet<>();
+        saleDays.add(DayOfWeek.WEDNESDAY);
+        intermittentSale1.setDaysOfSale(saleDays);
+
         intermittentSale1.setFromDayTime(time1);
 
         assertTrue(intermittentSale1.isAt(time2));
