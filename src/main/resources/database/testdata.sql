@@ -1,6 +1,6 @@
-MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('cook', 'Crusty Cook', 'ROLE_COOK');
-MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('waiter', 'Wily Waiter', 'ROLE_SERVICE');
-MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('manager', 'Maverick Manager', 'ROLE_MANAGER');
+MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('cook', 'Crusty Cook', 'ROLE_COOK', 0);
+MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('waiter', 'Wily Waiter', 'ROLE_SERVICE', 0);
+MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('manager', 'Maverick Manager', 'ROLE_MANAGER', 0);
 
 MERGE INTO MenuCategory (ID, name) KEY(ID) VALUES (1, 'starter');
 MERGE INTO MenuCategory (ID, name) KEY(ID) VALUES (2, 'main dish');
