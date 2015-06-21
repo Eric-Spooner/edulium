@@ -199,7 +199,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
                     "EXISTS (SELECT 1 FROM RestaurantOrder o " +
                     "WHERE o.invoice_ID = i.ID AND o.ID IN (" +
                     invoice.getOrders().stream().map(o -> "?").collect(Collectors.joining(", ")) +
-                    ") AND o.cancelled = FALSE);";
+                    ") AND o.canceled = FALSE);";
         } else {
             query = "SELECT * FROM Invoice i WHERE " +
                     "i.ID = ISNULL(?, i.ID) AND " +
