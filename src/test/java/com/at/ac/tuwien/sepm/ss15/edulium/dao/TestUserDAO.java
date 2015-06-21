@@ -30,7 +30,6 @@ public class TestUserDAO extends AbstractDAOTest {
         user.setIdentity("warty");
         user.setName("Warty Warthog");
         user.setRole("manager");
-        user.setTip(new BigDecimal("0.00"));
 
         // WHEN
         userDAO.create(user);

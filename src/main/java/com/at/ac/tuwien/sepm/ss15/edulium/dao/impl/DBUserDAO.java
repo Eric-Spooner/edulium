@@ -39,7 +39,7 @@ class DBUserDAO implements DAO<User> {
 
         validator.validateForCreate(user);
 
-        final String query = "INSERT INTO RestaurantUser (ID, name, userRole, tip) VALUES (?, ?, ?, ?)";
+        final String query = "INSERT INTO RestaurantUser (ID, name, userRole, tip) VALUES (?, ?, ?, ISNULL(?, 0))";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, user.getIdentity());
@@ -63,7 +63,7 @@ class DBUserDAO implements DAO<User> {
 
         validator.validateForUpdate(user);
 
-        final String query = "UPDATE RestaurantUser SET name = ?, userRole = ?, tip = ? WHERE ID = ?";
+        final String query = "UPDATE RestaurantUser SET name = ?, userRole = ?, tip = ISNULL(?, 0)  WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, user.getName());
