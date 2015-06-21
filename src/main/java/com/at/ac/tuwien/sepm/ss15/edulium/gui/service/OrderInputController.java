@@ -5,7 +5,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PersistentButtonToggleGroup;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
@@ -27,6 +26,7 @@ import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.SegmentedButton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.net.URL;
@@ -34,8 +34,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
-public class OrderInputController  implements Initializable, Controller {
+@Controller
+public class OrderInputController  implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(OrderInputController.class);
 
     private enum ScreenType {
@@ -286,7 +286,7 @@ public class OrderInputController  implements Initializable, Controller {
 
     @FXML
     private void onBackButtonClicked(ActionEvent actionEvent) {
-        showScreen((ScreenType)backButton.getUserData());
+        showScreen((ScreenType) backButton.getUserData());
     }
 
     private void showScreen(ScreenType screenType) {
@@ -329,12 +329,6 @@ public class OrderInputController  implements Initializable, Controller {
 
     public void setOnDone(EventHandler<ActionEvent> doneEventHandler) {
         this.doneEventHandler = doneEventHandler;
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-        menuCategoryOverviewController.disable(disabled);
-        menuEntryOverviewController.disable(disabled);
     }
 
     // we want to show normal orders and menus in the ordersView

@@ -15,6 +15,7 @@ import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.CheckListView;
+import org.springframework.stereotype.Controller;
 
 import java.net.URL;
 import java.util.LinkedList;
@@ -26,6 +27,7 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Dialog Controller Cook View Categories
  */
+@Controller
 public class DialogCookviewCategories implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(DialogCookviewCategories.class);
 

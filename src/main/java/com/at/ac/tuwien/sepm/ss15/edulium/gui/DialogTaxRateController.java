@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -21,6 +22,7 @@ import java.util.ResourceBundle;
 /**
  * Controller for the TaxRate Dialog
  */
+@Controller
 public class DialogTaxRateController implements Initializable{
     private static final Logger LOGGER = LogManager.getLogger(DialogTaxRateController.class);
 

@@ -3,19 +3,18 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.AlertPopOver;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.NumericTextField;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ReservationService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.net.URL;
@@ -29,7 +28,8 @@ import java.util.function.Consumer;
 /**
  * Controller for the ReservationEditViewPane
  */
-public class ReservationEditViewController implements Initializable, Controller {
+@Controller
+public class ReservationEditViewController implements Initializable {
     enum Mode {EDIT, ADD}
 
     @FXML
@@ -72,11 +72,6 @@ public class ReservationEditViewController implements Initializable, Controller 
 
     private Set<Table> selectedTables = new HashSet<>();
     private Set<Table> occupiedTables = new HashSet<>();
-
-    @Override
-    public void disable(boolean disabled) {
-
-    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {

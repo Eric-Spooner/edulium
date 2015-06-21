@@ -1,7 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
@@ -15,14 +14,14 @@ import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.GridCell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Controller;
 
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
-public class MenuOverviewController implements Initializable, Controller {
+@Controller
+public class MenuOverviewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(MenuOverviewController.class);
 
     @FXML
@@ -71,6 +70,7 @@ public class MenuOverviewController implements Initializable, Controller {
                 return null;
             }
         });
+        menus.startPolling();
 
         sortedMenus = new SortedList<>(menus);
         sortedMenus.setComparator((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()));
@@ -92,15 +92,6 @@ public class MenuOverviewController implements Initializable, Controller {
     {
         if (menuClickedConsumer != null) {
             menuClickedConsumer.accept(menu);
-        }
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-        if (disabled) {
-            menus.stopPolling();
-        } else {
-            menus.startPolling();
         }
     }
 }

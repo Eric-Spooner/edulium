@@ -9,12 +9,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class MainWindowController implements Initializable, Controller {
+@Controller
+public class MainWindowController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(MainWindowController.class);
 
     private enum ScreenType {
@@ -97,10 +99,5 @@ public class MainWindowController implements Initializable, Controller {
             default:
                 borderPane.setCenter(loginPane);
         }
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-
     }
 }

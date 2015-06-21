@@ -3,7 +3,6 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.AlertPopOver;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
@@ -23,16 +22,16 @@ import org.controlsfx.control.PopOver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.Supplier;
 
-@Component
-public class OrderOverviewController implements Initializable, Controller {
+@Controller
+public class OrderOverviewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(OrderOverviewController.class);
 
     @FXML
@@ -366,6 +365,7 @@ public class OrderOverviewController implements Initializable, Controller {
                 return null;
             }
         });
+        queuedOrders.startPolling();
 
         inProgressOrders.setSupplier(() -> {
             try {
@@ -378,6 +378,7 @@ public class OrderOverviewController implements Initializable, Controller {
                 return null;
             }
         });
+        inProgressOrders.startPolling();
 
         readyForDeliveryOrders.setSupplier(() -> {
             try {
@@ -390,6 +391,7 @@ public class OrderOverviewController implements Initializable, Controller {
                 return null;
             }
         });
+        readyForDeliveryOrders.startPolling();
 
         deliveredOrders.setSupplier(() -> {
             try {
@@ -402,6 +404,7 @@ public class OrderOverviewController implements Initializable, Controller {
                 return null;
             }
         });
+        deliveredOrders.startPolling();
 
         OrderInputController orderInputController = orderInputPane.getController(OrderInputController.class);
         orderInputController.setTable(table);
@@ -409,20 +412,5 @@ public class OrderOverviewController implements Initializable, Controller {
 
     public void setOnBackButtonAction(EventHandler<ActionEvent> event) {
         backButton.setOnAction(event);
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-        if (disabled) {
-            queuedOrders.stopPolling();
-            inProgressOrders.stopPolling();
-            readyForDeliveryOrders.stopPolling();
-            deliveredOrders.stopPolling();
-        } else {
-            queuedOrders.startPolling();
-            inProgressOrders.startPolling();
-            readyForDeliveryOrders.startPolling();
-            deliveredOrders.startPolling();
-        }
     }
 }

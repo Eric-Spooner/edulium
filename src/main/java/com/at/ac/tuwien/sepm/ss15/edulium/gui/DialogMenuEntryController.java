@@ -17,6 +17,7 @@ import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -27,6 +28,7 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Controller for the TaxRate Dialog
  */
+@Controller
 public class DialogMenuEntryController implements Initializable{
     private static final Logger LOGGER = LogManager.getLogger(DialogMenuEntryController.class);
 

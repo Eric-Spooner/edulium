@@ -31,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -43,8 +44,8 @@ import static javafx.collections.FXCollections.observableList;
 /**
  * Controller used for the Manager View
  */
-@Component
-public class ManagerViewController implements Initializable, Controller {
+@Controller
+public class ManagerViewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(ManagerViewController.class);
 
     @FXML TabPane tabPaneManager;
@@ -77,10 +78,5 @@ public class ManagerViewController implements Initializable, Controller {
         alert.setContentText(content);
 
         alert.showAndWait();
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-
     }
 }

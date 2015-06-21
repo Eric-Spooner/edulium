@@ -2,7 +2,6 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
@@ -10,26 +9,26 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
-public class TableOverviewController implements Initializable, Controller {
+@Controller
+public class TableOverviewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(TableOverviewController.class);
 
     @FXML
@@ -108,15 +107,7 @@ public class TableOverviewController implements Initializable, Controller {
                 return null;
             }
         });
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-        if(disabled) {
-            ordersReadyForDelivery.stopPolling();
-        } else {
-            ordersReadyForDelivery.startPolling();
-        }
+        ordersReadyForDelivery.startPolling();
     }
 
     @FXML

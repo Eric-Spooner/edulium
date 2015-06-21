@@ -2,7 +2,6 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.GridView;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
@@ -13,13 +12,12 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Controller;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -27,10 +25,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
-/**
- * Created by phili on 6/16/15.
- */
-public class TableViewController implements Initializable, Controller {
+@Controller
+public class TableViewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(TableViewController.class);
 
     @FXML
@@ -131,6 +127,7 @@ public class TableViewController implements Initializable, Controller {
                 return null;
             }
         });
+        tables.startPolling();
 
         sections = new PollingList<>(taskScheduler);
         sections.setInterval(1000);
@@ -142,6 +139,7 @@ public class TableViewController implements Initializable, Controller {
                 return null;
             }
         });
+        sections.startPolling();
 
         ListView<Section> listView = new ListView<>(sections);
         listView.setCellFactory(param -> new SectionListCell());
@@ -182,17 +180,6 @@ public class TableViewController implements Initializable, Controller {
         for(Table t : tables) {
             setTableColor(t, Color.BLACK);
             setTableDisable(t, false);
-        }
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-        if (disabled) {
-            tables.stopPolling();
-            sections.stopPolling();
-        } else {
-            tables.startPolling();
-            sections.startPolling();
         }
     }
 

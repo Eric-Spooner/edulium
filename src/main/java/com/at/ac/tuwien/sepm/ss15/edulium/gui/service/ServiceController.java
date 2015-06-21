@@ -1,19 +1,20 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ServiceController implements Initializable, Controller {
+@Controller
+public class ServiceController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(ServiceController.class);
 
     @FXML
@@ -62,10 +63,5 @@ public class ServiceController implements Initializable, Controller {
 
         reservationEditViewController.onCancel(reservation -> borderPane.setCenter(reservationOverviewPane));
         reservationEditViewController.onAccept(reservation -> borderPane.setCenter(reservationOverviewPane));
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-
     }
 }
