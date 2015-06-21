@@ -1,8 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.SaleService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.property.SimpleStringProperty;
@@ -10,22 +8,15 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.scheduling.TaskScheduler;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,18 +31,16 @@ public class SalesViewController implements Initializable, Controller {
     private static final Logger LOGGER = LogManager.getLogger(SalesViewController.class);
 
     @FXML
-    private TableView<Sale> tableViewMenu;
+    private TableView<Sale> tableViewSale;
     @FXML
-    private TableColumn<Sale,Long> tableColMenuId;
+    private TableColumn<Sale,Long> tableColSaleId;
     @FXML
-    private TableColumn<Sale,String> tableColMenuName;
+    private TableColumn<Sale,String> tableColSaleName;
     @FXML
-    private TableColumn<Sale,String> tableColMenuEntries;
+    private TableColumn<Sale,String> tableColSaleEntries;
 
     @Autowired
-    private SaleService menuService;
-    @Autowired
-    private TaskScheduler taskScheduler;
+    private SaleService saleService;
 
     private ObservableList<Sale> menus;
 
@@ -59,15 +48,15 @@ public class SalesViewController implements Initializable, Controller {
     public void initialize(URL location, ResourceBundle resources) {
         // queued
         try {
-            menus = observableArrayList(menuService.getAllSales());
-            tableViewMenu.setItems(menus);
-            tableColMenuId.setCellValueFactory(new PropertyValueFactory<Sale, Long>("identity"));
-            tableColMenuName.setCellValueFactory(new PropertyValueFactory<Sale, String>("name"));
-            tableColMenuEntries.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Sale, String>, ObservableValue<String>>() {
+            menus = observableArrayList(saleService.getAllSales());
+            tableViewSale.setItems(menus);
+            tableColSaleId.setCellValueFactory(new PropertyValueFactory<Sale, Long>("identity"));
+            tableColSaleName.setCellValueFactory(new PropertyValueFactory<Sale, String>("name"));
+            tableColSaleEntries.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Sale, String>, ObservableValue<String>>() {
                 public ObservableValue<String> call(TableColumn.CellDataFeatures<Sale, String> p) {
                     // p.getValue() returns the Person instance for a particular TableView row
                     List<String> list = new LinkedList<String>();
-                    p.getValue().getEntries().forEach(entry->list.add(entry.getName()));
+                    p.getValue().getEntries().forEach(entry -> list.add(entry.getName()));
                     return new SimpleStringProperty(list.toString());
                 }
             });
@@ -77,11 +66,11 @@ public class SalesViewController implements Initializable, Controller {
 
     }
 
-    public void buttonMenuUpdateClicked(ActionEvent actionEvent) {
+    public void buttonSaleUpdateClicked(ActionEvent actionEvent) {
         /*try {
             LOGGER.info("Update Menu Button Click");
             Stage stage = new Stage();
-            if(tableViewMenu.getSelectionModel().getSelectedItem() == null){
+            if(tableViewSale.getSelectionModel().getSelectedItem() == null){
                 ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a Menu to Update");
                 return;
@@ -89,36 +78,36 @@ public class SalesViewController implements Initializable, Controller {
             DialogMenuController.resetDialog();
             DialogMenuController.setThisStage(stage);
             DialogMenuController.setDialogEnumeration(DialogEnumeration.UPDATE);
-            DialogMenuController.setMenu(tableViewMenu.getSelectionModel().getSelectedItem());
+            DialogMenuController.setMenu(tableViewSale.getSelectionModel().getSelectedItem());
             stage.setTitle("Update Menu");
             ApplicationContext context = EduliumApplicationContext.getContext();
             FXMLPane myPane = context.getBean("menuDialogPane", FXMLPane.class);
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
-            menus.setAll(menuService.getAllMenus());
+            menus.setAll(saleService.getAllMenus());
             DialogMenuController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Loading the Menus failed" + e);
         }*/
     }
 
-    public void buttonMenuRemoveClicked(ActionEvent actionEvent) {
+    public void buttonSaleRemoveClicked(ActionEvent actionEvent) {
         /*try {
             LOGGER.info("Delete Menu Button Click");
-            if(tableViewMenu.getSelectionModel().getSelectedItem() == null){
+            if(tableViewSale.getSelectionModel().getSelectedItem() == null){
                 ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a Menu to Delete");
                 return;
             }
-            menuService.removeMenu(tableViewMenu.getSelectionModel().getSelectedItem());
-            menus.setAll(menuService.getAllMenus());
+            saleService.removeMenu(tableViewSale.getSelectionModel().getSelectedItem());
+            menus.setAll(saleService.getAllMenus());
         }catch (Exception e){
             LOGGER.error("Loading the Menus failed" + e);
         }*/
     }
 
-    public void buttonMenuAddClicked(ActionEvent actionEvent){
+    public void buttonSaleAddClicked(ActionEvent actionEvent){
         /*try {
             LOGGER.info("Add Menu Button Click");
             Stage stage = new Stage();
@@ -130,7 +119,7 @@ public class SalesViewController implements Initializable, Controller {
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
-            menus.setAll(menuService.getAllMenus());
+            menus.setAll(saleService.getAllMenus());
         }catch (IOException e){
             LOGGER.error("Add Menu Button Click did not work");
         }catch (Exception e){
@@ -138,9 +127,9 @@ public class SalesViewController implements Initializable, Controller {
         }*/
     }
 
-    public void buttonShowAllMenuClicked(ActionEvent actionEvent) {
+    public void buttonShowAllSaleClicked(ActionEvent actionEvent) {
         try {
-            menus.setAll(menuService.getAllSales());
+            menus.setAll(saleService.getAllSales());
         } catch (Exception e){
             LOGGER.error("Loading All Sale failed" + e);
         }
