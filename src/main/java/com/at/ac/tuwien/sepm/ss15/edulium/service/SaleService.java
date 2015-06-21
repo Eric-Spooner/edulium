@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Service interface for sales.
  */
-public interface SaleService {
+public interface SaleService extends Service {
     /**
      * adds a intermittentSale to the underlying datasource
      * @param intermittentSale intermittentSale to add

@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Implementation of the SaleService
  */
-public class SaleServiceImpl implements SaleService {
+class SaleServiceImpl implements SaleService {
     private static final Logger LOGGER = LogManager.getLogger(SaleServiceImpl.class);
 
     @Autowired

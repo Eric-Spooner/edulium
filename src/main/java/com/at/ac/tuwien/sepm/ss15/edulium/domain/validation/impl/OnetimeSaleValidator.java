@@ -1,13 +1,18 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.OnetimeSale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * validator implementation for the OnetimeSale domain object
  */
-public class OnetimeSaleValidator implements Validator<OnetimeSale> {
+class OnetimeSaleValidator implements Validator<OnetimeSale> {
+    @Autowired
+    Validator<MenuEntry> menuEntryValidator;
+
     @Override
     public void validateForCreate(OnetimeSale onetimeSale) throws ValidationException {
         if (onetimeSale == null) {
@@ -69,6 +74,10 @@ public class OnetimeSaleValidator implements Validator<OnetimeSale> {
         }
         if (onetimeSale.getFromTime().isAfter(onetimeSale.getToTime())) {
             throw new ValidationException("FromTime must not be after toTime.");
+        }
+
+        for(MenuEntry entry : onetimeSale.getEntries()) {
+            menuEntryValidator.validateIdentity(entry);
         }
     }
 }

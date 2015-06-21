@@ -10,6 +10,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
@@ -24,6 +25,7 @@ import java.util.List;
 /**
  * This is a helper class for the H2 Database implementations DBIntermittentSaleDAO and DBOnetimeSaleDAO
  */
+@PreAuthorize("isAuthenticated()")
 abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
     private static final Logger LOGGER = LogManager.getLogger(DBAbstractSaleDAO.class);
 
@@ -35,12 +37,10 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
     @Override
     public void create(T sale) throws DAOException, ValidationException {
         //Save Sale
-        final String saleQuery = "INSERT INTO Sale (name, deleted) VALUES (?, ?)";
+        final String saleQuery = "INSERT INTO Sale (name) VALUES (?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery)) {
             stmt.setString(1, sale.getName());
-            stmt.setBoolean(2, false);
-
             stmt.executeUpdate();
 
             ResultSet key = stmt.getGeneratedKeys();
@@ -185,18 +185,18 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
             throw new DAOException("retrieving the change number failed", e);
         }
 
-        generateReservationAssociationsHistory(sale, changeNr);
+        generateSaleAssociationsHistory(sale, changeNr);
     }
 
     /**
      * writes the association changes of the dataset into the database
      * stores the time; number of the change (uses the given changeNumber) and the user which executed the changes
      * @param sale updated dataset
-     * @param changeNumber reservation history change number
+     * @param changeNumber sale history change number
      * @throws DAOException if an error accessing the database occurred
      */
-    private void generateReservationAssociationsHistory(Sale sale, long changeNumber) throws DAOException {
-        LOGGER.debug("Entering generateReservationAssociationsHistory with parameters: " + sale);
+    private void generateSaleAssociationsHistory(Sale sale, long changeNumber) throws DAOException {
+        LOGGER.debug("Entering generateSaleAssociationsHistory with parameters: " + sale);
 
         final String query = "INSERT INTO SaleAssocHistory " +
                 "(SELECT *, CURRENT_TIMESTAMP(), ?, ? FROM SaleAssoc WHERE sale_ID = ?)";
@@ -282,7 +282,6 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
 
         // set entries
         // SaleAssoc (sale_ID, menuEntry_ID, salePrice, disabled)
-
         final String entriesQuery = "SELECT * FROM SaleAssocHistory WHERE sale_ID = ? AND changeNr = ? AND disabled = false";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(entriesQuery)) {
             stmt.setLong(1, history.getData().getIdentity());

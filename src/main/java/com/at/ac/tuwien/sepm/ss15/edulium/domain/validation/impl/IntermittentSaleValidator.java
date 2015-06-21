@@ -1,13 +1,18 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * validator implementation for the IntermittentSale domain object
  */
-public class IntermittentSaleValidator implements Validator<IntermittentSale> {
+class IntermittentSaleValidator implements Validator<IntermittentSale> {
+    @Autowired
+    Validator<MenuEntry> menuEntryValidator;
+
     @Override
     public void validateForCreate(IntermittentSale intermittentSale) throws ValidationException {
         if (intermittentSale == null) {
@@ -75,6 +80,10 @@ public class IntermittentSaleValidator implements Validator<IntermittentSale> {
         }
         if (intermittentSale.getDuration() == null || intermittentSale.getDuration().isNegative()) {
             throw new ValidationException("Negative durations are not accepted.");
+        }
+
+        for(MenuEntry entry : intermittentSale.getEntries()) {
+            menuEntryValidator.validateIdentity(entry);
         }
     }
 }
