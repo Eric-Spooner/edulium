@@ -210,10 +210,10 @@ class DBInvoiceDAO implements DAO<Invoice> {
         }
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, invoice.getIdentity());
-            stmt.setTimestamp(2, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
-            stmt.setBigDecimal(3, invoice.getGross());
-            stmt.setString(4, invoice.getCreator() == null ? null : invoice.getCreator().getIdentity());
+            stmt.setObject(1, invoice.getIdentity());
+            stmt.setObject(2, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
+            stmt.setObject(3, invoice.getGross());
+            stmt.setObject(4, invoice.getCreator() == null ? null : invoice.getCreator().getIdentity());
 
             if (invoice.getOrders() != null && invoice.getOrders().size() > 0) {
                 int index = 5;
