@@ -21,7 +21,7 @@
       <Text layoutX="20.0" layoutY="405.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name: " AnchorPane.bottomAnchor="29.2353515625" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="645.0224609375" />
       <TextField fx:id="textFieldName" layoutX="75.0" layoutY="384.0" prefHeight="31.0" prefWidth="491.0" AnchorPane.bottomAnchor="23.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="146.0" />
       <Button defaultButton="true" layoutX="658.0" layoutY="384.0" mnemonicParsing="false" onAction="#buttonOKClick" text="OK" AnchorPane.bottomAnchor="23.0" AnchorPane.rightAnchor="13.0" />
-      <Text layoutX="443.0" layoutY="131.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Menu Price:" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
+      <Text layoutX="443.0" layoutY="131.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sale Price:" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
       <TableView fx:id="tableViewInMenu" layoutX="413.0" layoutY="14.0" prefHeight="342.0" prefWidth="404.0" AnchorPane.bottomAnchor="82.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
          <columns>
             <TableColumn fx:id="tableColNameInMenu" prefWidth="138.0" text="Name" />

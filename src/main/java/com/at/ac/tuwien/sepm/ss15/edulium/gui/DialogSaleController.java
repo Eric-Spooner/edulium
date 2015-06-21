@@ -1,8 +1,10 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.OnetimeSale;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.SaleService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -36,21 +38,23 @@ public class DialogSaleController implements Initializable{
     private static Stage thisStage;
 
     @Autowired
+    private SaleService saleService;
+    @Autowired
     private MenuService menuService;
 
-    private static Menu menu;
+    private static Sale sale;
     private static DialogEnumeration dialogEnumeration;
 
     public static void setThisStage(Stage thisStage) {
         DialogSaleController.thisStage = thisStage;
     }
-    public static void setMenu(Menu menu) {
-        DialogSaleController.menu = menu; }
+    public static void setSale(Sale sale) {
+        DialogSaleController.sale = sale; }
     public static void setDialogEnumeration(DialogEnumeration dialogEnumeration) {
         DialogSaleController.dialogEnumeration = dialogEnumeration;
     }
-    public static Menu getMenu() {
-        return menu;
+    public static Sale getSale() {
+        return sale;
     }
 
     @FXML
@@ -84,13 +88,13 @@ public class DialogSaleController implements Initializable{
 
 
     /**
-     * Function is used to init the Menu Dialog
+     * Function is used to init the Sale Dialog
      * @param location
      * @param resources
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        LOGGER.info("Initialize Dialog Menu");
+        LOGGER.info("Initialize Dialog Sale");
 
         tableColNameData.setCellValueFactory(new PropertyValueFactory<MenuEntry, String>("name"));
         tableColCategoryData.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<MenuEntry, String>, ObservableValue<String>>() {
@@ -101,22 +105,22 @@ public class DialogSaleController implements Initializable{
         });
         tableColPriceData.setCellValueFactory(new PropertyValueFactory<MenuEntry, BigDecimal>("price"));
 
-        if(menu == null){
-            Menu menuForInit = new Menu();
-            menuForInit.setEntries(new LinkedList<>());
-            DialogSaleController.setMenu(menuForInit);
+        if(sale == null){
+            Sale saleForInit = new OnetimeSale(); //TODO change
+            saleForInit.setEntries(new LinkedList<>());
+            DialogSaleController.setSale(saleForInit);
         }
-        if(menu.getEntries() == null) {
-            menu.setEntries(new LinkedList<>());
+        if(sale.getEntries() == null) {
+            sale.setEntries(new LinkedList<>());
         }
         try {
             allMenuEntries = observableArrayList(menuService.getAllMenuEntries());
-            inMenuMenuEntries = observableArrayList(menu.getEntries());
+            inMenuMenuEntries = observableArrayList(sale.getEntries());
         }catch (Exception e){
             ManagerViewController.showErrorDialog
                     ("Error", "Refreshing View", "An Error occured during initializing the View /n" + e.toString());
         }
-        if(menu.getName() != null) textFieldName.setText(menu.getName());
+        if(sale.getName() != null) textFieldName.setText(sale.getName());
         tableViewData.setItems(allMenuEntries);
         tableViewInMenu.setItems(inMenuMenuEntries);
         tableColNameInMenu.setCellValueFactory(new PropertyValueFactory<MenuEntry, String>("name"));
@@ -138,12 +142,12 @@ public class DialogSaleController implements Initializable{
             return;
         }
         if (DialogSaleController.dialogEnumeration == DialogEnumeration.SEARCH) {
-            if(!textFieldName.getText().isEmpty()) menu.setName(textFieldName.getText());
+            if(!textFieldName.getText().isEmpty()) sale.setName(textFieldName.getText());
         } else{
-            menu.setName(textFieldName.getText());
+            sale.setName(textFieldName.getText());
         }
         if(DialogSaleController.dialogEnumeration != DialogEnumeration.SEARCH){
-            if (menu.getEntries().size() == 0) {
+            if (sale.getEntries().size() == 0) {
                 ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "There hast to be at least one Menu Entry");
                 return;
@@ -152,23 +156,23 @@ public class DialogSaleController implements Initializable{
         try {
             switch (DialogSaleController.dialogEnumeration) {
                 case ADD:
-                    menuService.addMenu(menu);
+                    saleService.addOnetimeSale((OnetimeSale) sale); //TODO change
                     break;
                 case UPDATE:
-                    menuService.updateMenu(menu);
+                    saleService.updateOnetimeSale((OnetimeSale) saleService); //TODO change
                     break;
             }
         }catch (Exception e){
             ManagerViewController.showErrorDialog
-                    ("Error", "Menu Service Error", "The Service was unable to handle the required Menu action/n" + e.toString());
-            LOGGER.error("The Service was unable to handle the required Menu action " + e);
+                    ("Error", "Sale Service Error", "The Service was unable to handle the required Sale action/n" + e.toString());
+            LOGGER.error("The Service was unable to handle the required Sale action " + e);
             return;
         }
         thisStage.close();
     }
 
     public void buttonCancelClick(ActionEvent actionEvent) {
-        LOGGER.info("Dialog Menu Cancel Button clicked");
+        LOGGER.info("Dialog Sale Cancel Button clicked");
         resetDialog();
         thisStage.close();
     }
@@ -178,7 +182,7 @@ public class DialogSaleController implements Initializable{
                 DialogSaleController.dialogEnumeration != DialogEnumeration.SEARCH){
             switch (DialogSaleController.dialogEnumeration) {
                 case UPDATE:
-                case ADD: //There has to be a Price, if the User want's to ADD or UPDATE
+                case ADD: //There has to be a Price, if the User wants to ADD or UPDATE
                     ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must have a value");
                     return;
             }
@@ -205,17 +209,17 @@ public class DialogSaleController implements Initializable{
                     }
                     break;
             }
-            List<MenuEntry> list = menu.getEntries();
+            List<MenuEntry> list = sale.getEntries();
             list.add(menuEntry);
-            menu.setEntries(list);
-            inMenuMenuEntries.setAll(menu.getEntries());
+            sale.setEntries(list);
+            inMenuMenuEntries.setAll(sale.getEntries());
         } catch (NumberFormatException e) {
             ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must be a number/n" + e.toString());
-            LOGGER.info("Dialog Menu Add Button Clicked Price must be number " + e);
+            LOGGER.info("Dialog Sale Add Button Clicked Price must be number " + e);
         } catch (Exception e) {
             ManagerViewController.showErrorDialog
                     ("Error", "Data Validation", "An Error occured during adding MenuEntry/n" + e.toString());
-            LOGGER.info("Dialog Menu Add Button Menu Entry handling Error" + e);
+            LOGGER.info("Dialog Sale Add Button Menu Entry handling Error" + e);
         }
     }
 
@@ -226,16 +230,16 @@ public class DialogSaleController implements Initializable{
             return;
         }
         MenuEntry menuEntry = tableViewInMenu.getSelectionModel().getSelectedItem();
-        List<MenuEntry> list = menu.getEntries();
+        List<MenuEntry> list = sale.getEntries();
         list.remove(menuEntry);
-        menu.setEntries(list);
-        inMenuMenuEntries.setAll(menu.getEntries());
+        sale.setEntries(list);
+        inMenuMenuEntries.setAll(sale.getEntries());
     }
 
     /**
      * this function is used to rest the static members of the class
      */
     public static void resetDialog(){
-        DialogSaleController.setMenu(null);
+        DialogSaleController.setSale(null);
     }
 }
