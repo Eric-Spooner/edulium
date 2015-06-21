@@ -42,14 +42,14 @@ public class SalesViewController implements Initializable, Controller {
     @Autowired
     private SaleService saleService;
 
-    private ObservableList<Sale> menus;
+    private ObservableList<Sale> sales;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // queued
         try {
-            menus = observableArrayList(saleService.getAllSales());
-            tableViewSale.setItems(menus);
+            sales = observableArrayList(saleService.getAllSales());
+            tableViewSale.setItems(sales);
             tableColSaleId.setCellValueFactory(new PropertyValueFactory<Sale, Long>("identity"));
             tableColSaleName.setCellValueFactory(new PropertyValueFactory<Sale, String>("name"));
             tableColSaleEntries.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Sale, String>, ObservableValue<String>>() {
@@ -85,7 +85,7 @@ public class SalesViewController implements Initializable, Controller {
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
-            menus.setAll(saleService.getAllMenus());
+            sales.setAll(saleService.getAllMenus());
             DialogMenuController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Loading the Menus failed" + e);
@@ -101,7 +101,7 @@ public class SalesViewController implements Initializable, Controller {
                 return;
             }
             saleService.removeMenu(tableViewSale.getSelectionModel().getSelectedItem());
-            menus.setAll(saleService.getAllMenus());
+            sales.setAll(saleService.getAllMenus());
         }catch (Exception e){
             LOGGER.error("Loading the Menus failed" + e);
         }*/
@@ -119,7 +119,7 @@ public class SalesViewController implements Initializable, Controller {
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
-            menus.setAll(saleService.getAllMenus());
+            sales.setAll(saleService.getAllMenus());
         }catch (IOException e){
             LOGGER.error("Add Menu Button Click did not work");
         }catch (Exception e){
@@ -129,7 +129,7 @@ public class SalesViewController implements Initializable, Controller {
 
     public void buttonShowAllSaleClicked(ActionEvent actionEvent) {
         try {
-            menus.setAll(saleService.getAllSales());
+            sales.setAll(saleService.getAllSales());
         } catch (Exception e){
             LOGGER.error("Loading All Sale failed" + e);
         }
