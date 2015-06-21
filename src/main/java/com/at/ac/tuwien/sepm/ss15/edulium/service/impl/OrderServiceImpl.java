@@ -8,6 +8,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.SaleService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +24,8 @@ import java.util.List;
  */
 class OrderServiceImpl implements OrderService {
     private static final Logger LOGGER = LogManager.getLogger(TaxRateServiceImpl.class);
+    @Resource(name = "saleService")
+    private SaleService saleService;
     @Resource(name = "invoiceService")
     private InvoiceService invoiceService;
     @Resource(name = "orderDAO")
@@ -38,6 +41,11 @@ class OrderServiceImpl implements OrderService {
         orderValidator.validateForCreate(order);
 
         try {
+            //Check if a sale is active and let the price be updated
+            MenuEntry entry = order.getMenuEntry();
+            saleService.applySales(entry);
+            order.setMenuEntry(entry);
+            //Create the order with the updated price
             orderDAO.create(order);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
