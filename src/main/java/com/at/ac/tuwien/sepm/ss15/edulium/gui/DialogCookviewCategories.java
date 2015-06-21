@@ -26,7 +26,7 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Dialog Controller Cook View Categories
  */
-public class DialogCookviewCategories implements Initializable {
+public class DialogCookviewCategories implements Initializable, Controller{
     private static final Logger LOGGER = LogManager.getLogger(DialogCookviewCategories.class);
 
     private static Stage thisStage;
@@ -70,5 +70,10 @@ public class DialogCookviewCategories implements Initializable {
 
     public void btnBackClicked(ActionEvent actionEvent) {
         thisStage.close();
+    }
+
+    @Override
+    public void disable(boolean disabled) {
+
     }
 }

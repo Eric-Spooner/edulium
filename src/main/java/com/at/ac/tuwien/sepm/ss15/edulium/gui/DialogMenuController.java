@@ -30,7 +30,7 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Controller for the TaxRate Dialog
  */
-public class DialogMenuController implements Initializable{
+public class DialogMenuController implements Initializable, Controller{
     private static final Logger LOGGER = LogManager.getLogger(DialogMenuController.class);
 
     private static Stage thisStage;
@@ -236,5 +236,10 @@ public class DialogMenuController implements Initializable{
      */
     public static void resetDialog(){
         DialogMenuController.setMenu(null);
+    }
+
+    @Override
+    public void disable(boolean disabled) {
+
     }
 }

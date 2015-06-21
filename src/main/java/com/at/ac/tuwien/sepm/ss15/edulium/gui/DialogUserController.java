@@ -25,7 +25,7 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Controller for the TaxRate Dialog
  */
-public class DialogUserController implements Initializable{
+public class DialogUserController implements Initializable, Controller{
     private static final Logger LOGGER = LogManager.getLogger(DialogUserController.class);
 
 
@@ -148,6 +148,11 @@ public class DialogUserController implements Initializable{
 
     public static void resetDialog(){
         DialogUserController.setUser(null);
+    }
+
+    @Override
+    public void disable(boolean disabled) {
+
     }
 }
 

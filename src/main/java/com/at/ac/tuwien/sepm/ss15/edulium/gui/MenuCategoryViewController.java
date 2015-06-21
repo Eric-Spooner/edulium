@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -47,6 +48,9 @@ public class MenuCategoryViewController implements Initializable, Controller {
 
     private ObservableList<MenuCategory> menuCategories;
 
+    @Resource(name = "menuCategoryDialogPane")
+    private FXMLPane menuCategoryDialogPane;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // queued
@@ -68,8 +72,7 @@ public class MenuCategoryViewController implements Initializable, Controller {
             DialogMenuCategoryController.setThisStage(stage);
             DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search Menu Category");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
-            Scene scene = new Scene(myPane);
+            Scene scene = new Scene(menuCategoryDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             if (DialogMenuCategoryController.getMenuCategory() != null) {
@@ -96,8 +99,7 @@ public class MenuCategoryViewController implements Initializable, Controller {
             DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.UPDATE);
             DialogMenuCategoryController.setMenuCategory(tableViewMenuCategory.getSelectionModel().getSelectedItem());
             stage.setTitle("Update Menu Category");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
-            Scene scene = new Scene(myPane);
+            Scene scene = new Scene(menuCategoryDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             menuCategories.setAll(menuService.getAllMenuCategories());
@@ -114,8 +116,7 @@ public class MenuCategoryViewController implements Initializable, Controller {
             DialogMenuCategoryController.setThisStage(stage);
             DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Insert Menu Category");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
-            Scene scene = new Scene(myPane);
+            Scene scene = new Scene(menuCategoryDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             menuCategories.setAll(menuService.getAllMenuCategories());

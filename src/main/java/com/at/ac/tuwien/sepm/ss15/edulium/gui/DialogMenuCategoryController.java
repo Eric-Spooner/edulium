@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
 /**
  * Controller for the TaxRate Dialog
  */
-public class DialogMenuCategoryController implements Initializable{
+public class DialogMenuCategoryController implements Initializable, Controller{
     private static final Logger LOGGER = LogManager.getLogger(DialogMenuCategoryController.class);
 
     @Autowired
@@ -90,5 +90,10 @@ public class DialogMenuCategoryController implements Initializable{
 
     public static void resetDialog(){
         menuCategory = null;
+    }
+
+    @Override
+    public void disable(boolean disabled) {
+
     }
 }

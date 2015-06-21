@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -38,6 +39,9 @@ public class EmployeeViewController implements Initializable, Controller {
     private TableColumn<User,String> employeeName;
     @FXML
     private TableColumn<User,String> employeeRole;
+
+    @Resource(name = "userDialogPane")
+    private FXMLPane userDialogPane;
 
     @Autowired
     private UserService userService;
@@ -69,13 +73,10 @@ public class EmployeeViewController implements Initializable, Controller {
             DialogUserController.setThisStage(stage);
             DialogUserController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Add Employee");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogUser.fxml"));
-            Scene scene = new Scene(myPane);
+            Scene scene = new Scene(userDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             users.setAll(userService.getAllUsers());
-        }catch (IOException e){
-            LOGGER.error("Add User Button Click did not work");
         }catch (Exception e){
             LOGGER.error("Loading the Users failed" + e);
         }
@@ -95,14 +96,11 @@ public class EmployeeViewController implements Initializable, Controller {
             DialogUserController.setDialogEnumeration(DialogEnumeration.UPDATE);
             DialogUserController.setUser(tableViewEmployee.getSelectionModel().getSelectedItem());
             stage.setTitle("Update User");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogUser.fxml"));
-            Scene scene = new Scene(myPane);
+            Scene scene = new Scene(userDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             users.setAll(userService.getAllUsers());
             DialogMenuController.resetDialog();
-        }catch (IOException e){
-            LOGGER.error("Add User Button Click did not work");
         }catch (Exception e){
             LOGGER.error("Loading the User failed" + e);
         }
@@ -116,8 +114,7 @@ public class EmployeeViewController implements Initializable, Controller {
             DialogUserController.setThisStage(stage);
             DialogUserController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search User");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogUser.fxml"));
-            Scene scene = new Scene(myPane);
+            Scene scene = new Scene(userDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             if(DialogUserController.getUser() != null){
@@ -126,8 +123,6 @@ public class EmployeeViewController implements Initializable, Controller {
                 users.setAll(userService.getAllUsers());
             }
             DialogMenuEntryController.resetDialog();
-        }catch (IOException e){
-            LOGGER.error("Search User Button Click did not work");
         }catch (Exception e){
             LOGGER.error("Loading the User Entries failed" + e);
         }

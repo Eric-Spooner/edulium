@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 
+import javax.annotation.Resource;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -75,6 +76,10 @@ public class CookViewController implements Initializable, Controller {
     private TableColumn<Order, String> tableColDeliveryAddInfo;
     @FXML
     private TableColumn<Order, Long> tableColDeliveryTime;
+
+    @Resource(name = "cookViewDialogPane")
+    private FXMLPane cookViewDialogPane;
+
 
     @Autowired
     private MenuService menuService;
@@ -290,8 +295,7 @@ public class CookViewController implements Initializable, Controller {
             DialogCookviewCategories.setCheckedCategories(checkedCategories);
             DialogCookviewCategories.setThisStage(stage);
             DialogCookviewCategories.setMenuService(menuService);
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogCookViewMenCat.fxml"));
-            Scene scene = new Scene(myPane);
+            Scene scene = new Scene(cookViewDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             checkedCategories = DialogCookviewCategories.getCheckedCategories();

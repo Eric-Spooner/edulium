@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -53,6 +54,10 @@ public class MenuEntryViewController implements Initializable, Controller {
     private TableColumn<MenuEntry, String> tableColMenuEntryCategory;
     @FXML
     private TableColumn<MenuEntry, Boolean> tableColMenuEntryAvailable;
+
+    @Resource(name = "menuEntryDialogPane")
+    private FXMLPane menuEntryDialogPane;
+
 
     @Autowired
     private MenuService menuService;
@@ -108,8 +113,7 @@ public class MenuEntryViewController implements Initializable, Controller {
             DialogMenuEntryController.setThisStage(stage);
             DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search MenuEntry");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
-            Scene scene = new Scene(myPane);
+            Scene scene = new Scene(menuEntryDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             if(DialogMenuEntryController.getMenuEntry() != null){
@@ -118,8 +122,6 @@ public class MenuEntryViewController implements Initializable, Controller {
                 menuEntries.setAll(menuService.getAllMenuEntries());
             }
             DialogMenuEntryController.resetDialog();
-        }catch (IOException e){
-            LOGGER.error("Search MenuEntry Button Click did not work");
         }catch (Exception e){
             LOGGER.error("Loading the Menus Entries failed" + e);
         }
@@ -144,8 +146,7 @@ public class MenuEntryViewController implements Initializable, Controller {
             DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.UPDATE);
             DialogMenuEntryController.setMenuEntry(tableViewMenuEntry.getSelectionModel().getSelectedItem());
             stage.setTitle("Update MenuEntry");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
-            Scene scene = new Scene(myPane);
+            Scene scene = new Scene(menuEntryDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             menuEntries.setAll(menuService.getAllMenuEntries());
@@ -163,8 +164,7 @@ public class MenuEntryViewController implements Initializable, Controller {
             DialogMenuEntryController.setThisStage(stage);
             DialogMenuEntryController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Insert MenuEntry");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuEntry.fxml"));
-            Scene scene = new Scene(myPane);
+            Scene scene = new Scene(menuEntryDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             menuEntries.setAll(menuService.getAllMenuEntries());

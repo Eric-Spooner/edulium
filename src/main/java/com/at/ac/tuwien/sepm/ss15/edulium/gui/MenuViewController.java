@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.TaskScheduler;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedList;
@@ -47,6 +48,9 @@ public class MenuViewController implements Initializable, Controller {
     private TableColumn<Menu,String> tableColMenuName;
     @FXML
     private TableColumn<Menu,String> tableColMenuEntries;
+
+    @Resource(name = "menuDialogPane")
+    private FXMLPane menuDialogPane;
 
     @Autowired
     private MenuService menuService;
@@ -91,9 +95,7 @@ public class MenuViewController implements Initializable, Controller {
             DialogMenuController.setDialogEnumeration(DialogEnumeration.UPDATE);
             DialogMenuController.setMenu(tableViewMenu.getSelectionModel().getSelectedItem());
             stage.setTitle("Update Menu");
-            ApplicationContext context = EduliumApplicationContext.getContext();
-            FXMLPane myPane = context.getBean("menuDialogPane", FXMLPane.class);
-            Scene scene = new Scene(myPane);
+            Scene scene = new Scene(menuDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             menus.setAll(menuService.getAllMenus());
@@ -111,8 +113,7 @@ public class MenuViewController implements Initializable, Controller {
             DialogMenuController.setThisStage(stage);
             DialogMenuController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search Menu");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
-            Scene scene = new Scene(myPane);
+            Scene scene = new Scene(menuDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             if(DialogMenuController.getMenu() != null){
@@ -121,8 +122,6 @@ public class MenuViewController implements Initializable, Controller {
                 menus.setAll(menuService.getAllMenus());
             }
             DialogMenuController.resetDialog();
-        }catch (IOException e){
-            LOGGER.error("Search Menu Button Click did not work" + e);
         }catch (ServiceException e){
             LOGGER.error("Menu Service finding Menus did not work" + e);
         }
@@ -151,13 +150,10 @@ public class MenuViewController implements Initializable, Controller {
             DialogMenuController.setThisStage(stage);
             DialogMenuController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Add Menu");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
-            Scene scene = new Scene(myPane);
+            Scene scene = new Scene(menuDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             menus.setAll(menuService.getAllMenus());
-        }catch (IOException e){
-            LOGGER.error("Add Menu Button Click did not work");
         }catch (Exception e){
             LOGGER.error("Loading the Menus failed" + e);
         }
