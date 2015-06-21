@@ -103,31 +103,6 @@ public class SalesViewController implements Initializable, Controller {
         }*/
     }
 
-    public void buttonMenuSearchClicked(ActionEvent actionEvent) {
-        /*try {
-            LOGGER.info("Search Menu Button Click");
-            Stage stage = new Stage();
-            DialogMenuController.resetDialog();
-            DialogMenuController.setThisStage(stage);
-            DialogMenuController.setDialogEnumeration(DialogEnumeration.SEARCH);
-            stage.setTitle("Search Menu");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
-            Scene scene = new Scene(myPane);
-            stage.setScene(scene);
-            stage.showAndWait();
-            if(DialogMenuController.getMenu() != null){
-                menus.setAll(menuService.findMenu(DialogMenuController.getMenu()));
-            }else {
-                menus.setAll(menuService.getAllMenus());
-            }
-            DialogMenuController.resetDialog();
-        }catch (IOException e){
-            LOGGER.error("Search Menu Button Click did not work" + e);
-        }catch (ServiceException e){
-            LOGGER.error("Menu Service finding Menus did not work" + e);
-        }*/
-    }
-
     public void buttonMenuRemoveClicked(ActionEvent actionEvent) {
         /*try {
             LOGGER.info("Delete Menu Button Click");
