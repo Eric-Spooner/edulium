@@ -39,12 +39,13 @@ class DBUserDAO implements DAO<User> {
 
         validator.validateForCreate(user);
 
-        final String query = "INSERT INTO RestaurantUser (ID, name, userRole) VALUES (?, ?, ?)";
+        final String query = "INSERT INTO RestaurantUser (ID, name, userRole, tip) VALUES (?, ?, ?, ISNULL(?, 0))";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, user.getIdentity());
             stmt.setString(2, user.getName());
             stmt.setString(3, user.getRole());
+            stmt.setBigDecimal(4, user.getTip());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -62,12 +63,14 @@ class DBUserDAO implements DAO<User> {
 
         validator.validateForUpdate(user);
 
-        final String query = "UPDATE RestaurantUser SET name = ?, userRole = ? WHERE ID = ?";
+        final String query = "UPDATE RestaurantUser SET name = ?, userRole = ?, tip = ISNULL(?, 0)  WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getRole());
-            stmt.setString(3, user.getIdentity());
+            stmt.setBigDecimal(3, user.getTip());
+            stmt.setString(4, user.getIdentity());
+
 
             if (stmt.executeUpdate() == 0) {
                 LOGGER.error("Updating user in database failed, user not found");
@@ -114,7 +117,7 @@ class DBUserDAO implements DAO<User> {
         }
 
         final String query = "SELECT * FROM RestaurantUser WHERE ID = ISNULL(?, ID) AND name = ISNULL(?, name) " +
-                             "AND userRole = ISNULL(?, userRole) AND deleted = false";
+                             "AND userRole = ISNULL(?, userRole) AND tip = ISNULL(?, tip) AND deleted = false";
 
         final List<User> users = new ArrayList<>();
 
@@ -122,6 +125,7 @@ class DBUserDAO implements DAO<User> {
             stmt.setObject(1, user.getIdentity());
             stmt.setObject(2, user.getName());
             stmt.setObject(3, user.getRole());
+            stmt.setObject(4, user.getTip());
 
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
@@ -255,6 +259,7 @@ class DBUserDAO implements DAO<User> {
         user.setIdentity(result.getString("ID"));
         user.setName(result.getString("name"));
         user.setRole(result.getString("userRole"));
+        user.setTip(result.getBigDecimal("tip"));
         return user;
     }
 

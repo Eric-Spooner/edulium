@@ -1,5 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
+import java.math.BigDecimal;
+
 /**
  * domain object which represents a user
  */
@@ -7,6 +9,10 @@ public class User {
     private String identity = null;
     private String name = null;
     private String role = null;
+
+
+
+    private BigDecimal tip = null;
 
     /**
      * Creates a new user object and assigns the given identity to it.
@@ -64,12 +70,29 @@ public class User {
         this.role = role;
     }
 
+    /**
+     *
+     * @return the tip of the User
+     */
+    public BigDecimal getTip() {
+        return tip;
+    }
+
+    /**
+     * set the tip of the User
+     * @param tip
+     */
+    public void setTip(BigDecimal tip) {
+        this.tip = tip;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "identity=" + identity +
                 ", name='" + name + '\'' +
                 ", role='" + role + '\'' +
+                ", tip='" + tip + '\'' +
                 '}';
     }
 
@@ -82,6 +105,7 @@ public class User {
 
         if (identity != null ? !identity.equals(user.identity) : user.identity != null) return false;
         if (name != null ? !name.equals(user.name) : user.name != null) return false;
+        if (tip != null ? tip.compareTo(user.tip)!=0 : user.tip != null) return false;
         return !(role != null ? !role.equals(user.role) : user.role != null);
 
     }
