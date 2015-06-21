@@ -9,8 +9,12 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPageable;
 
 import java.awt.*;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,7 +40,7 @@ public class PrinterInvoiceManager implements InvoiceManager {
         printPDF(filePath);
     }
 
-    public void generatePDF(Invoice invoice, String filePath) throws ServiceException {
+    private void generatePDF(Invoice invoice, String filePath) throws ServiceException {
         OutputStream file = null;
         Document document = new Document();
         try {
@@ -44,7 +48,7 @@ public class PrinterInvoiceManager implements InvoiceManager {
             PdfWriter.getInstance(document, file);
             document.open();
             // TODO: Generate the actual content of the pdf
-            document.add(new Paragraph("Hello World #2!"));
+            document.add(new Paragraph("Hello World!"));
             document.close();
         } catch (DocumentException e) {
             LOGGER.error("An error occurred while generating the PDF", e);
@@ -68,7 +72,7 @@ public class PrinterInvoiceManager implements InvoiceManager {
     }
 
     // Temporary method for viewing the pdf
-    public void viewPDF(String filePath) throws ServiceException {
+    private void viewPDF(String filePath) throws ServiceException {
         if (Desktop.isDesktopSupported()) {
             File file = new File(filePath);
             try {
@@ -79,11 +83,27 @@ public class PrinterInvoiceManager implements InvoiceManager {
         }
     }
 
-    public void printPDF(String filePath) throws ServiceException {
-        // TODO: Implement printing functionality
+    private void printPDF(String filePath) throws ServiceException {
+        try {
+            PDDocument document = PDDocument.load(filePath);
+            PrinterJob job = PrinterJob.getPrinterJob();
+            if (job == null) {
+                LOGGER.error("Default printer not configured");
+                throw new ServiceException("Default printer not configured");
+            }
+            job.setPageable(new PDPageable(document, job));
+            job.setJobName("Invoice print");
+            job.print();
+        } catch (IOException e) {
+            LOGGER.error("An error occurred while trying to load the PDF file", e);
+            throw new ServiceException("An error occurred while trying to load the PDF file", e);
+        } catch (PrinterException e) {
+            LOGGER.error("An error occurred while trying to print the invoice", e);
+            throw new ServiceException("An error occurred while trying to print the invoice", e);
+        }
     }
 
-    public void deletePDF(String filePath) throws ServiceException {
+    private void deletePDF(String filePath) throws ServiceException {
         try {
             Files.deleteIfExists(Paths.get(filePath));
         } catch (IOException e) {

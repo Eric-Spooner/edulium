@@ -2,7 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 
-public interface InvoiceManager {
+public interface InvoiceManager extends Service {
 
     /**
      * Generates an invoice for the customer and manages it
