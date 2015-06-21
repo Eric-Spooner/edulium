@@ -202,13 +202,16 @@ class SaleServiceImpl implements SaleService {
 
         BigDecimal price = menuEntry.getPrice();
 
+        //Get all sales
         List<Sale> sales = new ArrayList<>();
         sales.addAll(getAllIntermittentSales());
         sales.addAll(getAllOnetimeSales());
 
+        //Look at all sales
         for (Sale sale : sales) {
             if (sale.isAt(LocalDateTime.now())) {
                 for (MenuEntry menuEntry1 : sale.getEntries()) {
+                    //If possible, lower the price
                     if (menuEntry1.getIdentity() == menuEntry.getIdentity()) {
                         price = price.min(menuEntry1.getPrice());
                     }
