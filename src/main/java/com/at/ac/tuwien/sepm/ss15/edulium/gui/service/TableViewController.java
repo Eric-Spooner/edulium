@@ -9,9 +9,12 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -89,8 +92,16 @@ public class TableViewController implements Initializable, Controller {
 
             GridView<Table> gridView = new GridView<>();
             gridView.setCellFactory(view -> new TableGridCell());
-
+            gridView.setAlignment(Pos.CENTER);
             gridView.setItems(tables.filtered(table -> table.getSection().equals(item)));
+            gridView.setStyle("-fx-border-color: rgb(0, 0, 0);\n" +
+                    "    -fx-border-radius: 5;\n" +
+                    "    -fx-border-width: 2; \n" +
+                    "    -fx-padding: 10 10 10 10;");
+
+            HBox hBox = new HBox();
+            hBox.setAlignment(Pos.CENTER);
+            hBox.getChildren().add(gridView);
 
             if (item != null) {
                 sectionsMap.put(item, gridView);
@@ -99,8 +110,9 @@ public class TableViewController implements Initializable, Controller {
                 titleLabel.setFont(new Font(20.0));
                 titleLabel.setText(item.getName());
 
-                VBox vBox = new VBox(20);
-                vBox.getChildren().addAll(titleLabel, gridView);
+                VBox vBox = new VBox(15.0);
+                vBox.setAlignment(Pos.CENTER);
+                vBox.getChildren().addAll(titleLabel, hBox);
 
                 setGraphic(vBox);
             }
