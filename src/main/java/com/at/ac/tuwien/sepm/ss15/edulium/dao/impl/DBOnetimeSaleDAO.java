@@ -43,7 +43,7 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
         super.create(onetimeSale);
 
         //Create OnetimeSale
-        final String query = "INSERT INTO OnetimeSale (sale_ID, fromTime, toTime) VALUES (?, ?, ?)";
+        final String query = "INSERT INTO OnetimeSale (ID, fromTime, toTime) VALUES (?, ?, ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, onetimeSale.getIdentity());
@@ -68,7 +68,7 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
         super.update(onetimeSale);
 
         //Update OnetimeSale
-        final String query = "UPDATE OnetimeSale SET fromTime = ?, toTime = ? WHERE sale_ID = ?";
+        final String query = "UPDATE OnetimeSale SET fromTime = ?, toTime = ? WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setTimestamp(1, Timestamp.valueOf(onetimeSale.getFromTime()));
@@ -109,9 +109,8 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
         final List<OnetimeSale> sales = new ArrayList<>();
 
         if (onetimeSale.getEntries() == null) {  // query without entries - no SaleAssoc join needed :)
-            final String query = "SELECT * FROM OnetimeSale JOIN Sale" +
-                    " ON OnetimeSale.sale_ID = Sale.ID" +
-                    " WHERE sale_ID = ISNULL(?, sale_ID)" +
+            final String query = "SELECT * FROM OnetimeSale NATURAL JOIN Sale" +
+                    " WHERE Sale.ID = ISNULL(?, Sale.ID)" +
                     " AND fromTime = ISNULL(?, fromTime)"+
                     " AND toTime = ISNULL(?, toTime)"+
                     " AND name = ISNULL(?, name) " +
@@ -143,15 +142,14 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
             // sadly we have to provide our own list of pairs - fake it with a list of question marks in the prepared stmt
             final String entries = onetimeSale.getEntries().stream().map(t -> "?").collect(Collectors.joining(", "));
 
-            final String query = "SELECT * FROM OnetimeSale JOIN Sale" +
-                    " ON OnetimeSale.sale_ID = Sale.ID" +
-                    " WHERE sale_ID = ISNULL(?, sale_ID)" +
+            final String query = "SELECT * FROM OnetimeSale NATURAL JOIN Sale" +
+                    " WHERE Sale.ID = ISNULL(?, Sale.ID)" +
                     " AND fromTime = ISNULL(?, fromTime)"+
                     " AND toTime = ISNULL(?, toTime)"+
                     " AND name = ISNULL(?, name) " +
                     " AND deleted = false" +
                     " AND EXISTS (SELECT 1 FROM SaleAssoc " +
-                    " WHERE SaleAssoc.sale_ID = OnetimeSale.sale_ID AND menuEntry_ID IN (" + entries + ") AND disabled = false)";
+                    " WHERE sale_ID = Sale.ID AND menuEntry_ID IN (" + entries + ") AND disabled = false)";
 
             try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
                 int index = 1;
@@ -189,9 +187,7 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
     public List<OnetimeSale> getAll() throws DAOException {
         LOGGER.debug("Entering getAll");
 
-        final String query = "SELECT * FROM OnetimeSale JOIN Sale" +
-                " ON OnetimeSale.sale_ID = Sale.ID" +
-                " WHERE EXISTS (SELECT * FROM Sale WHERE OnetimeSale.sale_ID = Sale.ID AND deleted = false)";
+        final String query = "SELECT * FROM OnetimeSale NATURAL JOIN Sale WHERE deleted = false";
 
         final List<OnetimeSale> onetimeSales = new ArrayList<>();
 
@@ -220,7 +216,7 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
 
         validator.validateIdentity(onetimeSale);
 
-        final String query = "SELECT * FROM OnetimeSaleHistory WHERE sale_ID = ? ORDER BY changeNr";
+        final String query = "SELECT * FROM OnetimeSaleHistory WHERE ID = ? ORDER BY changeNr";
 
         List<History<OnetimeSale>> history = new ArrayList<>();
 
@@ -251,9 +247,8 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
             validator.validateIdentity(onetimeSale);
         }
 
-        final String query = "SELECT * FROM OnetimeSale JOIN Sale" +
-                " ON OnetimeSale.sale_ID = Sale.ID" +
-                " WHERE sale_ID IN (" +
+        final String query = "SELECT * FROM OnetimeSale NATURAL JOIN Sale" +
+                " WHERE Sale.ID IN (" +
                 onetimeSales.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
 
         final List<OnetimeSale> populatedOnetimeSales = new ArrayList<>();
@@ -295,8 +290,8 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
 
         final String query = "INSERT INTO OnetimeSaleHistory " +
                 "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
-                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM OnetimeSaleHistory WHERE sale_ID = ?) " +
-                "FROM OnetimeSale WHERE sale_ID = ?)";
+                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM OnetimeSaleHistory WHERE ID = ?) " +
+                "FROM OnetimeSale WHERE ID = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
@@ -318,7 +313,7 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
      */
     private OnetimeSale onetimeSaleFromResultSet(ResultSet result) throws SQLException {
         OnetimeSale onetimeSale = new OnetimeSale();
-        onetimeSale.setIdentity(result.getLong("sale_ID"));
+        onetimeSale.setIdentity(result.getLong("ID"));
         onetimeSale.setFromTime(result.getTimestamp("fromTime").toLocalDateTime());
         onetimeSale.setToTime(result.getTimestamp("toTime").toLocalDateTime());
         return onetimeSale;

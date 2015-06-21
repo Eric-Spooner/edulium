@@ -45,7 +45,7 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
         super.create(intermittentSale);
 
         //Save IntermittentSale
-        final String query = "INSERT INTO IntermittentSale (sale_ID, monday, tuesday, wednesday, thursday, friday, saturday, sunday, fromDayTime, duration, enabled) " +
+        final String query = "INSERT INTO IntermittentSale (ID, monday, tuesday, wednesday, thursday, friday, saturday, sunday, fromDayTime, duration, enabled) " +
                              "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
@@ -79,7 +79,7 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
 
         //Save IntermittentSale
         final String query = "UPDATE IntermittentSale SET monday = ?, tuesday = ?, wednesday = ?, thursday = ?, friday = ?, " +
-                "saturday = ?, sunday = ?, fromDayTime = ?, duration = ?, enabled = ? WHERE sale_ID = ?";
+                "saturday = ?, sunday = ?, fromDayTime = ?, duration = ?, enabled = ? WHERE ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             int index = 1;
@@ -125,9 +125,8 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
         final List<IntermittentSale> intermittentSales = new ArrayList<>();
 
         if (intermittentSale.getEntries() == null) {  // query without entries - no SaleAssoc join needed :)
-            final String query = "SELECT * FROM IntermittentSale JOIN Sale" +
-                    " ON IntermittentSale.sale_ID = Sale.ID" +
-                    " WHERE sale_ID = ISNULL(?, sale_ID)" +
+            final String query = "SELECT * FROM IntermittentSale NATURAL JOIN Sale" +
+                    " WHERE Sale.ID = ISNULL(?, Sale.ID)" +
                     " AND monday = ISNULL(?, monday)"+
                     " AND tuesday = ISNULL(?, tuesday)"+
                     " AND wednesday = ISNULL(?, wednesday)"+
@@ -174,9 +173,8 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
             // sadly we have to provide our own list of pairs - fake it with a list of question marks in the prepared stmt
             final String entries = intermittentSale.getEntries().stream().map(t -> "?").collect(Collectors.joining(", "));
 
-            final String query = "SELECT * FROM IntermittentSale JOIN Sale" +
-                    " ON IntermittentSale.sale_ID = Sale.ID" +
-                    " WHERE ID = ISNULL(?, ID)" +
+            final String query = "SELECT * FROM IntermittentSale NATURAL JOIN Sale" +
+                    " WHERE Sale.ID = ISNULL(?, Sale.ID)" +
                     " AND monday = ISNULL(?, monday)"+
                     " AND tuesday = ISNULL(?, tuesday)"+
                     " AND wednesday = ISNULL(?, wednesday)"+
@@ -190,7 +188,7 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
                     " AND name = ISNULL(?, name) " +
                     " AND deleted = false" +
                     " AND EXISTS (SELECT 1 FROM SaleAssoc " +
-                    " WHERE SaleAssoc.sale_ID = IntermittentSale.sale_ID AND menuEntry_ID IN (" + entries + ") AND disabled = false)";
+                    " WHERE sale_ID = Sale.ID AND menuEntry_ID IN (" + entries + ") AND disabled = false)";
 
             try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
 
@@ -233,9 +231,7 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
     public List<IntermittentSale> getAll() throws DAOException {
         LOGGER.debug("Entering getAll");
 
-        final String query = "SELECT * FROM IntermittentSale JOIN Sale" +
-                " ON IntermittentSale.sale_ID = Sale.ID" +
-                " WHERE EXISTS (SELECT * FROM Sale WHERE IntermittentSale.sale_ID = Sale.ID AND deleted = false)";
+        final String query = "SELECT * FROM IntermittentSale NATURAL JOIN Sale WHERE deleted = false";
 
         final List<IntermittentSale> intermittentSales = new ArrayList<>();
 
@@ -265,7 +261,7 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
 
         validator.validateIdentity(intermittentSale);
 
-        final String query = "SELECT * FROM IntermittentSaleHistory WHERE sale_ID = ? ORDER BY changeNr";
+        final String query = "SELECT * FROM IntermittentSaleHistory WHERE ID = ? ORDER BY changeNr";
 
         List<History<IntermittentSale>> history = new ArrayList<>();
 
@@ -297,9 +293,8 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
             validator.validateIdentity(order);
         }
 
-        final String query = "SELECT * FROM IntermittentSale JOIN Sale" +
-                " ON IntermittentSale.sale_ID = Sale.ID" +
-                " WHERE sale_ID IN (" +
+        final String query = "SELECT * FROM IntermittentSale NATURAL JOIN Sale" +
+                " WHERE Sale.ID IN (" +
                 intermittentSales.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
 
         final List<IntermittentSale> populatedIntermittentSales = new ArrayList<>();
@@ -342,8 +337,8 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
 
         final String query = "INSERT INTO IntermittentSaleHistory " +
                 "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
-                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM IntermittentSaleHistory WHERE sale_ID = ?) " +
-                "FROM IntermittentSale WHERE sale_ID = ?)";
+                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM IntermittentSaleHistory WHERE ID = ?) " +
+                "FROM IntermittentSale WHERE ID = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
@@ -365,7 +360,7 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
      */
     private IntermittentSale intermittentSaleFromResultSet(ResultSet result) throws SQLException {
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(result.getLong("sale_ID"));
+        intermittentSale.setIdentity(result.getLong("ID"));
 
         HashSet<DayOfWeek> saleDays = new HashSet<>();
         for(DayOfWeek day : DayOfWeek.values()) {
