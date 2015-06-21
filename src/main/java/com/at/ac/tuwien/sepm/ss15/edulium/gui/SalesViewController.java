@@ -1,5 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.OnetimeSale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.SaleService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
@@ -8,15 +10,21 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -78,7 +86,7 @@ public class SalesViewController implements Initializable, Controller {
             DialogMenuController.resetDialog();
             DialogMenuController.setThisStage(stage);
             DialogMenuController.setDialogEnumeration(DialogEnumeration.UPDATE);
-            DialogMenuController.setMenu(tableViewSale.getSelectionModel().getSelectedItem());
+            //DialogMenuController.setMenu(tableViewSale.getSelectionModel().getSelectedItem());
             stage.setTitle("Update Menu");
             ApplicationContext context = EduliumApplicationContext.getContext();
             FXMLPane myPane = context.getBean("menuDialogPane", FXMLPane.class);
@@ -93,38 +101,46 @@ public class SalesViewController implements Initializable, Controller {
     }
 
     public void buttonSaleRemoveClicked(ActionEvent actionEvent) {
-        /*try {
-            LOGGER.info("Delete Menu Button Click");
+        try {
+            LOGGER.info("Delete Sale Button Click");
             if(tableViewSale.getSelectionModel().getSelectedItem() == null){
                 ManagerViewController.showErrorDialog
-                        ("Error", "Input Validation Error", "You have to select a Menu to Delete");
+                        ("Error", "Input Validation Error", "You have to select a Sale to Delete");
                 return;
             }
-            saleService.removeMenu(tableViewSale.getSelectionModel().getSelectedItem());
-            sales.setAll(saleService.getAllMenus());
+            Sale s = tableViewSale.getSelectionModel().getSelectedItem();
+            if (s instanceof IntermittentSale) {
+                saleService.removeIntermittentSale((IntermittentSale)s);
+            } else if (s instanceof OnetimeSale) {
+                saleService.removeIntermittentSale((IntermittentSale)s);
+            } else {
+                LOGGER.error("Sale is neither IntermittentSale nor OnetimeSale!");
+            }
+
+            sales.setAll(saleService.getAllSales());
         }catch (Exception e){
-            LOGGER.error("Loading the Menus failed" + e);
-        }*/
+            LOGGER.error("Loading the Sales failed" + e);
+        }
     }
 
     public void buttonSaleAddClicked(ActionEvent actionEvent){
-        /*try {
-            LOGGER.info("Add Menu Button Click");
+        try {
+            LOGGER.info("Add Sale Button Click");
             Stage stage = new Stage();
-            DialogMenuController.resetDialog();
-            DialogMenuController.setThisStage(stage);
-            DialogMenuController.setDialogEnumeration(DialogEnumeration.ADD);
-            stage.setTitle("Add Menu");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenu.fxml"));
+            DialogSaleController.resetDialog();
+            DialogSaleController.setThisStage(stage);
+            DialogSaleController.setDialogEnumeration(DialogEnumeration.ADD);
+            stage.setTitle("Add Sale");
+            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogSale.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
             stage.showAndWait();
-            sales.setAll(saleService.getAllMenus());
+            sales.setAll(saleService.getAllSales());
         }catch (IOException e){
-            LOGGER.error("Add Menu Button Click did not work");
+            LOGGER.error("Add Sale Button Click did not work");
         }catch (Exception e){
-            LOGGER.error("Loading the Menus failed" + e);
-        }*/
+            LOGGER.error("Loading the Sales failed" + e);
+        }
     }
 
     public void buttonShowAllSaleClicked(ActionEvent actionEvent) {
