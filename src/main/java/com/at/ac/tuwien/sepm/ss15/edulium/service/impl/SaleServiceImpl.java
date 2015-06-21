@@ -12,6 +12,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +31,8 @@ class SaleServiceImpl implements SaleService {
     private Validator<IntermittentSale> intermittentSaleValidator;
     @Autowired
     private Validator<OnetimeSale> onetimeSaleValidator;
+    @Autowired
+    private Validator<MenuEntry> menuEntryValidator;
 
     @Override
     public void addIntermittentSale(IntermittentSale intermittentSale) throws ValidationException, ServiceException {
@@ -192,5 +197,25 @@ class SaleServiceImpl implements SaleService {
     @Override
     public void applySales(MenuEntry menuEntry) throws ValidationException, ServiceException {
         LOGGER.debug("Entering applySales with parameter: "+ menuEntry);
+
+        menuEntryValidator.validateForUpdate(menuEntry);
+
+        BigDecimal price = menuEntry.getPrice();
+
+        List<Sale> sales = new ArrayList<>();
+        sales.addAll(getAllIntermittentSales());
+        sales.addAll(getAllOnetimeSales());
+
+        for (Sale sale : sales) {
+            if (sale.isAt(LocalDateTime.now())) {
+                for (MenuEntry menuEntry1 : sale.getEntries()) {
+                    if (menuEntry1.getIdentity() == menuEntry.getIdentity()) {
+                        price = price.min(menuEntry1.getPrice());
+                    }
+                }
+            }
+        }
+
+        menuEntry.setPrice(price);
     }
 }
