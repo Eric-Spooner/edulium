@@ -4,9 +4,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="emplyoeeViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.EmployeeViewController" scope="prototype" />
+    <bean id="employeeViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.EmployeeViewController" scope="prototype" />
 
-    <bean id="emplyoeeViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
+    <bean id="employeeViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
         <constructor-arg name="fxml" value="gui/EmployeeView.fxml" />
     </bean>
 

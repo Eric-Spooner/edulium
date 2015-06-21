@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -47,26 +48,32 @@ import static javafx.collections.FXCollections.observableList;
 public class ManagerViewController implements Initializable, Controller {
     private static final Logger LOGGER = LogManager.getLogger(ManagerViewController.class);
 
-    @FXML TabPane tabPaneManager;
+    @FXML
+    private TabPane tabPaneManager;
 
-    private ObservableList<Tab> tabs;
+    @Resource(name = "employeeViewPane")
+    FXMLPane employeeViewPane;
+    @Resource(name = "taxRateViewPane")
+    FXMLPane taxRateViewPane;
+    @Resource(name = "menuCategoryViewPane")
+    FXMLPane menuCategoryViewPane;
+    @Resource(name = "menuEntryViewPane")
+    FXMLPane menuEntryViewPane;
+    @Resource(name = "menuViewPane")
+    FXMLPane menuViewPane;
+    @Resource(name = "statisticViewPane")
+    FXMLPane statisticViewPane;
+    @Resource(name = "roomViewPane")
+    FXMLPane roomViewPane;
 
     @Override
-    public void initialize(URL location, ResourceBundle resources){
-        ApplicationContext context = EduliumApplicationContext.getContext();
-        FXMLPane employeeViewPane = context.getBean("emplyoeeViewPane", FXMLPane.class);
+    public void initialize(URL location, ResourceBundle resources) {
         tabPaneManager.getTabs().add(new Tab("Employees", employeeViewPane));
-        FXMLPane taxRateViewPane = context.getBean("taxRateViewPane", FXMLPane.class);
         tabPaneManager.getTabs().add(new Tab("TaxRates", taxRateViewPane));
-        FXMLPane menuCategoryViewPane = context.getBean("menuCategoryViewPane", FXMLPane.class);
         tabPaneManager.getTabs().add(new Tab("MenuCategories", menuCategoryViewPane));
-        FXMLPane menuEntryViewPane = context.getBean("menuEntryViewPane", FXMLPane.class);
         tabPaneManager.getTabs().add(new Tab("MenuEntries", menuEntryViewPane));
-        FXMLPane menuViewPane = context.getBean("menuViewPane", FXMLPane.class);
         tabPaneManager.getTabs().add(new Tab("Menus", menuViewPane));
-        FXMLPane statisticViewPane = context.getBean("statisticViewPane", FXMLPane.class);
         tabPaneManager.getTabs().add(new Tab("Statistics", statisticViewPane));
-        FXMLPane roomViewPane = context.getBean("roomViewPane", FXMLPane.class);
         tabPaneManager.getTabs().add(new Tab("Rooms", roomViewPane));
     }
 
