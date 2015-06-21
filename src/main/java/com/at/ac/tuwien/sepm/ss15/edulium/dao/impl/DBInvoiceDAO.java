@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -187,17 +187,41 @@ class DBInvoiceDAO implements DAO<Invoice> {
 
         final List<Invoice> results = new ArrayList<>();
 
-        final String query = "SELECT * FROM Invoice WHERE " +
-                "ID = ISNULL(?, ID) AND " +
-                "invoiceTime = ISNULL(?, invoiceTime) AND " +
-                "brutto = ISNULL(?, brutto) AND " +
-                "user_ID = ISNULL(?, user_ID) AND " +
-                "canceled = FALSE;";
+        final String query;
+
+        if (invoice.getOrders() != null && invoice.getOrders().size() > 0) {
+            query = "SELECT * FROM Invoice i WHERE " +
+                    "i.ID = ISNULL(?, i.ID) AND " +
+                    "i.invoiceTime = ISNULL(?, i.invoiceTime) AND " +
+                    "i.brutto = ISNULL(?, i.brutto) AND " +
+                    "i.user_ID = ISNULL(?, i.user_ID) AND " +
+                    "canceled = FALSE AND " +
+                    "EXISTS (SELECT 1 FROM RestaurantOrder o " +
+                    "WHERE o.invoice_ID = i.ID AND o.ID IN (" +
+                    invoice.getOrders().stream().map(o -> "?").collect(Collectors.joining(", ")) +
+                    ") AND o.canceled = FALSE);";
+        } else {
+            query = "SELECT * FROM Invoice i WHERE " +
+                    "i.ID = ISNULL(?, i.ID) AND " +
+                    "i.invoiceTime = ISNULL(?, i.invoiceTime) AND " +
+                    "i.brutto = ISNULL(?, i.brutto) AND " +
+                    "i.user_ID = ISNULL(?, i.user_ID) AND " +
+                    "canceled = FALSE;";
+        }
+
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, invoice.getIdentity());
-            stmt.setTimestamp(2, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
-            stmt.setBigDecimal(3, invoice.getGross());
-            stmt.setString(4, invoice.getCreator() == null ? null : invoice.getCreator().getIdentity());
+            stmt.setObject(1, invoice.getIdentity());
+            stmt.setObject(2, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
+            stmt.setObject(3, invoice.getGross());
+            stmt.setObject(4, invoice.getCreator() == null ? null : invoice.getCreator().getIdentity());
+
+            if (invoice.getOrders() != null && invoice.getOrders().size() > 0) {
+                int index = 5;
+                for (Order order : invoice.getOrders()) {
+                    stmt.setLong(index++, order.getIdentity());
+                }
+            }
+
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -340,7 +364,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
      * @throws SQLException If an error, while accessing database results, occurs
      */
     private Invoice parseResult(ResultSet rs) throws DAOException, ValidationException, SQLException {
-        List<User> creator = userDAO.populate(Arrays.asList(User.withIdentity(rs.getString("user_ID"))));
+        List<User> creator = userDAO.populate(Collections.singletonList(User.withIdentity(rs.getString("user_ID"))));
         if (creator.size() != 1) {
             LOGGER.error("Retrieving creator failed");
             throw new DAOException("Retrieving creator failed");
@@ -363,7 +387,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
      * @throws SQLException Thrown in case an error occurs when accessing the database result
      */
     private History<Invoice> parseHistoryResult(ResultSet rs) throws DAOException, ValidationException, SQLException {
-        List<User> user = userDAO.populate(Arrays.asList(User.withIdentity(rs.getString("changeUser"))));
+        List<User> user = userDAO.populate(Collections.singletonList(User.withIdentity(rs.getString("changeUser"))));
         if (user.size() != 1) {
             LOGGER.error("User not found");
             throw new DAOException("User not found");
