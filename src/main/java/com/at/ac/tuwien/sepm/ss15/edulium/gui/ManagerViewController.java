@@ -64,6 +64,8 @@ public class ManagerViewController implements Initializable, Controller {
         tabPaneManager.getTabs().add(new Tab("MenuEntries", menuEntryViewPane));
         FXMLPane menuViewPane = context.getBean("menuViewPane", FXMLPane.class);
         tabPaneManager.getTabs().add(new Tab("Menus", menuViewPane));
+        FXMLPane salesViewPane = context.getBean("salesViewPane", FXMLPane.class);
+        tabPaneManager.getTabs().add(new Tab("Sales", salesViewPane));
         FXMLPane statisticViewPane = context.getBean("statisticViewPane", FXMLPane.class);
         tabPaneManager.getTabs().add(new Tab("Statistics", statisticViewPane));
         FXMLPane roomViewPane = context.getBean("roomViewPane", FXMLPane.class);

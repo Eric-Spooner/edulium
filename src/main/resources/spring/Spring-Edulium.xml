@@ -57,6 +57,7 @@
     <import resource="gui/Spring-EmployeeViewPane.xml" />
     <import resource="gui/Spring-ManagerViewPane.xml" />
     <import resource="gui/Spring-MenuViewPane.xml" />
+    <import resource="gui/Spring-SalesViewPane.xml" />
     <import resource="gui/Spring-MenuEntryViewPane.xml" />
     <import resource="gui/Spring-MenuCategoryViewPane.xml" />
     <import resource="gui/Spring-TaxRateViewPane.xml" />
