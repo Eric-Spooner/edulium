@@ -104,7 +104,7 @@ public class UpdateTableController implements Initializable {
             } else {
                 //Check if table number is not used in this section
                 for (Rect iteratingRect : rects) {
-                    if (iteratingRect.getNumber() == Long.valueOf(numberTF.getText())) {
+                    if (iteratingRect != clickedRect && iteratingRect.getNumber() == Long.valueOf(numberTF.getText())) {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Error");
                         alert.setHeaderText("Number already used");
