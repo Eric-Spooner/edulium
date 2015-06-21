@@ -102,16 +102,6 @@ public class TestOrderService extends AbstractServiceTest {
         Mockito.verify(orderDAO, never()).create(order);
     }
 
-    @Test(expected = ServiceException.class)
-    @WithMockUser(username = "servicetester", roles={"SERVICE"})
-    public void testAddOrder_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
-        // PREPARE
-        Order order  = new Order();
-        Mockito.doThrow(new DAOException("")).when(orderDAO).create(order);
-
-        // WHEN
-        orderService.addOrder(order);
-    }
 
     @Test(expected = AccessDeniedException.class)
     @WithMockUser(username = "servicetester", roles={"COOK"})
