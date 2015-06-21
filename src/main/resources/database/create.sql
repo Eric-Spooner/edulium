@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS RestaurantUser (
     ID VARCHAR(25) PRIMARY KEY,
     name VARCHAR(100),
     userRole VARCHAR(100),
+    tip DECIMAL(20,2),
     deleted BOOLEAN DEFAULT FALSE
 );
 
@@ -9,6 +10,7 @@ CREATE TABLE IF NOT EXISTS RestaurantUserHistory (
     ID VARCHAR(25) REFERENCES RestaurantUser(ID),
     name VARCHAR(100),
     userRole VARCHAR(100),
+    tip DECIMAL(20,2),
     deleted BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
