@@ -105,7 +105,7 @@ public class User {
 
         if (identity != null ? !identity.equals(user.identity) : user.identity != null) return false;
         if (name != null ? !name.equals(user.name) : user.name != null) return false;
-        if (tip != null ? !tip.equals(user.tip) : user.tip != null) return false;
+        if (tip != null ? tip.compareTo(user.tip)!=0 : user.tip != null) return false;
         return !(role != null ? !role.equals(user.role) : user.role != null);
 
     }

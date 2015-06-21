@@ -30,6 +30,7 @@ public class TestUserDAO extends AbstractDAOTest {
         user.setIdentity("warty");
         user.setName("Warty Warthog");
         user.setRole("manager");
+        user.setTip(BigDecimal.valueOf(0));
 
         // WHEN
         userDAO.create(user);
@@ -508,6 +509,7 @@ public class TestUserDAO extends AbstractDAOTest {
     public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
         // get test user
+        System.out.println(userDAO.getAll());
         User testUser = getCurrentUser();
 
         // GIVEN
