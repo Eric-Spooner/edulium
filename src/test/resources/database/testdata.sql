@@ -1,10 +1,9 @@
-
 INSERT INTO MenuCategory (name) VALUES ('starter');
 INSERT INTO MenuCategory (name) VALUES ('main dish');
 INSERT INTO MenuCategory (name) VALUES ('dessert');
 
-MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('daotester', 'DAO Testuser', 'ADMIN');
-MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('servicetester', 'Service Testuser', 'MANAGER');
+MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('daotester', 'DAO Testuser', 'ADMIN', 0);
+MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('servicetester', 'Service Testuser', 'MANAGER', 0);
 
 MERGE INTO RestaurantSection (ID, name) KEY(ID) VALUES(1, 'Garden');
 MERGE INTO RestaurantSection (ID, name) KEY(ID) VALUES(2, 'Main');
