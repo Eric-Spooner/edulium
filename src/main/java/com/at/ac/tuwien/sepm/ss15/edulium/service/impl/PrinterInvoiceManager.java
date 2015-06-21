@@ -6,6 +6,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,24 +29,27 @@ public class PrinterInvoiceManager implements InvoiceManager {
      */
     @Override
     public void manageInvoice(Invoice invoice) throws ServiceException {
-        String filePath = "target/last_invoice.pdf";
+        final String templatePath = "";
+        final String outputFilePaht = "target/last_invoice.pdf";
 
         // delete the last generated PDF
-        deletePDF(filePath);
+        deletePDF(outputFilePaht);
         // generate new PDF and place it in the provided directory
-        generatePDF(invoice, filePath);
+        generatePDF(invoice, templatePath, outputFilePaht);
         // temporary opening of the PDF
-        viewPDF(filePath);
+        viewPDF(outputFilePaht);
         // send PDF to printer and print it out
-        printPDF(filePath);
+        // printPDF(filePath);
     }
 
-    private void generatePDF(Invoice invoice, String filePath) throws ServiceException {
-        OutputStream file = null;
+    private void generatePDF(Invoice invoice, String templatePath, String outputFilePath) throws ServiceException {
+        PdfReader reader = null;
+        OutputStream outputFile = null;
         Document document = new Document();
         try {
-            file = new FileOutputStream(filePath);
-            PdfWriter.getInstance(document, file);
+            reader = new PdfReader(templatePath);
+            outputFile = new FileOutputStream(outputFilePath);
+            PdfWriter.getInstance(document, outputFile);
             document.open();
             // TODO: Generate the actual content of the pdf
             document.add(new Paragraph("Hello World!"));
@@ -56,14 +60,20 @@ public class PrinterInvoiceManager implements InvoiceManager {
         } catch (FileNotFoundException e) {
             LOGGER.error("An error occurred while opening the output stream", e);
             throw new ServiceException("An error occurred while opening the output stream", e);
+        } catch (IOException e) {
+            // TODO: Handle reader initialization error
         } finally {
             if (document.isOpen()) {
                 document.close();
             }
 
+            if (reader != null) {
+                reader.close();
+            }
+
             try {
-                if (file != null) {
-                    file.close();
+                if (outputFile != null) {
+                    outputFile.close();
                 }
             } catch (IOException e) {
                 LOGGER.error("An error occurred while trying to close the output stream", e);
