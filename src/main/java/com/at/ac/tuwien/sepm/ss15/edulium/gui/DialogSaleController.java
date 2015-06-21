@@ -11,9 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -81,6 +79,44 @@ public class DialogSaleController implements Initializable{
     @FXML
     private TableColumn<MenuEntry, BigDecimal> tableColPriceInMen;
 
+    @FXML
+    private RadioButton radioButtonOnetimeSale;
+    @FXML
+    private RadioButton radioButtonIntermittentSale;
+    @FXML
+    private DatePicker datePickerFromTime;
+    @FXML
+    private DatePicker datePickerToTime;
+    @FXML
+    private TextField textFieldFromTimeHr;
+    @FXML
+    private TextField textFieldFromTimeMin;
+    @FXML
+    private TextField textFieldToTimeHr;
+    @FXML
+    private TextField textFieldToTimeMin;
+    @FXML
+    private CheckBox checkBoxEnabled;
+    @FXML
+    private CheckBox checkBoxMonday;
+    @FXML
+    private CheckBox checkBoxTuesday;
+    @FXML
+    private CheckBox checkBoxWednesday;
+    @FXML
+    private CheckBox checkBoxThursday;
+    @FXML
+    private CheckBox checkBoxFriday;
+    @FXML
+    private CheckBox checkBoxSaturday;
+    @FXML
+    private CheckBox checkBoxSunday;
+    @FXML
+    private TextField textFieldBeginningTimeHr;
+    @FXML
+    private TextField textFieldBeginningTimeMin;
+    @FXML
+    private TextField textFieldDuration;
 
     private ObservableList<MenuEntry> allMenuEntries;
     private ObservableList<MenuEntry> inMenuMenuEntries;
