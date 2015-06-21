@@ -289,13 +289,14 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
     private void generateHistory(OnetimeSale onetimeSale) throws DAOException {
         LOGGER.debug("Entering generateHistory with parameters: " + onetimeSale);
 
+        final long changeNr = super.generateSaleHistory(onetimeSale);
+
         final String query = "INSERT INTO OnetimeSaleHistory " +
-                "(SELECT *, " +
-                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM OnetimeSaleHistory WHERE ID = ?) " +
+                "(SELECT *, ? " +
                 "FROM OnetimeSale WHERE ID = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, onetimeSale.getIdentity());          // dataset id
+            stmt.setLong(1, changeNr);          // changeNr
             stmt.setLong(2, onetimeSale.getIdentity());          // dataset id
 
             stmt.executeUpdate();

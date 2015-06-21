@@ -336,13 +336,14 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
     private void generateHistory(IntermittentSale intermittentSale) throws DAOException {
         LOGGER.debug("Entering generateHistory with parameters: " + intermittentSale);
 
+        final long changeNr = super.generateSaleHistory(intermittentSale);
+
         final String query = "INSERT INTO IntermittentSaleHistory " +
-                "(SELECT *, " +
-                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM IntermittentSaleHistory WHERE ID = ?) " +
+                "(SELECT *, ? " +
                 "FROM IntermittentSale WHERE ID = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setLong(1, intermittentSale.getIdentity());          // dataset id
+            stmt.setLong(1, changeNr);          // change Nr
             stmt.setLong(2, intermittentSale.getIdentity());          // dataset id
 
             stmt.executeUpdate();

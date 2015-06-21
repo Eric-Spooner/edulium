@@ -58,7 +58,6 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
         }
 
         updateSaleAssoc(sale);
-        generateSaleHistory(sale);
     }
 
     @Override
@@ -79,7 +78,6 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
         }
 
         updateSaleAssoc(sale);
-        generateSaleHistory(sale);
     }
 
     @Override
@@ -99,8 +97,6 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
             LOGGER.error("Deleting sale from database failed", e);
             throw new DAOException("Deleting sale from database failed", e);
         }
-
-        generateSaleHistory(sale);
     }
 
     /**
@@ -149,18 +145,37 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
      * stores the time; number of the change and the user which executed the changes
      * @param sale updated dataset
      * @throws DAOException if an error accessing the database occurred
+     * @return returns the changeNr
      */
-    protected void generateSaleHistory(Sale sale) throws DAOException {
+    protected long generateSaleHistory(Sale sale) throws DAOException {
         LOGGER.debug("Entering generateHistory with parameters: " + sale);
 
+        final long changeNr;
+
+        final String changeNrQuery = "SELECT ISNULL(MAX(changeNr) + 1, 1) AS changeNr FROM SaleHistory WHERE ID = ?";
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(changeNrQuery)) {
+            stmt.setLong(1, sale.getIdentity());
+
+            ResultSet result = stmt.executeQuery();
+            if(!result.next()) {
+                LOGGER.error("retrieving changeNr failed");
+                throw new DAOException("retrieving changeNr failed");
+            }
+
+            changeNr = result.getLong("changeNr");
+        } catch (SQLException e) {
+            LOGGER.error("retrieving changeNr failed");
+            throw new DAOException("retrieving changeNr failed");
+        }
+
+
         final String query = "INSERT INTO SaleHistory " +
-                "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
-                "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM SaleHistory WHERE ID = ?) " +
+                "(SELECT *, CURRENT_TIMESTAMP(), ?, ? " +
                 "FROM Sale WHERE ID = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
-            stmt.setLong(2, sale.getIdentity());          // dataset id
+            stmt.setLong(2, changeNr);          // change nr
             stmt.setLong(3, sale.getIdentity());          // dataset id
 
             stmt.executeUpdate();
@@ -169,27 +184,8 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
             throw new DAOException("generating history failed", e);
         }
 
-        // get the latest history change number
-        final String queryChangeNr = "SELECT MAX(changeNr) FROM SaleHistory WHERE ID = ?";
-
-        long changeNr;
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryChangeNr)) {
-            stmt.setLong(1, sale.getIdentity());
-
-            ResultSet result = stmt.executeQuery();
-            if (result.next()) {
-                changeNr = result.getLong(1);
-            } else {
-                LOGGER.error("retrieving the change number failed, reservation history not found");
-                throw new DAOException("retrieving the change number failed, reservation history not found");
-            }
-        } catch (SQLException e) {
-            LOGGER.error("retrieving the change number failed", e);
-            throw new DAOException("retrieving the change number failed", e);
-        }
-
         generateSaleAssociationsHistory(sale, changeNr);
+        return changeNr;
     }
 
     /**
