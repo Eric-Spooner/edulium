@@ -1,8 +1,10 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.OnetimeSale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
+import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.NumericTextField;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.SaleService;
 import javafx.beans.property.SimpleStringProperty;
@@ -21,9 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.time.*;
+import java.util.*;
 
 import static javafx.collections.FXCollections.observableArrayList;
 
@@ -88,13 +89,13 @@ public class DialogSaleController implements Initializable{
     @FXML
     private DatePicker datePickerToTime;
     @FXML
-    private TextField textFieldFromTimeHr;
+    private NumericTextField textFieldFromTimeHr;
     @FXML
-    private TextField textFieldFromTimeMin;
+    private NumericTextField textFieldFromTimeMin;
     @FXML
-    private TextField textFieldToTimeHr;
+    private NumericTextField textFieldToTimeHr;
     @FXML
-    private TextField textFieldToTimeMin;
+    private NumericTextField textFieldToTimeMin;
     @FXML
     private CheckBox checkBoxEnabled;
     @FXML
@@ -112,11 +113,13 @@ public class DialogSaleController implements Initializable{
     @FXML
     private CheckBox checkBoxSunday;
     @FXML
-    private TextField textFieldBeginningTimeHr;
+    private NumericTextField textFieldBeginningTimeHr;
     @FXML
-    private TextField textFieldBeginningTimeMin;
+    private NumericTextField textFieldBeginningTimeMin;
     @FXML
-    private TextField textFieldDuration;
+    private NumericTextField textFieldDuration;
+
+    final ToggleGroup group = new ToggleGroup();
 
     private ObservableList<MenuEntry> allMenuEntries;
     private ObservableList<MenuEntry> inMenuMenuEntries;
@@ -132,6 +135,11 @@ public class DialogSaleController implements Initializable{
     public void initialize(URL location, ResourceBundle resources) {
         LOGGER.info("Initialize Dialog Sale");
 
+        radioButtonOnetimeSale.setToggleGroup(group);
+        radioButtonIntermittentSale.setToggleGroup(group);
+        radioButtonOnetimeSale.setSelected(true);
+        selectOnetimeSaleRadioButton(true);
+
         tableColNameData.setCellValueFactory(new PropertyValueFactory<MenuEntry, String>("name"));
         tableColCategoryData.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<MenuEntry, String>, ObservableValue<String>>() {
             public ObservableValue<String> call(TableColumn.CellDataFeatures<MenuEntry, String> p) {
@@ -142,7 +150,7 @@ public class DialogSaleController implements Initializable{
         tableColPriceData.setCellValueFactory(new PropertyValueFactory<MenuEntry, BigDecimal>("price"));
 
         if(sale == null){
-            Sale saleForInit = new OnetimeSale(); //TODO change
+            Sale saleForInit = new OnetimeSale();
             saleForInit.setEntries(new LinkedList<>());
             DialogSaleController.setSale(saleForInit);
         }
@@ -192,7 +200,59 @@ public class DialogSaleController implements Initializable{
         try {
             switch (DialogSaleController.dialogEnumeration) {
                 case ADD:
-                    saleService.addOnetimeSale((OnetimeSale) sale); //TODO change
+                    if (radioButtonOnetimeSale.isSelected()) {
+                        OnetimeSale onetimeSale = new OnetimeSale();
+                        onetimeSale.setName(sale.getName());
+                        onetimeSale.setEntries(sale.getEntries());
+                        LocalDate fromDate = datePickerFromTime.getValue();
+                        Integer hr = new Integer(textFieldFromTimeHr.getText());
+                        Integer min = new Integer(textFieldFromTimeMin.getText());
+                        LocalTime fromTimeT = LocalTime.of(hr, min);
+                        LocalDateTime fromTime = LocalDateTime.of(fromDate, fromTimeT);
+                        onetimeSale.setFromTime(fromTime);
+                        LocalDate toDate = datePickerFromTime.getValue();
+                        hr = new Integer(textFieldFromTimeHr.getText());
+                        min = new Integer(textFieldFromTimeMin.getText());
+                        LocalTime toTimeT = LocalTime.of(hr, min);
+                        LocalDateTime toTime = LocalDateTime.of(toDate, toTimeT);
+                        onetimeSale.setToTime(toTime);
+                        saleService.addOnetimeSale(onetimeSale);
+                        sale = onetimeSale;
+                    } else {
+                        IntermittentSale intermittentSale = new IntermittentSale();
+                        intermittentSale.setName(sale.getName());
+                        intermittentSale.setEntries(sale.getEntries());
+                        intermittentSale.setEnabled(checkBoxEnabled.isSelected());
+                        Set<DayOfWeek> weekDays = new HashSet<>();
+                        if (checkBoxMonday.isSelected()) {
+                            weekDays.add(DayOfWeek.MONDAY);
+                        }
+                        if (checkBoxTuesday.isSelected()) {
+                            weekDays.add(DayOfWeek.TUESDAY);
+                        }
+                        if (checkBoxWednesday.isSelected()) {
+                            weekDays.add(DayOfWeek.WEDNESDAY);
+                        }
+                        if (checkBoxThursday.isSelected()) {
+                            weekDays.add(DayOfWeek.THURSDAY);
+                        }
+                        if (checkBoxFriday.isSelected()) {
+                            weekDays.add(DayOfWeek.FRIDAY);
+                        }
+                        if (checkBoxSaturday.isSelected()) {
+                            weekDays.add(DayOfWeek.SATURDAY);
+                        }
+                        if (checkBoxSunday.isSelected()) {
+                            weekDays.add(DayOfWeek.SUNDAY);
+                        }
+                        intermittentSale.setDaysOfSale(weekDays);
+                        Integer hr = new Integer(textFieldBeginningTimeHr.getText());
+                        Integer min = new Integer(textFieldBeginningTimeMin.getText());
+                        LocalTime fromDayTime = LocalTime.of(hr,min);
+                        intermittentSale.setFromDayTime(fromDayTime);
+                        Duration duration = Duration.ofMinutes(new Long(textFieldDuration.getText()));
+                        intermittentSale.setDuration(duration);
+                    }
                     break;
                 case UPDATE:
                     saleService.updateOnetimeSale((OnetimeSale) saleService); //TODO change
@@ -277,5 +337,29 @@ public class DialogSaleController implements Initializable{
      */
     public static void resetDialog(){
         DialogSaleController.setSale(null);
+    }
+
+    public void changeRadio() {
+        selectOnetimeSaleRadioButton(radioButtonOnetimeSale.isSelected());
+    }
+
+    private void selectOnetimeSaleRadioButton(boolean b) {
+        datePickerFromTime.setDisable(!b);
+        datePickerToTime.setDisable(!b);
+        textFieldFromTimeHr.setDisable(!b);
+        textFieldToTimeHr.setDisable(!b);
+        textFieldFromTimeMin.setDisable(!b);
+        textFieldToTimeMin.setDisable(!b);
+        checkBoxEnabled.setDisable(b);
+        checkBoxMonday.setDisable(b);
+        checkBoxTuesday.setDisable(b);
+        checkBoxWednesday.setDisable(b);
+        checkBoxThursday.setDisable(b);
+        checkBoxFriday.setDisable(b);
+        checkBoxSaturday.setDisable(b);
+        checkBoxSunday.setDisable(b);
+        textFieldBeginningTimeHr.setDisable(b);
+        textFieldBeginningTimeMin.setDisable(b);
+        textFieldDuration.setDisable(b);
     }
 }
