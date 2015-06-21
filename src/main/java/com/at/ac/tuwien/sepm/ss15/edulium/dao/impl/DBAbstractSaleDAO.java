@@ -214,59 +214,46 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
     }
 
     /**
+     * searches all entries from the sale-menuEntry associations for the given sale
+     * @param sale sale dataset
+     * @throws DAOException if an error accessing the database occurred
+     */
+    private List<MenuEntry> getEntriesForSale(T sale) throws DAOException, ValidationException {
+        LOGGER.debug("Entering getEntriesForSale with parameters: " + sale);
+
+        final String query = "SELECT menuEntry_ID FROM SaleAssoc WHERE sale_ID = ? " +
+                "AND disabled = false";
+
+        final List<MenuEntry> entries = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, sale.getIdentity());
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                final Long menuEntryId = result.getLong("menuEntry_ID");
+
+                // we populate the list of entries before we return it - so the identity of a entry is enough for now
+                entries.add(MenuEntry.withIdentity(menuEntryId));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Searching for reservation-tables failed", e);
+            throw new DAOException("Searching for reservation-tables failed", e);
+        }
+
+        return menuEntryDAO.populate(entries);
+    }
+
+    /**
      * Sets the name and the entries of the sale object according to the values in the database.
      * @param sale sale object resulting from a query
      */
-    protected void setSaleParameters(Sale sale) throws DAOException {
-        LOGGER.debug("Entering setSaleParameters with parameters: " + sale);
+    protected void saleFromResultSet(T sale, ResultSet result) throws SQLException, DAOException, ValidationException {
+        LOGGER.debug("Entering saleFromResultSet with parameters: " + sale);
 
         // set name
-        final String saleQuery = "SELECT * FROM Sale WHERE ID = ?";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery)) {
-            stmt.setLong(1, sale.getIdentity());
-
-            ResultSet result = stmt.executeQuery();
-            if(!result.next()) {
-                LOGGER.error("sale dataset not found");
-                throw new DAOException("sale dataset not found");
-            }
-
-            String name = result.getString("name");
-            sale.setName(name);
-        } catch (SQLException e) {
-            LOGGER.error("reading from SALE table failed", e);
-            throw new DAOException("reading from SALE table failed", e);
-        }
-
-        // set entries
-        // SaleAssoc (sale_ID, menuEntry_ID, salePrice, disabled)
-
-        final String entriesQuery = "SELECT * FROM SaleAssoc WHERE sale_ID = ? AND disabled = false";
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(entriesQuery)) {
-            stmt.setLong(1, sale.getIdentity());
-            ResultSet result = stmt.executeQuery();
-
-            List<MenuEntry> entries = new ArrayList<>();
-
-            while(result.next()) {
-                List<MenuEntry> tmpEntryList = menuEntryDAO.find(MenuEntry.withIdentity(result.getLong("menuEntry_ID")));
-
-                if(tmpEntryList.size() != 1) {
-                    LOGGER.error("Menu Entry not found");
-                    throw new DAOException("Menu Entry not found");
-                }
-
-                MenuEntry entry = tmpEntryList.get(0);
-                entry.setPrice(result.getBigDecimal("salePrice"));
-                entries.add(entry);
-            }
-
-            sale.setEntries(entries);
-        } catch (SQLException e) {
-            LOGGER.error("reading from SALE table failed", e);
-            throw new DAOException("reading from SALE table failed", e);
-        }
+        sale.setName(result.getString("name"));
+        sale.setEntries(getEntriesForSale(sale));
     }
 
     protected void setSaleHistoryParameters(History<T> history) throws DAOException {

@@ -106,38 +106,92 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
             return new ArrayList<>();
         }
 
-        final String query = "SELECT * FROM OnetimeSale WHERE sale_ID = ISNULL(?, sale_ID)" +
-                " AND fromTime = ISNULL(?, fromTime)"+
-                " AND toTime = ISNULL(?, toTime)"+
-                " AND EXISTS (SELECT * FROM Sale WHERE OnetimeSale.sale_ID = Sale.ID AND name = ISNULL(?, name) AND deleted = false)";
+        final List<OnetimeSale> sales = new ArrayList<>();
 
-        final List<OnetimeSale> onetimeSales = new ArrayList<>();
+        if (onetimeSale.getEntries() == null) {  // query without entries - no SaleAssoc join needed :)
+            final String query = "SELECT * FROM OnetimeSale JOIN Sale" +
+                    " ON OnetimeSale.sale_ID = Sale.ID" +
+                    " WHERE sale_ID = ISNULL(?, sale_ID)" +
+                    " AND fromTime = ISNULL(?, fromTime)"+
+                    " AND toTime = ISNULL(?, toTime)"+
+                    " AND name = ISNULL(?, name) " +
+                    " AND deleted = false";
 
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setObject(1, onetimeSale.getIdentity());
-            stmt.setObject(2, onetimeSale.getFromTime()==null ? null : Timestamp.valueOf(onetimeSale.getFromTime()));
-            stmt.setObject(3, onetimeSale.getToTime()==null ? null : Timestamp.valueOf(onetimeSale.getToTime()));
-            stmt.setObject(4, onetimeSale.getName());
+            try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+                stmt.setObject(1, onetimeSale.getIdentity());
+                stmt.setObject(2, onetimeSale.getFromTime()==null ? null : Timestamp.valueOf(onetimeSale.getFromTime()));
+                stmt.setObject(3, onetimeSale.getToTime()==null ? null : Timestamp.valueOf(onetimeSale.getToTime()));
+                stmt.setObject(4, onetimeSale.getName());
 
-            ResultSet result = stmt.executeQuery();
-            while (result.next()) {
-                OnetimeSale sale = onetimeSaleFromResultSet(result);
-                setSaleParameters(sale);
-                onetimeSales.add(sale);
+                ResultSet result = stmt.executeQuery();
+                while (result.next()) {
+                    OnetimeSale saleFromResult = onetimeSaleFromResultSet(result);
+                    try {
+                        saleFromResultSet(saleFromResult, result);
+                    } catch (ValidationException e) {
+                        LOGGER.warn("parsing the result '" + result + "' failed", e);
+                    }
+                    sales.add(saleFromResult);
+                }
+            } catch (SQLException e) {
+                LOGGER.error("Searching for OneTimeSales failed", e);
+                throw new DAOException("Searching for OneTimeSales failed", e);
             }
-        } catch (SQLException e) {
-            LOGGER.error("Searching for onetimeSales failed", e);
-            throw new DAOException("Searching for onetimeSales failed", e);
+
+        } else { // more complex query with table - SaleAssoc join required
+
+            // sadly we have to provide our own list of pairs - fake it with a list of question marks in the prepared stmt
+            final String entries = onetimeSale.getEntries().stream().map(t -> "?").collect(Collectors.joining(", "));
+
+            final String query = "SELECT * FROM OnetimeSale JOIN Sale" +
+                    " ON OnetimeSale.sale_ID = Sale.ID" +
+                    " WHERE sale_ID = ISNULL(?, sale_ID)" +
+                    " AND fromTime = ISNULL(?, fromTime)"+
+                    " AND toTime = ISNULL(?, toTime)"+
+                    " AND name = ISNULL(?, name) " +
+                    " AND deleted = false" +
+                    " AND EXISTS (SELECT 1 FROM SaleAssoc " +
+                    " WHERE SaleAssoc.sale_ID = OnetimeSale.sale_ID AND menuEntry_ID IN (" + entries + ") AND disabled = false)";
+
+            try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+                int index = 1;
+                stmt.setObject(index++, onetimeSale.getIdentity());
+                stmt.setObject(index++, onetimeSale.getFromTime()==null ? null : Timestamp.valueOf(onetimeSale.getFromTime()));
+                stmt.setObject(index++, onetimeSale.getToTime()==null ? null : Timestamp.valueOf(onetimeSale.getToTime()));
+                stmt.setObject(index++, onetimeSale.getName());
+
+
+                // fill entries
+                for (MenuEntry entry : onetimeSale.getEntries()) {
+                    stmt.setLong(index++, entry.getIdentity());
+                }
+
+                ResultSet result = stmt.executeQuery();
+                while (result.next()) {
+                    OnetimeSale sale = onetimeSaleFromResultSet(result);
+                    try {
+                        saleFromResultSet(sale, result);
+                    } catch (ValidationException e) {
+                        LOGGER.warn("parsing the result '" + result + "' failed", e);
+                    }
+                    sales.add(sale);
+                }
+            } catch (SQLException e) {
+                LOGGER.error("Searching for intermittentSales failed", e);
+                throw new DAOException("Searching for intermittentSales failed", e);
+            }
         }
 
-        return onetimeSales;
+        return sales;
     }
 
     @Override
     public List<OnetimeSale> getAll() throws DAOException {
         LOGGER.debug("Entering getAll");
 
-        final String query = "SELECT * FROM OnetimeSale WHERE EXISTS (SELECT * FROM Sale WHERE OnetimeSale.sale_ID = Sale.ID AND deleted = false)";
+        final String query = "SELECT * FROM OnetimeSale JOIN Sale" +
+                " ON OnetimeSale.sale_ID = Sale.ID" +
+                " WHERE EXISTS (SELECT * FROM Sale WHERE OnetimeSale.sale_ID = Sale.ID AND deleted = false)";
 
         final List<OnetimeSale> onetimeSales = new ArrayList<>();
 
@@ -145,7 +199,11 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
-                setSaleParameters(onetimeSaleFromResult);
+                try {
+                    saleFromResultSet(onetimeSaleFromResult, result);
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
                 onetimeSales.add(onetimeSaleFromResult);
             }
         } catch (SQLException e) {
@@ -193,7 +251,9 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
             validator.validateIdentity(onetimeSale);
         }
 
-        final String query = "SELECT * FROM OnetimeSale WHERE sale_ID IN (" +
+        final String query = "SELECT * FROM OnetimeSale JOIN Sale" +
+                " ON OnetimeSale.sale_ID = Sale.ID" +
+                " WHERE sale_ID IN (" +
                 onetimeSales.stream().map(u -> "?").collect(Collectors.joining(", ")) + ")"; // fake a list of identities
 
         final List<OnetimeSale> populatedOnetimeSales = new ArrayList<>();
@@ -209,7 +269,11 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
             ResultSet result = stmt.executeQuery();
             while (result.next()) {
                 OnetimeSale onetimeSaleFromResult = onetimeSaleFromResultSet(result);
-                setSaleParameters(onetimeSaleFromResult);
+                try {
+                    saleFromResultSet(onetimeSaleFromResult, result);
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
                 populatedOnetimeSales.add(onetimeSaleFromResult);
             }
         } catch (SQLException e) {
