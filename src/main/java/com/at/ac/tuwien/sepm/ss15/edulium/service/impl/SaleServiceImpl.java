@@ -188,4 +188,9 @@ class SaleServiceImpl implements SaleService {
             throw new ServiceException("An Error has occurred in the data access object", e);
         }
     }
+
+    @Override
+    public void applySales(MenuEntry menuEntry) throws ValidationException, ServiceException {
+        LOGGER.debug("Entering applySales with parameter: "+ menuEntry);
+    }
 }
