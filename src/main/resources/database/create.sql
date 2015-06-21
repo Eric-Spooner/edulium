@@ -250,7 +250,7 @@ CREATE TABLE IF NOT EXISTS IntermittentSale (
     saturday BOOLEAN,
     sunday BOOLEAN,
     fromDayTime TIME,
-    duration INT,
+    duration BIGINT,
     enabled BOOLEAN DEFAULT TRUE
 );
 
@@ -264,7 +264,7 @@ CREATE TABLE IF NOT EXISTS IntermittentSaleHistory (
     saturday BOOLEAN,
     sunday BOOLEAN,
     fromDayTime TIME,
-    duration INT,
+    duration BIGINT,
     enabled BOOLEAN,
     changeTime TIMESTAMP,
     changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),

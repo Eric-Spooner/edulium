@@ -94,6 +94,8 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
         validator.validateForDelete(onetimeSale);
 
         super.delete(onetimeSale);
+
+        generateHistory(onetimeSale);
     }
 
     @Override
@@ -277,9 +279,10 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
         History<OnetimeSale> historyEntry = new History<>();
         historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
         historyEntry.setChangeNumber(result.getLong("changeNr"));
-        historyEntry.setDeleted(result.getBoolean("deleted"));
         historyEntry.setUser(storedUsers.get(0));
         historyEntry.setData(onetimeSaleFromResultSet(result));
+
+        setSaleHistoryParameters(historyEntry);
 
         return historyEntry;
     }

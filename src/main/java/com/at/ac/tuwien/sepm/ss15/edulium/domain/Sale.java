@@ -69,6 +69,15 @@ public abstract class Sale {
     }
 
     @Override
+    public String toString() {
+        return "Sale{" +
+                "identity=" + identity +
+                ", name='" + name + '\'' +
+                ", entries=" + entries +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

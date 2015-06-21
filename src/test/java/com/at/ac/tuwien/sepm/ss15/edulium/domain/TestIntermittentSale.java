@@ -1,9 +1,14 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.HashSet;
 
 import static org.junit.Assert.*;
 
@@ -11,21 +16,16 @@ import static org.junit.Assert.*;
  * Unit Test for the IntermittentSale domain class
  */
 public class TestIntermittentSale {
+
     @Test
     public void testIsAt_shouldAcceptSameTime() {
         LocalTime time1 = LocalTime.parse("10:15:30");
-        LocalDateTime time2 = LocalDateTime.parse("2015-06-17T10:15:30");
+        LocalDateTime time2 = LocalDateTime.parse("2015-06-17T10:15:30.1");
 
         IntermittentSale intermittentSale1 = new IntermittentSale();
-        intermittentSale1.setIdentity(new Long(123));
-        intermittentSale1.setDuration(60);
-        intermittentSale1.setMonday(false);
-        intermittentSale1.setTuesday(false);
-        intermittentSale1.setWednesday(true);
-        intermittentSale1.setThursday(false);
-        intermittentSale1.setFriday(false);
-        intermittentSale1.setSaturday(false);
-        intermittentSale1.setSunday(false);
+        intermittentSale1.setIdentity(123L);
+        intermittentSale1.setDuration(Duration.ofMinutes(60));
+        intermittentSale1.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
         intermittentSale1.setFromDayTime(time1);
 
         assertTrue(intermittentSale1.isAt(time2));
@@ -37,15 +37,8 @@ public class TestIntermittentSale {
         LocalDateTime time2 = LocalDateTime.parse("2015-06-15T10:15:30");
 
         IntermittentSale intermittentSale1 = new IntermittentSale();
-        intermittentSale1.setIdentity(new Long(123));
-        intermittentSale1.setDuration(60);
-        intermittentSale1.setMonday(false);
-        intermittentSale1.setTuesday(false);
-        intermittentSale1.setWednesday(false);
-        intermittentSale1.setThursday(false);
-        intermittentSale1.setFriday(false);
-        intermittentSale1.setSaturday(false);
-        intermittentSale1.setSunday(false);
+        intermittentSale1.setIdentity(123L);
+        intermittentSale1.setDuration(Duration.ofMinutes(60));
         intermittentSale1.setFromDayTime(time1);
 
         assertFalse(intermittentSale1.isAt(time2));
@@ -57,15 +50,8 @@ public class TestIntermittentSale {
         LocalDateTime time2 = LocalDateTime.parse("2015-06-16T10:15:30");
 
         IntermittentSale intermittentSale1 = new IntermittentSale();
-        intermittentSale1.setIdentity(new Long(123));
-        intermittentSale1.setDuration(60);
-        intermittentSale1.setMonday(false);
-        intermittentSale1.setTuesday(false);
-        intermittentSale1.setWednesday(false);
-        intermittentSale1.setThursday(false);
-        intermittentSale1.setFriday(false);
-        intermittentSale1.setSaturday(false);
-        intermittentSale1.setSunday(false);
+        intermittentSale1.setIdentity(123L);
+        intermittentSale1.setDuration(Duration.ofMinutes(60));
         intermittentSale1.setFromDayTime(time1);
 
         assertFalse(intermittentSale1.isAt(time2));
@@ -77,15 +63,8 @@ public class TestIntermittentSale {
         LocalDateTime time2 = LocalDateTime.parse("2015-06-17T10:15:30");
 
         IntermittentSale intermittentSale1 = new IntermittentSale();
-        intermittentSale1.setIdentity(new Long(123));
-        intermittentSale1.setDuration(60);
-        intermittentSale1.setMonday(false);
-        intermittentSale1.setTuesday(false);
-        intermittentSale1.setWednesday(false);
-        intermittentSale1.setThursday(false);
-        intermittentSale1.setFriday(false);
-        intermittentSale1.setSaturday(false);
-        intermittentSale1.setSunday(false);
+        intermittentSale1.setIdentity(123L);
+        intermittentSale1.setDuration(Duration.ofMinutes(60));
         intermittentSale1.setFromDayTime(time1);
 
         assertFalse(intermittentSale1.isAt(time2));
@@ -97,15 +76,8 @@ public class TestIntermittentSale {
         LocalDateTime time2 = LocalDateTime.parse("2015-06-18T10:15:30");
 
         IntermittentSale intermittentSale1 = new IntermittentSale();
-        intermittentSale1.setIdentity(new Long(123));
-        intermittentSale1.setDuration(60);
-        intermittentSale1.setMonday(false);
-        intermittentSale1.setTuesday(false);
-        intermittentSale1.setWednesday(false);
-        intermittentSale1.setThursday(false);
-        intermittentSale1.setFriday(false);
-        intermittentSale1.setSaturday(false);
-        intermittentSale1.setSunday(false);
+        intermittentSale1.setIdentity(123L);
+        intermittentSale1.setDuration(Duration.ofMinutes(60));
         intermittentSale1.setFromDayTime(time1);
 
         assertFalse(intermittentSale1.isAt(time2));
@@ -117,15 +89,8 @@ public class TestIntermittentSale {
         LocalDateTime time2 = LocalDateTime.parse("2015-06-19T10:15:30");
 
         IntermittentSale intermittentSale1 = new IntermittentSale();
-        intermittentSale1.setIdentity(new Long(123));
-        intermittentSale1.setDuration(60);
-        intermittentSale1.setMonday(false);
-        intermittentSale1.setTuesday(false);
-        intermittentSale1.setWednesday(false);
-        intermittentSale1.setThursday(false);
-        intermittentSale1.setFriday(false);
-        intermittentSale1.setSaturday(false);
-        intermittentSale1.setSunday(false);
+        intermittentSale1.setIdentity(123L);
+        intermittentSale1.setDuration(Duration.ofMinutes(60));
         intermittentSale1.setFromDayTime(time1);
 
         assertFalse(intermittentSale1.isAt(time2));
@@ -137,15 +102,8 @@ public class TestIntermittentSale {
         LocalDateTime time2 = LocalDateTime.parse("2015-06-20T10:15:30");
 
         IntermittentSale intermittentSale1 = new IntermittentSale();
-        intermittentSale1.setIdentity(new Long(123));
-        intermittentSale1.setDuration(60);
-        intermittentSale1.setMonday(false);
-        intermittentSale1.setTuesday(false);
-        intermittentSale1.setWednesday(false);
-        intermittentSale1.setThursday(false);
-        intermittentSale1.setFriday(false);
-        intermittentSale1.setSaturday(false);
-        intermittentSale1.setSunday(false);
+        intermittentSale1.setIdentity(123L);
+        intermittentSale1.setDuration(Duration.ofMinutes(60));
         intermittentSale1.setFromDayTime(time1);
 
         assertFalse(intermittentSale1.isAt(time2));
@@ -157,15 +115,8 @@ public class TestIntermittentSale {
         LocalDateTime time2 = LocalDateTime.parse("2015-06-21T10:15:30");
 
         IntermittentSale intermittentSale1 = new IntermittentSale();
-        intermittentSale1.setIdentity(new Long(123));
-        intermittentSale1.setDuration(60);
-        intermittentSale1.setMonday(false);
-        intermittentSale1.setTuesday(false);
-        intermittentSale1.setWednesday(false);
-        intermittentSale1.setThursday(false);
-        intermittentSale1.setFriday(false);
-        intermittentSale1.setSaturday(false);
-        intermittentSale1.setSunday(false);
+        intermittentSale1.setIdentity(123L);
+        intermittentSale1.setDuration(Duration.ofMinutes(60));
         intermittentSale1.setFromDayTime(time1);
 
         assertFalse(intermittentSale1.isAt(time2));

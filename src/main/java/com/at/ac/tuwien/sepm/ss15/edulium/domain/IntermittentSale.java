@@ -1,22 +1,20 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Domain object representing an intermittentSale
  */
 public class IntermittentSale extends Sale {
-    private Boolean monday = null;
-    private Boolean tuesday = null;
-    private Boolean wednesday = null;
-    private Boolean thursday = null;
-    private Boolean friday = null;
-    private Boolean saturday = null;
-    private Boolean sunday = null;
+
+    private Set<DayOfWeek> daysOfSale = null;
     private LocalTime fromDayTime = null;
-    private Integer duration = null;
+    private Duration duration = null;
     private Boolean enabled = null;
 
     /**
@@ -31,108 +29,18 @@ public class IntermittentSale extends Sale {
     }
 
     /**
-     * @return Returns true if the intermittentSale is active on mondays.
+     * @return returns a set of days on which this sale is active
      */
-    public Boolean getMonday() {
-        return monday;
+    public Set<DayOfWeek> getDaysOfSale() {
+        return daysOfSale;
     }
 
     /**
-     * Sets whether or not the intermittentSale is active on mondays.
-     * @param monday Set to true if the intermittentSale is active on mondays and false otherwise.
+     * sets the days on which the sale is active
+     * @param days days
      */
-    public void setMonday(Boolean monday) {
-        this.monday = monday;
-    }
-
-    /**
-     * @return Returns true if the intermittentSale is active on tuesdays.
-     */
-    public Boolean getTuesday() {
-        return tuesday;
-    }
-
-    /**
-     * Sets whether or not the intermittentSale is active on tuesdays.
-     * @param tuesday Set to true if the intermittentSale is active on tuesdays and false otherwise.
-     */
-    public void setTuesday(Boolean tuesday) {
-        this.tuesday = tuesday;
-    }
-
-    /**
-     * @return Returns true if the intermittentSale is active on wednesdays.
-     */
-    public Boolean getWednesday() {
-        return wednesday;
-    }
-
-    /**
-     * Sets whether or not the intermittentSale is active on wednesdays.
-     * @param wednesday Set to true if the intermittentSale is active on wednesdays and false otherwise.
-     */
-    public void setWednesday(Boolean wednesday) {
-        this.wednesday = wednesday;
-    }
-
-    /**
-     * @return Returns true if the intermittentSale is active on thursdays.
-     */
-    public Boolean getThursday() {
-        return thursday;
-    }
-
-    /**
-     * Sets whether or not the intermittentSale is active on thursdays.
-     * @param thursday Set to true if the intermittentSale is active on thursdays and false otherwise.
-     */
-    public void setThursday(Boolean thursday) {
-        this.thursday = thursday;
-    }
-
-    /**
-     * @return Returns true if the intermittentSale is active on fridays.
-     */
-    public Boolean getFriday() {
-        return friday;
-    }
-
-    /**
-     * Sets whether or not the intermittentSale is active on fridays.
-     * @param friday Set to true if the intermittentSale is active on fridays and false otherwise.
-     */
-    public void setFriday(Boolean friday) {
-        this.friday = friday;
-    }
-
-    /**
-     * @return Returns true if the intermittentSale is active on saturdays.
-     */
-    public Boolean getSaturday() {
-        return saturday;
-    }
-
-    /**
-     * Sets whether or not the intermittentSale is active on saturdays.
-     * @param saturday Set to true if the intermittentSale is active on saturdays and false otherwise.
-     */
-    public void setSaturday(Boolean saturday) {
-        this.saturday = saturday;
-    }
-
-    /**
-     * @return Returns true if the intermittentSale is active on sundays.
-     */
-    public Boolean getSunday() {
-        return sunday;
-    }
-
-    /**
-     * Sets whether or not the intermittentSale is active on sundays.
-     * @param sunday Set to true if the intermittentSale is active on sundays and false otherwise.
-     */
-    public void setSunday(Boolean sunday) {
-        this.sunday = sunday;
+    public void setDaysOfSale(Set<DayOfWeek> days) {
+        this.daysOfSale = days;
     }
 
     /**
@@ -150,16 +58,16 @@ public class IntermittentSale extends Sale {
     }
 
     /**
-     * @return Returns the duration of the intermittentSale in minutes.
+     * @return Returns the duration of the intermittentSale
      */
-    public Integer getDuration() {
+    public Duration getDuration() {
         return duration;
     }
 
     /**
-     * @param duration Sets the duration of the intermittentSale in minutes.
+     * @param duration Sets the duration of the intermittentSale
      */
-    public void setDuration(Integer duration) {
+    public void setDuration(Duration duration) {
         this.duration = duration;
     }
 
@@ -181,36 +89,22 @@ public class IntermittentSale extends Sale {
     @Override
     public String toString() {
         return "IntermittentSale{" +
-                "identity=" + identity +
-                ", name=" + name +
-                ", monday=" + monday +
-                ", tuesday=" + tuesday +
-                ", wednesday=" + wednesday +
-                ", thursday=" + thursday +
-                ", friday=" + friday +
-                ", saturday=" + saturday +
-                ", sunday=" + sunday +
+                "daysOfSale=" + daysOfSale +
                 ", fromDayTime=" + fromDayTime +
                 ", duration=" + duration +
                 ", enabled=" + enabled +
-                ", entries=" + entries +
-                '}';
+                '}' + super.toString();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
 
         IntermittentSale that = (IntermittentSale) o;
 
-        if (monday != null ? !monday.equals(that.monday) : that.monday != null) return false;
-        if (tuesday != null ? !tuesday.equals(that.tuesday) : that.tuesday != null) return false;
-        if (wednesday != null ? !wednesday.equals(that.wednesday) : that.wednesday != null) return false;
-        if (thursday != null ? !thursday.equals(that.thursday) : that.thursday != null) return false;
-        if (friday != null ? !friday.equals(that.friday) : that.friday != null) return false;
-        if (saturday != null ? !saturday.equals(that.saturday) : that.saturday != null) return false;
-        if (sunday != null ? !sunday.equals(that.sunday) : that.sunday != null) return false;
+        if (daysOfSale != null ? !daysOfSale.equals(that.daysOfSale) : that.daysOfSale != null) return false;
         if (fromDayTime != null ? !fromDayTime.equals(that.fromDayTime) : that.fromDayTime != null) return false;
         if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
         return !(enabled != null ? !enabled.equals(that.enabled) : that.enabled != null);
@@ -219,30 +113,11 @@ public class IntermittentSale extends Sale {
     @Override
     public boolean isAt(LocalDateTime time) {
         // Same day of the week?
-        boolean dayMatch = false;
-        if (time.getDayOfWeek().equals(DayOfWeek.MONDAY) && this.monday!=null && this.monday == true) {
-            dayMatch = true;
-        } else if (time.getDayOfWeek().equals(DayOfWeek.TUESDAY) && this.tuesday!=null && this.tuesday == true) {
-            dayMatch = true;
-        } else if (time.getDayOfWeek().equals(DayOfWeek.WEDNESDAY) && this.wednesday!=null && this.wednesday == true) {
-            dayMatch = true;
-        } else if (time.getDayOfWeek().equals(DayOfWeek.THURSDAY) && this.thursday!=null && this.thursday == true) {
-            dayMatch = true;
-        } else if (time.getDayOfWeek().equals(DayOfWeek.FRIDAY) && this.friday!=null && this.friday == true) {
-            dayMatch = true;
-        } else if (time.getDayOfWeek().equals(DayOfWeek.SATURDAY) && this.saturday!=null && this.saturday == true) {
-            dayMatch = true;
-        } else if (time.getDayOfWeek().equals(DayOfWeek.SUNDAY) && this.sunday!=null && this.sunday == true) {
-            dayMatch = true;
-        }
-        if (!dayMatch) {
+        if(!daysOfSale.contains(time.getDayOfWeek())) {
             return false;
         }
-        // Same day time?
-        // Count minutes since midnight
-        int timeMinutes = time.getHour()*60+time.getMinute();
-        int begin = this.fromDayTime.getHour()*60+this.fromDayTime.getMinute();
-        int end = begin+duration;
-        return (begin <= timeMinutes && timeMinutes <= end);
+
+        // check time
+        return fromDayTime.isBefore(time.toLocalTime()) && fromDayTime.plus(duration).isAfter(time.toLocalTime());
     }
 }

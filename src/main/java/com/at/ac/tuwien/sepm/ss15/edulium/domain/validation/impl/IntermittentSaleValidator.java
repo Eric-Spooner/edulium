@@ -58,7 +58,7 @@ public class IntermittentSaleValidator implements Validator<IntermittentSale> {
         if (intermittentSale.getEntries() == null){
             throw new ValidationException("Menu entries not be null");
         }
-        if (intermittentSale.getEntries().size() == 0){
+        if (intermittentSale.getEntries().isEmpty()){
             throw new ValidationException("There should be at least one menu entry");
         }
         if (intermittentSale.getFromDayTime() == null) {
@@ -67,28 +67,13 @@ public class IntermittentSaleValidator implements Validator<IntermittentSale> {
         if (intermittentSale.getEnabled() == null) {
             throw new ValidationException("Enabled must not be null");
         }
-        if (intermittentSale.getMonday() == null) {
-            throw new ValidationException("Monday must not be null");
+        if(intermittentSale.getDaysOfSale() == null) {
+            throw new ValidationException("DaysOfSale must not be null");
         }
-        if (intermittentSale.getTuesday() == null) {
-            throw new ValidationException("Tuesday must not be null");
+        if(intermittentSale.getDaysOfSale().isEmpty()) {
+            throw new ValidationException("There should be at least one day of sale");
         }
-        if (intermittentSale.getWednesday() == null) {
-            throw new ValidationException("Wednesday must not be null");
-        }
-        if (intermittentSale.getThursday() == null) {
-            throw new ValidationException("Thursday must not be null");
-        }
-        if (intermittentSale.getFriday() == null) {
-            throw new ValidationException("Friday must not be null");
-        }
-        if (intermittentSale.getSaturday() == null) {
-            throw new ValidationException("Saturday must not be null");
-        }
-        if (intermittentSale.getSunday() == null) {
-            throw new ValidationException("Sunday must not be null");
-        }
-        if (intermittentSale.getDuration() == null || intermittentSale.getDuration() < 0) {
+        if (intermittentSale.getDuration() == null || intermittentSale.getDuration().isNegative()) {
             throw new ValidationException("Negative durations are not accepted.");
         }
     }

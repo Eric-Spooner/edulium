@@ -81,7 +81,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
         // GIVEN
-        OnetimeSale onetimeSale = createOnetimeSale(new Long(123));
+        OnetimeSale onetimeSale = createOnetimeSale(123L);
 
         // WHEN
         onetimeSaleDAO.create(onetimeSale);
@@ -114,7 +114,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // PREPARE
-        OnetimeSale onetimeSale = createOnetimeSale(new Long(123));
+        OnetimeSale onetimeSale = createOnetimeSale(123L);
 
         // check if user is stored
         onetimeSaleDAO.create(onetimeSale);
@@ -180,7 +180,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
     public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // PREPARE
         final int numberBefore = onetimeSaleDAO.getAll().size();
-        OnetimeSale onetimeSale =  createOnetimeSale(new Long(123));
+        OnetimeSale onetimeSale =  createOnetimeSale(123L);
 
         // check if sale is stored
         onetimeSaleDAO.create(onetimeSale);
@@ -236,19 +236,19 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // Prepare
 
         // one time sale 1
-        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+        OnetimeSale onetimeSale1 = createOnetimeSale(123L);
 
         onetimeSaleDAO.create(onetimeSale1);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale1).size());
 
         // one time sale 2
-        OnetimeSale onetimeSale2 =  createOnetimeSale(new Long(124));
+        OnetimeSale onetimeSale2 =  createOnetimeSale(124L);
 
         onetimeSaleDAO.create(onetimeSale2);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale2).size());
 
         // one time sale 3
-        OnetimeSale onetimeSale3 =  createOnetimeSale(new Long(125));
+        OnetimeSale onetimeSale3 =  createOnetimeSale(125L);
 
         onetimeSaleDAO.create(onetimeSale3);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale3).size());
@@ -281,14 +281,14 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         LocalDateTime time2 = LocalDateTime.parse("2008-12-03T10:15:30");
 
         // one time sale 1
-        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+        OnetimeSale onetimeSale1 = createOnetimeSale(123L);
         onetimeSale1.setFromTime(time1);
 
         onetimeSaleDAO.create(onetimeSale1);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale1).size());
 
         // one time sale 2
-        OnetimeSale onetimeSale2 =  createOnetimeSale(new Long(124));
+        OnetimeSale onetimeSale2 =  createOnetimeSale(124L);
         onetimeSale2.setFromTime(time2);
 
         onetimeSaleDAO.create(onetimeSale2);
@@ -321,14 +321,14 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         LocalDateTime time2 = LocalDateTime.parse("2028-12-03T10:15:30");
 
         // one time sale 1
-        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+        OnetimeSale onetimeSale1 = createOnetimeSale(123L);
         onetimeSale1.setToTime(time1);
 
         onetimeSaleDAO.create(onetimeSale1);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale1).size());
 
         // one time sale 2
-        OnetimeSale onetimeSale2 =  createOnetimeSale(new Long(124));
+        OnetimeSale onetimeSale2 =  createOnetimeSale(124L);
         onetimeSale2.setToTime(time2);
 
         onetimeSaleDAO.create(onetimeSale2);
@@ -359,7 +359,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // Prepare
 
         // one time sale 1
-        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+        OnetimeSale onetimeSale1 = createOnetimeSale(123L);
 
         onetimeSaleDAO.create(onetimeSale1);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale1).size());
@@ -379,7 +379,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // Prepare
 
         // one time sale 1
-        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+        OnetimeSale onetimeSale1 = createOnetimeSale(123L);
 
         onetimeSaleDAO.create(onetimeSale1);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale1).size());
@@ -399,17 +399,17 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // Prepare
 
         // one time sale 1
-        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+        OnetimeSale onetimeSale1 = createOnetimeSale(123L);
 
         onetimeSaleDAO.create(onetimeSale1);
 
         // one time sale 2
-        OnetimeSale onetimeSale2 =  createOnetimeSale(new Long(124));
+        OnetimeSale onetimeSale2 =  createOnetimeSale(124L);
 
         onetimeSaleDAO.create(onetimeSale2);
 
         // one time sale 3
-        OnetimeSale onetimeSale3 =  createOnetimeSale(new Long(125));
+        OnetimeSale onetimeSale3 =  createOnetimeSale(125L);
 
         onetimeSaleDAO.create(onetimeSale3);
 
@@ -456,7 +456,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
 
     @Test
     public void testCreate_shouldAddRemoveAndReaddObject() throws DAOException, ValidationException {
-        OnetimeSale onetimeSale = createOnetimeSale(new Long(123));
+        OnetimeSale onetimeSale = createOnetimeSale(123L);
 
         onetimeSaleDAO.create(onetimeSale);
         assertEquals(onetimeSaleDAO.find(onetimeSale).size(), 1);
@@ -476,17 +476,17 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // Prepare
 
         // one time sale 1
-        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+        OnetimeSale onetimeSale1 = createOnetimeSale(123L);
 
         onetimeSaleDAO.create(onetimeSale1);
 
         // one time sale 2
-        OnetimeSale onetimeSale2 =  createOnetimeSale(new Long(124));
+        OnetimeSale onetimeSale2 =  createOnetimeSale(124L);
 
         onetimeSaleDAO.create(onetimeSale2);
 
         // one time sale 3
-        OnetimeSale onetimeSale3 =  createOnetimeSale(new Long(125));
+        OnetimeSale onetimeSale3 =  createOnetimeSale(125L);
 
         onetimeSaleDAO.create(onetimeSale3);
 
@@ -507,7 +507,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         // Prepare
 
         // one time sale 1
-        OnetimeSale onetimeSale1 = createOnetimeSale(new Long(123));
+        OnetimeSale onetimeSale1 = createOnetimeSale(123L);
 
         onetimeSaleDAO.create(onetimeSale1);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale1).size());
@@ -515,7 +515,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         assertEquals(0, onetimeSaleDAO.find(onetimeSale1).size());
 
         // one time sale 2
-        OnetimeSale onetimeSale2 =  createOnetimeSale(new Long(124));
+        OnetimeSale onetimeSale2 =  createOnetimeSale(124L);
 
         onetimeSaleDAO.create(onetimeSale2);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale2).size());
@@ -523,7 +523,7 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         assertEquals(0, onetimeSaleDAO.find(onetimeSale2).size());
 
         // one time sale 3
-        OnetimeSale onetimeSale3 =  createOnetimeSale(new Long(125));
+        OnetimeSale onetimeSale3 =  createOnetimeSale(125L);
 
         onetimeSaleDAO.create(onetimeSale3);
         assertEquals(1, onetimeSaleDAO.find(onetimeSale3).size());
@@ -581,17 +581,16 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         List<OnetimeSale> result = onetimeSaleDAO.populate(invalidSales);
     }
 
-    /*
-    Leave history out for now
+
     @Test
     public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
-// PREPARE
+        // PREPARE
         // get test user
         User user = getCurrentUser();
 
         // GIVEN
         // create data
-        OnetimeSale onetimeSale = createOnetimeSale(new Long(123));
+        OnetimeSale onetimeSale = createOnetimeSale(123L);
         LocalDateTime createTime = LocalDateTime.now();
         onetimeSaleDAO.create(onetimeSale);
 
@@ -633,5 +632,5 @@ public class TestOnetimeSaleDAO extends AbstractDAOTest {
         assertEquals(user, entry.getUser());
         assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
         assertTrue(entry.isDeleted());
-    }*/
+    }
 }

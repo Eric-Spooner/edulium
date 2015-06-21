@@ -16,7 +16,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.time.DayOfWeek;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,15 +52,14 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, intermittentSale.getIdentity());
-            stmt.setBoolean(2, intermittentSale.getMonday());
-            stmt.setBoolean(3, intermittentSale.getTuesday());
-            stmt.setBoolean(4, intermittentSale.getWednesday());
-            stmt.setBoolean(5, intermittentSale.getThursday());
-            stmt.setBoolean(6, intermittentSale.getFriday());
-            stmt.setBoolean(7, intermittentSale.getSaturday());
-            stmt.setBoolean(8, intermittentSale.getSunday());
+
+            int index = 2;
+            for(DayOfWeek day : DayOfWeek.values()) {
+                stmt.setBoolean(index++, intermittentSale.getDaysOfSale().contains(day));
+            }
+
             stmt.setTime(9, Time.valueOf(intermittentSale.getFromDayTime()));
-            stmt.setInt(10, intermittentSale.getDuration());
+            stmt.setLong(10, intermittentSale.getDuration().toMillis());
             stmt.setBoolean(11, intermittentSale.getEnabled());
 
             stmt.executeUpdate();
@@ -82,15 +84,12 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
                 "saturday = ?, sunday = ?, fromDayTime = ?, duration = ?, enabled = ? WHERE sale_ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setBoolean(1, intermittentSale.getMonday());
-            stmt.setBoolean(2, intermittentSale.getTuesday());
-            stmt.setBoolean(3, intermittentSale.getWednesday());
-            stmt.setBoolean(4, intermittentSale.getThursday());
-            stmt.setBoolean(5, intermittentSale.getFriday());
-            stmt.setBoolean(6, intermittentSale.getSaturday());
-            stmt.setBoolean(7, intermittentSale.getSunday());
+            int index = 1;
+            for(DayOfWeek day : DayOfWeek.values()) {
+                stmt.setBoolean(index++, intermittentSale.getDaysOfSale().contains(day));
+            }
             stmt.setTime(8, Time.valueOf(intermittentSale.getFromDayTime()));
-            stmt.setInt(9, intermittentSale.getDuration());
+            stmt.setLong(9, intermittentSale.getDuration().toMillis());
             stmt.setBoolean(10, intermittentSale.getEnabled());
             stmt.setLong(11, intermittentSale.getIdentity());
 
@@ -113,6 +112,8 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
         validator.validateForDelete(intermittentSale);
 
         super.delete(intermittentSale);
+
+        generateHistory(intermittentSale);
     }
 
     @Override
@@ -140,15 +141,14 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setObject(1, intermittentSale.getIdentity());
-            stmt.setObject(2, intermittentSale.getMonday());
-            stmt.setObject(3, intermittentSale.getTuesday());
-            stmt.setObject(4, intermittentSale.getWednesday());
-            stmt.setObject(5, intermittentSale.getThursday());
-            stmt.setObject(6, intermittentSale.getFriday());
-            stmt.setObject(7, intermittentSale.getSaturday());
-            stmt.setObject(8, intermittentSale.getSunday());
+
+            int index = 2;
+            for(DayOfWeek day : DayOfWeek.values()) {
+                stmt.setObject(index++, intermittentSale.getDaysOfSale() == null ? null : intermittentSale.getDaysOfSale().contains(day));
+            }
+
             stmt.setObject(9, intermittentSale.getFromDayTime() == null ? null : Time.valueOf(intermittentSale.getFromDayTime()));
-            stmt.setObject(10, intermittentSale.getDuration());
+            stmt.setObject(10, intermittentSale.getDuration() != null ? intermittentSale.getDuration().toMillis() : null);
             stmt.setObject(11, intermittentSale.getEnabled());
             stmt.setObject(12, intermittentSale.getName());
 
@@ -291,15 +291,17 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
     private IntermittentSale intermittentSaleFromResultSet(ResultSet result) throws SQLException {
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(result.getLong("sale_ID"));
-        intermittentSale.setMonday(result.getBoolean("monday"));
-        intermittentSale.setTuesday(result.getBoolean("tuesday"));
-        intermittentSale.setWednesday(result.getBoolean("wednesday"));
-        intermittentSale.setThursday(result.getBoolean("thursday"));
-        intermittentSale.setFriday(result.getBoolean("friday"));
-        intermittentSale.setSaturday(result.getBoolean("saturday"));
-        intermittentSale.setSunday(result.getBoolean("sunday"));
+
+        HashSet<DayOfWeek> saleDays = new HashSet<>();
+        for(DayOfWeek day : DayOfWeek.values()) {
+            if(result.getBoolean(day.toString().toLowerCase())) {
+                saleDays.add(day);
+            }
+        }
+
+        intermittentSale.setDaysOfSale(saleDays);
         intermittentSale.setFromDayTime(result.getTime("fromDayTime").toLocalTime());
-        intermittentSale.setDuration(result.getInt("duration"));
+        intermittentSale.setDuration(Duration.ofMillis(result.getLong("duration")));
         intermittentSale.setEnabled(result.getBoolean("enabled"));
         return intermittentSale;
     }
@@ -323,9 +325,10 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
         History<IntermittentSale> historyEntry = new History<>();
         historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
         historyEntry.setChangeNumber(result.getLong("changeNr"));
-        historyEntry.setDeleted(result.getBoolean("deleted"));
         historyEntry.setUser(storedUsers.get(0));
         historyEntry.setData(intermittentSaleFromResultSet(result));
+
+        setSaleHistoryParameters(historyEntry);
 
         return historyEntry;
     }

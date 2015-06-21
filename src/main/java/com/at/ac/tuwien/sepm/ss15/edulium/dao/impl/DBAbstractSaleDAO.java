@@ -5,6 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -163,13 +164,58 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
             LOGGER.error("generating history failed", e);
             throw new DAOException("generating history failed", e);
         }
+
+        // get the latest history change number
+        final String queryChangeNr = "SELECT MAX(changeNr) FROM SaleHistory WHERE ID = ?";
+
+        long changeNr;
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryChangeNr)) {
+            stmt.setLong(1, sale.getIdentity());
+
+            ResultSet result = stmt.executeQuery();
+            if (result.next()) {
+                changeNr = result.getLong(1);
+            } else {
+                LOGGER.error("retrieving the change number failed, reservation history not found");
+                throw new DAOException("retrieving the change number failed, reservation history not found");
+            }
+        } catch (SQLException e) {
+            LOGGER.error("retrieving the change number failed", e);
+            throw new DAOException("retrieving the change number failed", e);
+        }
+
+        generateReservationAssociationsHistory(sale, changeNr);
     }
 
     /**
-     * Sets the name of the sale object according to the value in the database.
-     * @param sale sale object resulting from a query, not having a name value yet
-     * @throws SQLException if an error accessing the database occurred
-     * @return true if the Sale was not deleted yet.
+     * writes the association changes of the dataset into the database
+     * stores the time; number of the change (uses the given changeNumber) and the user which executed the changes
+     * @param sale updated dataset
+     * @param changeNumber reservation history change number
+     * @throws DAOException if an error accessing the database occurred
+     */
+    private void generateReservationAssociationsHistory(Sale sale, long changeNumber) throws DAOException {
+        LOGGER.debug("Entering generateReservationAssociationsHistory with parameters: " + sale);
+
+        final String query = "INSERT INTO SaleAssocHistory " +
+                "(SELECT *, CURRENT_TIMESTAMP(), ?, ? FROM SaleAssoc WHERE sale_ID = ?)";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+            stmt.setLong(2, changeNumber);
+            stmt.setLong(3, sale.getIdentity());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("generating history for sale-table associations failed", e);
+            throw new DAOException("generating history for sale-table associations failed", e);
+        }
+    }
+
+    /**
+     * Sets the name and the entries of the sale object according to the values in the database.
+     * @param sale sale object resulting from a query
      */
     protected void setSaleParameters(Sale sale) throws DAOException {
         LOGGER.debug("Entering setSaleParameters with parameters: " + sale);
@@ -220,6 +266,61 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
         } catch (SQLException e) {
             LOGGER.error("reading from SALE table failed", e);
             throw new DAOException("reading from SALE table failed", e);
+        }
+    }
+
+    protected void setSaleHistoryParameters(History<T> history) throws DAOException {
+        LOGGER.debug("Entering setSaleParameterFromHistory with parameters: " + history);
+
+        // set name
+        final String saleQuery = "SELECT * FROM SaleHistory WHERE ID = ? AND changeNr = ?";
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery)) {
+            stmt.setLong(1, history.getData().getIdentity());
+            stmt.setLong(2, history.getChangeNumber());
+
+            ResultSet result = stmt.executeQuery();
+            if(!result.next()) {
+                LOGGER.error("sale history dataset not found");
+                throw new DAOException("sale history dataset not found");
+            }
+
+            history.getData().setName(result.getString("name"));
+            history.setDeleted(result.getBoolean("deleted"));
+
+        } catch (SQLException e) {
+            LOGGER.error("reading from SaleHistory table failed", e);
+            throw new DAOException("reading from SaleHistory table failed", e);
+        }
+
+        // set entries
+        // SaleAssoc (sale_ID, menuEntry_ID, salePrice, disabled)
+
+        final String entriesQuery = "SELECT * FROM SaleAssocHistory WHERE sale_ID = ? AND changeNr = ? AND disabled = false";
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(entriesQuery)) {
+            stmt.setLong(1, history.getData().getIdentity());
+            stmt.setLong(2, history.getChangeNumber());
+            ResultSet result = stmt.executeQuery();
+
+            List<MenuEntry> entries = new ArrayList<>();
+
+            while(result.next()) {
+                List<MenuEntry> tmpEntryList = menuEntryDAO.find(MenuEntry.withIdentity(result.getLong("menuEntry_ID")));
+
+                if(tmpEntryList.size() != 1) {
+                    LOGGER.error("Menu Entry not found");
+                    throw new DAOException("Menu Entry not found");
+                }
+
+                MenuEntry entry = tmpEntryList.get(0);
+                entry.setPrice(result.getBigDecimal("salePrice"));
+                entries.add(entry);
+            }
+
+            history.getData().setEntries(entries);
+        } catch (SQLException e) {
+            LOGGER.error("reading from SaleAssocHistory table failed", e);
+            throw new DAOException("reading from SaleAssocHistory table failed", e);
         }
     }
 }

@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -23,18 +25,16 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForCreate_shouldAcceptIntermittentSale() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setIdentity(123L);
         intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -53,14 +53,12 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -77,17 +75,14 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForCreate_saleWithoutNameShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setIdentity(123L);
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -104,18 +99,15 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForCreate_saleWithEmptyNameShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setIdentity(123L);
         intermittentSale.setName("");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -132,18 +124,16 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForCreate_intermittentSaleWithNegativeDurationShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setIdentity(123L);
         intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(-120);
+        intermittentSale.setDuration(Duration.ofMinutes(-120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -160,18 +150,17 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForCreate_intermittentSaleWithoutEntriesShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setIdentity(123L);
         intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+
         intermittentSale.setEntries(null);
 
         // WHEN
@@ -182,18 +171,16 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForCreate_intermittentSaleWithEmptyEntriesShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setIdentity(123L);
         intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
 
@@ -207,17 +194,15 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForCreate_intermittentSaleWithoutFromDayTimeShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setIdentity(123L);
         intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
+
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -234,206 +219,15 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForCreate_intermittentSaleWithoutEnabledShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setIdentity(123L);
         intermittentSale.setName("Sale");
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
 
-        List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
-        entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
-
-        intermittentSale.setEntries(entries);
-
-        // WHEN
-        intermittentSaleValidator.validateForCreate(intermittentSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForCreate_intermittentSaleWithoutMondayShouldThrow() throws ValidationException {
-        // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-        intermittentSale.setName("Sale");
-        intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
-        intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
-
-        List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
-        entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
-
-        intermittentSale.setEntries(entries);
-
-        // WHEN
-        intermittentSaleValidator.validateForCreate(intermittentSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForCreate_intermittentSaleWithoutTuesdayShouldThrow() throws ValidationException {
-        // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-        intermittentSale.setName("Sale");
-        intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
-        intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
-
-        List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
-        entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
-
-        intermittentSale.setEntries(entries);
-
-        // WHEN
-        intermittentSaleValidator.validateForCreate(intermittentSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForCreate_intermittentSaleWithoutWednesdayShouldThrow() throws ValidationException {
-        // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-        intermittentSale.setName("Sale");
-        intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
-        intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
-
-        List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
-        entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
-
-        intermittentSale.setEntries(entries);
-
-        // WHEN
-        intermittentSaleValidator.validateForCreate(intermittentSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForCreate_intermittentSaleWithoutThursdayShouldThrow() throws ValidationException {
-        // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-        intermittentSale.setName("Sale");
-        intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
-        intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
-
-        List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
-        entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
-
-        intermittentSale.setEntries(entries);
-
-        // WHEN
-        intermittentSaleValidator.validateForCreate(intermittentSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForCreate_intermittentSaleWithoutFridayShouldThrow() throws ValidationException {
-        // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-        intermittentSale.setName("Sale");
-        intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
-        intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
-
-        List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
-        entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
-
-        intermittentSale.setEntries(entries);
-
-        // WHEN
-        intermittentSaleValidator.validateForCreate(intermittentSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForCreate_intermittentSaleWithoutSaturdayShouldThrow() throws ValidationException {
-        // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-        intermittentSale.setName("Sale");
-        intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
-        intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSunday(false);
-
-        List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
-        entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
-
-        intermittentSale.setEntries(entries);
-
-        // WHEN
-        intermittentSaleValidator.validateForCreate(intermittentSale);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void testValidateForCreate_intermittentSaleWithoutSundayShouldThrow() throws ValidationException {
-        // GIVEN
-        IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
-        intermittentSale.setName("Sale");
-        intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
-        intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -459,18 +253,16 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForUpdate_shouldAcceptIntermittentSale() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setIdentity(123L);
         intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -489,15 +281,13 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -514,17 +304,15 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForUpdate_saleWithoutNameShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setIdentity(123L);
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -541,18 +329,16 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForUpdate_saleWithEmptyNameShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setIdentity(123L);
         intermittentSale.setName("");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -569,18 +355,16 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForUpdate_intermittentSaleWithNegativeDurationShouldThrow() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setIdentity(123L);
         intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(-120);
+        intermittentSale.setDuration(Duration.ofMinutes(-120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -606,18 +390,16 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateForDelete_shouldAcceptIntermittentSale() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setIdentity(123L);
         intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -636,15 +418,13 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -671,18 +451,16 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
     public void testValidateIdentity_shouldAcceptSale() throws ValidationException {
         // GIVEN
         IntermittentSale intermittentSale = new IntermittentSale();
-        intermittentSale.setIdentity(new Long(123));
+        intermittentSale.setIdentity(123L);
         intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();
@@ -701,15 +479,13 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setName("Sale");
         intermittentSale.setEnabled(true);
-        intermittentSale.setDuration(120);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.setMonday(true);
-        intermittentSale.setTuesday(true);
-        intermittentSale.setWednesday(true);
-        intermittentSale.setThursday(true);
-        intermittentSale.setFriday(false);
-        intermittentSale.setSaturday(false);
-        intermittentSale.setSunday(false);
+
+        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
+        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
 
         List<MenuEntry> entries = new ArrayList<>();
         MenuEntry entry = new MenuEntry();

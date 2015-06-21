@@ -1,17 +1,17 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -63,32 +63,34 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         return entries;
     }
 
-    private IntermittentSale createIntermittentSale(Long identity, String name, List<MenuEntry> entries, Integer duration, Boolean enabled, LocalTime fromDayTime, Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday, Boolean saturday, Boolean sunday) {
+    private IntermittentSale createIntermittentSale(Long identity, String name, List<MenuEntry> entries, Integer duration, Boolean enabled, LocalTime fromDayTime, Set<DayOfWeek> days) {
         IntermittentSale intermittentSale = new IntermittentSale();
         intermittentSale.setIdentity(identity);
         intermittentSale.setName(name);
         intermittentSale.setEntries(entries);
-        intermittentSale.setDuration(duration);
+        intermittentSale.setDuration(Duration.ofMinutes(duration));
         intermittentSale.setEnabled(enabled);
         intermittentSale.setFromDayTime(fromDayTime);
-        intermittentSale.setMonday(monday);
-        intermittentSale.setTuesday(tuesday);
-        intermittentSale.setWednesday(wednesday);
-        intermittentSale.setThursday(thursday);
-        intermittentSale.setFriday(friday);
-        intermittentSale.setSaturday(saturday);
-        intermittentSale.setSunday(sunday);
+        intermittentSale.setDaysOfSale(days);
         return intermittentSale;
     }
 
     private IntermittentSale createIntermittentSale(Long identity) throws ValidationException, DAOException {
-        return createIntermittentSale(identity, "Sale", createRandomEntries(), 60, true, LocalTime.parse("10:15:30"), new Boolean(true), new Boolean(true), new Boolean(false), new Boolean(false), new Boolean(true), new Boolean(true), new Boolean(true));
+
+        HashSet<DayOfWeek> daysOfWeek = new HashSet<>();
+
+        daysOfWeek.add(DayOfWeek.MONDAY);
+        daysOfWeek.add(DayOfWeek.TUESDAY);
+        daysOfWeek.add(DayOfWeek.SATURDAY);
+        daysOfWeek.add(DayOfWeek.SUNDAY);
+
+        return createIntermittentSale(identity, "Sale", createRandomEntries(), 60, true, LocalTime.parse("10:15:30"), daysOfWeek);
     }
 
     @Test
     public void testCreate_shouldAddObject() throws DAOException, ValidationException {
         // GIVEN
-        IntermittentSale intermittentSale = createIntermittentSale(new Long(123));
+        IntermittentSale intermittentSale = createIntermittentSale(123L);
 
         // WHEN
         intermittentSaleDAO.create(intermittentSale);
@@ -121,23 +123,23 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
     @Test
     public void testUpdate_shouldUpdateObject() throws DAOException, ValidationException {
         // PREPARE
-        IntermittentSale intermittentSale = createIntermittentSale(new Long(123));
+        IntermittentSale intermittentSale = createIntermittentSale(123L);
 
         // check if user is stored
         intermittentSaleDAO.create(intermittentSale);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale).size());
 
         // GIVEN
-        IntermittentSale intermittentSale2 = createIntermittentSale(intermittentSale.getIdentity(), "Sale2", intermittentSale.getEntries(), intermittentSale.getDuration(), intermittentSale.getEnabled(), intermittentSale.getFromDayTime(), intermittentSale.getMonday(), intermittentSale.getTuesday(), intermittentSale.getWednesday(), intermittentSale.getThursday(), intermittentSale.getFriday(), intermittentSale.getSaturday(), intermittentSale.getSunday());
+        intermittentSale.setName("updatedSALE");
 
         // WHEN
-        intermittentSaleDAO.update(intermittentSale2);
+        intermittentSaleDAO.update(intermittentSale);
 
         // THEN
         // check if the user has been updated;
-        List<IntermittentSale> storedObjects = intermittentSaleDAO.find(intermittentSale2);
+        List<IntermittentSale> storedObjects = intermittentSaleDAO.find(intermittentSale);
         assertEquals(1, storedObjects.size());
-        assertEquals(intermittentSale2, storedObjects.get(0));
+        assertEquals(intermittentSale, storedObjects.get(0));
     }
 
     @Test(expected = ValidationException.class)
@@ -182,7 +184,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
     public void testDelete_shouldDeleteObject() throws DAOException, ValidationException {
         // PREPARE
         final int numberBefore = intermittentSaleDAO.getAll().size();
-        IntermittentSale intermittentSale = createIntermittentSale(new Long(123));
+        IntermittentSale intermittentSale = createIntermittentSale(123L);
 
         // check if user is stored
         intermittentSaleDAO.create(intermittentSale);
@@ -233,19 +235,19 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // Prepare
 
         // intermittent sale 1
-        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
+        IntermittentSale intermittentSale1 = createIntermittentSale(123L);
 
         intermittentSaleDAO.create(intermittentSale1);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
 
         // intermittent sale 2
-        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
+        IntermittentSale intermittentSale2 = createIntermittentSale(124L);
 
         intermittentSaleDAO.create(intermittentSale2);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
 
         // intermittent sale 3
-        IntermittentSale intermittentSale3 = createIntermittentSale(new Long(125));
+        IntermittentSale intermittentSale3 = createIntermittentSale(125L);
 
         intermittentSaleDAO.create(intermittentSale3);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale3).size());
@@ -281,34 +283,34 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         LocalTime time3 = LocalTime.parse("10:17:50");
 
         // intermittent sale 1
-        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
+        IntermittentSale intermittentSale1 = createIntermittentSale(123L);
         intermittentSale1.setFromDayTime(time1);
 
         intermittentSaleDAO.create(intermittentSale1);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
 
         // intermittent sale 2
-        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
+        IntermittentSale intermittentSale2 = createIntermittentSale(124L);
         intermittentSale2.setFromDayTime(time2);
 
         intermittentSaleDAO.create(intermittentSale2);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
 
         // intermittent sale 3
-        IntermittentSale intermittentSale3 = createIntermittentSale(new Long(125));
+        IntermittentSale intermittentSale3 = createIntermittentSale(125L);
         intermittentSale3.setFromDayTime(time3);
 
         intermittentSaleDAO.create(intermittentSale3);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale3).size());
 
         // GIVEN
-        IntermittentSale matcher1 = IntermittentSale.withIdentity(new Long(123)); // for sale 1
+        IntermittentSale matcher1 = IntermittentSale.withIdentity(123L); // for sale 1
         matcher1.setIdentity(null);
         matcher1.setFromDayTime(time1);
-        IntermittentSale matcher2 = IntermittentSale.withIdentity(new Long(123)); // for sale 2
+        IntermittentSale matcher2 = IntermittentSale.withIdentity(123L); // for sale 2
         matcher2.setIdentity(null);
         matcher2.setFromDayTime(time2);
-        IntermittentSale matcher3 = IntermittentSale.withIdentity(new Long(123)); // for sale 3
+        IntermittentSale matcher3 = IntermittentSale.withIdentity(123L); // for sale 3
         matcher3.setIdentity(null);
         matcher3.setFromDayTime(time3);
 
@@ -333,41 +335,41 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // Prepare
 
         //FromDayTimes
-        Integer integer1 = new Integer(50);
-        Integer integer2 = new Integer(30);
-        Integer integer3 = new Integer(120);
+        Duration duration50 = Duration.ofMinutes(50);
+        Duration duration30 = Duration.ofMinutes(30);
+        Duration duration120 = Duration.ofMinutes(120);
 
         // intermittent sale 1
-        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
-        intermittentSale1.setDuration(integer1);
+        IntermittentSale intermittentSale1 = createIntermittentSale(123L);
+        intermittentSale1.setDuration(duration50);
 
         intermittentSaleDAO.create(intermittentSale1);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
 
         // intermittent sale 2
-        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
-        intermittentSale2.setDuration(integer2);
+        IntermittentSale intermittentSale2 = createIntermittentSale(124L);
+        intermittentSale2.setDuration(duration30);
 
         intermittentSaleDAO.create(intermittentSale2);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
 
         // intermittent sale 3
-        IntermittentSale intermittentSale3 = createIntermittentSale(new Long(125));
-        intermittentSale3.setDuration(integer3);
+        IntermittentSale intermittentSale3 = createIntermittentSale(125L);
+        intermittentSale3.setDuration(duration120);
 
         intermittentSaleDAO.create(intermittentSale3);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale3).size());
 
         // GIVEN
-        IntermittentSale matcher1 = IntermittentSale.withIdentity(new Long(123)); // for sale 1
+        IntermittentSale matcher1 = IntermittentSale.withIdentity(123L); // for sale 1
         matcher1.setIdentity(null);
-        matcher1.setDuration(integer1);
-        IntermittentSale matcher2 = IntermittentSale.withIdentity(new Long(123)); // for sale 2
+        matcher1.setDuration(duration50);
+        IntermittentSale matcher2 = IntermittentSale.withIdentity(123L); // for sale 2
         matcher2.setIdentity(null);
-        matcher2.setDuration(integer2);
-        IntermittentSale matcher3 = IntermittentSale.withIdentity(new Long(123)); // for sale 3
+        matcher2.setDuration(duration30);
+        IntermittentSale matcher3 = IntermittentSale.withIdentity(123L); // for sale 3
         matcher3.setIdentity(null);
-        matcher3.setDuration(integer3);
+        matcher3.setDuration(duration120);
 
         // WHEN
         List<IntermittentSale> result1 = intermittentSaleDAO.find(matcher1);
@@ -386,258 +388,40 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
     }
 
     @Test
-    public void testFind_byMondayShouldReturnObjects() throws DAOException, ValidationException {
+    public void testFind_bySaleDayShouldReturnObjects() throws DAOException, ValidationException {
         // Prepare
 
         // intermittent sale 1
-        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
-        intermittentSale1.setMonday(true);
+        IntermittentSale intermittentSale1 = createIntermittentSale(123L);
+
+        HashSet<DayOfWeek> days1 = new HashSet<>();
+        days1.add(DayOfWeek.MONDAY);
+        intermittentSale1.setDaysOfSale(days1);
 
         intermittentSaleDAO.create(intermittentSale1);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
 
         // intermittent sale 2
-        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
-        intermittentSale2.setMonday(false);
+        IntermittentSale intermittentSale2 = createIntermittentSale(124L);
+
+        HashSet<DayOfWeek> days2 = new HashSet<>();
+        days2.add(DayOfWeek.FRIDAY);
+        days2.add(DayOfWeek.SUNDAY);
+        intermittentSale2.setDaysOfSale(days2);
 
         intermittentSaleDAO.create(intermittentSale2);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
 
         // GIVEN
-        IntermittentSale matcher1 = IntermittentSale.withIdentity(new Long(123)); // for sale 1
-        matcher1.setIdentity(null);
-        matcher1.setMonday(true);
-        IntermittentSale matcher2 = IntermittentSale.withIdentity(new Long(123)); // for sale 2
-        matcher2.setIdentity(null);
-        matcher2.setMonday(false);
+        IntermittentSale matcher1 = new IntermittentSale();
+        IntermittentSale matcher2 = new IntermittentSale();
 
-        // WHEN
-        List<IntermittentSale> result1 = intermittentSaleDAO.find(matcher1);
-        List<IntermittentSale> result2 = intermittentSaleDAO.find(matcher2);
+        matcher1.setDaysOfSale(new HashSet<>());
+        matcher1.getDaysOfSale().add(DayOfWeek.MONDAY);
 
-        // THEN
-        assertEquals(1, result1.size());
-        assertTrue(result1.contains(intermittentSale1));
-
-        assertEquals(1, result2.size());
-        assertTrue(result2.contains(intermittentSale2));
-    }
-
-    @Test
-    public void testFind_byTuesdayShouldReturnObjects() throws DAOException, ValidationException {
-        // Prepare
-
-        // intermittent sale 1
-        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
-        intermittentSale1.setTuesday(true);
-
-        intermittentSaleDAO.create(intermittentSale1);
-        assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
-
-        // intermittent sale 2
-        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
-        intermittentSale2.setTuesday(false);
-
-        intermittentSaleDAO.create(intermittentSale2);
-        assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
-
-        // GIVEN
-        IntermittentSale matcher1 = IntermittentSale.withIdentity(new Long(123)); // for sale 1
-        matcher1.setIdentity(null);
-        matcher1.setTuesday(true);
-        IntermittentSale matcher2 = IntermittentSale.withIdentity(new Long(123)); // for sale 2
-        matcher2.setIdentity(null);
-        matcher2.setTuesday(false);
-
-        // WHEN
-        List<IntermittentSale> result1 = intermittentSaleDAO.find(matcher1);
-        List<IntermittentSale> result2 = intermittentSaleDAO.find(matcher2);
-
-        // THEN
-        assertEquals(1, result1.size());
-        assertTrue(result1.contains(intermittentSale1));
-
-        assertEquals(1, result2.size());
-        assertTrue(result2.contains(intermittentSale2));
-    }
-
-    @Test
-    public void testFind_byWednesdayShouldReturnObjects() throws DAOException, ValidationException {
-        // Prepare
-
-        // intermittent sale 1
-        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
-        intermittentSale1.setWednesday(true);
-
-        intermittentSaleDAO.create(intermittentSale1);
-        assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
-
-        // intermittent sale 2
-        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
-        intermittentSale2.setWednesday(false);
-
-        intermittentSaleDAO.create(intermittentSale2);
-        assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
-
-        // GIVEN
-        IntermittentSale matcher1 = IntermittentSale.withIdentity(new Long(123)); // for sale 1
-        matcher1.setIdentity(null);
-        matcher1.setWednesday(true);
-        IntermittentSale matcher2 = IntermittentSale.withIdentity(new Long(123)); // for sale 2
-        matcher2.setIdentity(null);
-        matcher2.setWednesday(false);
-
-        // WHEN
-        List<IntermittentSale> result1 = intermittentSaleDAO.find(matcher1);
-        List<IntermittentSale> result2 = intermittentSaleDAO.find(matcher2);
-
-        // THEN
-        assertEquals(1, result1.size());
-        assertTrue(result1.contains(intermittentSale1));
-
-        assertEquals(1, result2.size());
-        assertTrue(result2.contains(intermittentSale2));
-    }
-
-    @Test
-    public void testFind_byThursdayShouldReturnObjects() throws DAOException, ValidationException {
-        // Prepare
-
-        // intermittent sale 1
-        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
-        intermittentSale1.setThursday(true);
-
-        intermittentSaleDAO.create(intermittentSale1);
-        assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
-
-        // intermittent sale 2
-        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
-        intermittentSale2.setThursday(false);
-
-        intermittentSaleDAO.create(intermittentSale2);
-        assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
-
-        // GIVEN
-        IntermittentSale matcher1 = IntermittentSale.withIdentity(new Long(123)); // for sale 1
-        matcher1.setIdentity(null);
-        matcher1.setThursday(true);
-        IntermittentSale matcher2 = IntermittentSale.withIdentity(new Long(123)); // for sale 2
-        matcher2.setIdentity(null);
-        matcher2.setThursday(false);
-
-        // WHEN
-        List<IntermittentSale> result1 = intermittentSaleDAO.find(matcher1);
-        List<IntermittentSale> result2 = intermittentSaleDAO.find(matcher2);
-
-        // THEN
-        assertEquals(1, result1.size());
-        assertTrue(result1.contains(intermittentSale1));
-
-        assertEquals(1, result2.size());
-        assertTrue(result2.contains(intermittentSale2));
-    }
-
-    @Test
-    public void testFind_byFridayShouldReturnObjects() throws DAOException, ValidationException {
-        // Prepare
-
-        // intermittent sale 1
-        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
-        intermittentSale1.setFriday(true);
-
-        intermittentSaleDAO.create(intermittentSale1);
-        assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
-
-        // intermittent sale 2
-        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
-        intermittentSale2.setFriday(false);
-
-        intermittentSaleDAO.create(intermittentSale2);
-        assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
-
-        // GIVEN
-        IntermittentSale matcher1 = IntermittentSale.withIdentity(new Long(123)); // for sale 1
-        matcher1.setIdentity(null);
-        matcher1.setFriday(true);
-        IntermittentSale matcher2 = IntermittentSale.withIdentity(new Long(123)); // for sale 2
-        matcher2.setIdentity(null);
-        matcher2.setFriday(false);
-
-        // WHEN
-        List<IntermittentSale> result1 = intermittentSaleDAO.find(matcher1);
-        List<IntermittentSale> result2 = intermittentSaleDAO.find(matcher2);
-
-        // THEN
-        assertEquals(1, result1.size());
-        assertTrue(result1.contains(intermittentSale1));
-
-        assertEquals(1, result2.size());
-        assertTrue(result2.contains(intermittentSale2));
-    }
-
-    @Test
-    public void testFind_bySaturdayShouldReturnObjects() throws DAOException, ValidationException {
-        // Prepare
-
-        // intermittent sale 1
-        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
-        intermittentSale1.setSaturday(true);
-
-        intermittentSaleDAO.create(intermittentSale1);
-        assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
-
-        // intermittent sale 2
-        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
-        intermittentSale2.setSaturday(false);
-
-        intermittentSaleDAO.create(intermittentSale2);
-        assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
-
-        // GIVEN
-        IntermittentSale matcher1 = IntermittentSale.withIdentity(new Long(123)); // for sale 1
-        matcher1.setIdentity(null);
-        matcher1.setSaturday(true);
-        IntermittentSale matcher2 = IntermittentSale.withIdentity(new Long(123)); // for sale 2
-        matcher2.setIdentity(null);
-        matcher2.setSaturday(false);
-
-        // WHEN
-        List<IntermittentSale> result1 = intermittentSaleDAO.find(matcher1);
-        List<IntermittentSale> result2 = intermittentSaleDAO.find(matcher2);
-
-        // THEN
-        assertEquals(1, result1.size());
-        assertTrue(result1.contains(intermittentSale1));
-
-        assertEquals(1, result2.size());
-        assertTrue(result2.contains(intermittentSale2));
-    }
-
-    @Test
-    public void testFind_bySundayShouldReturnObjects() throws DAOException, ValidationException {
-        // Prepare
-
-        // intermittent sale 1
-        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
-        intermittentSale1.setSunday(true);
-
-        intermittentSaleDAO.create(intermittentSale1);
-        assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
-
-        // intermittent sale 2
-        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
-        intermittentSale2.setSunday(false);
-
-        intermittentSaleDAO.create(intermittentSale2);
-        assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
-
-        // GIVEN
-        IntermittentSale matcher1 = IntermittentSale.withIdentity(new Long(123)); // for sale 1
-        matcher1.setIdentity(null);
-        matcher1.setSunday(true);
-        IntermittentSale matcher2 = IntermittentSale.withIdentity(new Long(123)); // for sale 2
-        matcher2.setIdentity(null);
-        matcher2.setSunday(false);
+        matcher2.setDaysOfSale(new HashSet<>());
+        matcher2.getDaysOfSale().add(DayOfWeek.FRIDAY);
+        matcher2.getDaysOfSale().add(DayOfWeek.SUNDAY);
 
         // WHEN
         List<IntermittentSale> result1 = intermittentSaleDAO.find(matcher1);
@@ -657,7 +441,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // Prepare
 
         // intermittent sale 1
-        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
+        IntermittentSale intermittentSale1 = createIntermittentSale(123L);
 
         intermittentSaleDAO.create(intermittentSale1);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
@@ -689,19 +473,19 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // Prepare
 
         // intermittent sale 1
-        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
+        IntermittentSale intermittentSale1 = createIntermittentSale(123L);
 
         intermittentSaleDAO.create(intermittentSale1);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
 
         // intermittent sale 2
-        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
+        IntermittentSale intermittentSale2 = createIntermittentSale(124L);
 
         intermittentSaleDAO.create(intermittentSale2);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
 
         // intermittent sale 3
-        IntermittentSale intermittentSale3 = createIntermittentSale(new Long(125));
+        IntermittentSale intermittentSale3 = createIntermittentSale(125L);
 
         intermittentSaleDAO.create(intermittentSale3);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale3).size());
@@ -748,7 +532,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
 
     @Test
     public void testCreate_shouldAddRemoveAndReaddObject() throws DAOException, ValidationException {
-        IntermittentSale intermittentSale = createIntermittentSale(new Long(123));
+        IntermittentSale intermittentSale = createIntermittentSale(123L);
 
         intermittentSaleDAO.create(intermittentSale);
         intermittentSaleDAO.create(intermittentSale);
@@ -774,19 +558,19 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // Prepare
 
         // intermittent sale 1
-        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
+        IntermittentSale intermittentSale1 = createIntermittentSale(123L);
 
         intermittentSaleDAO.create(intermittentSale1);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
 
         // intermittent sale 2
-        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
+        IntermittentSale intermittentSale2 = createIntermittentSale(124L);
 
         intermittentSaleDAO.create(intermittentSale2);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
 
         // intermittent sale 3
-        IntermittentSale intermittentSale3 = createIntermittentSale(new Long(125));
+        IntermittentSale intermittentSale3 = createIntermittentSale(125L);
 
         intermittentSaleDAO.create(intermittentSale3);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale3).size());
@@ -807,7 +591,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         // Prepare
 
         // intermittent sale 1
-        IntermittentSale intermittentSale1 = createIntermittentSale(new Long(123));
+        IntermittentSale intermittentSale1 = createIntermittentSale(123L);
 
         intermittentSaleDAO.create(intermittentSale1);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale1).size());
@@ -815,7 +599,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         assertEquals(0, intermittentSaleDAO.find(intermittentSale1).size());
 
         // intermittent sale 2
-        IntermittentSale intermittentSale2 = createIntermittentSale(new Long(124));
+        IntermittentSale intermittentSale2 = createIntermittentSale(124L);
 
         intermittentSaleDAO.create(intermittentSale2);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale2).size());
@@ -823,7 +607,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         assertEquals(0, intermittentSaleDAO.find(intermittentSale2).size());
 
         // intermittent sale 3
-        IntermittentSale intermittentSale3 = createIntermittentSale(new Long(125));
+        IntermittentSale intermittentSale3 = createIntermittentSale(125L);
 
         intermittentSaleDAO.create(intermittentSale3);
         assertEquals(1, intermittentSaleDAO.find(intermittentSale3).size());
@@ -856,7 +640,7 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
     @Test
     public void testPopulate_emptyListShouldReturnEmptyObjects() throws DAOException, ValidationException {
         // GIVEN
-        List<IntermittentSale> invalidSales = Arrays.asList();
+        List<IntermittentSale> invalidSales = new ArrayList<>();
 
         // WHEN
         List<IntermittentSale> result = intermittentSaleDAO.populate(invalidSales);
@@ -884,8 +668,6 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         List<IntermittentSale> result = intermittentSaleDAO.populate(invalidSales);
     }
 
-    /*
-    Leave history out for now
     @Test
     public void testGetHistory_shouldReturnObjects() throws DAOException, ValidationException {
         // PREPARE
@@ -894,17 +676,19 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
 
         // GIVEN
         // create data
-        IntermittentSale intermittentSale = createIntermittentSale(new Long(123));
-        LocalDateTime createTime = LocalTime.now();
+        IntermittentSale intermittentSale = createIntermittentSale(123L);
+        LocalDateTime createTime = LocalDateTime.now();
         intermittentSaleDAO.create(intermittentSale);
 
         // update data
-        IntermittentSale intermittentSale2 = createIntermittentSale(intermittentSale.getIdentity(), "Sale2", intermittentSale.getEntries(), intermittentSale.getDuration(), intermittentSale.getEnabled(), intermittentSale.getFromDayTime(), intermittentSale.getMonday(), intermittentSale.getTuesday(), intermittentSale.getWednesday(), intermittentSale.getThursday(), intermittentSale.getFriday(), intermittentSale.getSaturday(), intermittentSale.getSunday());
-        LocalDateTime updateTime = LocalTime.now();
+        IntermittentSale intermittentSale2 = createIntermittentSale(intermittentSale.getIdentity());
+        intermittentSale2.setName("updated name");
+
+        LocalDateTime updateTime = LocalDateTime.now();
         intermittentSaleDAO.update(intermittentSale2);
 
         // delete data
-        LocalDateTime deleteTime = LocalTime.now();
+        LocalDateTime deleteTime = LocalDateTime.now();
         intermittentSaleDAO.delete(intermittentSale2);
 
         // WHEN
@@ -936,5 +720,5 @@ public class TestIntermittentSaleDAO extends AbstractDAOTest {
         assertEquals(user, entry.getUser());
         assertTrue(Duration.between(deleteTime, entry.getTimeOfChange()).getSeconds() < 1);
         assertTrue(entry.isDeleted());
-    }*/
+    }
 }
