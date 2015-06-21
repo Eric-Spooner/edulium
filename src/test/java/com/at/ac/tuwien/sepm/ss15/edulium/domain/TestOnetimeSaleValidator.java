@@ -28,9 +28,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.now());
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         onetimeSale.setEntries(entries);
 
@@ -47,9 +47,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.now());
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         onetimeSale.setEntries(entries);
 
@@ -66,9 +66,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.now());
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         onetimeSale.setEntries(entries);
 
@@ -86,9 +86,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.now());
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         onetimeSale.setEntries(entries);
 
@@ -115,9 +115,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:14:00"));
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         onetimeSale.setEntries(entries);
 
@@ -135,9 +135,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         onetimeSale.setEntries(entries);
 
@@ -154,9 +154,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         onetimeSale.setEntries(entries);
 
@@ -173,9 +173,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         onetimeSale.setEntries(entries);
 
@@ -193,9 +193,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         onetimeSale.setEntries(entries);
 
@@ -222,9 +222,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:14:00"));
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         onetimeSale.setEntries(entries);
 
@@ -242,9 +242,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         onetimeSale.setEntries(entries);
 
@@ -261,9 +261,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         onetimeSale.setEntries(entries);
 
@@ -290,9 +290,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         onetimeSale.setEntries(entries);
 
@@ -309,9 +309,9 @@ public class TestOnetimeSaleValidator extends AbstractDomainTest {
         onetimeSale.setToTime(LocalDateTime.parse("2007-12-03T10:16:00"));
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         onetimeSale.setEntries(entries);
 

@@ -93,7 +93,7 @@ public class IntermittentSale extends Sale {
                 ", fromDayTime=" + fromDayTime +
                 ", duration=" + duration +
                 ", enabled=" + enabled +
-                '}' + super.toString();
+                '}';
     }
 
     @Override

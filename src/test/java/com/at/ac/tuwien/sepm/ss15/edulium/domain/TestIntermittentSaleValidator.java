@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -31,15 +32,19 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -55,15 +60,18 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -79,15 +87,18 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -104,15 +115,18 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -130,15 +144,17 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setDuration(Duration.ofMinutes(-120));
         intermittentSale.setFromDayTime(LocalTime.now());
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -156,10 +172,12 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         intermittentSale.setEntries(null);
 
@@ -177,14 +195,40 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
 
         intermittentSale.setEntries(entries);
+
+        // WHEN
+        intermittentSaleValidator.validateForCreate(intermittentSale);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_intermittentSaleWithInvalidEntriesShouldThrow() throws ValidationException {
+        // GIVEN
+        IntermittentSale intermittentSale = new IntermittentSale();
+        intermittentSale.setIdentity(123L);
+        intermittentSale.setName("Sale");
+        intermittentSale.setEnabled(true);
+        intermittentSale.setDuration(Duration.ofMinutes(120));
+        intermittentSale.setFromDayTime(LocalTime.now());
+
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
+
+        List<MenuEntry> entries = new ArrayList<>();
+        entries.add(new MenuEntry());
 
         // WHEN
         intermittentSaleValidator.validateForCreate(intermittentSale);
@@ -199,15 +243,17 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setEnabled(true);
         intermittentSale.setDuration(Duration.ofMinutes(120));
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);;
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -224,15 +270,17 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -259,15 +307,17 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -284,15 +334,17 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -309,15 +361,17 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -335,15 +389,17 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -361,15 +417,17 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setDuration(Duration.ofMinutes(-120));
         intermittentSale.setFromDayTime(LocalTime.now());
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -396,15 +454,17 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -421,15 +481,17 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -457,15 +519,17 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
@@ -482,15 +546,17 @@ public class TestIntermittentSaleValidator extends AbstractDomainTest {
         intermittentSale.setDuration(Duration.ofMinutes(120));
         intermittentSale.setFromDayTime(LocalTime.now());
 
-        intermittentSale.getDaysOfSale().add(DayOfWeek.MONDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.TUESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.WEDNESDAY);
-        intermittentSale.getDaysOfSale().add(DayOfWeek.THURSDAY);
+        HashSet<DayOfWeek> days = new HashSet<>();
+        days.add(DayOfWeek.MONDAY);
+        days.add(DayOfWeek.TUESDAY);
+        days.add(DayOfWeek.WEDNESDAY);
+        days.add(DayOfWeek.THURSDAY);
+        intermittentSale.setDaysOfSale(days);
 
         List<MenuEntry> entries = new ArrayList<>();
-        MenuEntry entry = new MenuEntry();
+        MenuEntry entry = MenuEntry.withIdentity(1L);
         entry.setPrice(BigDecimal.valueOf(10));
-        entries.add(new MenuEntry());
+        entries.add(entry);
 
         intermittentSale.setEntries(entries);
 
