@@ -1,13 +1,14 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceManager;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.*;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -16,12 +17,21 @@ import org.apache.pdfbox.pdmodel.PDPageable;
 import java.awt.*;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PrinterInvoiceManager implements InvoiceManager {
     private static final Logger LOGGER = LogManager.getLogger(PrinterInvoiceManager.class);
+
+    private static final String templatePath = "invoice_pdf_template/template.pdf";
+    private static final String outputFilePath = "target/last_invoice.pdf";
 
     /**
      * Generates a PDF document from the given invoice and sends it to
@@ -29,62 +39,118 @@ public class PrinterInvoiceManager implements InvoiceManager {
      */
     @Override
     public void manageInvoice(Invoice invoice) throws ServiceException {
-        final String templatePath = "";
-        final String outputFilePaht = "target/last_invoice.pdf";
-
-        // delete the last generated PDF
-        deletePDF(outputFilePaht);
-        // generate new PDF and place it in the provided directory
-        generatePDF(invoice, templatePath, outputFilePaht);
-        // temporary opening of the PDF
-        viewPDF(outputFilePaht);
-        // send PDF to printer and print it out
-        // printPDF(filePath);
+        deletePDF();
+        generatePDF(invoice);
+        viewPDF();
+//        printPDF();
     }
 
-    private void generatePDF(Invoice invoice, String templatePath, String outputFilePath) throws ServiceException {
+    private void generatePDF(Invoice invoice) throws ServiceException {
         PdfReader reader = null;
-        OutputStream outputFile = null;
-        Document document = new Document();
+        PdfStamper stamper = null;
         try {
             reader = new PdfReader(templatePath);
-            outputFile = new FileOutputStream(outputFilePath);
-            PdfWriter.getInstance(document, outputFile);
-            document.open();
-            // TODO: Generate the actual content of the pdf
-            document.add(new Paragraph("Hello World!"));
-            document.close();
+            stamper = new PdfStamper(reader, new FileOutputStream(outputFilePath));
+            PdfContentByte canvas = stamper.getOverContent(1);
+
+            // fixed table width
+            int tableWidth = 3 * 170;
+
+            Rectangle pageSize = reader.getPageSize(1);
+            float xPos = (pageSize.getWidth() - tableWidth) / 2;
+            float yPos = pageSize.getHeight() - 200;
+            final float cHeight = 20f;
+
+            ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+                    new Phrase("Invoice ID: " + invoice.getIdentity()), xPos, yPos, 0);
+            LocalDateTime invoiceTime = invoice.getTime();
+            ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+                    new Phrase("Date: " + invoiceTime.getDayOfMonth() +
+                            "." + invoiceTime.getMonth().getValue() +
+                            "." + invoiceTime.getYear()), xPos, yPos -= 15f, 0);
+            ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+                    new Phrase("Time: " + invoiceTime.getHour() +
+                            ":" + invoiceTime.getMinute() +
+                            ":" + invoiceTime.getSecond()), xPos, yPos -= 15f, 0);
+            ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+                    new Phrase("Waiter: " + invoice.getCreator().getName()), xPos, yPos -= 15f, 0);
+
+            PdfPTable ordersTable = new PdfPTable(3);
+            ordersTable.setTotalWidth(tableWidth);
+
+            PdfPCell infoCell = new PdfPCell();
+            infoCell.setFixedHeight(cHeight);
+            infoCell.setPhrase(new Phrase("Item"));
+            ordersTable.addCell(infoCell);
+            infoCell.setPhrase(new Phrase("Quantity x Price"));
+            ordersTable.addCell(infoCell);
+            infoCell.setPhrase(new Phrase("Total"));
+            ordersTable.addCell(infoCell);
+
+            int index = 1;
+            MenuEntry entry;
+            TaxRate taxRate;
+            List<TaxRate> rates = new ArrayList<>();
+            for (Order order : invoice.getOrders()) {
+
+                entry = order.getMenuEntry();
+                taxRate = entry.getTaxRate();
+                if (!rates.contains(taxRate)) {
+                    rates.add(taxRate);
+                }
+
+                PdfPCell cell = new PdfPCell();
+                cell.setFixedHeight(cHeight);
+                if (index++ % 2 == 0) {
+                    cell.setBackgroundColor(BaseColor.WHITE);
+                } else {
+                    cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                }
+                cell.setPhrase(new Phrase(entry.getName()));
+                ordersTable.addCell(cell);
+                cell.setPhrase(new Phrase("1 * " + order.getBrutto() + " EUR")); // TODO: Set real amount
+                cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                ordersTable.addCell(cell);
+                cell.setPhrase(new Phrase(order.getBrutto() + " EUR [" + taxRate.getIdentity() + "]"));
+                ordersTable.addCell(cell);
+            }
+
+            // write table to page
+            ordersTable.writeSelectedRows(0, -1, xPos, yPos -= 15f, canvas);
+
+            yPos -= cHeight * ordersTable.size() + cHeight;
+            for (TaxRate tr : rates) {
+                ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, new Phrase("[" +tr.getIdentity() +
+                "] incl. " + tr.getValue().floatValue() * 100f + "% Tax"), xPos, yPos, 0);
+                yPos -= 15f;
+            }
         } catch (DocumentException e) {
-            LOGGER.error("An error occurred while generating the PDF", e);
-            throw new ServiceException("An error occurred while generating the PDF", e);
+            LOGGER.error("An error occurred while creating the PDF stamper", e);
+            throw new ServiceException("An error occurred while creating the PDF stamper", e);
         } catch (FileNotFoundException e) {
             LOGGER.error("An error occurred while opening the output stream", e);
             throw new ServiceException("An error occurred while opening the output stream", e);
         } catch (IOException e) {
             // TODO: Handle reader initialization error
         } finally {
-            if (document.isOpen()) {
-                document.close();
+            if (stamper != null) {
+                try {
+                    stamper.close();
+                } catch (DocumentException | IOException e) {
+                    // TODO: Handle exception
+                }
             }
 
             if (reader != null) {
                 reader.close();
             }
-
-            try {
-                if (outputFile != null) {
-                    outputFile.close();
-                }
-            } catch (IOException e) {
-                LOGGER.error("An error occurred while trying to close the output stream", e);
-            }
         }
     }
 
-    // Temporary method for viewing the pdf
-    private void viewPDF(String filePath) throws ServiceException {
+    // temporary method for viewing the pdf
+    private void viewPDF() throws ServiceException {
         if (Desktop.isDesktopSupported()) {
-            File file = new File(filePath);
+            File file = new File(outputFilePath);
             try {
                 Desktop.getDesktop().open(file);
             } catch (IOException e) {
@@ -93,9 +159,9 @@ public class PrinterInvoiceManager implements InvoiceManager {
         }
     }
 
-    private void printPDF(String filePath) throws ServiceException {
+    private void printPDF() throws ServiceException {
         try {
-            PDDocument document = PDDocument.load(filePath);
+            PDDocument document = PDDocument.load(outputFilePath);
             PrinterJob job = PrinterJob.getPrinterJob();
             if (job == null) {
                 LOGGER.error("Default printer not configured");
@@ -113,9 +179,9 @@ public class PrinterInvoiceManager implements InvoiceManager {
         }
     }
 
-    private void deletePDF(String filePath) throws ServiceException {
+    private void deletePDF() throws ServiceException {
         try {
-            Files.deleteIfExists(Paths.get(filePath));
+            Files.deleteIfExists(Paths.get(outputFilePath));
         } catch (IOException e) {
             LOGGER.error("An I/O error occurred while trying to delete the PDF", e);
             throw new ServiceException("An I/O error occurred while trying to delete the PDF", e);
