@@ -51,3 +51,7 @@ MERGE INTO Menu(ID,name) KEY(ID) VALUES (4, 'Bananen Menu');
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (4,3,3);
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (4,4,0.5);
 
+MERGE INTO Invoice(ID, invoiceTime, brutto, user_ID) KEY(ID) VALUES(1, TIME.NOW, )
+
+MERGE INTO RestaurantOrder(ID, invoice_ID,  table_section, table_number BIGINT, menuEntry_ID, orderTime, brutto
+    tax, info TEXT, state) KEY(table_section, table_number) VLAUES(1, )
