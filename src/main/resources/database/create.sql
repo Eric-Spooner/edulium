@@ -227,23 +227,21 @@ CREATE TABLE IF NOT EXISTS SaleAssocHistory (
 );
 
 CREATE TABLE IF NOT EXISTS OnetimeSale (
-    sale_ID BIGINT PRIMARY KEY REFERENCES Sale(ID),
+    ID BIGINT PRIMARY KEY REFERENCES Sale(ID),
     fromTime TIMESTAMP,
     toTime TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS OnetimeSaleHistory (
-    sale_ID BIGINT REFERENCES Sale(ID),
+    ID BIGINT REFERENCES Sale(ID),
     fromTime TIMESTAMP,
     toTime TIMESTAMP,
-    changeTime TIMESTAMP,
-    changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(sale_ID, changeNr)
+    PRIMARY KEY(ID, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS IntermittentSale (
-    sale_ID BIGINT PRIMARY KEY REFERENCES Sale(ID),
+    ID BIGINT PRIMARY KEY REFERENCES Sale(ID),
     monday BOOLEAN,
     tuesday BOOLEAN,
     wednesday BOOLEAN,
@@ -252,12 +250,12 @@ CREATE TABLE IF NOT EXISTS IntermittentSale (
     saturday BOOLEAN,
     sunday BOOLEAN,
     fromDayTime TIME,
-    duration INT,
+    duration BIGINT,
     enabled BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE IF NOT EXISTS IntermittentSaleHistory (
-    sale_ID BIGINT REFERENCES Sale(ID),
+    ID BIGINT REFERENCES Sale(ID),
     monday BOOLEAN,
     tuesday BOOLEAN,
     wednesday BOOLEAN,
@@ -266,12 +264,10 @@ CREATE TABLE IF NOT EXISTS IntermittentSaleHistory (
     saturday BOOLEAN,
     sunday BOOLEAN,
     fromDayTime TIME,
-    duration INT,
+    duration BIGINT,
     enabled BOOLEAN,
-    changeTime TIMESTAMP,
-    changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
-    PRIMARY KEY(sale_ID, changeNr)
+    PRIMARY KEY(ID, changeNr)
 );
 
 CREATE TABLE IF NOT EXISTS Menu (
