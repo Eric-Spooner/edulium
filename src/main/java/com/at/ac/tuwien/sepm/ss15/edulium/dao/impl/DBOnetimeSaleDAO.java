@@ -28,8 +28,6 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
     @Autowired
     private DataSource dataSource;
     @Autowired
-    private DAO<User> userDAO;
-    @Autowired
     private DAO<MenuEntry> menuEntryDAO;
     @Autowired
     private Validator<OnetimeSale> validator;
@@ -216,7 +214,10 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
 
         validator.validateIdentity(onetimeSale);
 
-        final String query = "SELECT * FROM OnetimeSaleHistory WHERE ID = ? ORDER BY changeNr";
+        final String query = "SELECT * FROM OnetimeSaleHistory JOIN SaleHistory" +
+                " ON OnetimeSaleHistory.ID = SaleHistory.ID AND" +
+                " OnetimeSaleHistory.changeNr = SaleHistory.changeNr" +
+                " WHERE SaleHistory.ID = ? ORDER BY changeNr";
 
         List<History<OnetimeSale>> history = new ArrayList<>();
 
@@ -289,14 +290,13 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
         LOGGER.debug("Entering generateHistory with parameters: " + onetimeSale);
 
         final String query = "INSERT INTO OnetimeSaleHistory " +
-                "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
+                "(SELECT *, " +
                 "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM OnetimeSaleHistory WHERE ID = ?) " +
                 "FROM OnetimeSale WHERE ID = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+            stmt.setLong(1, onetimeSale.getIdentity());          // dataset id
             stmt.setLong(2, onetimeSale.getIdentity());          // dataset id
-            stmt.setLong(3, onetimeSale.getIdentity());          // dataset id
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -326,22 +326,12 @@ class DBOnetimeSaleDAO extends DBAbstractSaleDAO<OnetimeSale> {
      * @throws SQLException if an error accessing the database occurred
      * @throws DAOException if an error retrieving the sale ocurred
      */
-    private History<OnetimeSale> historyFromResultSet(ResultSet result) throws DAOException, SQLException {
-        // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
-        if (storedUsers.size() != 1) {
-            LOGGER.error("user not found");
-            throw new DAOException("user not found");
-        }
-
+    private History<OnetimeSale> historyFromResultSet(ResultSet result) throws DAOException, SQLException, ValidationException {
         // create history entry
         History<OnetimeSale> historyEntry = new History<>();
-        historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
-        historyEntry.setChangeNumber(result.getLong("changeNr"));
-        historyEntry.setUser(storedUsers.get(0));
         historyEntry.setData(onetimeSaleFromResultSet(result));
 
-        setSaleHistoryParameters(historyEntry);
+        saleHistoryFromResultSet(historyEntry, result);
 
         return historyEntry;
     }

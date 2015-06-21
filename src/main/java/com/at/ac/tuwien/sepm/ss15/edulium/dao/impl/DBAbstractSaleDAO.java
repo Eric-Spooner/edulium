@@ -5,6 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -31,6 +33,8 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
 
     @Autowired
     private DataSource dataSource;
+    @Autowired
+    private DAO<User> userDAO;
     @Autowired
     private DAO<MenuEntry> menuEntryDAO;
 
@@ -221,10 +225,11 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
     private List<MenuEntry> getEntriesForSale(T sale) throws DAOException, ValidationException {
         LOGGER.debug("Entering getEntriesForSale with parameters: " + sale);
 
-        final String query = "SELECT menuEntry_ID FROM SaleAssoc WHERE sale_ID = ? " +
+        final String query = "SELECT menuEntry_ID, salePrice FROM SaleAssoc WHERE sale_ID = ? " +
                 "AND disabled = false";
 
-        final List<MenuEntry> entries = new ArrayList<>();
+        List<MenuEntry> entries = new ArrayList<>();
+        HashMap<Long, BigDecimal> salePrices = new HashMap<>();
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setLong(1, sale.getIdentity());
@@ -233,15 +238,60 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
             while (result.next()) {
                 final Long menuEntryId = result.getLong("menuEntry_ID");
 
-                // we populate the list of entries before we return it - so the identity of a entry is enough for now
+                salePrices.put(menuEntryId, result.getBigDecimal("salePrice"));
                 entries.add(MenuEntry.withIdentity(menuEntryId));
             }
+
         } catch (SQLException e) {
             LOGGER.error("Searching for reservation-tables failed", e);
             throw new DAOException("Searching for reservation-tables failed", e);
         }
 
-        return menuEntryDAO.populate(entries);
+        // populate list with data
+        entries = menuEntryDAO.populate(entries);
+        // set sale prices
+        entries.stream().forEach(entry -> entry.setPrice(salePrices.get(entry.getIdentity())));
+
+        return entries;
+    }
+
+    /**
+     * searches all entries from the sale-menuEntry associations history for the history
+     * @param history history object with sale_id and changeNr set
+     * @throws DAOException if an error accessing the database occurred
+     */
+    private List<MenuEntry> getEntriesForSaleHistory(History<T> history) throws DAOException, ValidationException {
+        LOGGER.debug("Entering getEntriesForSaleHistory with parameters: " + history);
+
+        final String query = "SELECT menuEntry_ID, salePrice FROM SaleAssocHistory " +
+                "WHERE sale_ID = ? AND changeNr = ? AND disabled = false";
+
+        List<MenuEntry> entries = new ArrayList<>();
+        HashMap<Long, BigDecimal> salePrices = new HashMap<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, history.getData().getIdentity());
+            stmt.setLong(2, history.getChangeNumber());
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                final Long menuEntryId = result.getLong("menuEntry_ID");
+
+                salePrices.put(menuEntryId, result.getBigDecimal("salePrice"));
+                entries.add(MenuEntry.withIdentity(menuEntryId));
+            }
+
+        } catch (SQLException e) {
+            LOGGER.error("Searching for reservation-tables failed", e);
+            throw new DAOException("Searching for reservation-tables failed", e);
+        }
+
+        // populate list with data
+        entries = menuEntryDAO.populate(entries);
+        // set sale prices
+        entries.stream().forEach(entry -> entry.setPrice(salePrices.get(entry.getIdentity())));
+
+        return entries;
     }
 
     /**
@@ -256,57 +306,23 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
         sale.setEntries(getEntriesForSale(sale));
     }
 
-    protected void setSaleHistoryParameters(History<T> history) throws DAOException {
-        LOGGER.debug("Entering setSaleParameterFromHistory with parameters: " + history);
+    protected  void saleHistoryFromResultSet(History<T> history, ResultSet result) throws SQLException, DAOException, ValidationException  {
+        LOGGER.debug("Entering saleHistoryFromResultSet " + history);
 
-        // set name
-        final String saleQuery = "SELECT * FROM SaleHistory WHERE ID = ? AND changeNr = ?";
-
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(saleQuery)) {
-            stmt.setLong(1, history.getData().getIdentity());
-            stmt.setLong(2, history.getChangeNumber());
-
-            ResultSet result = stmt.executeQuery();
-            if(!result.next()) {
-                LOGGER.error("sale history dataset not found");
-                throw new DAOException("sale history dataset not found");
-            }
-
-            history.getData().setName(result.getString("name"));
-            history.setDeleted(result.getBoolean("deleted"));
-
-        } catch (SQLException e) {
-            LOGGER.error("reading from SaleHistory table failed", e);
-            throw new DAOException("reading from SaleHistory table failed", e);
+        // get user
+        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
+        if (storedUsers.size() != 1) {
+            LOGGER.error("user not found");
+            throw new DAOException("user not found");
         }
 
-        // set entries
-        // SaleAssoc (sale_ID, menuEntry_ID, salePrice, disabled)
-        final String entriesQuery = "SELECT * FROM SaleAssocHistory WHERE sale_ID = ? AND changeNr = ? AND disabled = false";
-        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(entriesQuery)) {
-            stmt.setLong(1, history.getData().getIdentity());
-            stmt.setLong(2, history.getChangeNumber());
-            ResultSet result = stmt.executeQuery();
+        history.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
+        history.setChangeNumber(result.getLong("changeNr"));
+        history.setUser(storedUsers.get(0));
+        history.setDeleted(result.getBoolean("deleted"));
 
-            List<MenuEntry> entries = new ArrayList<>();
-
-            while(result.next()) {
-                List<MenuEntry> tmpEntryList = menuEntryDAO.find(MenuEntry.withIdentity(result.getLong("menuEntry_ID")));
-
-                if(tmpEntryList.size() != 1) {
-                    LOGGER.error("Menu Entry not found");
-                    throw new DAOException("Menu Entry not found");
-                }
-
-                MenuEntry entry = tmpEntryList.get(0);
-                entry.setPrice(result.getBigDecimal("salePrice"));
-                entries.add(entry);
-            }
-
-            history.getData().setEntries(entries);
-        } catch (SQLException e) {
-            LOGGER.error("reading from SaleAssocHistory table failed", e);
-            throw new DAOException("reading from SaleAssocHistory table failed", e);
-        }
+        history.getData().setName(result.getString("name"));
+        history.getData().setEntries(getEntriesForSaleHistory(history));
     }
+
 }

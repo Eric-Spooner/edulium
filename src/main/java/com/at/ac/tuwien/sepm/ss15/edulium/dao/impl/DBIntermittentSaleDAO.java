@@ -30,8 +30,6 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
     @Autowired
     private DataSource dataSource;
     @Autowired
-    private DAO<User> userDAO;
-    @Autowired
     private DAO<MenuEntry> menuEntryDAO;
     @Autowired
     private Validator<IntermittentSale> validator;
@@ -261,7 +259,10 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
 
         validator.validateIdentity(intermittentSale);
 
-        final String query = "SELECT * FROM IntermittentSaleHistory WHERE ID = ? ORDER BY changeNr";
+        final String query = "SELECT * FROM IntermittentSaleHistory JOIN SaleHistory" +
+                " ON IntermittentSaleHistory.ID = SaleHistory.ID AND" +
+                " IntermittentSaleHistory.changeNr = SaleHistory.changeNr" +
+                " WHERE SaleHistory.ID = ? ORDER BY changeNr";
 
         List<History<IntermittentSale>> history = new ArrayList<>();
 
@@ -336,14 +337,13 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
         LOGGER.debug("Entering generateHistory with parameters: " + intermittentSale);
 
         final String query = "INSERT INTO IntermittentSaleHistory " +
-                "(SELECT *, CURRENT_TIMESTAMP(), ?, " +
+                "(SELECT *, " +
                 "(SELECT ISNULL(MAX(changeNr) + 1, 1) FROM IntermittentSaleHistory WHERE ID = ?) " +
                 "FROM IntermittentSale WHERE ID = ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
-            stmt.setString(1, SecurityContextHolder.getContext().getAuthentication().getName()); // user
+            stmt.setLong(1, intermittentSale.getIdentity());          // dataset id
             stmt.setLong(2, intermittentSale.getIdentity());          // dataset id
-            stmt.setLong(3, intermittentSale.getIdentity());          // dataset id
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -383,22 +383,12 @@ class DBIntermittentSaleDAO extends DBAbstractSaleDAO<IntermittentSale> {
      * @throws SQLException if an error accessing the database occurred
      * @throws DAOException if an error retrieving the sale ocurred
      */
-    private History<IntermittentSale> historyFromResultSet(ResultSet result) throws DAOException, SQLException {
-        // get user
-        List<User> storedUsers = userDAO.find(User.withIdentity(result.getString("changeUser")));
-        if (storedUsers.size() != 1) {
-            LOGGER.error("user not found");
-            throw new DAOException("user not found");
-        }
-
+    private History<IntermittentSale> historyFromResultSet(ResultSet result) throws DAOException, SQLException, ValidationException {
         // create history entry
         History<IntermittentSale> historyEntry = new History<>();
-        historyEntry.setTimeOfChange(result.getTimestamp("changeTime").toLocalDateTime());
-        historyEntry.setChangeNumber(result.getLong("changeNr"));
-        historyEntry.setUser(storedUsers.get(0));
         historyEntry.setData(intermittentSaleFromResultSet(result));
 
-        setSaleHistoryParameters(historyEntry);
+        saleHistoryFromResultSet(historyEntry, result);
 
         return historyEntry;
     }

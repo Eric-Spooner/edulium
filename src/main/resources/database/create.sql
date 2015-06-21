@@ -234,8 +234,6 @@ CREATE TABLE IF NOT EXISTS OnetimeSaleHistory (
     ID BIGINT REFERENCES Sale(ID),
     fromTime TIMESTAMP,
     toTime TIMESTAMP,
-    changeTime TIMESTAMP,
-    changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
     PRIMARY KEY(ID, changeNr)
 );
@@ -266,8 +264,6 @@ CREATE TABLE IF NOT EXISTS IntermittentSaleHistory (
     fromDayTime TIME,
     duration BIGINT,
     enabled BOOLEAN,
-    changeTime TIMESTAMP,
-    changeUser VARCHAR(25) REFERENCES RestaurantUser(ID),
     changeNr BIGINT AUTO_INCREMENT,
     PRIMARY KEY(ID, changeNr)
 );
