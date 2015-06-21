@@ -102,13 +102,24 @@ class ReservationServiceImpl implements ReservationService {
     public void findTablesForReservation(Reservation reservation) throws ServiceException, ValidationException {
         LOGGER.debug("Entering findTablesForReservation with parameter: " + reservation);
 
-        reservationValidator.validateForCreate(reservation);
+        // validate reservation
+        if (reservation.getTime() == null) {
+            throw new ValidationException("time must not be null");
+        }
+
+        if (reservation.getDuration() == null) {
+            throw new ValidationException("duration must not be null");
+        }
+
+        if (reservation.getQuantity() == null) {
+            throw new ValidationException("quantity must not be null");
+        }
 
         validateReservationTime(reservation);
 
         List<Table> tables = reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables());
 
-        if(tables.isEmpty()) {
+        if (tables.isEmpty()) {
             LOGGER.debug("no free tables found");
             throw new ServiceException("no free tables found");
         }

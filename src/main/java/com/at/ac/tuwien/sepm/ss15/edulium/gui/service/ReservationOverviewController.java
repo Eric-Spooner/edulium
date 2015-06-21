@@ -197,7 +197,7 @@ public class ReservationOverviewController implements Initializable, Controller 
 
     private void initializeCancelPopOver() {
         cancelPopOver = new AlertPopOver();
-        cancelPopOver.getLabel().setText("Do you really want to cancel\nthe current changes?");
+        cancelPopOver.getLabel().setText("Do you really want to cancel\n the selected reservation?");
         cancelPopOver.getOkButton().setText("Yes");
         cancelPopOver.getCancelButton().setText("No");
 
