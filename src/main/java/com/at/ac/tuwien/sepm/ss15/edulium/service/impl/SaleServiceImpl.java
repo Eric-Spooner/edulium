@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,6 +29,14 @@ class SaleServiceImpl implements SaleService {
     private Validator<IntermittentSale> intermittentSaleValidator;
     @Autowired
     private Validator<OnetimeSale> onetimeSaleValidator;
+
+    @Override
+    public List<Sale> getAllSales() throws ServiceException {
+        List<Sale> sales = new ArrayList<>();
+        sales.addAll(getAllOnetimeSales());
+        sales.addAll(getAllIntermittentSales());
+        return sales;
+    }
 
     @Override
     public void addIntermittentSale(IntermittentSale intermittentSale) throws ValidationException, ServiceException {
