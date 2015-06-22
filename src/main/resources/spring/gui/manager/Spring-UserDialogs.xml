@@ -10,8 +10,4 @@
         <constructor-arg name="fxml" value="gui/DialogUser.fxml" />
     </bean>
 
-    <bean id="userInputDialog" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.UserInputDialog" scope="prototype" />
-
-    <bean id="userSearchDialog" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.UserSearchDialog" scope="prototype" />
-
 </beans>

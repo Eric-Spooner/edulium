@@ -13,10 +13,10 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * Controller for the TaxRate Dialog
+ * Controller for the User Dialog
  */
 @Controller
-public class UserDialogController implements Initializable {
+public class UserDialogController implements Initializable, InputDialogController<User> {
 
     @FXML
     private TextField textFieldName;
@@ -38,6 +38,7 @@ public class UserDialogController implements Initializable {
         });
     }
 
+    @Override
     public void prepareForCreate() {
         textFieldName.clear();
         textFieldUsername.clear();
@@ -46,6 +47,7 @@ public class UserDialogController implements Initializable {
         textFieldUsername.setDisable(false);
     }
 
+    @Override
     public void prepareForUpdate(User user) {
         assert user != null;
 
@@ -57,6 +59,7 @@ public class UserDialogController implements Initializable {
         textFieldUsername.setDisable(true);
     }
 
+    @Override
     public void prepareForSearch() {
         textFieldName.clear();
         textFieldUsername.clear();
@@ -66,7 +69,8 @@ public class UserDialogController implements Initializable {
         textFieldUsername.setDisable(false);
     }
 
-    public User toUser() {
+    @Override
+    public User toDomainObject() {
         User user = new User();
         user.setName(textFieldName.getText().isEmpty() ? null : textFieldName.getText());
         user.setIdentity(textFieldUsername.getText().isEmpty() ? null : textFieldUsername.getText());

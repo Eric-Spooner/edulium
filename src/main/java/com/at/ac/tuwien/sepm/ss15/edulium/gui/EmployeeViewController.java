@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,16 +42,19 @@ public class EmployeeViewController implements Initializable {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private Validator<User> userValidator;
 
-    @Autowired
-    private UserInputDialog userInputDialog;
-    @Autowired
-    private UserSearchDialog userSearchDialog;
+    @Resource(name = "userDialogPane")
+    private FXMLPane userDialogPane;
+    private UserDialogController userDialogController;
 
     private ObservableList<User> users = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        userDialogController = userDialogPane.getController(UserDialogController.class);
+
         tableViewEmployee.setItems(users);
 
         employeeId.setCellValueFactory(new PropertyValueFactory<>("identity"));
@@ -69,7 +73,11 @@ public class EmployeeViewController implements Initializable {
 
     @FXML
     public void buttonEmployeesAddClicked(ActionEvent actionEvent) {
-        userInputDialog.showAndWaitForCreate().ifPresent(user -> {
+        InputDialog<User> userInputDialog = new CreateInputDialog<>("employee");
+        userInputDialog.setValidator(userValidator);
+        userInputDialog.setContent(userDialogPane);
+        userInputDialog.setController(userDialogController);
+        userInputDialog.showAndWait().ifPresent(user -> {
             try {
                 userService.addUser(user);
                 users.add(user);
@@ -89,7 +97,11 @@ public class EmployeeViewController implements Initializable {
     public void buttonEmployeesUpdateClicked(ActionEvent actionEvent) {
         User selectedUser = tableViewEmployee.getSelectionModel().getSelectedItem();
         if (selectedUser != null) {
-            userInputDialog.showAndWaitForUpdate(selectedUser).ifPresent(editedUser -> {
+            InputDialog<User> userInputDialog = new UpdateInputDialog<>("employee", selectedUser);
+            userInputDialog.setValidator(userValidator);
+            userInputDialog.setContent(userDialogPane);
+            userInputDialog.setController(userDialogController);
+            userInputDialog.showAndWait().ifPresent(editedUser -> {
                 try {
                     userService.updateUser(editedUser);
                     users.remove(selectedUser);
@@ -109,6 +121,9 @@ public class EmployeeViewController implements Initializable {
 
     @FXML
     public void buttonEmployeesSearchClicked(ActionEvent actionEvent) {
+        InputDialog<User> userSearchDialog = new SearchInputDialog<>("employees");
+        userSearchDialog.setContent(userDialogPane);
+        userSearchDialog.setController(userDialogController);
         userSearchDialog.showAndWait().ifPresent(userMatcher -> {
             try {
                 users.setAll(userService.findUsers(userMatcher));
