@@ -17,6 +17,7 @@ import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.*;
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -29,8 +30,9 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Controller for the TaxRate Dialog
  */
-public class DialogMenuController implements Initializable, Controller{
-    private static final Logger LOGGER = LogManager.getLogger(DialogMenuController.class);
+@Controller
+public class MenuDialogController implements Initializable {
+    private static final Logger LOGGER = LogManager.getLogger(MenuDialogController.class);
 
     @Autowired
     private MenuService menuService;
@@ -236,10 +238,5 @@ public class DialogMenuController implements Initializable, Controller{
         if(menu.getEntries() == null) {
             menu.setEntries(new LinkedList<>());
         }
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-
     }
 }
