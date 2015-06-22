@@ -1,96 +1,55 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * Controller for the TaxRate Dialog
+ * Controller for the Menu Category Dialog
  */
 @Controller
-public class MenuCategoryDialogController implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(MenuCategoryDialogController.class);
-
-    @Autowired
-    private MenuService menuService;
-
-    private static Stage thisStage;
-    private static MenuCategory menuCategory;
-    private static DialogEnumeration dialogEnumeration;
-
-    public static void setThisStage(Stage thisStage) {
-        MenuCategoryDialogController.thisStage = thisStage;
-    }
-    public static MenuCategory getMenuCategory() {
-        return menuCategory;
-    }
-    public static void setMenuCategory(MenuCategory menuCategory) {
-        MenuCategoryDialogController.menuCategory = menuCategory;
-    }
-    public static void setDialogEnumeration(DialogEnumeration dialogEnumeration) {
-        MenuCategoryDialogController.dialogEnumeration = dialogEnumeration;
-    }
-
+public class MenuCategoryDialogController implements Initializable, InputDialogController<MenuCategory> {
 
     @FXML
     private TextField textFieldName;
 
-
+    private Long identity = null;
 
     @Override
-    public void initialize(URL location, ResourceBundle resources){
-        LOGGER.info("Initialize Dialog MenuCategory");
-        if (menuCategory == null){
-            menuCategory = new MenuCategory();
-        }
+    public void initialize(URL location, ResourceBundle resources) {
+
+    }
+
+    @Override
+    public void prepareForCreate() {
+        textFieldName.clear();
+        identity = null;
+    }
+
+    @Override
+    public void prepareForUpdate(MenuCategory menuCategory) {
+        assert menuCategory != null;
+
         textFieldName.setText(menuCategory.getName());
+        identity = menuCategory.getIdentity();
     }
 
-    public void buttonOKClick(ActionEvent actionEvent) {
-        LOGGER.info("Dialog MenuCategory OK Button clicked");
-        switch (MenuCategoryDialogController.dialogEnumeration){
-            case ADD:
-            case UPDATE:
-                if(textFieldName.getText() == null || textFieldName.getText().equals("")){
-                    ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
-                    return;
-                }
-        }
-        try {
-            menuCategory.setName(textFieldName.getText());
-            switch (MenuCategoryDialogController.dialogEnumeration) {
-                case ADD:
-                    menuService.addMenuCategory(menuCategory);
-                    break;
-                case UPDATE:
-                    menuService.updateMenuCategory(menuCategory);
-                    break;
-            }
-            thisStage.close();
-        }catch (Exception e) {
-            LOGGER.error("Was not able to create Menu Category " + e);
-        }
-
+    @Override
+    public void prepareForSearch() {
+        textFieldName.clear();
+        identity = null;
     }
 
-    public void buttonCancelClick(ActionEvent actionEvent) {
-        LOGGER.info("Dialog MenuCategory Cancel Button clicked");
-        resetDialog();
-        thisStage.close();
-    }
-
-    public static void resetDialog(){
-        menuCategory = null;
+    @Override
+    public MenuCategory toDomainObject() {
+        MenuCategory menuCategory = new MenuCategory();
+        menuCategory.setIdentity(identity);
+        menuCategory.setName(textFieldName.getText().isEmpty() ? null : textFieldName.getText());
+        return menuCategory;
     }
 }
