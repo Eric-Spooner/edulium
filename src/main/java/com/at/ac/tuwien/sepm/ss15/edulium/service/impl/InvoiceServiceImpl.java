@@ -5,6 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.ImmutableDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Instalment;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ImmutableValidator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
@@ -15,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 
 class InvoiceServiceImpl implements InvoiceService {
@@ -36,6 +38,7 @@ class InvoiceServiceImpl implements InvoiceService {
     public void addInvoice(Invoice invoice) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addInvoice with parameters: " + invoice);
         invoiceValidator.validateForCreate(invoice);
+        updateGross(invoice);
 
         try {
             invoiceDAO.create(invoice);
@@ -48,11 +51,22 @@ class InvoiceServiceImpl implements InvoiceService {
     public void updateInvoice(Invoice invoice) throws ServiceException, ValidationException {
         LOGGER.debug("Entering updateInvoice with parameters: " + invoice);
         invoiceValidator.validateForUpdate(invoice);
+        updateGross(invoice);
 
         try {
             invoiceDAO.update(invoice);
         } catch (DAOException e) {
             throw new ServiceException("Could not update invoice", e);
+        }
+    }
+
+    private void updateGross(Invoice invoice) {
+        if (invoice.getOrders() != null) {
+            BigDecimal sum = BigDecimal.ZERO;
+            for (Order order : invoice.getOrders()) {
+                sum = sum.add(order.getBrutto());
+            }
+            invoice.setGross(sum);
         }
     }
 
