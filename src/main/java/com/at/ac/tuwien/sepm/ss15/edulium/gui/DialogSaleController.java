@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.*;
+import java.time.temporal.TemporalUnit;
 import java.util.*;
 
 import static javafx.collections.FXCollections.observableArrayList;
@@ -47,6 +48,31 @@ public class DialogSaleController implements Initializable{
     public void showSale(){
         inMenuMenuEntries.setAll(sale.getEntries());
         textFieldName.setText(sale.getName());
+        if (sale instanceof OnetimeSale) {
+            radioButtonOnetimeSale.setSelected(true);
+            selectOnetimeSaleRadioButton(true);
+            datePickerFromTime.setValue(((OnetimeSale) sale).getFromTime().toLocalDate());
+            datePickerToTime.setValue(((OnetimeSale) sale).getToTime().toLocalDate());
+            textFieldFromTimeHr.setText(((OnetimeSale) sale).getFromTime().toLocalTime().getHour()+"");
+            textFieldFromTimeMin.setText(((OnetimeSale) sale).getFromTime().toLocalTime().getMinute()+"");
+            textFieldToTimeHr.setText(((OnetimeSale) sale).getToTime().toLocalTime().getHour()+"");
+            textFieldToTimeMin.setText(((OnetimeSale) sale).getToTime().toLocalTime().getMinute()+"");
+        } else if (sale instanceof IntermittentSale) {
+            radioButtonIntermittentSale.setSelected(true);
+            selectOnetimeSaleRadioButton(false);
+            checkBoxEnabled.setSelected(((IntermittentSale) sale).getEnabled());
+            checkBoxMonday.setSelected(((IntermittentSale) sale).getDaysOfSale().contains(DayOfWeek.MONDAY));
+            checkBoxTuesday.setSelected(((IntermittentSale) sale).getDaysOfSale().contains(DayOfWeek.TUESDAY));
+            checkBoxWednesday.setSelected(((IntermittentSale) sale).getDaysOfSale().contains(DayOfWeek.WEDNESDAY));
+            checkBoxThursday.setSelected(((IntermittentSale) sale).getDaysOfSale().contains(DayOfWeek.THURSDAY));
+            checkBoxFriday.setSelected(((IntermittentSale) sale).getDaysOfSale().contains(DayOfWeek.FRIDAY));
+            checkBoxSaturday.setSelected(((IntermittentSale) sale).getDaysOfSale().contains(DayOfWeek.SATURDAY));
+            checkBoxSunday.setSelected(((IntermittentSale) sale).getDaysOfSale().contains(DayOfWeek.SUNDAY));
+            textFieldBeginningTimeHr.setText(((IntermittentSale) sale).getFromDayTime().getHour()+"");
+            textFieldBeginningTimeMin.setText(((IntermittentSale) sale).getFromDayTime().getMinute()+"");
+            long minutes = ((IntermittentSale) sale).getDuration().toMinutes();
+            textFieldDuration.setText(minutes+"");
+        }
     }
 
     public static void setThisStage(Stage thisStage) {
@@ -185,22 +211,15 @@ public class DialogSaleController implements Initializable{
 
     public boolean validateData() {
         LOGGER.info("Dialog Sale OK Button clicked");
-        if ((textFieldName.getText() == null || textFieldName.getText().equals("")) &&
-                DialogSaleController.dialogEnumeration != DialogEnumeration.SEARCH) {
+        if ((textFieldName.getText() == null || textFieldName.getText().equals(""))) {
             ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
             return false;
         }
-        if (DialogSaleController.dialogEnumeration == DialogEnumeration.SEARCH) {
-            if(!textFieldName.getText().isEmpty()) sale.setName(textFieldName.getText());
-        } else{
-            sale.setName(textFieldName.getText());
-        }
-        if(DialogSaleController.dialogEnumeration != DialogEnumeration.SEARCH){
-            if (sale.getEntries().size() == 0) {
-                ManagerViewController.showErrorDialog
-                        ("Error", "Input Validation Error", "There hast to be at least one Menu Entry");
-                return false;
-            }
+        sale.setName(textFieldName.getText());
+        if (sale.getEntries().size() == 0) {
+            ManagerViewController.showErrorDialog
+                    ("Error", "Input Validation Error", "There hast to be at least one Menu Entry");
+            return false;
         }
         try {
             switch (DialogSaleController.dialogEnumeration) {
@@ -211,14 +230,48 @@ public class DialogSaleController implements Initializable{
                         onetimeSale.setName(sale.getName());
                         onetimeSale.setEntries(sale.getEntries());
                         LocalDate fromDate = datePickerFromTime.getValue();
-                        Integer hr = new Integer(textFieldFromTimeHr.getText());
-                        Integer min = new Integer(textFieldFromTimeMin.getText());
+                        if (fromDate == null) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify a date");
+                            return false;
+                        }
+                        Integer hr;
+                        Integer min;
+                        try {
+                            hr = new Integer(textFieldFromTimeHr.getText());
+                            min = new Integer(textFieldFromTimeMin.getText());
+                        } catch (NumberFormatException e) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify valid integer numbers");
+                            return false;
+                        }
+                        if (hr<0 || hr>=24 || min < 0 || min >= 60) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify valid numbers for hour/minutes");
+                            return false;
+                        }
                         LocalTime fromTimeT = LocalTime.of(hr, min);
                         LocalDateTime fromTime = LocalDateTime.of(fromDate, fromTimeT);
                         onetimeSale.setFromTime(fromTime);
                         LocalDate toDate = datePickerFromTime.getValue();
-                        hr = new Integer(textFieldFromTimeHr.getText());
-                        min = new Integer(textFieldFromTimeMin.getText());
+                        if (toDate == null) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify a date");
+                            return false;
+                        }
+                        try {
+                            hr = new Integer(textFieldToTimeHr.getText());
+                            min = new Integer(textFieldToTimeMin.getText());
+                        } catch (NumberFormatException e) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify valid integer numbers");
+                            return false;
+                        }
+                        if (hr<0 || hr>=24 || min < 0 || min >= 60) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify valid numbers for hour/minutes");
+                            return false;
+                        }
                         LocalTime toTimeT = LocalTime.of(hr, min);
                         LocalDateTime toTime = LocalDateTime.of(toDate, toTimeT);
                         onetimeSale.setToTime(toTime);
@@ -253,8 +306,21 @@ public class DialogSaleController implements Initializable{
                             weekDays.add(DayOfWeek.SUNDAY);
                         }
                         intermittentSale.setDaysOfSale(weekDays);
-                        Integer hr = new Integer(textFieldBeginningTimeHr.getText());
-                        Integer min = new Integer(textFieldBeginningTimeMin.getText());
+                        Integer hr;
+                        Integer min;
+                        try {
+                            hr = new Integer(textFieldBeginningTimeHr.getText());
+                            min = new Integer(textFieldBeginningTimeMin.getText());
+                        } catch (NumberFormatException e) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify valid integer numbers");
+                            return false;
+                        }
+                        if (hr<0 || hr>=24 || min < 0 || min >= 60) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify valid numbers for hour/minutes");
+                            return false;
+                        }
                         LocalTime fromDayTime = LocalTime.of(hr,min);
                         intermittentSale.setFromDayTime(fromDayTime);
                         Duration duration = Duration.ofMinutes(new Long(textFieldDuration.getText()));
@@ -265,20 +331,64 @@ public class DialogSaleController implements Initializable{
                     break;
                 case UPDATE:
                     if (radioButtonOnetimeSale.isSelected()) {
+                        if (! (sale instanceof OnetimeSale)) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Sale Service Error", "An intermittent sale cannot be converted to a onetime sale.");
+                            return false;
+                        }
                         LocalDate fromDate = datePickerFromTime.getValue();
-                        Integer hr = new Integer(textFieldFromTimeHr.getText());
-                        Integer min = new Integer(textFieldFromTimeMin.getText());
+                        if (fromDate == null) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify a date");
+                            return false;
+                        }
+                        Integer hr;
+                        Integer min;
+                        try {
+                            hr = new Integer(textFieldFromTimeHr.getText());
+                            min = new Integer(textFieldFromTimeMin.getText());
+                        } catch (NumberFormatException e) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify valid integer numbers");
+                            return false;
+                        }
+                        if (hr<0 || hr>=24 || min < 0 || min >= 60) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify valid numbers for hour/minutes");
+                            return false;
+                        }
                         LocalTime fromTimeT = LocalTime.of(hr, min);
                         LocalDateTime fromTime = LocalDateTime.of(fromDate, fromTimeT);
                         ((OnetimeSale)sale).setFromTime(fromTime);
                         LocalDate toDate = datePickerFromTime.getValue();
-                        hr = new Integer(textFieldFromTimeHr.getText());
-                        min = new Integer(textFieldFromTimeMin.getText());
+                        if (toDate == null) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify a date");
+                            return false;
+                        }
+                        try {
+                            hr = new Integer(textFieldToTimeHr.getText());
+                            min = new Integer(textFieldToTimeMin.getText());
+                        } catch (NumberFormatException e) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify valid integer numbers");
+                            return false;
+                        }
+                        if (hr<0 || hr>=24 || min < 0 || min >= 60) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify valid numbers for hour/minutes");
+                            return false;
+                        }
                         LocalTime toTimeT = LocalTime.of(hr, min);
                         LocalDateTime toTime = LocalDateTime.of(toDate, toTimeT);
                         ((OnetimeSale)sale).setToTime(toTime);
                         saleService.updateOnetimeSale((OnetimeSale) sale);
                     } else {
+                        if (! (sale instanceof IntermittentSale)) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Sale Service Error", "A onetime sale cannot be converted to an intermittent sale.");
+                            return false;
+                        }
                         ((IntermittentSale)sale).setEnabled(checkBoxEnabled.isSelected());
                         Set<DayOfWeek> weekDays = new HashSet<>();
                         if (checkBoxMonday.isSelected()) {
@@ -303,8 +413,21 @@ public class DialogSaleController implements Initializable{
                             weekDays.add(DayOfWeek.SUNDAY);
                         }
                         ((IntermittentSale)sale).setDaysOfSale(weekDays);
-                        Integer hr = new Integer(textFieldBeginningTimeHr.getText());
-                        Integer min = new Integer(textFieldBeginningTimeMin.getText());
+                        Integer hr;
+                        Integer min;
+                        try {
+                            hr = new Integer(textFieldBeginningTimeHr.getText());
+                            min = new Integer(textFieldBeginningTimeMin.getText());
+                        } catch (NumberFormatException e) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify valid integer numbers");
+                            return false;
+                        }
+                        if (hr<0 || hr>=24 || min < 0 || min >= 60) {
+                            ManagerViewController.showErrorDialog
+                                    ("Error", "Input Validation Error", "Please specify valid numbers for hour/minutes");
+                            return false;
+                        }
                         LocalTime fromDayTime = LocalTime.of(hr,min);
                         ((IntermittentSale)sale).setFromDayTime(fromDayTime);
                         Duration duration = Duration.ofMinutes(new Long(textFieldDuration.getText()));
@@ -398,6 +521,15 @@ public class DialogSaleController implements Initializable{
     }
 
     public void changeRadio() {
+        if (DialogSaleController.dialogEnumeration.equals(DialogEnumeration.UPDATE)) {
+            ManagerViewController.showErrorDialog
+                    ("Error", "Sale Information", "The type of a sale cannot be changed after its creation.");
+            if (sale instanceof OnetimeSale) {
+                radioButtonOnetimeSale.setSelected(true);
+            } else {
+                radioButtonIntermittentSale.setSelected(true);
+            }
+        }
         selectOnetimeSaleRadioButton(radioButtonOnetimeSale.isSelected());
     }
 
