@@ -42,7 +42,6 @@ class OrderServiceImpl implements OrderService {
             //Check if a sale is active and let the price be updated
             MenuEntry entry = order.getMenuEntry();
             saleService.applySales(entry);
-            order.setMenuEntry(entry);
             //Create the order with the updated price
             orderDAO.create(order);
         } catch (DAOException e) {
@@ -50,6 +49,7 @@ class OrderServiceImpl implements OrderService {
             throw new ServiceException("An Error has occurred in the data access object");
         }
     }
+
     @Override
     public void updateOrder(Order order) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addOrder with parameter: " + order);
