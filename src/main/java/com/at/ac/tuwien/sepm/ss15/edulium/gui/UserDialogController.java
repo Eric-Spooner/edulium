@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import java.net.URL;
 import java.util.LinkedList;
@@ -25,8 +26,9 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Controller for the TaxRate Dialog
  */
-public class DialogUserController implements Initializable, Controller{
-    private static final Logger LOGGER = LogManager.getLogger(DialogUserController.class);
+@Controller
+public class UserDialogController implements Initializable {
+    private static final Logger LOGGER = LogManager.getLogger(UserDialogController.class);
 
 
     private static Stage thisStage;
@@ -47,13 +49,13 @@ public class DialogUserController implements Initializable, Controller{
         return user;
     }
     public static void setUser(User user) {
-        DialogUserController.user = user;
+        UserDialogController.user = user;
     }
     public static void setThisStage(Stage thisStage) {
-        DialogUserController.thisStage = thisStage;
+        UserDialogController.thisStage = thisStage;
     }
     public static void setDialogEnumeration(DialogEnumeration dialogEnumeration) {
-        DialogUserController.dialogEnumeration = dialogEnumeration;
+        UserDialogController.dialogEnumeration = dialogEnumeration;
     }
 
     @Override
@@ -93,7 +95,7 @@ public class DialogUserController implements Initializable, Controller{
 
     public void buttonOKClick(ActionEvent actionEvent) {
         LOGGER.info("Dialog MenuEntry OK Button clicked");
-        switch (DialogUserController.dialogEnumeration){
+        switch (UserDialogController.dialogEnumeration){
             case ADD:
             case UPDATE:
                 if(textFieldUsername == null || textFieldUsername.getText().isEmpty()){
@@ -123,7 +125,7 @@ public class DialogUserController implements Initializable, Controller{
             user.setRole(dropRole.getSelectionModel().getSelectedItem());
         }
         try {
-            switch (DialogUserController.dialogEnumeration){
+            switch (UserDialogController.dialogEnumeration){
                 case ADD:
                     userService.addUser(user);
                     break;
@@ -147,12 +149,7 @@ public class DialogUserController implements Initializable, Controller{
     }
 
     public static void resetDialog(){
-        DialogUserController.setUser(null);
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-
+        UserDialogController.setUser(null);
     }
 }
 

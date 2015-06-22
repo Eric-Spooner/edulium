@@ -2,7 +2,6 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.AlertPopOver;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ReservationService;
@@ -22,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Controller;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -32,10 +32,8 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-/**
- * Created by phili on 6/17/15.
- */
-public class ReservationOverviewController implements Initializable, Controller {
+@Controller
+public class ReservationOverviewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(ReservationOverviewController.class);
 
     @FXML
@@ -106,15 +104,6 @@ public class ReservationOverviewController implements Initializable, Controller 
     }
 
     @Override
-    public void disable(boolean disabled) {
-        if(disabled) {
-            reservations.stopPolling();
-        } else {
-            reservations.startPolling();
-        }
-    }
-
-    @Override
     public void initialize(URL location, ResourceBundle resources) {
         reservations = new PollingList<>(taskScheduler);
         reservations.setInterval(1000);
@@ -126,6 +115,7 @@ public class ReservationOverviewController implements Initializable, Controller 
                 return null;
             }
         });
+        reservations.startPolling();
 
         initializeFiltering();
         initializeCancelPopOver();
@@ -189,7 +179,7 @@ public class ReservationOverviewController implements Initializable, Controller 
 
         lvReservations.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             // set edit button disabled if reservation is bygone
-            boolean disable = newValue == null? null : newValue.getTime().plus(newValue.getDuration()).isBefore(LocalDateTime.now());
+            boolean disable = newValue == null? true : newValue.getTime().plus(newValue.getDuration()).isBefore(LocalDateTime.now());
             btnEdit.setDisable(disable);
             btnDelete.setDisable(disable);
         });
@@ -197,7 +187,7 @@ public class ReservationOverviewController implements Initializable, Controller 
 
     private void initializeCancelPopOver() {
         cancelPopOver = new AlertPopOver();
-        cancelPopOver.getLabel().setText("Do you really want to cancel\nthe current changes?");
+        cancelPopOver.getLabel().setText("Do you really want to cancel\n the selected reservation?");
         cancelPopOver.getOkButton().setText("Yes");
         cancelPopOver.getCancelButton().setText("No");
 

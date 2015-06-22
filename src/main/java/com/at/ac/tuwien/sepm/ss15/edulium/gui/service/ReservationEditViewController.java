@@ -3,19 +3,18 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.AlertPopOver;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.NumericTextField;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ReservationService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.net.URL;
@@ -29,13 +28,16 @@ import java.util.function.Consumer;
 /**
  * Controller for the ReservationEditViewPane
  */
-public class ReservationEditViewController implements Initializable, Controller {
+@Controller
+public class ReservationEditViewController implements Initializable {
     enum Mode {EDIT, ADD}
 
     @FXML
     private Button btnCancel;
     @FXML
     private Button btnSave;
+    @FXML
+    private Button btnAuto;
     @FXML
     private SplitPane splitPane;
     @FXML
@@ -54,6 +56,7 @@ public class ReservationEditViewController implements Initializable, Controller 
     private Label lblSeats;
 
     private AlertPopOver cancelPopOver;
+    private AlertPopOver autoPopOver;
 
     @Autowired
     private ReservationService reservationService;
@@ -65,13 +68,10 @@ public class ReservationEditViewController implements Initializable, Controller 
     private Consumer<Reservation> onAcceptedConsumer;
     private Consumer<Reservation> onCanceledConsumer;
     private Reservation reservation;
-    private final Reservation reservationCopy = new Reservation();
     private Mode mode;
 
-    @Override
-    public void disable(boolean disabled) {
-
-    }
+    private Set<Table> selectedTables = new HashSet<>();
+    private Set<Table> occupiedTables = new HashSet<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -81,56 +81,40 @@ public class ReservationEditViewController implements Initializable, Controller 
         splitPane.getItems().add(0, tableViewPane);
 
         tableViewController.setOnTableClicked(table -> {
-            if(reservation.getTables().contains(table)) {
-                // remove table from selection
-                reservation.getTables().remove(table);
-                tableViewController.setTableColor(table, Color.BLACK);
+            if(selectedTables.contains(table)) {
+                selectedTables.remove(table);
             } else {
-                // add table to selection
-                reservation.getTables().add(table);
-                tableViewController.setTableColor(table, Color.BLUE);
+                selectedTables.add(table);
             }
 
-            updateSeatsLabel();
+            updateUI();
         });
 
         ChangeListener<Object> changeListener = (observable, oldValue, newValue) -> {
-            LocalDateTime dateTime = getLocalDateTime();
-
-            if(tfDuration.isEmpty() || dateTime == null) {
-                updateSeatsLabel();
-                btnSave.setDisable(true);
-                return;
-            }
-
-            boolean disable = dateTime.isBefore(LocalDateTime.now()) || tfDuration.isEmpty() || tfName.getText().isEmpty() || tfQuantity.isEmpty();
-
-            btnSave.setDisable(disable);
-
-            try {
-                List<Reservation> reservations = reservationService.findReservationBetween(dateTime, dateTime.plusHours((int) tfDuration.getValue()));
-                displayOccupiedTables(reservations);
-
-            } catch (ServiceException | ValidationException e) {
-                displayErrorMessage("error retrieving reservations", e);
-            }
+            updateOccupiedTables();
+            updateUI();
         };
 
+
+        // update ui
+        tfName.textProperty().addListener((observable, oldValue, newValue) -> updateUI());
+
+        // clear tables and update ui
         datePicker.valueProperty().addListener(changeListener);
         tfDuration.textProperty().addListener(changeListener);
         tfHour.textProperty().addListener(changeListener);
         tfMinute.textProperty().addListener(changeListener);
-        tfName.textProperty().addListener(changeListener);
         tfQuantity.textProperty().addListener(changeListener);
 
         tfHour.setMinMax(0, 24);
         tfMinute.setMinMax(0, 60);
 
-        initializeCancelPopOver();
+        initializePopOver();
     }
 
     public void setReservation(Reservation reservation) {
-        this.reservation = reservation;
+        selectedTables.clear();
+        occupiedTables.clear();
 
         // clear inputs
         tfName.clear();
@@ -147,22 +131,15 @@ public class ReservationEditViewController implements Initializable, Controller 
             mode = Mode.EDIT;
         }
 
-        if(mode == Mode.EDIT) {
-            // copy reservation in case the user cancels the edit process
-            reservationCopy.setIdentity(reservation.getIdentity());
-            reservationCopy.setDuration(reservation.getDuration());
-            reservationCopy.setTime(reservation.getTime());
-            reservationCopy.setName(reservation.getName());
-            reservationCopy.setQuantity(reservation.getQuantity());
-            reservationCopy.setTables(new ArrayList<>(reservation.getTables()));
+        this.reservation = reservation;
 
+        if(mode == Mode.EDIT) {
             displayReservationData();
         } else {
-            btnSave.setDisable(true);
             reservation.setTables(new ArrayList<>());
         }
 
-        updateSeatsLabel();
+        updateUI();
     }
 
     public void onAccept(Consumer<Reservation> consumer) {
@@ -171,6 +148,26 @@ public class ReservationEditViewController implements Initializable, Controller 
 
     public void onCancel(Consumer<Reservation> consumer) {
         onCanceledConsumer = consumer;
+    }
+
+    public void updateUI() {
+        // clear table view controller
+        tableViewController.clear();
+
+        // display occupied tables
+        occupiedTables.stream().forEach(t -> {tableViewController.setTableColor(t, Color.RED); tableViewController.setTableDisable(t, true);});
+
+        // display selected tables
+        selectedTables.stream().forEach(t -> tableViewController.setTableColor(t, Color.BLUE));
+
+        // handle buttons
+        boolean notReady = tfDuration.isEmpty() || tfHour.isEmpty() || tfMinute.isEmpty()
+                || tfQuantity.isEmpty() || datePicker.getValue() == null;
+
+        btnAuto.setDisable(notReady);
+        btnSave.setDisable(notReady || selectedTables.isEmpty() || tfName.getText().isEmpty());
+
+        updateSeatsLabel();
     }
 
     @FXML
@@ -201,8 +198,26 @@ public class ReservationEditViewController implements Initializable, Controller 
         }
     }
 
-    private void initializeCancelPopOver() {
-        cancelPopOver= new AlertPopOver();
+    @FXML
+    public void on_btnAuto_clicked() {
+        setReservationData();
+        tableViewController.clear();
+
+        try {
+            reservationService.findTablesForReservation(reservation);
+
+            selectedTables.clear();
+            selectedTables.addAll(reservation.getTables());
+
+        } catch (ServiceException | ValidationException e) {
+            autoPopOver.show(btnAuto);
+        }
+
+        updateUI();
+    }
+
+    private void initializePopOver() {
+        cancelPopOver = new AlertPopOver();
         cancelPopOver.getLabel().setText("Do you really want to cancel\nthe current changes?");
         cancelPopOver.getOkButton().setText("Yes");
         cancelPopOver.getCancelButton().setText("No");
@@ -213,6 +228,15 @@ public class ReservationEditViewController implements Initializable, Controller 
         });
 
         cancelPopOver.getCancelButton().setOnAction(event -> cancelPopOver.hide());
+
+        autoPopOver = new AlertPopOver();
+        autoPopOver.getLabel().setText("No free tables available");
+        autoPopOver.getOkButton().setText("Ok");
+        autoPopOver.getCancelButton().setVisible(false);
+
+        autoPopOver.getOkButton().setOnAction(event -> {
+            autoPopOver.hide();
+        });
     }
 
     private void setReservationData() {
@@ -220,6 +244,7 @@ public class ReservationEditViewController implements Initializable, Controller 
         reservation.setDuration(Duration.ofHours((long) tfDuration.getValue()));
         reservation.setQuantity((int) tfQuantity.getValue());
         reservation.setTime(getLocalDateTime());
+        reservation.setTables(new ArrayList<>(selectedTables));
     }
 
     private void displayReservationData() {
@@ -242,13 +267,13 @@ public class ReservationEditViewController implements Initializable, Controller 
             datePicker.setValue(dateTime.toLocalDate());
         }
 
+        selectedTables.addAll(reservation.getTables());
+
         // delay setting table colors; workaround: wait for tableview to load tables
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                if (reservation.getTables() != null) {
-                    reservation.getTables().stream().forEach(t -> tableViewController.setTableColor(t, Color.BLUE));
-                }
+                selectedTables.stream().forEach(t -> tableViewController.setTableColor(t, Color.BLUE));
             }
         };
 
@@ -258,10 +283,8 @@ public class ReservationEditViewController implements Initializable, Controller 
 
     private void updateSeatsLabel() {
         int sumSeats = 0;
-        if(reservation.getTables() != null) {
-            for(Table t : reservation.getTables()) {
-                sumSeats += t.getSeats();
-            }
+        for(Table t : selectedTables) {
+            sumSeats += t.getSeats();
         }
         lblSeats.setText(sumSeats + " / " + (int) tfQuantity.getValue());
     }
@@ -275,23 +298,32 @@ public class ReservationEditViewController implements Initializable, Controller 
         return LocalDateTime.of(datePicker.getValue(), LocalTime.of((int) tfHour.getValue(), (int) tfMinute.getValue()));
     }
 
-    private void displayOccupiedTables(List<Reservation> reservations) {
-        tableViewController.clear();
+    private void updateOccupiedTables() {
+        LocalDateTime start = getLocalDateTime();
+
+        if(start == null || tfDuration.isEmpty()) {
+            return;
+        }
+
+        Duration duration = Duration.ofMinutes((long) tfDuration.getValue());
+        List<Reservation> reservations = new ArrayList<>();
+
+        // get other reservations
+        try {
+            reservations = reservationService.findReservationBetween(start, start.plus(duration));
+        } catch (ServiceException | ValidationException e) {
+            displayErrorMessage("error retrieving reservations", e);
+        }
 
         // remove current reservation
-        reservations.remove(reservation);
+        reservations.removeIf(res -> res.getIdentity().equals(reservation.getIdentity()));
 
+        occupiedTables.clear();
         for(Reservation res : reservations) {
-            for(Table t : res.getTables()) {
-                tableViewController.setTableColor(t, Color.RED);
-                tableViewController.setTableDisable(t, true);
-                // remove not free tables from reservation
-                if(reservation.getTables() != null) {
-                    reservation.getTables().remove(t);
-                }
-            }
+            occupiedTables.addAll(res.getTables());
         }
-        updateSeatsLabel();
+        // remove occupied tables from selected
+        selectedTables.removeAll(occupiedTables);
     }
 
     private void displayErrorMessage(String message, Exception e) {

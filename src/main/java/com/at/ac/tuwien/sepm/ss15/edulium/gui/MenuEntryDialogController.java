@@ -17,6 +17,7 @@ import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -27,8 +28,9 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Controller for the TaxRate Dialog
  */
-public class DialogMenuEntryController implements Initializable, Controller{
-    private static final Logger LOGGER = LogManager.getLogger(DialogMenuEntryController.class);
+@Controller
+public class MenuEntryDialogController implements Initializable {
+    private static final Logger LOGGER = LogManager.getLogger(MenuEntryDialogController.class);
 
     private static Stage thisStage;
     @Autowired
@@ -40,11 +42,12 @@ public class DialogMenuEntryController implements Initializable, Controller{
 
 
     public static void setThisStage(Stage thisStage) {
-        DialogMenuEntryController.thisStage = thisStage;
+        MenuEntryDialogController.thisStage = thisStage;
     }
-    public static void setMenuEntry(MenuEntry menuEntry) {DialogMenuEntryController.menuEntry = menuEntry; }
+    public static void setMenuEntry(MenuEntry menuEntry) {
+        MenuEntryDialogController.menuEntry = menuEntry; }
     public static void setDialogEnumeration(DialogEnumeration dialogEnumeration) {
-        DialogMenuEntryController.dialogEnumeration = dialogEnumeration;
+        MenuEntryDialogController.dialogEnumeration = dialogEnumeration;
     }
     public static MenuEntry getMenuEntry() {
         return menuEntry;
@@ -138,7 +141,7 @@ public class DialogMenuEntryController implements Initializable, Controller{
     public void buttonOKClick(ActionEvent actionEvent) {
         LOGGER.info("Dialog MenuEntry OK Button clicked");
         BigDecimal price = null;
-        switch (DialogMenuEntryController.dialogEnumeration){
+        switch (MenuEntryDialogController.dialogEnumeration){
             case ADD:
             case UPDATE:
                 if(textFieldName.getText() == null || textFieldName.getText().equals("")){
@@ -191,7 +194,7 @@ public class DialogMenuEntryController implements Initializable, Controller{
         menuEntry.setCategory(dropMenuCategory.getSelectionModel().getSelectedItem());
         menuEntry.setTaxRate(dropTaxRate.getSelectionModel().getSelectedItem());
         menuEntry.setAvailable(checkAvailible.isSelected());
-        if(DialogMenuEntryController.dialogEnumeration == DialogEnumeration.SEARCH){
+        if(MenuEntryDialogController.dialogEnumeration == DialogEnumeration.SEARCH){
             if(!textFieldDesription.getText().isEmpty()) menuEntry.setDescription(textFieldDesription.getText());
             if(textFieldName.getText() != null) menuEntry.setName(textFieldName.getText());
         }else {
@@ -200,7 +203,7 @@ public class DialogMenuEntryController implements Initializable, Controller{
         }
 
         try {
-            switch (DialogMenuEntryController.dialogEnumeration){
+            switch (MenuEntryDialogController.dialogEnumeration){
                 case ADD:
                     menuService.addMenuEntry(menuEntry);
                     break;
@@ -221,12 +224,7 @@ public class DialogMenuEntryController implements Initializable, Controller{
     }
 
     public static void resetDialog(){
-        DialogMenuEntryController.setMenuEntry(null);
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-
+        MenuEntryDialogController.setMenuEntry(null);
     }
 }
 

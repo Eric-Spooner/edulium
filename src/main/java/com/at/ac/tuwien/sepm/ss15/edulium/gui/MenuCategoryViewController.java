@@ -1,37 +1,31 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import static javafx.collections.FXCollections.observableArrayList;
 
-/**
- * Created by - on 12.06.2015.
- */
-public class MenuCategoryViewController implements Initializable, Controller {
+@Controller
+public class MenuCategoryViewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(MenuCategoryViewController.class);
 
     @FXML
@@ -69,18 +63,18 @@ public class MenuCategoryViewController implements Initializable, Controller {
         try {
             LOGGER.info("Search MenuCategory Button Click");
             Stage stage = new Stage();
-            DialogMenuCategoryController.setThisStage(stage);
-            DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.SEARCH);
+            MenuCategoryDialogController.setThisStage(stage);
+            MenuCategoryDialogController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search Menu Category");
             Scene scene = new Scene(menuCategoryDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
-            if (DialogMenuCategoryController.getMenuCategory() != null) {
-                menuCategories.setAll(menuService.findMenuCategory(DialogMenuCategoryController.getMenuCategory()));
+            if (MenuCategoryDialogController.getMenuCategory() != null) {
+                menuCategories.setAll(menuService.findMenuCategory(MenuCategoryDialogController.getMenuCategory()));
             } else {
                 menuCategories.setAll(menuService.getAllMenuCategories());
             }
-            DialogMenuCategoryController.resetDialog();
+            MenuCategoryDialogController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Search MenuCategory Button Click did not work");
         }
@@ -95,15 +89,15 @@ public class MenuCategoryViewController implements Initializable, Controller {
                         ("Error", "Input Validation Error", "You have to select a MenuCategory to Update");
                 return;
             }
-            DialogMenuCategoryController.setThisStage(stage);
-            DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.UPDATE);
-            DialogMenuCategoryController.setMenuCategory(tableViewMenuCategory.getSelectionModel().getSelectedItem());
+            MenuCategoryDialogController.setThisStage(stage);
+            MenuCategoryDialogController.setDialogEnumeration(DialogEnumeration.UPDATE);
+            MenuCategoryDialogController.setMenuCategory(tableViewMenuCategory.getSelectionModel().getSelectedItem());
             stage.setTitle("Update Menu Category");
             Scene scene = new Scene(menuCategoryDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             menuCategories.setAll(menuService.getAllMenuCategories());
-            DialogMenuCategoryController.resetDialog();
+            MenuCategoryDialogController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Update MenuCategory Button Click did not work" + e);
         }
@@ -113,14 +107,14 @@ public class MenuCategoryViewController implements Initializable, Controller {
         try {
             LOGGER.info("Add MenuCategory Button Click");
             Stage stage = new Stage();
-            DialogMenuCategoryController.setThisStage(stage);
-            DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.ADD);
+            MenuCategoryDialogController.setThisStage(stage);
+            MenuCategoryDialogController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Insert Menu Category");
             Scene scene = new Scene(menuCategoryDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             menuCategories.setAll(menuService.getAllMenuCategories());
-            DialogMenuCategoryController.resetDialog();
+            MenuCategoryDialogController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Add MenuCategory Button Click did not work" + e);
         }
@@ -148,11 +142,4 @@ public class MenuCategoryViewController implements Initializable, Controller {
             LOGGER.error("Loading All Menu Categories failed" + e);
         }
     }
-
-    @Override
-    public void disable(boolean disabled) {
-
-    }
-
-
 }

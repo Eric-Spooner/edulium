@@ -30,6 +30,7 @@ import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.PopOver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.net.URL;
@@ -44,7 +45,8 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Controller used for the Cook View
  */
-public class CookViewController implements Initializable, Controller {
+@Controller
+public class CookViewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(CookViewController.class);
 
     @FXML
@@ -154,6 +156,7 @@ public class CookViewController implements Initializable, Controller {
                 }
             }
         });
+        ordersQueued.startPolling();
         ordersQueuedFiltered = new FilteredList<Order>(ordersQueued);
         ordersQueuedFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
         SortedList<Order> sortedDataQueued = new SortedList<>(ordersQueuedFiltered);
@@ -161,7 +164,7 @@ public class CookViewController implements Initializable, Controller {
         tableViewQueued.setItems(sortedDataQueued);
         tableViewQueued.setStyle("-fx-font-size: 25px;");
         tableViewQueued.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        tableViewQueued.setRowFactory(new Callback<TableView<Order>, TableRow<Order>> () {
+        tableViewQueued.setRowFactory(new Callback<TableView<Order>, TableRow<Order>>() {
             @Override
             public TableRow<Order> call(TableView<Order> tableView) {
                 final TableRow<Order> row = new TableRow<>();
@@ -169,10 +172,10 @@ public class CookViewController implements Initializable, Controller {
                     @Override
                     public void handle(MouseEvent event) {
                         final int index = row.getIndex();
-                        if (index >= 0 && index < tableView.getItems().size() && tableView.getSelectionModel().isSelected(index)  ) {
+                        if (index >= 0 && index < tableView.getItems().size() && tableView.getSelectionModel().isSelected(index)) {
                             tableView.getSelectionModel().clearSelection();
                             event.consume();
-                        }else if(index >= 0 && index < tableView.getItems().size()){
+                        } else if (index >= 0 && index < tableView.getItems().size()) {
                             tableView.getSelectionModel().select(index);
                             event.consume();
                         }
@@ -201,6 +204,7 @@ public class CookViewController implements Initializable, Controller {
                 }
             }
         });
+        ordersInProgress.startPolling();
         ordersInProgressFiltered = new FilteredList<Order>(ordersInProgress);
         ordersInProgressFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
         SortedList<Order> sortedDataInProgress = new SortedList<>(ordersInProgressFiltered);
@@ -208,7 +212,7 @@ public class CookViewController implements Initializable, Controller {
         tableViewInProgress.setItems(sortedDataInProgress);
         tableViewInProgress.setStyle("-fx-font-size: 25px;");
         tableViewInProgress.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        tableViewInProgress.setRowFactory(new Callback<TableView<Order>, TableRow<Order>> () {
+        tableViewInProgress.setRowFactory(new Callback<TableView<Order>, TableRow<Order>>() {
             @Override
             public TableRow<Order> call(TableView<Order> tableView) {
                 final TableRow<Order> row = new TableRow<>();
@@ -216,10 +220,10 @@ public class CookViewController implements Initializable, Controller {
                     @Override
                     public void handle(MouseEvent event) {
                         final int index = row.getIndex();
-                        if (index >= 0 && index < tableView.getItems().size() && tableView.getSelectionModel().isSelected(index)  ) {
+                        if (index >= 0 && index < tableView.getItems().size() && tableView.getSelectionModel().isSelected(index)) {
                             tableView.getSelectionModel().clearSelection();
                             event.consume();
-                        }else if(index >= 0 && index < tableView.getItems().size()){
+                        } else if (index >= 0 && index < tableView.getItems().size()) {
                             tableView.getSelectionModel().select(index);
                             event.consume();
                         }
@@ -249,6 +253,7 @@ public class CookViewController implements Initializable, Controller {
                 }
             }
         });
+        ordersReadyForDelivery.startPolling();
         ordersReadyForDeliverFiltered = new FilteredList<Order>(ordersReadyForDelivery);
         ordersReadyForDeliverFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
         SortedList<Order> sortedDataReady = new SortedList<>(ordersReadyForDeliverFiltered);
@@ -307,19 +312,6 @@ public class CookViewController implements Initializable, Controller {
                 ordersQueued.immediateUpdate();
                 ordersInProgress.immediateUpdate();
             }
-        }
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-        if (disabled) {
-            ordersQueued.stopPolling();
-            ordersInProgress.stopPolling();
-            ordersReadyForDelivery.stopPolling();
-        } else {
-            ordersQueued.startPolling();
-            ordersInProgress.startPolling();
-            ordersReadyForDelivery.startPolling();
         }
     }
 

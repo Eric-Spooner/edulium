@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -17,8 +18,9 @@ import java.util.ResourceBundle;
 /**
  * Controller for the TaxRate Dialog
  */
-public class DialogMenuCategoryController implements Initializable, Controller{
-    private static final Logger LOGGER = LogManager.getLogger(DialogMenuCategoryController.class);
+@Controller
+public class MenuCategoryDialogController implements Initializable {
+    private static final Logger LOGGER = LogManager.getLogger(MenuCategoryDialogController.class);
 
     @Autowired
     private MenuService menuService;
@@ -28,16 +30,16 @@ public class DialogMenuCategoryController implements Initializable, Controller{
     private static DialogEnumeration dialogEnumeration;
 
     public static void setThisStage(Stage thisStage) {
-        DialogMenuCategoryController.thisStage = thisStage;
+        MenuCategoryDialogController.thisStage = thisStage;
     }
     public static MenuCategory getMenuCategory() {
         return menuCategory;
     }
     public static void setMenuCategory(MenuCategory menuCategory) {
-        DialogMenuCategoryController.menuCategory = menuCategory;
+        MenuCategoryDialogController.menuCategory = menuCategory;
     }
     public static void setDialogEnumeration(DialogEnumeration dialogEnumeration) {
-        DialogMenuCategoryController.dialogEnumeration = dialogEnumeration;
+        MenuCategoryDialogController.dialogEnumeration = dialogEnumeration;
     }
 
 
@@ -57,7 +59,7 @@ public class DialogMenuCategoryController implements Initializable, Controller{
 
     public void buttonOKClick(ActionEvent actionEvent) {
         LOGGER.info("Dialog MenuCategory OK Button clicked");
-        switch (DialogMenuCategoryController.dialogEnumeration){
+        switch (MenuCategoryDialogController.dialogEnumeration){
             case ADD:
             case UPDATE:
                 if(textFieldName.getText() == null || textFieldName.getText().equals("")){
@@ -67,7 +69,7 @@ public class DialogMenuCategoryController implements Initializable, Controller{
         }
         try {
             menuCategory.setName(textFieldName.getText());
-            switch (DialogMenuCategoryController.dialogEnumeration) {
+            switch (MenuCategoryDialogController.dialogEnumeration) {
                 case ADD:
                     menuService.addMenuCategory(menuCategory);
                     break;
@@ -90,10 +92,5 @@ public class DialogMenuCategoryController implements Initializable, Controller{
 
     public static void resetDialog(){
         menuCategory = null;
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-
     }
 }
