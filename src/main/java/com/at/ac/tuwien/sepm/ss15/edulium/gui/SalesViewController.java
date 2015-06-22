@@ -97,29 +97,24 @@ public class SalesViewController implements Initializable {
     }
 
     public void buttonSaleUpdateClicked(ActionEvent actionEvent) {
-        /*try {
-            LOGGER.info("Update Menu Button Click");
+        try {
+            LOGGER.info("Update Sale Button Click");
             Stage stage = new Stage();
             if(tableViewSale.getSelectionModel().getSelectedItem() == null){
                 ManagerViewController.showErrorDialog
-                        ("Error", "Input Validation Error", "You have to select a Menu to Update");
+                        ("Error", "Input Validation Error", "You have to select a Sale to Update");
                 return;
             }
-            DialogMenuController.resetDialog();
-            DialogMenuController.setThisStage(stage);
-            DialogMenuController.setDialogEnumeration(DialogEnumeration.UPDATE);
-            //DialogMenuController.setMenu(tableViewSale.getSelectionModel().getSelectedItem());
-            stage.setTitle("Update Menu");
-            ApplicationContext context = EduliumApplicationContext.getContext();
-            FXMLPane myPane = context.getBean("menuDialogPane", FXMLPane.class);
-            Scene scene = new Scene(myPane);
-            stage.setScene(scene);
-            stage.showAndWait();
-            sales.setAll(saleService.getAllMenus());
-            DialogMenuController.resetDialog();
+            saleDialogController.resetDialog();
+            saleDialogController.setDialogEnumeration(DialogEnumeration.UPDATE);
+            saleDialogController.setSale(tableViewSale.getSelectionModel().getSelectedItem());
+            saleDialogController.showSale();
+            saleDialog.showAndWait();
+            sales.setAll(saleService.getAllSales());
+            saleDialogController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Loading the Menus failed" + e);
-        }*/
+        }
     }
 
     public void buttonSaleRemoveClicked(ActionEvent actionEvent) {
