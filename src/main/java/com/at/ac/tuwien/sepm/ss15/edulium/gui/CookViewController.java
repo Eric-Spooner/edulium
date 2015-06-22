@@ -9,6 +9,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -25,6 +26,8 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.CheckListView;
+import org.controlsfx.control.PopOver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 
@@ -77,9 +80,8 @@ public class CookViewController implements Initializable, Controller {
     @FXML
     private TableColumn<Order, Long> tableColDeliveryTime;
 
-    @Resource(name = "cookViewDialogPane")
-    private FXMLPane cookViewDialogPane;
-
+    @FXML
+    private Button  btnOpenMenuCats;
 
     @Autowired
     private MenuService menuService;
@@ -96,8 +98,41 @@ public class CookViewController implements Initializable, Controller {
     private FilteredList<Order> ordersInProgressFiltered;
     private FilteredList<Order> ordersReadyForDeliverFiltered;
 
+
+    private PopOver menuSelectionPopOver;
+
+    public void initMenuSelectionPopOver(){
+        try {
+            CheckListView<MenuCategory> listView = new CheckListView<>();
+            listView.setItems(observableArrayList(menuService.getAllMenuCategories()));
+            listView.getItems().forEach(MenuCategory -> listView.getCheckModel().check(MenuCategory));
+            listView.getCheckModel().getCheckedItems().addListener(new ListChangeListener<MenuCategory>() {
+                public void onChanged(ListChangeListener.Change<? extends MenuCategory> c) {
+                    checkedCategories.clear();
+                    checkedCategories.addAll(listView.getCheckModel().getCheckedItems());
+                    ordersQueuedFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
+                    ordersReadyForDeliverFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
+                    ordersInProgressFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
+                }
+            });
+            // set up listview (listeners; set observablelist,...)
+            menuSelectionPopOver = new PopOver(listView);
+            // setup menuSelectionPopOver
+            menuSelectionPopOver.setHideOnEscape(true);
+            menuSelectionPopOver.setAutoHide(true);
+            menuSelectionPopOver.setDetachable(false);
+            menuSelectionPopOver.setMinSize(1200, 700);
+            menuSelectionPopOver.setStyle("-fx-font-size: 25px;");
+            menuSelectionPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
+        }catch (ServiceException e ){
+            LOGGER.error("Init Cook View Menu Categories failed", e);
+        }
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        initMenuSelectionPopOver();
+
         try {
             checkedCategories = menuService.getAllMenuCategories();
         }catch (ServiceException e ){
@@ -289,16 +324,21 @@ public class CookViewController implements Initializable, Controller {
     }
 
     public void btnSelectShownCats(ActionEvent actionEvent){
-        try {
+        if (menuSelectionPopOver.isShowing()) {
+            menuSelectionPopOver.hide();
+        } else {
+            menuSelectionPopOver.show(btnOpenMenuCats);
+        }
+        /*try {
             Stage stage = new Stage();
             stage.setTitle("Menu Categories");
-            DialogCookviewCategories.setCheckedCategories(checkedCategories);
-            DialogCookviewCategories.setThisStage(stage);
-            DialogCookviewCategories.setMenuService(menuService);
+            DialogCookviewCategories dialogController = cookViewDialogPane.getController(DialogCookviewCategories.class);
+            dialogController.setCheckedCategories(checkedCategories);
+            dialogController.setThisStage(stage);
             Scene scene = new Scene(cookViewDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
-            checkedCategories = DialogCookviewCategories.getCheckedCategories();
+            checkedCategories = dialogController.getCheckedCategories();
             ordersQueuedFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
             ordersReadyForDeliverFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
             ordersInProgressFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
@@ -306,6 +346,6 @@ public class CookViewController implements Initializable, Controller {
             LOGGER.error("Open the Cook View Menu Categories selection Dialog failed", e);
             ManagerViewController.showErrorDialog("Error", "Cook View open Menu Categories Error", "Open the Cook View Menu Categories selection Dialog failed \n"  + e.toString());
         }
-
+*/
     }
 }
