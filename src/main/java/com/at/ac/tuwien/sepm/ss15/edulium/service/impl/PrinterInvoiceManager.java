@@ -54,11 +54,11 @@ public class PrinterInvoiceManager implements InvoiceManager {
             PdfContentByte canvas = stamper.getOverContent(1);
 
             // fixed table width
-            int tableWidth = 3 * 170;
+            float tableWidth = 3f * 170f;
 
             Rectangle pageSize = reader.getPageSize(1);
-            float xPos = (pageSize.getWidth() - tableWidth) / 2;
-            float yPos = pageSize.getHeight() - 200;
+            float xPos = (pageSize.getWidth() - tableWidth) / 2f;
+            float yPos = pageSize.getHeight() - 200f;
             final float cHeight = 20f;
 
             ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
@@ -79,6 +79,7 @@ public class PrinterInvoiceManager implements InvoiceManager {
             ordersTable.setTotalWidth(tableWidth);
 
             PdfPCell infoCell = new PdfPCell();
+            infoCell.setHorizontalAlignment(Element.ALIGN_CENTER);
             infoCell.setFixedHeight(cHeight);
             infoCell.setPhrase(new Phrase("Item"));
             ordersTable.addCell(infoCell);
@@ -92,7 +93,6 @@ public class PrinterInvoiceManager implements InvoiceManager {
             TaxRate taxRate;
             List<TaxRate> rates = new ArrayList<>();
             for (Order order : invoice.getOrders()) {
-
                 entry = order.getMenuEntry();
                 taxRate = entry.getTaxRate();
                 if (!rates.contains(taxRate)) {
@@ -108,19 +108,29 @@ public class PrinterInvoiceManager implements InvoiceManager {
                 }
                 cell.setPhrase(new Phrase(entry.getName()));
                 ordersTable.addCell(cell);
-                cell.setPhrase(new Phrase("1 * " + order.getBrutto() + " EUR")); // TODO: Set real amount
+                cell.setPhrase(new Phrase("1" + " x " + order.getBrutto() + " EUR")); // TODO: Set real amount
                 cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
                 ordersTable.addCell(cell);
                 cell.setPhrase(new Phrase(order.getBrutto() + " EUR [" + taxRate.getIdentity() + "]"));
                 ordersTable.addCell(cell);
             }
 
+            PdfPCell sumCell = new PdfPCell(new Phrase("Sum"));
+            sumCell.setFixedHeight(cHeight);
+            sumCell.setColspan(2);
+            sumCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            ordersTable.addCell(sumCell);
+
+            sumCell.setColspan(1);
+            sumCell.setPhrase(new Phrase(invoice.getGross() + " EUR"));
+            ordersTable.addCell(sumCell);
+
             // write table to page
             ordersTable.writeSelectedRows(0, -1, xPos, yPos -= 15f, canvas);
 
             yPos -= cHeight * ordersTable.size() + cHeight;
             for (TaxRate tr : rates) {
-                ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, new Phrase("[" +tr.getIdentity() +
+                ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, new Phrase("[" + tr.getIdentity() +
                 "] incl. " + tr.getValue().floatValue() * 100f + "% Tax"), xPos, yPos, 0);
                 yPos -= 15f;
             }
