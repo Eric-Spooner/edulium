@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,10 +65,8 @@ class OrderServiceImpl implements OrderService {
         }else {
             Order preOrder = preOrders.get(0);
             //if the order already had an invoice it is not allowed to be changed
-            List<Order> list = new LinkedList<>();
-            list.add(order);
             Invoice invoice = new Invoice();
-            invoice.setOrders(list);
+            invoice.setOrders(Arrays.asList(order));
             if(invoiceService.findInvoices(invoice).size()>0){
                 LOGGER.error("It is not allowed to change an order with invoice");
                 throw new ServiceException("It is not allowed to change an order with invoice");
@@ -159,8 +158,12 @@ class OrderServiceImpl implements OrderService {
     @Override
     public User getOrderSubmitter(Order order) throws ServiceException, ValidationException {
         orderValidator.validateIdentity(order);
-        History<Order> history =  this.getOrderHistory(order).get(0);
-        return history.getUser();
+        if(this.getOrderHistory(order).size()>0) {
+            History<Order> history = this.getOrderHistory(order).get(0);
+            return history.getUser();
+        }else{
+            throw new ServiceException("THere should be at least one History entry for the order");
+        }
     }
 
     @Override

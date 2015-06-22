@@ -12,6 +12,7 @@ import java.util.List;
 /**
  * service for the Order domain object
  */
+@PreAuthorize("isAuthenticated()")
 public interface OrderService extends Service {
 
     /**
