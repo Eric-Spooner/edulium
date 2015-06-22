@@ -178,7 +178,7 @@ public class DialogSaleController implements Initializable{
 
     }
 
-    public void buttonOKClick(ActionEvent actionEvent) {
+    /*public void buttonOKClick(ActionEvent actionEvent) {
         LOGGER.info("Dialog Menu OK Button clicked");
         if ((textFieldName.getText() == null || textFieldName.getText().equals("")) &&
                 DialogSaleController.dialogEnumeration != DialogEnumeration.SEARCH) {
@@ -271,12 +271,106 @@ public class DialogSaleController implements Initializable{
         LOGGER.info("Dialog Sale Cancel Button clicked");
         resetDialog();
         thisStage.close();
+    }*/
+
+    public boolean validateData() {
+        LOGGER.info("Dialog Sale OK Button clicked");
+        if ((textFieldName.getText() == null || textFieldName.getText().equals("")) &&
+                DialogSaleController.dialogEnumeration != DialogEnumeration.SEARCH) {
+            ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
+            return false;
+        }
+        if (DialogSaleController.dialogEnumeration == DialogEnumeration.SEARCH) {
+            if(!textFieldName.getText().isEmpty()) sale.setName(textFieldName.getText());
+        } else{
+            sale.setName(textFieldName.getText());
+        }
+        if(DialogSaleController.dialogEnumeration != DialogEnumeration.SEARCH){
+            if (sale.getEntries().size() == 0) {
+                ManagerViewController.showErrorDialog
+                        ("Error", "Input Validation Error", "There hast to be at least one Menu Entry");
+                return false;
+            }
+        }
+        try {
+            switch (DialogSaleController.dialogEnumeration) {
+                case ADD:
+                    if (radioButtonOnetimeSale.isSelected()) {
+                        OnetimeSale onetimeSale = new OnetimeSale();
+                        onetimeSale.setIdentity(new Long(1));
+                        onetimeSale.setName(sale.getName());
+                        onetimeSale.setEntries(sale.getEntries());
+                        LocalDate fromDate = datePickerFromTime.getValue();
+                        Integer hr = new Integer(textFieldFromTimeHr.getText());
+                        Integer min = new Integer(textFieldFromTimeMin.getText());
+                        LocalTime fromTimeT = LocalTime.of(hr, min);
+                        LocalDateTime fromTime = LocalDateTime.of(fromDate, fromTimeT);
+                        onetimeSale.setFromTime(fromTime);
+                        LocalDate toDate = datePickerFromTime.getValue();
+                        hr = new Integer(textFieldFromTimeHr.getText());
+                        min = new Integer(textFieldFromTimeMin.getText());
+                        LocalTime toTimeT = LocalTime.of(hr, min);
+                        LocalDateTime toTime = LocalDateTime.of(toDate, toTimeT);
+                        onetimeSale.setToTime(toTime);
+                        saleService.addOnetimeSale(onetimeSale);
+                        sale = onetimeSale;
+                    } else {
+                        IntermittentSale intermittentSale = new IntermittentSale();
+                        intermittentSale.setIdentity(new Long(1));
+                        intermittentSale.setName(sale.getName());
+                        intermittentSale.setEntries(sale.getEntries());
+                        intermittentSale.setEnabled(checkBoxEnabled.isSelected());
+                        Set<DayOfWeek> weekDays = new HashSet<>();
+                        if (checkBoxMonday.isSelected()) {
+                            weekDays.add(DayOfWeek.MONDAY);
+                        }
+                        if (checkBoxTuesday.isSelected()) {
+                            weekDays.add(DayOfWeek.TUESDAY);
+                        }
+                        if (checkBoxWednesday.isSelected()) {
+                            weekDays.add(DayOfWeek.WEDNESDAY);
+                        }
+                        if (checkBoxThursday.isSelected()) {
+                            weekDays.add(DayOfWeek.THURSDAY);
+                        }
+                        if (checkBoxFriday.isSelected()) {
+                            weekDays.add(DayOfWeek.FRIDAY);
+                        }
+                        if (checkBoxSaturday.isSelected()) {
+                            weekDays.add(DayOfWeek.SATURDAY);
+                        }
+                        if (checkBoxSunday.isSelected()) {
+                            weekDays.add(DayOfWeek.SUNDAY);
+                        }
+                        intermittentSale.setDaysOfSale(weekDays);
+                        Integer hr = new Integer(textFieldBeginningTimeHr.getText());
+                        Integer min = new Integer(textFieldBeginningTimeMin.getText());
+                        LocalTime fromDayTime = LocalTime.of(hr,min);
+                        intermittentSale.setFromDayTime(fromDayTime);
+                        Duration duration = Duration.ofMinutes(new Long(textFieldDuration.getText()));
+                        intermittentSale.setDuration(duration);
+                        saleService.addIntermittentSale(intermittentSale);
+                        sale = intermittentSale;
+                    }
+                    break;
+                case UPDATE:
+                    saleService.updateOnetimeSale((OnetimeSale) saleService); //TODO change
+                    break;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            ManagerViewController.showErrorDialog
+                    ("Error", "Sale Service Error", "The Service was unable to handle the required Sale action/n" + e.toString());
+            LOGGER.error("The Service was unable to handle the required Sale action " + e);
+            return false;
+        }
+        return true;
     }
 
     public void buttonAddClick(ActionEvent actionEvent) {
         if((textFieldPrice.getText() == null || textFieldPrice.getText().equals("")) &&
-                DialogSaleController.dialogEnumeration != DialogEnumeration.SEARCH){
-            switch (DialogSaleController.dialogEnumeration) {
+                this.dialogEnumeration != DialogEnumeration.SEARCH){
+            switch (this.dialogEnumeration) {
                 case UPDATE:
                 case ADD: //There has to be a Price, if the User wants to ADD or UPDATE
                     ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must have a value");
@@ -292,7 +386,7 @@ public class DialogSaleController implements Initializable{
         try {
             MenuEntry menuEntry = tableViewData.getSelectionModel().getSelectedItem();
             BigDecimal price = null;
-            switch (DialogSaleController.dialogEnumeration) {
+            switch (this.dialogEnumeration) {
                 case UPDATE:
                 case ADD:
                     price = BigDecimal.valueOf(Double.parseDouble(textFieldPrice.getText()));
@@ -335,8 +429,16 @@ public class DialogSaleController implements Initializable{
     /**
      * this function is used to rest the static members of the class
      */
-    public static void resetDialog(){
-        DialogSaleController.setSale(null);
+    public void resetDialog(){
+        this.textFieldName.setText("");
+        this.textFieldPrice.setText("");
+        Sale saleForInit = new OnetimeSale();
+        saleForInit.setEntries(new LinkedList<>());
+        inMenuMenuEntries.clear();
+        this.setSale(saleForInit);
+        if(sale.getEntries() == null) {
+            sale.setEntries(new LinkedList<>());
+        }
     }
 
     public void changeRadio() {

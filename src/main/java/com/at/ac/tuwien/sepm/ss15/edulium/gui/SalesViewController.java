@@ -13,8 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -24,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedList;
@@ -47,6 +47,12 @@ public class SalesViewController implements Initializable {
     @FXML
     private TableColumn<Sale,String> tableColSaleEntries;
 
+    @Resource(name = "salesDialogPane")
+    private FXMLPane salesDialogPane;
+
+    private DialogSaleController saleDialogController;
+    private Dialog<Sale> saleDialog;
+
     @Autowired
     private SaleService saleService;
 
@@ -67,6 +73,22 @@ public class SalesViewController implements Initializable {
                     p.getValue().getEntries().forEach(entry -> list.add(entry.getName()));
                     return new SimpleStringProperty(list.toString());
                 }
+            });
+
+            saleDialogController = salesDialogPane.getController(DialogSaleController.class);
+            saleDialog = new Dialog<>();
+            saleDialog.getDialogPane().setContent(salesDialogPane);
+            ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+            saleDialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, cancelButtonType);
+            final Button btOk = (Button) saleDialog.getDialogPane().lookupButton(ButtonType.OK);
+            btOk.addEventFilter(ActionEvent.ACTION, event -> {
+                if (!saleDialogController.validateData()) {
+                    event.consume();
+                }
+            });
+            final Button cancelButton = (Button) saleDialog.getDialogPane().lookupButton(cancelButtonType);
+            cancelButton.addEventFilter(ActionEvent.ACTION, event -> {
+                saleDialogController.resetDialog();
             });
         }catch (ServiceException e){
             LOGGER.error("Initialize Menu View Failed due to" + e);
@@ -116,7 +138,6 @@ public class SalesViewController implements Initializable {
             } else {
                 LOGGER.error("Sale is neither IntermittentSale nor OnetimeSale!");
             }
-
             sales.setAll(saleService.getAllSales());
         }catch (Exception e){
             LOGGER.error("Loading the Sales failed" + e);
@@ -126,18 +147,10 @@ public class SalesViewController implements Initializable {
     public void buttonSaleAddClicked(ActionEvent actionEvent){
         try {
             LOGGER.info("Add Sale Button Click");
-            Stage stage = new Stage();
-            DialogSaleController.resetDialog();
-            DialogSaleController.setThisStage(stage);
-            DialogSaleController.setDialogEnumeration(DialogEnumeration.ADD);
-            stage.setTitle("Add Sale");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogSale.fxml"));
-            Scene scene = new Scene(myPane);
-            stage.setScene(scene);
-            stage.showAndWait();
+            saleDialogController.resetDialog();
+            saleDialogController.setDialogEnumeration(DialogEnumeration.ADD);
+            saleDialog.showAndWait();
             sales.setAll(saleService.getAllSales());
-        }catch (IOException e){
-            LOGGER.error("Add Sale Button Click did not work");
         }catch (Exception e){
             LOGGER.error("Loading the Sales failed" + e);
         }

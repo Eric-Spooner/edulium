@@ -171,7 +171,7 @@ public class MenuDialogController implements Initializable {
                 this.dialogEnumeration != DialogEnumeration.SEARCH){
             switch (this.dialogEnumeration) {
                 case UPDATE:
-                case ADD: //There has to be a Price, if the User want's to ADD or UPDATE
+                case ADD: //There has to be a Price, if the User wants to ADD or UPDATE
                     ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must have a value");
                     return;
             }

@@ -21,7 +21,6 @@
       <Button layoutX="447.0" layoutY="182.0" mnemonicParsing="false" onAction="#buttonAddClick" prefHeight="31.0" prefWidth="74.0" text="Add" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
       <Text layoutX="20.0" layoutY="405.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name: " AnchorPane.bottomAnchor="189.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="645.0224609375" />
       <TextField fx:id="textFieldName" layoutX="75.0" layoutY="384.0" prefHeight="31.0" prefWidth="491.0" AnchorPane.bottomAnchor="183.0" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="146.0" />
-      <Button defaultButton="true" layoutX="658.0" layoutY="384.0" mnemonicParsing="false" onAction="#buttonOKClick" text="OK" AnchorPane.bottomAnchor="189.0" AnchorPane.rightAnchor="13.0" />
       <Text layoutX="443.0" layoutY="131.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sale Price:" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
       <TableView fx:id="tableViewInMenu" layoutX="413.0" layoutY="14.0" prefHeight="342.0" prefWidth="404.0" AnchorPane.bottomAnchor="242.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
          <columns>
@@ -30,7 +29,6 @@
             <TableColumn fx:id="tableColPriceInMen" prefWidth="119.0" text="Price" />
          </columns>
       </TableView>
-      <Button cancelButton="true" layoutX="588.0" layoutY="384.0" mnemonicParsing="false" onAction="#buttonCancelClick" text="Cancel" AnchorPane.bottomAnchor="189.0" AnchorPane.rightAnchor="58.0" />
       <Button layoutX="445.0" layoutY="224.0" mnemonicParsing="false" onAction="#buttonRemoveClick" text="Remove" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
       <RadioButton fx:id="radioButtonOnetimeSale" layoutX="15.0" layoutY="359.0" mnemonicParsing="false" onAction="#changeRadio" text="One-time sale" AnchorPane.bottomAnchor="140.0" AnchorPane.leftAnchor="14.0" />
       <RadioButton fx:id="radioButtonIntermittentSale" layoutX="15.0" layoutY="452.0" mnemonicParsing="false" onAction="#changeRadio" text="Intermittent sale" AnchorPane.bottomAnchor="74.0" AnchorPane.leftAnchor="14.0" />
