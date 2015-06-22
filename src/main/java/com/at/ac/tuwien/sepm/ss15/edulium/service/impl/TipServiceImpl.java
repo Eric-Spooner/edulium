@@ -24,7 +24,7 @@ class TipServiceImpl implements TipService {
     private OrderService orderService;
 
     @Override
-    public void calculateTheTipPerUserAndMatchItToUser(Invoice invoice, BigDecimal tip) throws ServiceException{
+    public void divideAndMatchTip(Invoice invoice, BigDecimal tip) throws ServiceException{
         List<User> userList = new LinkedList<>();
         try {
             for(Order order: invoice.getOrders()){

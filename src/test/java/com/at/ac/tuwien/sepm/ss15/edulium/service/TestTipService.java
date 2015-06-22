@@ -72,7 +72,7 @@ public class TestTipService extends AbstractServiceTest {
 
         @Test
         @WithMockUser(username = "servicetester", roles={"SERVICE"})
-        public void testCalcTipAndMatchUser_shouldWork() throws ServiceException {
+        public void testDivideAndMatchTip_shouldWork() throws ServiceException {
             //PREPARE
             Order order1 = createOrder(BigDecimal.valueOf(100),"Order Information", BigDecimal.valueOf(0.2),
                     LocalDateTime.now(), Order.State.QUEUED, 1);
@@ -88,7 +88,7 @@ public class TestTipService extends AbstractServiceTest {
             invoice.setOrders(orderList);
 
             //WHEN
-            tipService.calculateTheTipPerUserAndMatchItToUser(invoice, BigDecimal.valueOf(20));
+            tipService.divideAndMatchTip(invoice, BigDecimal.valueOf(20));
 
             //THEN
             List<User> userList = userService.findUsers(User.withIdentity("servicetester"));
@@ -99,14 +99,14 @@ public class TestTipService extends AbstractServiceTest {
 
         @Test
         @WithMockUser(username = "servicetester", roles={"SERVICE"})
-        public void testCalcTipAndMatchUser_shouldWorkWithMultipleUsers() throws ServiceException {
+        public void testDivideAndMatchTip_shouldWorkWithMultipleUsers() throws ServiceException {
             //PREPARE
             //The used data is in the testdata.sql file already prepared
             assertEquals(1, invoiceService.findInvoices(Invoice.withIdentity(1)).size());
             Invoice invoice = invoiceService.findInvoices(Invoice.withIdentity(1)).get(0);
 
             //WHEN
-            tipService.calculateTheTipPerUserAndMatchItToUser(invoice, BigDecimal.valueOf(100));
+            tipService.divideAndMatchTip(invoice, BigDecimal.valueOf(100));
 
             //THEN
             List<User> userList = userService.findUsers(User.withIdentity("servicetester"));

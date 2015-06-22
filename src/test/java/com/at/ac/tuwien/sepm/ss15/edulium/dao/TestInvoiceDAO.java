@@ -207,7 +207,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
     @Test
     public void testFind_shouldReturnEmptyListWhenNoObjectIsStored() throws DAOException {
         // WHEN
-        List results = invoiceDAO.find(Invoice.withIdentity(1L));
+        List results = invoiceDAO.find(Invoice.withIdentity(100L));
 
         // THEN
         assertTrue(results.isEmpty());
@@ -236,6 +236,8 @@ public class TestInvoiceDAO extends AbstractDAOTest {
     @Test
     public void testGetAll_shouldReturnAllObjects() throws ValidationException, DAOException {
         // GIVEN
+        int sizeBefore = invoiceDAO.getAll().size();
+
         Invoice inv1 = new Invoice();
         Invoice inv2 = new Invoice();
         Invoice inv3 = new Invoice();
@@ -260,7 +262,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         assertNotNull(all);
 
         // THEN
-        assertEquals(3, all.size());
+        assertEquals(sizeBefore + 3, all.size());
         assertTrue(all.contains(inv1));
         assertTrue(all.contains(inv2));
         assertTrue(all.contains(inv3));

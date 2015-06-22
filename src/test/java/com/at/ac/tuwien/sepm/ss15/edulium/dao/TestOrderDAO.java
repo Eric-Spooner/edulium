@@ -191,7 +191,7 @@ public class TestOrderDAO extends AbstractDAOTest {
     public void testUpdate_updatingNotPersistentObjectShouldFail() throws DAOException,
             ValidationException {
         // GIVEN
-        Long identity = (long) 1;
+        Long identity = (long) 100;
         Order order = Order.withIdentity(identity);
 
         // generate identity which is not used by any persistent object
@@ -282,7 +282,7 @@ public class TestOrderDAO extends AbstractDAOTest {
     public void testDelete_deletingNotPersistentObjectShouldFail() throws DAOException,
             ValidationException {
         // GIVEN
-        Long identity = (long) 1;
+        Long identity = (long) 100;
         Order order = new Order();
         order.setIdentity(identity);
 
@@ -427,7 +427,7 @@ public class TestOrderDAO extends AbstractDAOTest {
     public void testGetHistory_notPersistentDataShouldReturnEmptyList()
             throws DAOException, ValidationException {
         // GIVEN
-        Long identity = (long) 1;
+        Long identity = (long) 100;
         Order matcher = new Order();
         matcher.setIdentity(identity);
 
@@ -442,14 +442,10 @@ public class TestOrderDAO extends AbstractDAOTest {
     }
 
     @Test
-    public void testGetAll_shouldReturnEmptyList() throws DAOException {
-        // WHEN / THEN
-        assertTrue(orderDAO.getAll().isEmpty());
-    }
-
-    @Test
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
+        int sizeBefore = orderDAO.getAll().size();
+
         Order order1  = createOrder(BigDecimal.valueOf(500),"Order Information1",
                 BigDecimal.valueOf(0.2), LocalDateTime.now(), Order.State.DELIVERED);
         orderDAO.create(order1);
@@ -464,7 +460,7 @@ public class TestOrderDAO extends AbstractDAOTest {
         List<Order> objects = orderDAO.getAll();
 
         // THEN
-        assertEquals(3, objects.size());
+        assertEquals(sizeBefore+3, objects.size());
         assertTrue(objects.contains(order1));
         assertTrue(objects.contains(order2));
         assertTrue(objects.contains(order3));
