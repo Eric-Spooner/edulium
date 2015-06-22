@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -17,7 +18,8 @@ import java.util.ResourceBundle;
 /**
  * Controller for the TaxRate Dialog
  */
-public class DialogMenuCategoryController implements Initializable, Controller{
+@Controller
+public class DialogMenuCategoryController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(DialogMenuCategoryController.class);
 
     @Autowired
@@ -90,10 +92,5 @@ public class DialogMenuCategoryController implements Initializable, Controller{
 
     public static void resetDialog(){
         menuCategory = null;
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-
     }
 }

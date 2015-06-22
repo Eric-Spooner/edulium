@@ -18,6 +18,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
 
 import java.net.URL;
 import java.util.List;
@@ -28,7 +29,8 @@ import java.util.function.Supplier;
 /**
  * Controller used for the Manager View
  */
-public class LoginController implements Initializable, Controller {
+@Controller
+public class LoginController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(LoginController.class);
 
     @FXML
@@ -82,6 +84,7 @@ public class LoginController implements Initializable, Controller {
                 }
             }
         });
+        users.startPolling();
 
         GridView<User> gridView = new GridView<>(users);
         gridView.setCellFactory(view -> new UserButtonCell());
@@ -129,15 +132,6 @@ public class LoginController implements Initializable, Controller {
             alert.setContentText("Login as '" + user.getIdentity() + "' has failed, please try it again or contact your manager.");
 
             alert.showAndWait();
-        }
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-        if (disabled) {
-            users.stopPolling();
-        } else {
-            users.startPolling();
         }
     }
 }

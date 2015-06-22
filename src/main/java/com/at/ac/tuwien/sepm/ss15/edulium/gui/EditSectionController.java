@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
 import java.net.URL;
@@ -32,7 +33,7 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Controller used for Edit Section window
  */
-@Component
+@Controller
 public class EditSectionController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(EditSectionController.class);
 

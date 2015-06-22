@@ -42,15 +42,11 @@ class ReservationServiceImpl implements ReservationService {
     public void addReservation(Reservation reservation) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addReservation with parameter: " + reservation);
 
+        reservationValidator.validateForCreate(reservation);
+
         validateReservationTime(reservation);
 
         try {
-            if(reservation.getTables() == null || reservation.getTables().isEmpty()) {
-                reservation.setTables(reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables()));
-            }
-
-            reservationValidator.validateForCreate(reservation);
-
             reservationDAO.create(reservation);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
@@ -78,20 +74,6 @@ class ReservationServiceImpl implements ReservationService {
         validateReservationTime(reservation);
 
         try {
-            // check if reservation time or seats will be changed
-            if((reservation.getTables() == null || reservation.getTables().isEmpty()) &&
-                    (reservation.getQuantity() != originalReservation.getQuantity() ||
-                     reservation.getTime() != originalReservation.getTime() ||
-                     reservation.getDuration() != originalReservation.getDuration())) {
-
-                // delete tables from reservation
-                originalReservation.setTables(new ArrayList<>());
-                reservationDAO.update(originalReservation);
-
-                // get new tables
-                reservation.setTables(reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables()));
-            }
-
             reservationDAO.update(reservation);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
@@ -114,6 +96,35 @@ class ReservationServiceImpl implements ReservationService {
             LOGGER.error("An Error has occurred in the data access object", e);
             throw new ServiceException("An Error has occurred in the data access object");
         }
+    }
+
+    @Override
+    public void findTablesForReservation(Reservation reservation) throws ServiceException, ValidationException {
+        LOGGER.debug("Entering findTablesForReservation with parameter: " + reservation);
+
+        // validate reservation
+        if (reservation.getTime() == null) {
+            throw new ValidationException("time must not be null");
+        }
+
+        if (reservation.getDuration() == null) {
+            throw new ValidationException("duration must not be null");
+        }
+
+        if (reservation.getQuantity() == null) {
+            throw new ValidationException("quantity must not be null");
+        }
+
+        validateReservationTime(reservation);
+
+        List<Table> tables = reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables());
+
+        if (tables.isEmpty()) {
+            LOGGER.debug("no free tables found");
+            throw new ServiceException("no free tables found");
+        }
+
+        reservation.setTables(tables);
     }
 
     @Override
@@ -184,7 +195,7 @@ class ReservationServiceImpl implements ReservationService {
             throw new ServiceException("An Error has occurred in the data access object");
         }
 
-        if(resList.isEmpty()) {
+        if(resList.size() != 1) {
             LOGGER.error("reservation not found");
             throw new ServiceException("reservation not found");
         }

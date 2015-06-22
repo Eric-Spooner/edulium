@@ -27,6 +27,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -36,10 +37,8 @@ import java.util.ResourceBundle;
 
 import static javafx.collections.FXCollections.observableArrayList;
 
-/**
- * Created by - on 12.06.2015.
- */
-public class MenuEntryViewController implements Initializable, Controller {
+@Controller
+public class MenuEntryViewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(MenuEntryViewController.class);
 
     @FXML
@@ -198,11 +197,5 @@ public class MenuEntryViewController implements Initializable, Controller {
         } catch (Exception e){
             LOGGER.error("Loading All Menu Entries failed" + e);
         }
-    }
-
-
-    @Override
-    public void disable(boolean disabled) {
-
     }
 }

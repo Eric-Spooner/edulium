@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
@@ -11,11 +12,12 @@
    <top>
       <HBox prefHeight="50.0" prefWidth="200.0" spacing="20.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="btnSave" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnSave_clicked" prefHeight="40.0" prefWidth="80.0" text="Save">
+            <Button fx:id="btnSave" disable="true" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnSave_clicked" prefHeight="40.0" prefWidth="80.0" text="Save">
                <font>
                   <Font size="18.0" />
                </font>
             </Button>
+            <Button fx:id="btnAuto" disable="true" mnemonicParsing="false" onAction="#on_btnAuto_clicked" prefHeight="40.0" prefWidth="160.0" text="Auto-Assign Tables" />
             <Button fx:id="btnCancel" layoutX="14.0" layoutY="5.0" mnemonicParsing="false" onAction="#on_btnCancel_clicked" prefHeight="40.0" prefWidth="120.0" text="Cancel">
                <font>
                   <Font size="18.0" />
@@ -25,7 +27,7 @@
       </HBox>
    </top>
    <center>
-      <SplitPane fx:id="splitPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" dividerPositions="0.8">
+      <SplitPane fx:id="splitPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <items>
             <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0">
                <children>
@@ -54,7 +56,7 @@
                         <Insets top="10.0" />
                      </VBox.margin>
                   </Label>
-                  <NumericTextField fx:id="tfQuantity" prefHeight="30.0" />
+                  <NumericTextField fx:id="tfQuantity" prefHeight="30.0" text="0"/>
                   <Label text="Duration">
                      <font>
                         <Font size="15.0" />
@@ -63,7 +65,7 @@
                         <Insets top="10.0" />
                      </VBox.margin>
                   </Label>
-                  <NumericTextField fx:id="tfDuration" prefHeight="30.0" />
+                  <NumericTextField fx:id="tfDuration" prefHeight="30.0"  text="0"/>
                   <Label text="Date:">
                      <font>
                         <Font size="15.0" />
@@ -83,9 +85,9 @@
                   </Label>
                   <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <NumericTextField fx:id="tfHour" prefHeight="30.0" prefWidth="45.0" />
+                        <NumericTextField fx:id="tfHour" prefHeight="30.0" prefWidth="45.0" text="0" />
                         <Label prefHeight="22.0" prefWidth="7.0" text=":" />
-                        <NumericTextField fx:id="tfMinute" prefHeight="30.0" prefWidth="46.0" />
+                        <NumericTextField fx:id="tfMinute" prefHeight="30.0" prefWidth="46.0" text="0" />
                      </children>
                   </HBox>
                   <Label fx:id="lblSeats" alignment="CENTER" text="0 / 0">

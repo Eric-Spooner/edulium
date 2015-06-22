@@ -29,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
 import java.net.URL;
@@ -41,7 +42,8 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Controller used for Room view in Manager Window
  */
-public class RoomViewController implements Initializable, Controller {
+@Controller
+public class RoomViewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(RoomViewController.class);
 
     @FXML
@@ -301,10 +303,5 @@ public class RoomViewController implements Initializable, Controller {
             }
         }
         return max*FACT + TABLE_SIZE + 2*SECTION_PADDING;
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-
     }
 }
