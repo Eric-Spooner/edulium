@@ -80,7 +80,7 @@ public class EmployeeViewController implements Initializable {
 
     @FXML
     public void buttonEmployeesAddClicked(ActionEvent actionEvent) {
-        InputDialog<User> userInputDialog = new CreateInputDialog<>("employee");
+        CreateInputDialog<User> userInputDialog = new CreateInputDialog<>("employee");
         userInputDialog.setValidator(userValidator);
         userInputDialog.setContent(userDialogPane);
         userInputDialog.setController(userDialogController);
@@ -104,7 +104,7 @@ public class EmployeeViewController implements Initializable {
     public void buttonEmployeesUpdateClicked(ActionEvent actionEvent) {
         User selectedUser = tableViewEmployee.getSelectionModel().getSelectedItem();
         if (selectedUser != null) {
-            InputDialog<User> userInputDialog = new UpdateInputDialog<>("employee", selectedUser);
+            UpdateInputDialog<User> userInputDialog = new UpdateInputDialog<>("employee", selectedUser);
             userInputDialog.setValidator(userValidator);
             userInputDialog.setContent(userDialogPane);
             userInputDialog.setController(userDialogController);
@@ -128,7 +128,7 @@ public class EmployeeViewController implements Initializable {
 
     @FXML
     public void buttonEmployeesSearchClicked(ActionEvent actionEvent) {
-        InputDialog<User> userSearchDialog = new SearchInputDialog<>("employees");
+        SearchInputDialog<User> userSearchDialog = new SearchInputDialog<>("employees");
         userSearchDialog.setContent(userDialogPane);
         userSearchDialog.setController(userDialogController);
         userSearchDialog.showAndWait().ifPresent(userMatcher -> {
