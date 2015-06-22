@@ -81,7 +81,7 @@ public class EditSectionController implements Initializable {
             Table tableMatcher = new Table();
             tableMatcher.setSection(section);
             for(Table table : interiorService.findTables(tableMatcher)) {
-                Rect rect = new Rect(table.getColumn()*FACT, table.getRow()*FACT, TABLE_SIZE, TABLE_SIZE, interiorService);
+                Rect rect = new Rect(table.getColumn()*FACT, table.getRow()*FACT, TABLE_SIZE, TABLE_SIZE);
                 rect.setNumber(table.getNumber());
                 rect.setSeats(table.getSeats());
                 rects.add(rect);
@@ -129,12 +129,12 @@ public class EditSectionController implements Initializable {
                                 }
                             }
 
-                            Rect rect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
+                            Rect rect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE);
                             for (Rect iteratingRect : rects) {
-                                if (iteratingRect.getRect(rect.getX() + 1, rect.getY() + 1) != null ||
-                                        iteratingRect.getRect(rect.getX() + TABLE_SIZE - 1, rect.getY() + 1) != null ||
-                                        iteratingRect.getRect(rect.getX() + 1, rect.getY() + TABLE_SIZE - 1) != null ||
-                                        iteratingRect.getRect(rect.getX() + TABLE_SIZE - 1, rect.getY() + TABLE_SIZE - 1) != null) {
+                                if (iteratingRect.contains(rect.getX() + 1, rect.getY() + 1) ||
+                                        iteratingRect.contains(rect.getX() + TABLE_SIZE - 1, rect.getY() + 1) ||
+                                        iteratingRect.contains(rect.getX() + 1, rect.getY() + TABLE_SIZE - 1) ||
+                                        iteratingRect.contains(rect.getX() + TABLE_SIZE - 1, rect.getY() + TABLE_SIZE - 1)) {
                                     intersectsWithExistingTable = true;
                                 }
                             }
@@ -149,7 +149,7 @@ public class EditSectionController implements Initializable {
                     } else if (removeTable) {
                         Rect deleteRect = null;
                         for (Rect rect : rects) {
-                            if (rect.getRect(t.getX(), t.getY()) != null) {
+                            if (rect.contains(t.getX(), t.getY())) {
                                 deleteRect = rect;
                             }
                         }
@@ -158,7 +158,7 @@ public class EditSectionController implements Initializable {
                         drawCanvas();
                     } else if (updateTable) {
                         for (Rect rect : rects) {
-                            if (rect.getRect(t.getX(), t.getY()) != null) {
+                            if (rect.contains(t.getX(), t.getY())) {
                                 try {
                                     Stage stage = new Stage();
                                     UpdateTableController.setThisStage(stage);
@@ -201,7 +201,7 @@ public class EditSectionController implements Initializable {
             public void handle(MouseEvent t) {
                 if(moveTable) {
                     if(movingRect != null) {
-                        Rect movedRect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
+                        Rect movedRect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE);
                         movedRect.setNumber(movingRect.getNumber());
                         rects.add(movedRect);
                         movingRect = null;
@@ -215,7 +215,7 @@ public class EditSectionController implements Initializable {
             public void handle(MouseEvent t) {
                 if(moveTable) {
                     for (Rect rect : rects) {
-                        if (rect.getRect(t.getX(), t.getY()) != null) {
+                        if (rect.contains(t.getX(), t.getY())) {
                             if(movingRect == null) {
                                 movingRect = rect;
                             }
@@ -231,10 +231,10 @@ public class EditSectionController implements Initializable {
 
                         boolean intersectsWithExistingTable = false;
                         for (Rect iteratingRect : rects) {
-                            if (iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) != null ||
-                                    iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) != null ||
-                                    iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1) != null ||
-                                    iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1) != null) {
+                            if (iteratingRect.contains(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) ||
+                                    iteratingRect.contains(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) ||
+                                    iteratingRect.contains(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1) ||
+                                    iteratingRect.contains(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1)) {
                                 intersectsWithExistingTable = true;
                             }
                         }
