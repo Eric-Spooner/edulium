@@ -1,6 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
@@ -12,6 +13,9 @@ class InvoiceValidator implements Validator<Invoice> {
 
     @Resource(name = "userValidator")
     private Validator<User> userValidator;
+
+    @Resource(name = "orderValidator")
+    private Validator<Order> orderValidator;
 
     /**
      * Validates the invoice object for the create action
@@ -77,6 +81,18 @@ class InvoiceValidator implements Validator<Invoice> {
 
         if (invoice.getGross().compareTo(BigDecimal.ZERO) < 0) {
             throw new ValidationException("The total gross amount cannot be negative");
+        }
+
+        if (invoice.getOrders() == null) {
+            throw new ValidationException("Orders cannot be null");
+        }
+
+        if (invoice.getOrders().isEmpty()) {
+            throw new ValidationException("Orders must contain at least one order");
+        }
+
+        for (Order order : invoice.getOrders()) {
+            orderValidator.validateIdentity(order);
         }
 
         userValidator.validateIdentity(invoice.getCreator());
