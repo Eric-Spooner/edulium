@@ -177,13 +177,14 @@ public class PrinterInvoiceManager implements InvoiceManager {
             LOGGER.error("An error occurred while opening the output stream", e);
             throw new ServiceException("An error occurred while opening the output stream", e);
         } catch (IOException e) {
-            // TODO: Handle reader initialization error
+            LOGGER.error("An error occurred while initiating the PDF reader", e);
+            throw new ServiceException("An error occurred while initiating the PDF reader", e);
         } finally {
             if (stamper != null) {
                 try {
                     stamper.close();
                 } catch (DocumentException | IOException e) {
-                    // TODO: Handle exception
+                    LOGGER.error("An error occurred while trying to close the PDF stamper", e);
                 }
             }
 
