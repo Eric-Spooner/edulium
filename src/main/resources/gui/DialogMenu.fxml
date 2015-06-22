@@ -2,16 +2,14 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
-<?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
 <VBox spacing="10.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.MenuDialogController">
    <children>
       <HBox layoutX="14.0" layoutY="14.0" spacing="10.0">
          <children>
-            <TableView fx:id="tableViewData" layoutX="14.0" layoutY="14.0" AnchorPane.bottomAnchor="82.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0" HBox.hgrow="ALWAYS">
+            <TableView fx:id="tableViewAll" layoutX="14.0" layoutY="14.0" onMouseClicked="#on_tableViewAll_clicked" AnchorPane.bottomAnchor="82.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0" HBox.hgrow="ALWAYS">
                <columns>
                   <TableColumn fx:id="tableColNameData" prefWidth="147.0" text="Name" />
                   <TableColumn fx:id="tableColCategoryData" prefWidth="178.0" text="Category" />
@@ -22,11 +20,11 @@
                <children>
                   <Text layoutX="443.0" layoutY="131.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Menu Price:" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
                   <TextField fx:id="textFieldPrice" layoutX="434.0" layoutY="143.0" prefWidth="100.0" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
-                  <Button layoutX="447.0" layoutY="182.0" mnemonicParsing="false" onAction="#buttonAddClick" prefWidth="100.0" text="Add" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
-                  <Button layoutX="445.0" layoutY="224.0" mnemonicParsing="false" onAction="#buttonRemoveClick" prefWidth="100.0" text="Remove" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
+                  <Button fx:id="buttonAdd" disable="true" layoutX="447.0" layoutY="182.0" mnemonicParsing="false" onAction="#buttonAddClick" prefWidth="100.0" text="Add" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
+                  <Button fx:id="buttonRemove" disable="true" layoutX="445.0" layoutY="224.0" mnemonicParsing="false" onAction="#buttonRemoveClick" prefWidth="100.0" text="Remove" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
                </children>
             </VBox>
-            <TableView fx:id="tableViewInMenu" layoutX="413.0" layoutY="14.0" AnchorPane.bottomAnchor="82.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" HBox.hgrow="ALWAYS">
+            <TableView fx:id="tableViewInMenu" layoutX="413.0" layoutY="14.0" onMouseClicked="#on_tableViewInMenu_clicked" AnchorPane.bottomAnchor="82.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" HBox.hgrow="ALWAYS">
                <columns>
                   <TableColumn fx:id="tableColNameInMenu" prefWidth="138.0" text="Name" />
                   <TableColumn fx:id="tableColCategoryInMen" prefWidth="144.0" text="Category" />
