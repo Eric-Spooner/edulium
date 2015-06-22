@@ -100,7 +100,7 @@ public class EmployeeViewController implements Initializable, Controller {
             stage.setScene(scene);
             stage.showAndWait();
             users.setAll(userService.getAllUsers());
-            DialogMenuController.resetDialog();
+            DialogUserController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Loading the User failed" + e);
         }

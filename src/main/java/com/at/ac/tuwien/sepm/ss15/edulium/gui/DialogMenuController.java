@@ -13,7 +13,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,22 +32,16 @@ import static javafx.collections.FXCollections.observableArrayList;
 public class DialogMenuController implements Initializable, Controller{
     private static final Logger LOGGER = LogManager.getLogger(DialogMenuController.class);
 
-    private static Stage thisStage;
-
     @Autowired
     private MenuService menuService;
 
-    private static Menu menu;
-    private static DialogEnumeration dialogEnumeration;
-
-    public static void setThisStage(Stage thisStage) {
-        DialogMenuController.thisStage = thisStage;
+    private  Menu menu;
+    private  DialogEnumeration dialogEnumeration;
+    public  void setMenu(Menu menu) {this.menu = menu; }
+    public  void setDialogEnumeration(DialogEnumeration dialogEnumeration) {
+        this.dialogEnumeration = dialogEnumeration;
     }
-    public static void setMenu(Menu menu) {DialogMenuController.menu = menu; }
-    public static void setDialogEnumeration(DialogEnumeration dialogEnumeration) {
-        DialogMenuController.dialogEnumeration = dialogEnumeration;
-    }
-    public static Menu getMenu() {
+    public Menu getMenu() {
         return menu;
     }
 
@@ -81,12 +74,17 @@ public class DialogMenuController implements Initializable, Controller{
     private ObservableList<MenuEntry> inMenuMenuEntries;
 
 
+    public void showMenu(){
+        inMenuMenuEntries.setAll(menu.getEntries());
+        textFieldName.setText(menu.getName());
+    }
 
     /**
      * Function is used to init the Menu Dialog
      * @param location
      * @param resources
      */
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         LOGGER.info("Initialize Dialog Menu");
@@ -103,7 +101,7 @@ public class DialogMenuController implements Initializable, Controller{
         if(menu == null){
             Menu menuForInit = new Menu();
             menuForInit.setEntries(new LinkedList<>());
-            DialogMenuController.setMenu(menuForInit);
+            this.setMenu(menuForInit);
         }
         if(menu.getEntries() == null) {
             menu.setEntries(new LinkedList<>());
@@ -129,53 +127,47 @@ public class DialogMenuController implements Initializable, Controller{
 
     }
 
-    public void buttonOKClick(ActionEvent actionEvent) {
+    public boolean validateData() {
         LOGGER.info("Dialog Menu OK Button clicked");
         if ((textFieldName.getText() == null || textFieldName.getText().equals("")) &&
-                DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH) {
+                this.dialogEnumeration != DialogEnumeration.SEARCH) {
             ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
-            return;
+            return false;
         }
-        if (DialogMenuController.dialogEnumeration == DialogEnumeration.SEARCH) {
+        if (this.dialogEnumeration == DialogEnumeration.SEARCH) {
             if(!textFieldName.getText().isEmpty()) menu.setName(textFieldName.getText());
         } else{
             menu.setName(textFieldName.getText());
         }
-        if(DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH){
+        if(this.dialogEnumeration != DialogEnumeration.SEARCH){
             if (menu.getEntries().size() == 0) {
                 ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "There hast to be at least one Menu Entry");
-                return;
+                return false;
             }
         }
         try {
-            switch (DialogMenuController.dialogEnumeration) {
+            switch (this.dialogEnumeration) {
                 case ADD:
                     menuService.addMenu(menu);
-                    break;
+                    return true;
                 case UPDATE:
                     menuService.updateMenu(menu);
-                    break;
+                    return true;
             }
+            return true;
         }catch (Exception e){
             ManagerViewController.showErrorDialog
                     ("Error", "Menu Service Error", "The Service was unable to handle the required Menu action/n" + e.toString());
             LOGGER.error("The Service was unable to handle the required Menu action " + e);
-            return;
+            return false;
         }
-        thisStage.close();
-    }
-
-    public void buttonCancelClick(ActionEvent actionEvent) {
-        LOGGER.info("Dialog Menu Cancel Button clicked");
-        resetDialog();
-        thisStage.close();
     }
 
     public void buttonAddClick(ActionEvent actionEvent) {
         if((textFieldPrice.getText() == null || textFieldPrice.getText().equals("")) &&
-                DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH){
-            switch (DialogMenuController.dialogEnumeration) {
+                this.dialogEnumeration != DialogEnumeration.SEARCH){
+            switch (this.dialogEnumeration) {
                 case UPDATE:
                 case ADD: //There has to be a Price, if the User want's to ADD or UPDATE
                     ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must have a value");
@@ -191,7 +183,7 @@ public class DialogMenuController implements Initializable, Controller{
         try {
             MenuEntry menuEntry = tableViewData.getSelectionModel().getSelectedItem();
             BigDecimal price = null;
-            switch (DialogMenuController.dialogEnumeration) {
+            switch (this.dialogEnumeration) {
                 case UPDATE:
                 case ADD:
                     price = BigDecimal.valueOf(Double.parseDouble(textFieldPrice.getText()));
@@ -209,11 +201,11 @@ public class DialogMenuController implements Initializable, Controller{
             menu.setEntries(list);
             inMenuMenuEntries.setAll(menu.getEntries());
         } catch (NumberFormatException e) {
-            ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must be a number/n" + e.toString());
+            ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must be a number /n" + e.toString());
             LOGGER.info("Dialog Menu Add Button Clicked Price must be number " + e);
         } catch (Exception e) {
             ManagerViewController.showErrorDialog
-                    ("Error", "Data Validation", "An Error occured during adding MenuEntry/n" + e.toString());
+                    ("Error", "Data Validation", "An Error occured during adding MenuEntry /n" + e.toString());
             LOGGER.info("Dialog Menu Add Button Menu Entry handling Error" + e);
         }
     }
@@ -234,8 +226,16 @@ public class DialogMenuController implements Initializable, Controller{
     /**
      * this function is used to rest the static members of the class
      */
-    public static void resetDialog(){
-        DialogMenuController.setMenu(null);
+    public void resetDialog(){
+        this.textFieldName.setText("");
+        this.textFieldPrice.setText("");
+        Menu menuForInit = new Menu();
+        menuForInit.setEntries(new LinkedList<>());
+        inMenuMenuEntries.clear();
+        this.setMenu(menuForInit);
+        if(menu.getEntries() == null) {
+            menu.setEntries(new LinkedList<>());
+        }
     }
 
     @Override

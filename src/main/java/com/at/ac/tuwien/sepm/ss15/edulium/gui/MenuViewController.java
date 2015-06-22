@@ -12,9 +12,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -52,6 +53,9 @@ public class MenuViewController implements Initializable, Controller {
     @Resource(name = "menuDialogPane")
     private FXMLPane menuDialogPane;
 
+    private DialogMenuController dialogMenuController;
+    private Dialog<Menu> menuDialog;
+
     @Autowired
     private MenuService menuService;
     @Autowired
@@ -75,6 +79,22 @@ public class MenuViewController implements Initializable, Controller {
                     return new SimpleStringProperty(list.toString());
                 }
             });
+
+            dialogMenuController = menuDialogPane.getController(DialogMenuController.class);
+            menuDialog = new Dialog<>();
+            menuDialog.getDialogPane().setContent(menuDialogPane);
+            ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+            menuDialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, cancelButtonType);
+            final Button btOk = (Button) menuDialog.getDialogPane().lookupButton(ButtonType.OK);
+            btOk.addEventFilter(ActionEvent.ACTION, event -> {
+                if (!dialogMenuController.validateData()) {
+                    event.consume();
+                }
+            });
+            final Button cancelButton = (Button) menuDialog.getDialogPane().lookupButton(cancelButtonType);
+            cancelButton.addEventFilter(ActionEvent.ACTION, event -> {
+                dialogMenuController.resetDialog();
+            });
         }catch (ServiceException e){
             LOGGER.error("Initialize Menu View Failed due to" + e);
         }
@@ -90,16 +110,13 @@ public class MenuViewController implements Initializable, Controller {
                         ("Error", "Input Validation Error", "You have to select a Menu to Update");
                 return;
             }
-            DialogMenuController.resetDialog();
-            DialogMenuController.setThisStage(stage);
-            DialogMenuController.setDialogEnumeration(DialogEnumeration.UPDATE);
-            DialogMenuController.setMenu(tableViewMenu.getSelectionModel().getSelectedItem());
-            stage.setTitle("Update Menu");
-            Scene scene = new Scene(menuDialogPane);
-            stage.setScene(scene);
-            stage.showAndWait();
+            dialogMenuController.resetDialog();
+            dialogMenuController.setDialogEnumeration(DialogEnumeration.UPDATE);
+            dialogMenuController.setMenu(tableViewMenu.getSelectionModel().getSelectedItem());
+            dialogMenuController.showMenu();
+            menuDialog.showAndWait();
             menus.setAll(menuService.getAllMenus());
-            DialogMenuController.resetDialog();
+            dialogMenuController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Loading the Menus failed" + e);
         }
@@ -108,20 +125,16 @@ public class MenuViewController implements Initializable, Controller {
     public void buttonMenuSearchClicked(ActionEvent actionEvent) {
         try {
             LOGGER.info("Search Menu Button Click");
-            Stage stage = new Stage();
-            DialogMenuController.resetDialog();
-            DialogMenuController.setThisStage(stage);
-            DialogMenuController.setDialogEnumeration(DialogEnumeration.SEARCH);
-            stage.setTitle("Search Menu");
-            Scene scene = new Scene(menuDialogPane);
-            stage.setScene(scene);
-            stage.showAndWait();
-            if(DialogMenuController.getMenu() != null){
-                menus.setAll(menuService.findMenu(DialogMenuController.getMenu()));
+            LOGGER.info("Add Menu Button Click");
+            dialogMenuController.resetDialog();
+            dialogMenuController.setDialogEnumeration(DialogEnumeration.SEARCH);
+            menuDialog.showAndWait();
+            if(dialogMenuController.getMenu() != null){
+                menus.setAll(menuService.findMenu(dialogMenuController.getMenu()));
             }else {
                 menus.setAll(menuService.getAllMenus());
             }
-            DialogMenuController.resetDialog();
+            dialogMenuController.resetDialog();
         }catch (ServiceException e){
             LOGGER.error("Menu Service finding Menus did not work" + e);
         }
@@ -145,14 +158,9 @@ public class MenuViewController implements Initializable, Controller {
     public void buttonMenuAddClicked(ActionEvent actionEvent){
         try {
             LOGGER.info("Add Menu Button Click");
-            Stage stage = new Stage();
-            DialogMenuController.resetDialog();
-            DialogMenuController.setThisStage(stage);
-            DialogMenuController.setDialogEnumeration(DialogEnumeration.ADD);
-            stage.setTitle("Add Menu");
-            Scene scene = new Scene(menuDialogPane);
-            stage.setScene(scene);
-            stage.showAndWait();
+            dialogMenuController.resetDialog();
+            dialogMenuController.setDialogEnumeration(DialogEnumeration.ADD);
+            menuDialog.showAndWait();
             menus.setAll(menuService.getAllMenus());
         }catch (Exception e){
             LOGGER.error("Loading the Menus failed" + e);
