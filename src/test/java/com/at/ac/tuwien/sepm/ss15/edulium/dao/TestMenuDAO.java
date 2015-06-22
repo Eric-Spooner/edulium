@@ -177,7 +177,6 @@ public class TestMenuDAO extends AbstractDAOTest {
         // THEN
         // check if entry was removed
         assertTrue(menuDAO.find(Menu.withIdentity(men.getIdentity())).isEmpty());
-        assertTrue(menuDAO.getAll().isEmpty());
     }
 
     @Test(expected = ValidationException.class)
@@ -406,14 +405,10 @@ public class TestMenuDAO extends AbstractDAOTest {
     }
 
     @Test
-    public void testGetAll_shouldReturnEmptyList() throws DAOException {
-        // WHEN / THEN
-        assertTrue(menuDAO.getAll().isEmpty());
-    }
-
-    @Test
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
+        int sizeBefore = menuDAO.getAll().size();
+
         LinkedList<MenuEntry> list1 = new LinkedList<>();
         list1.add(createMenuEntry("entry1", "desc", "cat", 20, 0.2, true));
         Menu men1 = createMenu("Menu", list1);
@@ -433,7 +428,7 @@ public class TestMenuDAO extends AbstractDAOTest {
         List<Menu> objects = menuDAO.getAll();
 
         // THEN
-        assertEquals(3, objects.size());
+        assertEquals(sizeBefore+3, objects.size());
         assertTrue(objects.contains(men1));
         assertTrue(objects.contains(men2));
         assertTrue(objects.contains(men3));
