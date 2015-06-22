@@ -61,8 +61,8 @@ class InvoiceServiceImpl implements InvoiceService {
     }
 
     private void updateGross(Invoice invoice) {
-        if (invoice.getOrders() != null && invoice.getOrders().size() > 0) {
-            BigDecimal sum = new BigDecimal("0");
+        if (invoice.getOrders() != null) {
+            BigDecimal sum = BigDecimal.ZERO;
             for (Order order : invoice.getOrders()) {
                 sum = sum.add(order.getBrutto());
             }

@@ -31,7 +31,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PrinterInvoiceManager implements InvoiceManager {
+class PrinterInvoiceManager implements InvoiceManager {
     private static final Logger LOGGER = LogManager.getLogger(PrinterInvoiceManager.class);
 
     private static final String templatePath = "src/main/resources/invoice_templates/template.pdf";
