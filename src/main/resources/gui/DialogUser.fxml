@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="217.0" prefWidth="421.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.UserDialogController">
+<GridPane hgap="5.0" vgap="5.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.UserDialogController">
    <children>
-      <Text layoutX="15.0" layoutY="86.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username:" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="336.13427734375" AnchorPane.topAnchor="69.8134765625" />
-      <TextField id="1" fx:id="textFieldName" layoutX="104.0" layoutY="18.0" prefHeight="31.0" prefWidth="300.0" AnchorPane.leftAnchor="104.0" AnchorPane.rightAnchor="17.0" AnchorPane.topAnchor="18.0" />
-      <TextField id="1" fx:id="textFieldUsername" layoutX="104.0" layoutY="65.0" prefHeight="31.0" prefWidth="300.0" AnchorPane.leftAnchor="104.0" AnchorPane.rightAnchor="17.0" AnchorPane.topAnchor="65.0" />
-      <ChoiceBox id="4" fx:id="dropRole" layoutX="104.0" layoutY="107.0" prefHeight="31.0" prefWidth="300.0" AnchorPane.leftAnchor="104.0" AnchorPane.rightAnchor="17.0" AnchorPane.topAnchor="107.0" />
-      <Button id="7" defaultButton="true" layoutX="359.0" layoutY="161.0" mnemonicParsing="false" onAction="#buttonOKClick" text="OK" AnchorPane.bottomAnchor="25.0" AnchorPane.rightAnchor="21.0" />
-      <Button cancelButton="true" layoutX="292.0" layoutY="161.0" mnemonicParsing="false" onAction="#buttonCancelClick" text="Cancel" AnchorPane.bottomAnchor="25.0" AnchorPane.rightAnchor="65.0" />
-      <Text layoutX="18.0" layoutY="128.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Role:" AnchorPane.leftAnchor="18.0" AnchorPane.rightAnchor="370.509765625" AnchorPane.topAnchor="112.0" />
-      <Text layoutX="13.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name:" AnchorPane.leftAnchor="13.0" AnchorPane.rightAnchor="365.13134765625" AnchorPane.topAnchor="22.8134765625" />
+      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Username:" GridPane.rowIndex="1" />
+      <TextField id="1" fx:id="textFieldName" prefHeight="31.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+      <TextField id="1" fx:id="textFieldUsername" prefHeight="31.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+      <ChoiceBox id="4" fx:id="dropRole" prefHeight="31.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Role:" GridPane.rowIndex="2" />
+      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Name:" />
    </children>
-</AnchorPane>
+   <columnConstraints>
+      <ColumnConstraints halignment="RIGHT" hgrow="NEVER" />
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+   </rowConstraints>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</GridPane>

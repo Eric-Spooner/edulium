@@ -56,7 +56,7 @@
     <import resource="gui/cook/Spring-CookViewPane.xml" />
     <import resource="gui/manager/Spring-MenuCategoryDialogPane.xml" />
     <import resource="gui/manager/Spring-MenuEntryDialogPane.xml" />
-    <import resource="gui/manager/Spring-UserDialogPane.xml" />
+    <import resource="gui/manager/Spring-UserDialogs.xml" />
     <import resource="gui/manager/Spring-EmployeeViewPane.xml" />
     <import resource="gui/manager/Spring-ManagerViewPane.xml" />
     <import resource="gui/manager/Spring-MenuViewPane.xml" />
