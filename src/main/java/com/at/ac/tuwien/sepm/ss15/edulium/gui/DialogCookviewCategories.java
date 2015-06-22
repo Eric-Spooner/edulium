@@ -15,6 +15,7 @@ import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.CheckListView;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URL;
 import java.util.LinkedList;
@@ -29,25 +30,23 @@ import static javafx.collections.FXCollections.observableArrayList;
 public class DialogCookviewCategories implements Initializable, Controller{
     private static final Logger LOGGER = LogManager.getLogger(DialogCookviewCategories.class);
 
-    private static Stage thisStage;
-    private static List<MenuCategory> checkedCategories;
-    private static ObservableList<MenuCategory> menuCategories;
-    private static MenuService menuService;
+    private Stage thisStage;
+    private List<MenuCategory> checkedCategories;
+    private ObservableList<MenuCategory> menuCategories;
+    @Autowired
+    private MenuService menuService;
 
     @FXML
     private CheckListView<MenuCategory> listMenuCats;
 
-    public static void setCheckedCategories(List<MenuCategory> checkedCategories) {
-        DialogCookviewCategories.checkedCategories = checkedCategories;
+    public void setCheckedCategories(List<MenuCategory> checkedCategories) {
+        this.checkedCategories = checkedCategories;
     }
-    public static void setThisStage(Stage thisStage) {
-        DialogCookviewCategories.thisStage = thisStage;
+    public void setThisStage(Stage thisStage) {
+        this.thisStage = thisStage;
     }
-    public static void setMenuService(MenuService menuService) {
-        DialogCookviewCategories.menuService = menuService;
-    }
-    public static List<MenuCategory> getCheckedCategories() {
-        return checkedCategories;
+    public List<MenuCategory> getCheckedCategories() {
+        return this.checkedCategories;
     }
     @Override
     public void initialize(URL location, ResourceBundle resources) {
