@@ -48,6 +48,7 @@
     <import resource="service/Spring-OrderService.xml" />
     <import resource="service/Spring-InvoiceService.xml" />
     <import resource="service/Spring-ReservationService.xml" />
+    <import resource="service/Spring-InvoiceManager.xml" />
     <import resource="service/Spring-SaleService.xml" />
 
     <!-- GUI beans -->
@@ -78,6 +79,5 @@
     <import resource="gui/service/Spring-MenuEntryOverviewPane.xml" />
     <import resource="gui/service/Spring-MenuOverviewPane.xml" />
     <import resource="gui/service/Spring-MenuDetailsPane.xml" />
-
 
 </beans>

@@ -325,6 +325,11 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
     public void testFind_byAvailabilityShouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         MenuEntry matcher = new MenuEntry();
+        matcher.setAvailable(true);
+        int sizeBeforeTrue = menuEntryDAO.find(matcher).size();
+        matcher.setAvailable(false);
+        int sizeBeforeFalse = menuEntryDAO.find(matcher).size();
+
 
         MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);
         menuEntryDAO.create(entry1);
@@ -340,7 +345,7 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
         List<MenuEntry> objects = menuEntryDAO.find(matcher);
 
         // THEN
-        assertEquals(2, objects.size());
+        assertEquals(sizeBeforeTrue + 2, objects.size());
         assertTrue(objects.contains(entry1));
         assertTrue(objects.contains(entry2));
 
@@ -349,7 +354,7 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
         objects = menuEntryDAO.find(matcher);
 
         // THEN
-        assertEquals(1, objects.size());
+        assertEquals(sizeBeforeFalse + 1, objects.size());
         assertEquals(entry3, objects.get(0));
     }
 
@@ -357,6 +362,10 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
     public void testFind_byPriceShouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
         MenuEntry matcher = new MenuEntry();
+        matcher.setPrice(BigDecimal.valueOf(10.00));
+        int sizeBefore10 = menuEntryDAO.find(matcher).size();
+        matcher.setPrice(BigDecimal.valueOf(20.000));
+        int sizeBefore20 = menuEntryDAO.find(matcher).size();
 
         MenuEntry entry1 = createMenuEntry("entry1", "desc1", "cat1", 10.0, 0.1, true);
         menuEntryDAO.create(entry1);
@@ -372,7 +381,7 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
         List<MenuEntry> objects = menuEntryDAO.find(matcher);
 
         // THEN
-        assertEquals(2, objects.size());
+        assertEquals(sizeBefore10 + 2, objects.size());
         assertTrue(objects.contains(entry1));
         assertTrue(objects.contains(entry2));
 
@@ -381,7 +390,7 @@ public class TestMenuEntryDAO extends AbstractDAOTest {
         objects = menuEntryDAO.find(matcher);
 
         // THEN
-        assertEquals(1, objects.size());
+        assertEquals(sizeBefore20 + 1, objects.size());
         assertEquals(entry3, objects.get(0));
     }
 

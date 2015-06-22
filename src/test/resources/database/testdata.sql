@@ -1,9 +1,5 @@
-INSERT INTO MenuCategory (name) VALUES ('starter');
-INSERT INTO MenuCategory (name) VALUES ('main dish');
-INSERT INTO MenuCategory (name) VALUES ('dessert');
-
-MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('daotester', 'DAO Testuser', 'ADMIN', 0);
-MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('servicetester', 'Service Testuser', 'MANAGER', 0);
+MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('daotester', 'DAO Testuser', 'admin', 0);
+MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('servicetester', 'Service Testuser', 'manager', 0);
 
 MERGE INTO RestaurantSection (ID, name) KEY(ID) VALUES(1, 'Garden');
 MERGE INTO RestaurantSection (ID, name) KEY(ID) VALUES(2, 'Main');
@@ -54,10 +50,3 @@ MERGE INTO Menu(ID,name) KEY(ID) VALUES (4, 'Bananen Menu');
 
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (4,3,3);
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (4,4,0.5);
-
-MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, state)
-KEY (id, table_section, table_number) VALUES (1, 1, 1, 1, 10, 0.01, 'QUEUED');
-MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, state)
-KEY (id, table_section, table_number) VALUES (2, 2, 2, 2, 10, 0.01, 'QUEUED');
-MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, info, state)
-KEY (id, table_section, table_number) VALUES (3, 2, 2, 3, 10, 0.01, 'Info' , 'QUEUED');
