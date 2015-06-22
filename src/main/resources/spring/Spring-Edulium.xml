@@ -47,6 +47,7 @@
     <import resource="service/Spring-OrderService.xml" />
     <import resource="service/Spring-InvoiceService.xml" />
     <import resource="service/Spring-ReservationService.xml" />
+    <import resource="service/Spring-InvoiceManager.xml" />
     <import resource="service/Spring-SaleService.xml" />
 
 </beans>
