@@ -1,13 +1,16 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.Service;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.math.BigDecimal;
 
 /**
  * TipService is used to calculate the tip and save it to the users
  */
+@PreAuthorize("isAuthenticated()")
 public interface TipService extends Service {
 
     /**
@@ -15,5 +18,5 @@ public interface TipService extends Service {
      * to all users, which created the orders, which are on the given invoice
      * @param invoice the invoice, where the tip is included
      */
-    public void divideAndMatchTip(Invoice invoice, BigDecimal tip) throws ServiceException;
+    public void divideAndMatchTip(Invoice invoice, BigDecimal tip) throws ServiceException, ValidationException;
 }
