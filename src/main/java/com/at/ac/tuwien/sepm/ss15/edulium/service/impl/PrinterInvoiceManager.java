@@ -45,7 +45,7 @@ public class PrinterInvoiceManager implements InvoiceManager {
     public void manageInvoice(Invoice invoice) throws ServiceException {
         deletePDF();
         generatePDF(invoice);
-        viewPDF();
+        printPDF();
     }
 
     /**
