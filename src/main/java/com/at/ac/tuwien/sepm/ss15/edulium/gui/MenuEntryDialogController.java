@@ -4,15 +4,13 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.TaxRateService;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,44 +19,27 @@ import org.springframework.stereotype.Controller;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
-import static javafx.collections.FXCollections.observableArrayList;
-
 /**
- * Controller for the TaxRate Dialog
+ * Controller for the Menu Entry Dialog
  */
 @Controller
-public class MenuEntryDialogController implements Initializable {
+public class MenuEntryDialogController implements Initializable, InputDialogController<MenuEntry> {
     private static final Logger LOGGER = LogManager.getLogger(MenuEntryDialogController.class);
 
-    private static Stage thisStage;
     @Autowired
     private MenuService menuService;
     @Autowired
     private TaxRateService taxRateService;
-    private static MenuEntry menuEntry;
-    private static DialogEnumeration dialogEnumeration;
-
-
-    public static void setThisStage(Stage thisStage) {
-        MenuEntryDialogController.thisStage = thisStage;
-    }
-    public static void setMenuEntry(MenuEntry menuEntry) {
-        MenuEntryDialogController.menuEntry = menuEntry; }
-    public static void setDialogEnumeration(DialogEnumeration dialogEnumeration) {
-        MenuEntryDialogController.dialogEnumeration = dialogEnumeration;
-    }
-    public static MenuEntry getMenuEntry() {
-        return menuEntry;
-    }
 
     @FXML
     private TextField textFieldName;
     @FXML
     private TextField textFieldPrice;
     @FXML
-    private CheckBox checkAvailible;
+    private CheckBox checkAvailable;
     @FXML
     private TextArea textFieldDesription;
     @FXML
@@ -66,165 +47,115 @@ public class MenuEntryDialogController implements Initializable {
     @FXML
     private ChoiceBox<TaxRate> dropTaxRate;
 
+    private Long identity;
+
     @Override
-    public void initialize(URL location, ResourceBundle resources){
-        LOGGER.info("Initialize Dialog MenuEntry");
+    public void initialize(URL location, ResourceBundle resources) {
+        dropTaxRate.setConverter(new StringConverter<TaxRate>() {
+            @Override
+            public String toString(TaxRate object) {
+                return object.getValue().toString();
+            }
+
+            @Override
+            public TaxRate fromString(String string) {
+                TaxRate taxRate = new TaxRate();
+                taxRate.setValue(BigDecimal.valueOf(Double.parseDouble(string)));
+                return taxRate;
+            }
+        });
+
+        // Used to handle the dropDown with the keyboard
+        dropTaxRate.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
+                event.consume();
+            }
+        });
+
+        dropMenuCategory.setConverter(new StringConverter<MenuCategory>() {
+            @Override
+            public String toString(MenuCategory object) {
+                return object.getName();
+            }
+
+            @Override
+            public MenuCategory fromString(String string) {
+                MenuCategory menuCategory = new MenuCategory();
+                menuCategory.setName(string);
+                return menuCategory;
+            }
+        });
+
+        // Used to handle the dropDown with the keyboard
+        dropMenuCategory.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
+                event.consume();
+            }
+        });
+
         try {
-            if(menuEntry == null){
-                menuEntry = new MenuEntry();
-                menuEntry.setAvailable(true);
-            }
-            dropTaxRate.setItems(observableArrayList(taxRateService.getAllTaxRates()));
-            dropTaxRate.setConverter(new StringConverter<TaxRate>() {
-                @Override
-                public String toString(TaxRate object) {
-                    return object.getValue().toString();
-                }
+            List<TaxRate> taxRates = taxRateService.getAllTaxRates();
+            dropTaxRate.getItems().setAll(taxRates);
+            dropTaxRate.getSelectionModel().selectFirst();
+        } catch (ServiceException e) {
+            e.printStackTrace();
+        }
 
-                @Override
-                public TaxRate fromString(String string) {
-                    TaxRate taxRate = new TaxRate();
-                    taxRate.setValue(BigDecimal.valueOf(Double.parseDouble(string)));
-                    return taxRate;
-                }
-            });
-            if (menuEntry.getTaxRate() != null){
-                dropTaxRate.getSelectionModel().select(menuEntry.getTaxRate());
-            }
-            dropMenuCategory.setItems(observableArrayList(menuService.getAllMenuCategories()));
-            dropMenuCategory.setConverter(new StringConverter<MenuCategory>() {
-                @Override
-                public String toString(MenuCategory object) {
-                    return object.getName();
-                }
-
-                @Override
-                public MenuCategory fromString(String string) {
-                    MenuCategory menuCategory = new MenuCategory();
-                    menuCategory.setName(string);
-                    return menuCategory;
-                }
-            });
-            if (menuEntry.getCategory() != null){
-               dropMenuCategory.getSelectionModel().select(menuEntry.getCategory());
-            }
-            textFieldName.setText(menuEntry.getName());
-            if(menuEntry.getPrice()!= null) {
-                textFieldPrice.setText(menuEntry.getPrice().toString());
-            }
-            if(menuEntry.getDescription() != null) {
-                textFieldDesription.setText(menuEntry.getDescription());
-            }
-            checkAvailible.setSelected(menuEntry.getAvailable());
-            //Used to handle the dropDown with the keyboard
-            dropTaxRate.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent event) {
-                    if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
-                        event.consume();
-                    }
-                }
-            });
-            dropMenuCategory.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent event) {
-                    if (event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN) {
-                        event.consume();
-                    }
-                }
-            });
-        }catch (Exception e){
-            LOGGER.error("Init Menu Entry crashed " + e);
+        try {
+            List<MenuCategory> menuCategories = menuService.getAllMenuCategories();
+            dropMenuCategory.getItems().setAll(menuCategories);
+            dropMenuCategory.getSelectionModel().selectFirst();
+        } catch (ServiceException e) {
+            e.printStackTrace();
         }
     }
 
-    public void buttonOKClick(ActionEvent actionEvent) {
-        LOGGER.info("Dialog MenuEntry OK Button clicked");
-        BigDecimal price = null;
-        switch (MenuEntryDialogController.dialogEnumeration){
-            case ADD:
-            case UPDATE:
-                if(textFieldName.getText() == null || textFieldName.getText().equals("")){
-                    ManagerViewController.showErrorDialog
-                            ("Error", "Input Validation Error", "You have to insert a Name");
-                    return;
-                }
-                if(textFieldPrice.getText() == null || textFieldPrice.getText().equals("")){
-                    ManagerViewController.showErrorDialog
-                            ("Error", "Input Validation Error", "You have to insert a Price");
-                    return;
-                }
+    @Override
+    public void prepareForCreate() {
+        textFieldName.clear();
+        textFieldPrice.clear();
+        textFieldDesription.clear();
+        checkAvailable.setSelected(true);
+        dropMenuCategory.getSelectionModel().selectFirst();
+        dropTaxRate.getSelectionModel().selectFirst();
+        identity = null;
+    }
 
-                try {
-                    price = BigDecimal.valueOf(Double.parseDouble(textFieldPrice.getText()));
-                } catch (NumberFormatException e) {
-                    ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must be a number");
-                    LOGGER.info("Dialog MenuEntry Price must be number " + e);
-                    return;
-                }
+    @Override
+    public void prepareForUpdate(MenuEntry menuEntry) {
+        assert menuEntry != null;
 
-                if(textFieldDesription.getText() == null || textFieldDesription.getText().equals("")){
-                    ManagerViewController.showErrorDialog
-                            ("Error", "Input Validation Error", "You have to insert a Description");
-                    return;
-                }
-                if(dropMenuCategory.getSelectionModel().getSelectedItem() == null){
-                    ManagerViewController.showErrorDialog
-                            ("Error", "Input Validation Error", "You have to select a Category");
-                    return;
-                }
-                if(dropTaxRate.getSelectionModel().getSelectedItem() == null){
-                    ManagerViewController.showErrorDialog
-                            ("Error", "Input Validation Error", "You have to select a TaxRate");
-                    return;
-                }
-                break;
-            case SEARCH:
-                if(textFieldPrice.getText() != null && !textFieldPrice.getText().equals("")) {
-                    try {
-                        price = BigDecimal.valueOf(Double.parseDouble(textFieldPrice.getText()));
-                    } catch (NumberFormatException e) {
-                        ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must be a number");
-                        LOGGER.info("Dialog MenuEntry Price must be number " + e);
-                        return;
-                    }
-                }
-        }
-        menuEntry.setPrice(price);
+        textFieldName.setText(menuEntry.getName());
+        textFieldPrice.setText(menuEntry.getPrice().toString());
+        checkAvailable.setSelected(menuEntry.getAvailable());
+        textFieldDesription.setText(menuEntry.getDescription());
+        dropMenuCategory.getSelectionModel().select(menuEntry.getCategory());
+        dropTaxRate.getSelectionModel().select(menuEntry.getTaxRate());
+        identity = menuEntry.getIdentity();
+    }
+
+    @Override
+    public void prepareForSearch() {
+        textFieldName.clear();
+        textFieldPrice.clear();
+        textFieldDesription.clear();
+        checkAvailable.setSelected(true);
+        dropMenuCategory.getSelectionModel().select(-1);
+        dropTaxRate.getSelectionModel().select(-1);
+        identity = null;
+    }
+
+    @Override
+    public MenuEntry toDomainObject() {
+        MenuEntry menuEntry = new MenuEntry();
+        menuEntry.setIdentity(identity);
+        menuEntry.setName(textFieldName.getText().isEmpty() ? null : textFieldName.getText());
+        menuEntry.setPrice(textFieldPrice.getText().isEmpty() ? null : new BigDecimal(textFieldPrice.getText()));
+        menuEntry.setAvailable(checkAvailable.isSelected());
+        menuEntry.setDescription(textFieldDesription.getText().isEmpty() ? null : textFieldDesription.getText());
         menuEntry.setCategory(dropMenuCategory.getSelectionModel().getSelectedItem());
         menuEntry.setTaxRate(dropTaxRate.getSelectionModel().getSelectedItem());
-        menuEntry.setAvailable(checkAvailible.isSelected());
-        if(MenuEntryDialogController.dialogEnumeration == DialogEnumeration.SEARCH){
-            if(!textFieldDesription.getText().isEmpty()) menuEntry.setDescription(textFieldDesription.getText());
-            if(textFieldName.getText() != null) menuEntry.setName(textFieldName.getText());
-        }else {
-            menuEntry.setName(textFieldName.getText());
-            menuEntry.setDescription(textFieldDesription.getText());
-        }
-
-        try {
-            switch (MenuEntryDialogController.dialogEnumeration){
-                case ADD:
-                    menuService.addMenuEntry(menuEntry);
-                    break;
-                case UPDATE:
-                    menuService.updateMenuEntry(menuEntry);
-                    break;
-            }
-        }catch (Exception e){
-            LOGGER.error("Updating the menuEntry in The Database Failed " + e);
-            return;
-        }
-        thisStage.close();
-    }
-
-    public void buttonCancelClick(ActionEvent actionEvent) {
-        LOGGER.info("Dialog MenuEntry Cancel Button clicked");
-        thisStage.close();
-    }
-
-    public static void resetDialog(){
-        MenuEntryDialogController.setMenuEntry(null);
+        return menuEntry;
     }
 }
 
