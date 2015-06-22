@@ -34,7 +34,7 @@ import java.util.Map;
 public class PrinterInvoiceManager implements InvoiceManager {
     private static final Logger LOGGER = LogManager.getLogger(PrinterInvoiceManager.class);
 
-    private static final String templatePath = "invoice_pdf_template/template.pdf";
+    private static final String templatePath = "src/main/resources/invoice_templates/template.pdf";
     private static final String outputFilePath = "target/last_invoice.pdf";
 
     /**
@@ -45,7 +45,7 @@ public class PrinterInvoiceManager implements InvoiceManager {
     public void manageInvoice(Invoice invoice) throws ServiceException {
         deletePDF();
         generatePDF(invoice);
-        printPDF();
+        viewPDF();
     }
 
     /**
@@ -60,7 +60,6 @@ public class PrinterInvoiceManager implements InvoiceManager {
             stamper = new PdfStamper(reader, new FileOutputStream(outputFilePath));
             PdfContentByte canvas = stamper.getOverContent(1);
 
-            // fixed table width
             float tableWidth = 3f * 170f;
 
             Rectangle pageSize = reader.getPageSize(1);
@@ -135,11 +134,14 @@ public class PrinterInvoiceManager implements InvoiceManager {
                 } else {
                     cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
                 }
+
                 cell.setPhrase(new Phrase(entry.getName() + (info == null ? "" : "\n(" + info + ")")));
                 ordersTable.addCell(cell);
+
                 cell.setPhrase(new Phrase(ef.getValue() + " x " + order.getBrutto()));
                 cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
                 ordersTable.addCell(cell);
+
                 cell.setPhrase(new Phrase(order.getBrutto().multiply(new BigDecimal(ef.getValue())) +
                         " EUR [" + taxRate.getIdentity() + "]"));
                 ordersTable.addCell(cell);
