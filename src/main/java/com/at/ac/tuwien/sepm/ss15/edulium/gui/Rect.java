@@ -3,26 +3,27 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-/**
- * Created by Administrator on 23.05.2015.
- */
+import java.util.List;
+
+@Component
 public class Rect {
     private double x, y, w, h;
     private Section section;
     private long number;
     private long identity;
-    private InteriorService interiorService;
     private int seats; //optional for creation
 
-    public Rect(double x, double y, double w, double h, InteriorService interiorService) {
+    @Autowired
+    private InteriorService interiorService;
+
+    public Rect(double x, double y, double w, double h) {
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
-        this.section = section;
-        this.number = number;
-        this.interiorService = interiorService;
     }
 
     public void setSection(Section section) {
@@ -77,24 +78,23 @@ public class Rect {
         return null;
     }
 
-    public com.at.ac.tuwien.sepm.ss15.edulium.domain.Table getTable(double x, double y) throws ServiceException {
-        if(x >= this.x && x <= this.x+this.w && y >= this.y && y <= this.y+this.h) {
-            com.at.ac.tuwien.sepm.ss15.edulium.domain.Table matcher = new com.at.ac.tuwien.sepm.ss15.edulium.domain.Table();
-            matcher.setNumber(number);
-            matcher.setSection(section);
-            if(!interiorService.findTables(matcher).isEmpty())
-                return interiorService.findTables(matcher).get(0);
+    public Table getTable(double x, double y) throws ServiceException {
+        if (x >= this.x && x <= this.x+this.w && y >= this.y && y <= this.y+this.h) {
+            List<Table> tables = interiorService.findTables(Table.withIdentity(section, number));
+            if (!tables.isEmpty()) {
+                return tables.get(0);
+            }
         }
 
         return null;
     }
 
-    public com.at.ac.tuwien.sepm.ss15.edulium.domain.Section getSection(double x, double y) throws ServiceException {
-        if(x >= this.x && x <= this.x+this.w && y >= this.y && y <= this.y+this.h) {
-            com.at.ac.tuwien.sepm.ss15.edulium.domain.Section matcher = new com.at.ac.tuwien.sepm.ss15.edulium.domain.Section();
-            matcher.setIdentity(identity);
-            if(!interiorService.findSections(matcher).isEmpty())
-                return interiorService.findSections(matcher).get(0);
+    public Section getSection(double x, double y) throws ServiceException {
+        if (x >= this.x && x <= this.x+this.w && y >= this.y && y <= this.y+this.h) {
+            List<Section> sections = interiorService.findSections(Section.withIdentity(identity));
+            if (!sections.isEmpty()) {
+                return sections.get(0);
+            }
         }
 
         return null;
