@@ -20,6 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
@@ -43,7 +44,6 @@ public class EditSectionController implements Initializable {
     private boolean updateTable = false;
     private static final int FACT = 40;
     private static final int TABLE_SIZE = 40;
-    private static InteriorService interiorService;
     private static Stage thisStage;
     private static RoomViewController.UpdateCanvas updateCanvas;
     private static ArrayList<Rect> rects = new ArrayList<Rect>();
@@ -52,6 +52,9 @@ public class EditSectionController implements Initializable {
     private int prevY = 0;
     private static Long sectionId;
     private static String sectionName;
+
+    @Autowired
+    private InteriorService interiorService;
 
     @FXML
     private Canvas canvas;
@@ -258,10 +261,6 @@ public class EditSectionController implements Initializable {
                 }
             }
         });
-    }
-
-    public static void setInteriorService(InteriorService interiorService) {
-        EditSectionController.interiorService = interiorService;
     }
 
     public static void setThisStage(Stage thisStage) {

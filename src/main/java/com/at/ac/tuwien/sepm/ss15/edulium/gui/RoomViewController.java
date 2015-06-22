@@ -190,7 +190,6 @@ public class RoomViewController implements Initializable {
         drawCanvas();
         try {
             Stage stage = new Stage();
-            AddSectionController.setInteriorService(interiorService);
             AddSectionController.setThisStage(stage);
             AddSectionController.setUpdateCanvas(new UpdateCanvas());
             stage.setTitle("Add Section");
@@ -209,7 +208,6 @@ public class RoomViewController implements Initializable {
             drawCanvas();
             try {
                 Stage stage = new Stage();
-                EditSectionController.setInteriorService(interiorService);
                 EditSectionController.setThisStage(stage);
                 EditSectionController.setUpdateCanvas(new UpdateCanvas());
                 EditSectionController.setSectionId(clickedSectionId);
