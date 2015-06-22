@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -35,7 +36,7 @@ import static javafx.collections.FXCollections.observableArrayList;
  * Controller used for Add section window
  */
 @Controller
-public class AddSectionController implements Initializable {
+public class AddSectionController implements Initializable, Controller {
     private static final Logger LOGGER = LogManager.getLogger(AddSectionController.class);
 
     private boolean createTable = false;
@@ -333,6 +334,16 @@ public class AddSectionController implements Initializable {
             gc.strokeRoundRect(rect.getX(), rect.getY(), rect.getW(), rect.getH(), 2, 2);
             gc.fillText(String.valueOf(rect.getNumber()), rect.getX()+TABLE_SIZE/4, rect.getY()+TABLE_SIZE/1.5);
         }
+    }
+
+    @Override
+    public String value() {
+        return null;
+    }
+
+    @Override
+    public Class<? extends Annotation> annotationType() {
+        return null;
     }
 
     public class UpdateCanvas {
