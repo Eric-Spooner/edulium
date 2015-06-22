@@ -469,13 +469,11 @@ public class DialogSaleController implements Initializable{
                 case UPDATE:
                 case ADD:
                     price = BigDecimal.valueOf(Double.parseDouble(textFieldPrice.getText()));
-                    menuEntry.setPrice(price);
-                    break;
-                case SEARCH:
-                    if (!textFieldPrice.getText().equals("")) {
-                        price = BigDecimal.valueOf(Double.parseDouble(textFieldPrice.getText()));
-                        menuEntry.setPrice(price);
+                    if (price.compareTo(new BigDecimal(0)) < 0) {
+                        ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must not be negative");
+                        return;
                     }
+                    menuEntry.setPrice(price);
                     break;
             }
             List<MenuEntry> list = sale.getEntries();
@@ -483,7 +481,7 @@ public class DialogSaleController implements Initializable{
             sale.setEntries(list);
             inMenuMenuEntries.setAll(sale.getEntries());
         } catch (NumberFormatException e) {
-            ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must be a number/n" + e.toString());
+            ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must be a\npositive number");
             LOGGER.info("Dialog Sale Add Button Clicked Price must be number " + e);
         } catch (Exception e) {
             ManagerViewController.showErrorDialog

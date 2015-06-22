@@ -151,11 +151,11 @@ public class SalesViewController implements Initializable {
         }
     }
 
-    public void buttonShowAllSaleClicked(ActionEvent actionEvent) {
+    /*public void buttonShowAllSaleClicked(ActionEvent actionEvent) {
         try {
             sales.setAll(saleService.getAllSales());
         } catch (Exception e){
             LOGGER.error("Loading All Sale failed" + e);
         }
-    }
+    }*/
 }
