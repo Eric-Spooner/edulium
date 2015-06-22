@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -30,15 +31,19 @@ public class EmployeeViewController implements Initializable {
     @FXML
     private TableView<User> tableViewEmployee;
     @FXML
-    private TableColumn<User,String> employeeId;
+    private TableColumn<User, String> employeeId;
     @FXML
-    private TableColumn<User,String> employeeName;
+    private TableColumn<User, String> employeeName;
     @FXML
-    private TableColumn<User,String> employeeRole;
+    private TableColumn<User, String> employeeRole;
+    @FXML
+    private TableColumn<User, BigDecimal> employeeTip;
     @FXML
     private Button buttonUpdate;
     @FXML
     private Button buttonRemove;
+    @FXML
+    private Button clearTipButton;
 
     @Autowired
     private UserService userService;
@@ -60,12 +65,14 @@ public class EmployeeViewController implements Initializable {
         employeeId.setCellValueFactory(new PropertyValueFactory<>("identity"));
         employeeName.setCellValueFactory(new PropertyValueFactory<>("name"));
         employeeRole.setCellValueFactory(new PropertyValueFactory<>("role"));
+        employeeTip.setCellValueFactory(new PropertyValueFactory<>("tip"));
 
         tableViewEmployee.getSelectionModel().selectedIndexProperty().addListener(event -> {
             final boolean hasSelection = tableViewEmployee.getSelectionModel().getSelectedIndex() >= 0;
 
             buttonUpdate.setDisable(!hasSelection);
             buttonRemove.setDisable(!hasSelection);
+            clearTipButton.setDisable(!hasSelection);
         });
 
         loadAllUsers();
@@ -152,6 +159,29 @@ public class EmployeeViewController implements Initializable {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error while deleting employee");
                 alert.setHeaderText("Could not delete employee '" + selectedUser.getIdentity() + "'");
+                alert.setContentText(e.getMessage());
+                alert.showAndWait();
+            }
+        }
+    }
+
+    @FXML
+    public void buttonClearTipClicked(ActionEvent actionEvent) {
+        User selectedUser = tableViewEmployee.getSelectionModel().getSelectedItem();
+        if (selectedUser != null) {
+            try {
+                User editedUser = selectedUser.clone();
+                editedUser.setTip(BigDecimal.ZERO);
+                userService.updateUser(editedUser);
+
+                users.remove(selectedUser);
+                users.add(editedUser);
+            } catch (ValidationException | ServiceException e) {
+                LOGGER.error("Could not clear tip of user " + selectedUser, e);
+
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error while clearing the tip of a employee");
+                alert.setHeaderText("Could not clear the tip of the employee '" + selectedUser.getIdentity() + "'");
                 alert.setContentText(e.getMessage());
                 alert.showAndWait();
             }
