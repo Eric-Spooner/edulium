@@ -64,42 +64,40 @@ public class TestTipService extends AbstractServiceTest {
 
         @Before
         public void setUp() throws Exception {
-            creator1 = new User();
-            creator1.setIdentity("A");
-            creator1.setName("Bob");
-            creator1.setRole("ROLE1");
         }
 
         @Test
         @WithMockUser(username = "servicetester", roles={"SERVICE"})
-        public void testDivideAndMatchTip_shouldWork() throws ServiceException {
+        public void testDivideAndMatchTip_shouldWork() throws ServiceException, ValidationException {
             //PREPARE
             Order order1 = createOrder(BigDecimal.valueOf(100),"Order Information", BigDecimal.valueOf(0.2),
                     LocalDateTime.now(), Order.State.QUEUED, 1);
+            orderService.addOrder(order1);
             Order order2 = createOrder(BigDecimal.valueOf(200),"Order Information", BigDecimal.valueOf(0.2),
                     LocalDateTime.now(), Order.State.QUEUED, 1);
+            orderService.addOrder(order2);
             List<Order> orderList = new LinkedList<>();
             orderList.add(order1);
             orderList.add(order2);
-            Invoice invoice = Invoice.withIdentity(1);
-            invoice.setCreator(creator1);
+            Invoice invoice = new Invoice();
+            List<User> userList = userService.findUsers(User.withIdentity("servicetester"));
+            invoice.setCreator(userList.get(0));
             invoice.setTime(LocalDateTime.now());
             invoice.setGross(new BigDecimal("300"));
             invoice.setOrders(orderList);
-
+            invoiceService.addInvoice(invoice);
             //WHEN
             tipService.divideAndMatchTip(invoice, BigDecimal.valueOf(20));
-
             //THEN
-            List<User> userList = userService.findUsers(User.withIdentity("servicetester"));
+            userList = userService.findUsers(User.withIdentity("servicetester"));
 
             assertEquals(1, userList.size());
-            assertTrue(BigDecimal.valueOf(20).compareTo(userList.get(0).getTip()) != 0);
+            assertTrue(BigDecimal.valueOf(20).compareTo(userList.get(0).getTip()) == 0);
         }
 
         @Test
         @WithMockUser(username = "servicetester", roles={"SERVICE"})
-        public void testDivideAndMatchTip_shouldWorkWithMultipleUsers() throws ServiceException {
+        public void testDivideAndMatchTip_shouldWorkWithMultipleUsers() throws ServiceException, ValidationException {
             //PREPARE
             //The used data is in the testdata.sql file already prepared
             assertEquals(1, invoiceService.findInvoices(Invoice.withIdentity(1)).size());

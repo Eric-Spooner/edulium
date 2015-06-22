@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
     private Validator<Order> orderValidator;
     @Resource(name = "userDAO")
     private DAO<User> userDAO;
+    @Resource(name = "orderDAO")
+    private DAO<Order> orderDAO;
 
     /**
      * Writes the invoice object into the database and sets the identity
@@ -133,7 +136,7 @@ class DBInvoiceDAO implements DAO<Invoice> {
         try (PreparedStatement orderStmt = dataSource.getConnection().prepareStatement(orderQuery)) {
             orderStmt.setLong(1, invoice.getIdentity());
 
-            int index = 1;
+            int index = 2;
             for (Order o : invoice.getOrders()) {
                 orderStmt.setLong(index++, o.getIdentity());
             }
@@ -369,13 +372,24 @@ class DBInvoiceDAO implements DAO<Invoice> {
             LOGGER.error("Retrieving creator failed");
             throw new DAOException("Retrieving creator failed");
         }
-
         Invoice invoice = new Invoice();
         invoice.setCreator(creator.get(0));
         invoice.setIdentity(rs.getLong("ID"));
         invoice.setTime(rs.getTimestamp("invoiceTime").toLocalDateTime());
         invoice.setGross(rs.getBigDecimal("brutto"));
-
+        List<Order> orders = new LinkedList<>();
+        final String query = "SELECT ID FROM RestaurantOrder WHERE invoice_ID = ?";
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, invoice.getIdentity());
+            ResultSet resultSet = stmt.executeQuery();
+            while (rs.next()) {
+                orders.add(Order.withIdentity(resultSet.getLong(1)));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Getting orders failed", e);
+            throw new DAOException("Getting orders failed", e);
+        }
+        invoice.setOrders(orderDAO.populate(orders));
         return invoice;
     }
 

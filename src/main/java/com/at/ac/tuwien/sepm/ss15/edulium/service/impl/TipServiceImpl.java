@@ -4,10 +4,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.TipService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,6 +27,9 @@ class TipServiceImpl implements TipService {
     @Override
     public void divideAndMatchTip(Invoice invoice, BigDecimal tip) throws ServiceException, ValidationException{
         List<User> userList = new LinkedList<>();
+        if(invoice.getOrders().size()==0){
+            throw new ServiceException("Given Invoice has no orders");
+        }
         for(Order order: invoice.getOrders()){
             if(!userList.contains(orderService.getOrderSubmitter(order))){
                 userList.add(orderService.getOrderSubmitter(order));
