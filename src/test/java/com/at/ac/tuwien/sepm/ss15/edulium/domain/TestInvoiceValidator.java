@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Test cases for the invoice validator
@@ -24,6 +26,32 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("23"));
         invoice.setCreator(creator);
+        invoice.setOrders(Arrays.asList(Order.withIdentity(10L)));
+
+        invoiceValidator.validateForCreate(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_shouldFailWithNullOrders() throws ValidationException {
+        User creator = User.withIdentity("testUser");
+
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("23"));
+        invoice.setCreator(creator);
+
+        invoiceValidator.validateForCreate(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForCreate_shouldFailWithEmptyOrders() throws ValidationException {
+        User creator = User.withIdentity("testUser");
+
+        Invoice invoice = new Invoice();
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("23"));
+        invoice.setCreator(creator);
+        invoice.setOrders(new ArrayList<>());
 
         invoiceValidator.validateForCreate(invoice);
     }
@@ -33,6 +61,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("23"));
+        invoice.setOrders(Arrays.asList(Order.withIdentity(10L)));
 
         invoiceValidator.validateForCreate(invoice);
     }
@@ -43,6 +72,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("23"));
         invoice.setCreator(new User());
+        invoice.setOrders(Arrays.asList(Order.withIdentity(10L)));
 
         invoiceValidator.validateForCreate(invoice);
     }
@@ -57,6 +87,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         Invoice invoice = new Invoice();
         invoice.setGross(new BigDecimal("23"));
         invoice.setCreator(User.withIdentity("TestUser"));
+        invoice.setOrders(Arrays.asList(Order.withIdentity(10L)));
 
         invoiceValidator.validateForCreate(invoice);
     }
@@ -66,6 +97,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setCreator(User.withIdentity("TestUser"));
+        invoice.setOrders(Arrays.asList(Order.withIdentity(10L)));
 
         invoiceValidator.validateForCreate(invoice);
     }
@@ -76,6 +108,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("-22"));
         invoice.setCreator(User.withIdentity("TestUser"));
+        invoice.setOrders(Arrays.asList(Order.withIdentity(10L)));
 
         invoiceValidator.validateForCreate(invoice);
     }
@@ -89,6 +122,34 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15"));
         invoice.setCreator(creator);
+        invoice.setOrders(Arrays.asList(Order.withIdentity(10L)));
+
+        invoiceValidator.validateForUpdate(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_shouldFailWithNullOrders() throws ValidationException {
+        User creator = User.withIdentity("TestUser");
+
+        Invoice invoice = new Invoice();
+        invoice.setIdentity(1L);
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15"));
+        invoice.setCreator(creator);
+
+        invoiceValidator.validateForUpdate(invoice);
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testValidateForUpdate_shouldFailWithEmptyOrders() throws ValidationException {
+        User creator = User.withIdentity("TestUser");
+
+        Invoice invoice = new Invoice();
+        invoice.setIdentity(1L);
+        invoice.setTime(LocalDateTime.now());
+        invoice.setGross(new BigDecimal("15"));
+        invoice.setCreator(creator);
+        invoice.setOrders(new ArrayList<>());
 
         invoiceValidator.validateForUpdate(invoice);
     }
@@ -99,6 +160,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         invoice.setGross(new BigDecimal("20"));
         invoice.setTime(LocalDateTime.now());
         invoice.setIdentity(1L);
+        invoice.setOrders(Arrays.asList(Order.withIdentity(10L)));
 
         invoiceValidator.validateForUpdate(invoice);
     }
@@ -111,6 +173,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         invoice.setGross(new BigDecimal("20"));
         invoice.setIdentity(1L);
         invoice.setCreator(creator);
+        invoice.setOrders(Arrays.asList(Order.withIdentity(10L)));
 
         invoiceValidator.validateForUpdate(invoice);
     }
@@ -123,6 +186,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setIdentity(1L);
         invoice.setCreator(creator);
+        invoice.setOrders(Arrays.asList(Order.withIdentity(10L)));
 
         invoiceValidator.validateForUpdate(invoice);
     }
@@ -136,6 +200,7 @@ public class TestInvoiceValidator extends AbstractDomainTest {
         invoice.setGross(new BigDecimal("-20"));
         invoice.setIdentity(1L);
         invoice.setCreator(creator);
+        invoice.setOrders(Arrays.asList(Order.withIdentity(10L)));
 
         invoiceValidator.validateForUpdate(invoice);
     }
