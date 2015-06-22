@@ -1,3 +1,4 @@
+
 MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('daotester', 'DAO Testuser', 'manager', 0);
 MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('servicetester', 'Service Testuser', 'manager', 0);
 

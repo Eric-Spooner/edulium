@@ -8,13 +8,13 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.SaleService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import sun.security.validator.ValidatorException;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,6 +23,8 @@ import java.util.List;
  */
 class OrderServiceImpl implements OrderService {
     private static final Logger LOGGER = LogManager.getLogger(TaxRateServiceImpl.class);
+    @Resource(name = "saleService")
+    private SaleService saleService;
     @Resource(name = "invoiceService")
     private InvoiceService invoiceService;
     @Resource(name = "orderDAO")
@@ -38,12 +40,17 @@ class OrderServiceImpl implements OrderService {
         orderValidator.validateForCreate(order);
 
         try {
+            //Check if a sale is active and let the price be updated
+            MenuEntry entry = order.getMenuEntry();
+            saleService.applySales(entry);
+            //Create the order with the updated price
             orderDAO.create(order);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
             throw new ServiceException("An Error has occurred in the data access object");
         }
     }
+
     @Override
     public void updateOrder(Order order) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addOrder with parameter: " + order);
@@ -58,10 +65,8 @@ class OrderServiceImpl implements OrderService {
         }else {
             Order preOrder = preOrders.get(0);
             //if the order already had an invoice it is not allowed to be changed
-            List<Order> list = new LinkedList<>();
-            list.add(order);
             Invoice invoice = new Invoice();
-            invoice.setOrders(list);
+            invoice.setOrders(Arrays.asList(order));
             if(invoiceService.findInvoices(invoice).size()>0){
                 LOGGER.error("It is not allowed to change an order with invoice");
                 throw new ServiceException("It is not allowed to change an order with invoice");
@@ -153,8 +158,12 @@ class OrderServiceImpl implements OrderService {
     @Override
     public User getOrderSubmitter(Order order) throws ServiceException, ValidationException {
         orderValidator.validateIdentity(order);
-        History<Order> history =  this.getOrderHistory(order).get(0);
-        return history.getUser();
+        if(this.getOrderHistory(order).size()>0) {
+            History<Order> history = this.getOrderHistory(order).get(0);
+            return history.getUser();
+        }else{
+            throw new ServiceException("THere should be at least one History entry for the order");
+        }
     }
 
     @Override

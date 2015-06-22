@@ -1,8 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
@@ -14,10 +12,12 @@ import java.util.List;
 /**
  * service for the Order domain object
  */
+@PreAuthorize("isAuthenticated()")
 public interface OrderService extends Service {
 
     /**
      * adds a Order object to the underlying datasource
+     * checks the price of the menuEntry and updates it, if there is an active sale
      * @param order order to add
      * @throws ServiceException if an error processing the request ocurred
      * @throws ValidationException if the data is invalid
