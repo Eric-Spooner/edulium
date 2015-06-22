@@ -12,8 +12,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.SaleService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import sun.security.validator.ValidatorException;
 
 import javax.annotation.Resource;
 import java.util.LinkedList;
