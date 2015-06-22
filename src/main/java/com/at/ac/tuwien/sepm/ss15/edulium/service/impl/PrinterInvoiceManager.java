@@ -45,10 +45,13 @@ public class PrinterInvoiceManager implements InvoiceManager {
     public void manageInvoice(Invoice invoice) throws ServiceException {
         deletePDF();
         generatePDF(invoice);
-//        viewPDF();
         printPDF();
     }
 
+    /**
+     * Manipulates the template PDF.
+     * Adds all information needed for the invoice.
+     */
     private void generatePDF(Invoice invoice) throws ServiceException {
         PdfReader reader = null;
         PdfStamper stamper = null;
@@ -202,7 +205,9 @@ public class PrinterInvoiceManager implements InvoiceManager {
         return nf.format(n) + " EUR";
     }
 
-    // temporary method for viewing the pdf
+    /**
+     * Opens the PDF with the default application for opening PDFs
+     */
     private void viewPDF() throws ServiceException {
         if (Desktop.isDesktopSupported()) {
             File file = new File(outputFilePath);
@@ -214,6 +219,9 @@ public class PrinterInvoiceManager implements InvoiceManager {
         }
     }
 
+    /**
+     * Sends the PDF to the default set printer
+     */
     private void printPDF() throws ServiceException {
         try {
             PDDocument document = PDDocument.load(outputFilePath);
@@ -234,6 +242,9 @@ public class PrinterInvoiceManager implements InvoiceManager {
         }
     }
 
+    /**
+     * Deletes the PDF
+     */
     private void deletePDF() throws ServiceException {
         try {
             Files.deleteIfExists(Paths.get(outputFilePath));
