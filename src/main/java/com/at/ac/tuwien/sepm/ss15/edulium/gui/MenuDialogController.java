@@ -32,8 +32,8 @@ import static javafx.collections.FXCollections.observableArrayList;
  * Controller for the TaxRate Dialog
  */
 @Controller
-public class DialogMenuController implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(DialogMenuController.class);
+public class MenuDialogController implements Initializable {
+    private static final Logger LOGGER = LogManager.getLogger(MenuDialogController.class);
 
     private static Stage thisStage;
 
@@ -44,11 +44,12 @@ public class DialogMenuController implements Initializable {
     private static DialogEnumeration dialogEnumeration;
 
     public static void setThisStage(Stage thisStage) {
-        DialogMenuController.thisStage = thisStage;
+        MenuDialogController.thisStage = thisStage;
     }
-    public static void setMenu(Menu menu) {DialogMenuController.menu = menu; }
+    public static void setMenu(Menu menu) {
+        MenuDialogController.menu = menu; }
     public static void setDialogEnumeration(DialogEnumeration dialogEnumeration) {
-        DialogMenuController.dialogEnumeration = dialogEnumeration;
+        MenuDialogController.dialogEnumeration = dialogEnumeration;
     }
     public static Menu getMenu() {
         return menu;
@@ -105,7 +106,7 @@ public class DialogMenuController implements Initializable {
         if(menu == null){
             Menu menuForInit = new Menu();
             menuForInit.setEntries(new LinkedList<>());
-            DialogMenuController.setMenu(menuForInit);
+            MenuDialogController.setMenu(menuForInit);
         }
         if(menu.getEntries() == null) {
             menu.setEntries(new LinkedList<>());
@@ -134,16 +135,16 @@ public class DialogMenuController implements Initializable {
     public void buttonOKClick(ActionEvent actionEvent) {
         LOGGER.info("Dialog Menu OK Button clicked");
         if ((textFieldName.getText() == null || textFieldName.getText().equals("")) &&
-                DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH) {
+                MenuDialogController.dialogEnumeration != DialogEnumeration.SEARCH) {
             ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
             return;
         }
-        if (DialogMenuController.dialogEnumeration == DialogEnumeration.SEARCH) {
+        if (MenuDialogController.dialogEnumeration == DialogEnumeration.SEARCH) {
             if(!textFieldName.getText().isEmpty()) menu.setName(textFieldName.getText());
         } else{
             menu.setName(textFieldName.getText());
         }
-        if(DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH){
+        if(MenuDialogController.dialogEnumeration != DialogEnumeration.SEARCH){
             if (menu.getEntries().size() == 0) {
                 ManagerViewController.showErrorDialog
                         ("Error", "Input Validation Error", "There hast to be at least one Menu Entry");
@@ -151,7 +152,7 @@ public class DialogMenuController implements Initializable {
             }
         }
         try {
-            switch (DialogMenuController.dialogEnumeration) {
+            switch (MenuDialogController.dialogEnumeration) {
                 case ADD:
                     menuService.addMenu(menu);
                     break;
@@ -176,8 +177,8 @@ public class DialogMenuController implements Initializable {
 
     public void buttonAddClick(ActionEvent actionEvent) {
         if((textFieldPrice.getText() == null || textFieldPrice.getText().equals("")) &&
-                DialogMenuController.dialogEnumeration != DialogEnumeration.SEARCH){
-            switch (DialogMenuController.dialogEnumeration) {
+                MenuDialogController.dialogEnumeration != DialogEnumeration.SEARCH){
+            switch (MenuDialogController.dialogEnumeration) {
                 case UPDATE:
                 case ADD: //There has to be a Price, if the User want's to ADD or UPDATE
                     ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must have a value");
@@ -193,7 +194,7 @@ public class DialogMenuController implements Initializable {
         try {
             MenuEntry menuEntry = tableViewData.getSelectionModel().getSelectedItem();
             BigDecimal price = null;
-            switch (DialogMenuController.dialogEnumeration) {
+            switch (MenuDialogController.dialogEnumeration) {
                 case UPDATE:
                 case ADD:
                     price = BigDecimal.valueOf(Double.parseDouble(textFieldPrice.getText()));
@@ -237,6 +238,6 @@ public class DialogMenuController implements Initializable {
      * this function is used to rest the static members of the class
      */
     public static void resetDialog(){
-        DialogMenuController.setMenu(null);
+        MenuDialogController.setMenu(null);
     }
 }

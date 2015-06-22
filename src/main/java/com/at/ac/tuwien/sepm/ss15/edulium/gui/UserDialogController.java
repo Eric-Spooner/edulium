@@ -27,8 +27,8 @@ import static javafx.collections.FXCollections.observableArrayList;
  * Controller for the TaxRate Dialog
  */
 @Controller
-public class DialogUserController implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(DialogUserController.class);
+public class UserDialogController implements Initializable {
+    private static final Logger LOGGER = LogManager.getLogger(UserDialogController.class);
 
 
     private static Stage thisStage;
@@ -49,13 +49,13 @@ public class DialogUserController implements Initializable {
         return user;
     }
     public static void setUser(User user) {
-        DialogUserController.user = user;
+        UserDialogController.user = user;
     }
     public static void setThisStage(Stage thisStage) {
-        DialogUserController.thisStage = thisStage;
+        UserDialogController.thisStage = thisStage;
     }
     public static void setDialogEnumeration(DialogEnumeration dialogEnumeration) {
-        DialogUserController.dialogEnumeration = dialogEnumeration;
+        UserDialogController.dialogEnumeration = dialogEnumeration;
     }
 
     @Override
@@ -95,7 +95,7 @@ public class DialogUserController implements Initializable {
 
     public void buttonOKClick(ActionEvent actionEvent) {
         LOGGER.info("Dialog MenuEntry OK Button clicked");
-        switch (DialogUserController.dialogEnumeration){
+        switch (UserDialogController.dialogEnumeration){
             case ADD:
             case UPDATE:
                 if(textFieldUsername == null || textFieldUsername.getText().isEmpty()){
@@ -125,7 +125,7 @@ public class DialogUserController implements Initializable {
             user.setRole(dropRole.getSelectionModel().getSelectedItem());
         }
         try {
-            switch (DialogUserController.dialogEnumeration){
+            switch (UserDialogController.dialogEnumeration){
                 case ADD:
                     userService.addUser(user);
                     break;
@@ -149,7 +149,7 @@ public class DialogUserController implements Initializable {
     }
 
     public static void resetDialog(){
-        DialogUserController.setUser(null);
+        UserDialogController.setUser(null);
     }
 }
 

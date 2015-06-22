@@ -19,8 +19,8 @@ import java.util.ResourceBundle;
  * Controller for the TaxRate Dialog
  */
 @Controller
-public class DialogMenuCategoryController implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(DialogMenuCategoryController.class);
+public class MenuCategoryDialogController implements Initializable {
+    private static final Logger LOGGER = LogManager.getLogger(MenuCategoryDialogController.class);
 
     @Autowired
     private MenuService menuService;
@@ -30,16 +30,16 @@ public class DialogMenuCategoryController implements Initializable {
     private static DialogEnumeration dialogEnumeration;
 
     public static void setThisStage(Stage thisStage) {
-        DialogMenuCategoryController.thisStage = thisStage;
+        MenuCategoryDialogController.thisStage = thisStage;
     }
     public static MenuCategory getMenuCategory() {
         return menuCategory;
     }
     public static void setMenuCategory(MenuCategory menuCategory) {
-        DialogMenuCategoryController.menuCategory = menuCategory;
+        MenuCategoryDialogController.menuCategory = menuCategory;
     }
     public static void setDialogEnumeration(DialogEnumeration dialogEnumeration) {
-        DialogMenuCategoryController.dialogEnumeration = dialogEnumeration;
+        MenuCategoryDialogController.dialogEnumeration = dialogEnumeration;
     }
 
 
@@ -59,7 +59,7 @@ public class DialogMenuCategoryController implements Initializable {
 
     public void buttonOKClick(ActionEvent actionEvent) {
         LOGGER.info("Dialog MenuCategory OK Button clicked");
-        switch (DialogMenuCategoryController.dialogEnumeration){
+        switch (MenuCategoryDialogController.dialogEnumeration){
             case ADD:
             case UPDATE:
                 if(textFieldName.getText() == null || textFieldName.getText().equals("")){
@@ -69,7 +69,7 @@ public class DialogMenuCategoryController implements Initializable {
         }
         try {
             menuCategory.setName(textFieldName.getText());
-            switch (DialogMenuCategoryController.dialogEnumeration) {
+            switch (MenuCategoryDialogController.dialogEnumeration) {
                 case ADD:
                     menuService.addMenuCategory(menuCategory);
                     break;

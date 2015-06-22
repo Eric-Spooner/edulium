@@ -5,13 +5,11 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,7 +18,6 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -68,9 +65,9 @@ public class EmployeeViewController implements Initializable {
         try {
             LOGGER.info("Add User Button Click");
             Stage stage = new Stage();
-            DialogUserController.resetDialog();
-            DialogUserController.setThisStage(stage);
-            DialogUserController.setDialogEnumeration(DialogEnumeration.ADD);
+            UserDialogController.resetDialog();
+            UserDialogController.setThisStage(stage);
+            UserDialogController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Add Employee");
             Scene scene = new Scene(userDialogPane);
             stage.setScene(scene);
@@ -90,16 +87,16 @@ public class EmployeeViewController implements Initializable {
                         ("Error", "Input Validation Error", "You have to select a User to Update");
                 return;
             }
-            DialogUserController.resetDialog();
-            DialogUserController.setThisStage(stage);
-            DialogUserController.setDialogEnumeration(DialogEnumeration.UPDATE);
-            DialogUserController.setUser(tableViewEmployee.getSelectionModel().getSelectedItem());
+            UserDialogController.resetDialog();
+            UserDialogController.setThisStage(stage);
+            UserDialogController.setDialogEnumeration(DialogEnumeration.UPDATE);
+            UserDialogController.setUser(tableViewEmployee.getSelectionModel().getSelectedItem());
             stage.setTitle("Update User");
             Scene scene = new Scene(userDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             users.setAll(userService.getAllUsers());
-            DialogMenuController.resetDialog();
+            MenuDialogController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Loading the User failed" + e);
         }
@@ -109,19 +106,19 @@ public class EmployeeViewController implements Initializable {
         try {
             LOGGER.info("Search User Button Click");
             Stage stage = new Stage();
-            DialogUserController.resetDialog();
-            DialogUserController.setThisStage(stage);
-            DialogUserController.setDialogEnumeration(DialogEnumeration.SEARCH);
+            UserDialogController.resetDialog();
+            UserDialogController.setThisStage(stage);
+            UserDialogController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search User");
             Scene scene = new Scene(userDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
-            if(DialogUserController.getUser() != null){
-                users.setAll(userService.findUsers(DialogUserController.getUser()));
+            if(UserDialogController.getUser() != null){
+                users.setAll(userService.findUsers(UserDialogController.getUser()));
             }else {
                 users.setAll(userService.getAllUsers());
             }
-            DialogMenuEntryController.resetDialog();
+            MenuEntryDialogController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Loading the User Entries failed" + e);
         }

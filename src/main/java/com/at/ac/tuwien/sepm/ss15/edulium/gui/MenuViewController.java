@@ -1,33 +1,27 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,7 +64,7 @@ public class MenuViewController implements Initializable {
                 public ObservableValue<String> call(TableColumn.CellDataFeatures<Menu, String> p) {
                     // p.getValue() returns the Person instance for a particular TableView row
                     List<String> list = new LinkedList<String>();
-                    p.getValue().getEntries().forEach(entry->list.add(entry.getName()));
+                    p.getValue().getEntries().forEach(entry -> list.add(entry.getName()));
                     return new SimpleStringProperty(list.toString());
                 }
             });
@@ -89,16 +83,16 @@ public class MenuViewController implements Initializable {
                         ("Error", "Input Validation Error", "You have to select a Menu to Update");
                 return;
             }
-            DialogMenuController.resetDialog();
-            DialogMenuController.setThisStage(stage);
-            DialogMenuController.setDialogEnumeration(DialogEnumeration.UPDATE);
-            DialogMenuController.setMenu(tableViewMenu.getSelectionModel().getSelectedItem());
+            MenuDialogController.resetDialog();
+            MenuDialogController.setThisStage(stage);
+            MenuDialogController.setDialogEnumeration(DialogEnumeration.UPDATE);
+            MenuDialogController.setMenu(tableViewMenu.getSelectionModel().getSelectedItem());
             stage.setTitle("Update Menu");
             Scene scene = new Scene(menuDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
             menus.setAll(menuService.getAllMenus());
-            DialogMenuController.resetDialog();
+            MenuDialogController.resetDialog();
         }catch (Exception e){
             LOGGER.error("Loading the Menus failed" + e);
         }
@@ -108,19 +102,19 @@ public class MenuViewController implements Initializable {
         try {
             LOGGER.info("Search Menu Button Click");
             Stage stage = new Stage();
-            DialogMenuController.resetDialog();
-            DialogMenuController.setThisStage(stage);
-            DialogMenuController.setDialogEnumeration(DialogEnumeration.SEARCH);
+            MenuDialogController.resetDialog();
+            MenuDialogController.setThisStage(stage);
+            MenuDialogController.setDialogEnumeration(DialogEnumeration.SEARCH);
             stage.setTitle("Search Menu");
             Scene scene = new Scene(menuDialogPane);
             stage.setScene(scene);
             stage.showAndWait();
-            if(DialogMenuController.getMenu() != null){
-                menus.setAll(menuService.findMenu(DialogMenuController.getMenu()));
+            if(MenuDialogController.getMenu() != null){
+                menus.setAll(menuService.findMenu(MenuDialogController.getMenu()));
             }else {
                 menus.setAll(menuService.getAllMenus());
             }
-            DialogMenuController.resetDialog();
+            MenuDialogController.resetDialog();
         }catch (ServiceException e){
             LOGGER.error("Menu Service finding Menus did not work" + e);
         }
@@ -145,9 +139,9 @@ public class MenuViewController implements Initializable {
         try {
             LOGGER.info("Add Menu Button Click");
             Stage stage = new Stage();
-            DialogMenuController.resetDialog();
-            DialogMenuController.setThisStage(stage);
-            DialogMenuController.setDialogEnumeration(DialogEnumeration.ADD);
+            MenuDialogController.resetDialog();
+            MenuDialogController.setThisStage(stage);
+            MenuDialogController.setDialogEnumeration(DialogEnumeration.ADD);
             stage.setTitle("Add Menu");
             Scene scene = new Scene(menuDialogPane);
             stage.setScene(scene);
