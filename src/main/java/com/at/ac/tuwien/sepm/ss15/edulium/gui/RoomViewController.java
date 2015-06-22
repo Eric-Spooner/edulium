@@ -29,10 +29,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -41,7 +43,8 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Controller used for Room view in Manager Window
  */
-public class RoomViewController implements Initializable, Controller {
+@Controller
+public class RoomViewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(RoomViewController.class);
 
     @FXML
@@ -76,19 +79,24 @@ public class RoomViewController implements Initializable, Controller {
             public void handle(MouseEvent t) {
                 boolean noSectionClicked = true;
                 for(Rect rect : rects) {
-                    try {
-                        Table clickedTable = rect.getTable(t.getX(), t.getY());
-                        if(clickedTable != null) {
-                            System.out.println((String.valueOf(clickedTable.getNumber()) + " clicked"));
+                    if (rect.contains(t.getX(), t.getY())) {
+                        try {
+                            List<Table> tables = interiorService.findTables(Table.withIdentity(Section.withIdentity(rect.getIdentity()), rect.getNumber()));
+                            if (!tables.isEmpty()) {
+                                Table clickedTable = tables.get(0);
+                                System.out.println((String.valueOf(clickedTable.getNumber()) + " clicked"));
+                            }
+
+                            List<Section> sections = interiorService.findSections(Section.withIdentity(rect.getIdentity()));
+                            if (!sections.isEmpty()) {
+                                Section clickedSection = sections.get(0);
+                                noSectionClicked = false;
+                                clickedSectionId = clickedSection.getIdentity();
+                                System.out.println((String.valueOf(clickedSection.getName()) + " clicked" + clickedSection.getIdentity()));
+                            }
+                        } catch (ServiceException e) {
+                            ManagerViewController.showErrorDialog("Error", "Error", e.getMessage());
                         }
-                        Section clickedSection = rect.getSection(t.getX(), t.getY());
-                        if(clickedSection != null) {
-                            noSectionClicked = false;
-                            clickedSectionId = clickedSection.getIdentity();
-                            System.out.println((String.valueOf(clickedSection.getName()) + " clicked" + clickedSection.getIdentity()));
-                        }
-                    } catch(ServiceException e) {
-                        ManagerViewController.showErrorDialog("Error", "Error", e.getMessage());
                     }
                 }
                 if(noSectionClicked)
@@ -158,7 +166,7 @@ public class RoomViewController implements Initializable, Controller {
                     gc.setStroke(Color.RED);
                 gc.strokeRoundRect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY, 10, 10);
                 gc.setStroke(Color.BLACK);
-                Rect rectSection = new Rect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY, interiorService);
+                Rect rectSection = new Rect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY);
                 rectSection.setIdentity(section.getIdentity());
                 rects.add(rectSection);
                 gc.setFont(new Font(gc.getFont().getName(), 20 * scaleText));
@@ -166,9 +174,9 @@ public class RoomViewController implements Initializable, Controller {
                 Table matcher = new Table();
                 matcher.setSection(section);
                 for (Table table : interiorService.findTables(matcher)) {
-                    Rect rectTable = new Rect(((x+SECTION_PADDING)+(table.getColumn()*FACT))*scaleX, ((y+SECTION_PADDING)+(table.getRow()*FACT))*scaleY, TABLE_SIZE*scaleX, TABLE_SIZE*scaleY, interiorService);
+                    Rect rectTable = new Rect(((x+SECTION_PADDING)+(table.getColumn()*FACT))*scaleX, ((y+SECTION_PADDING)+(table.getRow()*FACT))*scaleY, TABLE_SIZE*scaleX, TABLE_SIZE*scaleY);
                     rectTable.setNumber(table.getNumber());
-                    rectTable.setSection(section);
+                    rectTable.setIdentity(section.getIdentity());
                     gc.strokeRoundRect(rectTable.getX(), rectTable.getY(), rectTable.getW(), rectTable.getH(), 2, 2);
                     rects.add(rectTable);
                     gc.fillText(String.valueOf(table.getNumber()), ((x+SECTION_PADDING)+(table.getColumn()*FACT)+TABLE_SIZE/4)*scaleX, ((y+SECTION_PADDING)+(table.getRow()*FACT)+TABLE_SIZE/1.5)*scaleY);
@@ -188,7 +196,6 @@ public class RoomViewController implements Initializable, Controller {
         drawCanvas();
         try {
             Stage stage = new Stage();
-            AddSectionController.setInteriorService(interiorService);
             AddSectionController.setThisStage(stage);
             AddSectionController.setUpdateCanvas(new UpdateCanvas());
             stage.setTitle("Add Section");
@@ -207,7 +214,6 @@ public class RoomViewController implements Initializable, Controller {
             drawCanvas();
             try {
                 Stage stage = new Stage();
-                EditSectionController.setInteriorService(interiorService);
                 EditSectionController.setThisStage(stage);
                 EditSectionController.setUpdateCanvas(new UpdateCanvas());
                 EditSectionController.setSectionId(clickedSectionId);
@@ -259,9 +265,10 @@ public class RoomViewController implements Initializable, Controller {
 
     public void setupListeners() {
         scrollPaneLeft.widthProperty().addListener(new ChangeListener<Number>() {
-            @Override public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) {
                 tablesCanvas.setWidth(tablesCanvas.getWidth() - (oldSceneWidth.intValue() - newSceneWidth.intValue()));
-                scaleX = newSceneWidth.doubleValue()/550.0;
+                scaleX = newSceneWidth.doubleValue() / 550.0;
                 scaleX = Math.min(scaleX, 2.0);
                 scaleX = Math.max(scaleX, 0.5);
                 drawCanvas();
@@ -301,10 +308,5 @@ public class RoomViewController implements Initializable, Controller {
             }
         }
         return max*FACT + TABLE_SIZE + 2*SECTION_PADDING;
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-
     }
 }

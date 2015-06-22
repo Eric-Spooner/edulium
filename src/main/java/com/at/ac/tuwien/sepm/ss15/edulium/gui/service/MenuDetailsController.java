@@ -3,7 +3,6 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PersistentButtonToggleGroup;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
@@ -21,12 +20,14 @@ import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.SegmentedButton;
+import org.springframework.stereotype.Controller;
 
 import java.net.URL;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class MenuDetailsController implements Initializable, Controller {
+@Controller
+public class MenuDetailsController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(MenuDetailsController.class);
 
     @FXML
@@ -143,10 +144,5 @@ public class MenuDetailsController implements Initializable, Controller {
 
             menuAcceptedConsumer.accept(configuredMenu);
         }
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-
     }
 }

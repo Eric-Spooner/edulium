@@ -1,36 +1,31 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Controller;
 
-import java.io.IOException;
+import javax.annotation.Resource;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import static javafx.collections.FXCollections.observableArrayList;
-
-/**
- * Created by - on 12.06.2015.
- */
-public class MenuCategoryViewController implements Initializable, Controller {
+@Controller
+public class MenuCategoryViewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(MenuCategoryViewController.class);
 
     @FXML
@@ -39,119 +34,138 @@ public class MenuCategoryViewController implements Initializable, Controller {
     private TableColumn<MenuCategory,Long> tableColMenuCategoryID;
     @FXML
     private TableColumn<MenuCategory,String> tableColMenuCategoryName;
+    @FXML
+    private Button buttonUpdate;
+    @FXML
+    private Button buttonRemove;
 
     @Autowired
     private MenuService menuService;
     @Autowired
-    private TaskScheduler taskScheduler;
+    private Validator<MenuCategory> menuCategoryValidator;
 
-    private ObservableList<MenuCategory> menuCategories;
+    @Resource(name = "menuCategoryDialogPane")
+    private FXMLPane menuCategoryDialogPane;
+    private MenuCategoryDialogController menuCategoryDialogController;
+
+    private ObservableList<MenuCategory> menuCategories = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // queued
-        try {
-            menuCategories = observableArrayList(menuService.getAllMenuCategories());
-            tableViewMenuCategory.setItems(menuCategories);
-            tableColMenuCategoryID.setCellValueFactory(new PropertyValueFactory<MenuCategory, Long>("identity"));
-            tableColMenuCategoryName.setCellValueFactory(new PropertyValueFactory<MenuCategory, String>("name"));
-        }catch (ServiceException e){
-            LOGGER.error("Initialize MenuCategory View Failed due to" + e);
-        }
+        menuCategoryDialogController = menuCategoryDialogPane.getController(MenuCategoryDialogController.class);
 
+        tableViewMenuCategory.setItems(menuCategories);
+
+        tableColMenuCategoryID.setCellValueFactory(new PropertyValueFactory<>("identity"));
+        tableColMenuCategoryName.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        tableViewMenuCategory.getSelectionModel().selectedIndexProperty().addListener(event -> {
+            final boolean hasSelection = tableViewMenuCategory.getSelectionModel().getSelectedIndex() >= 0;
+
+            buttonUpdate.setDisable(!hasSelection);
+            buttonRemove.setDisable(!hasSelection);
+        });
+
+        loadAllMenuCategories();
     }
 
+    @FXML
     public void buttonMenuCategorySearchClicked(ActionEvent actionEvent) {
-        try {
-            LOGGER.info("Search MenuCategory Button Click");
-            Stage stage = new Stage();
-            DialogMenuCategoryController.setThisStage(stage);
-            DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.SEARCH);
-            stage.setTitle("Search Menu Category");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
-            Scene scene = new Scene(myPane);
-            stage.setScene(scene);
-            stage.showAndWait();
-            if (DialogMenuCategoryController.getMenuCategory() != null) {
-                menuCategories.setAll(menuService.findMenuCategory(DialogMenuCategoryController.getMenuCategory()));
-            } else {
-                menuCategories.setAll(menuService.getAllMenuCategories());
+        InputDialog<MenuCategory> menuCategorySearchDialog = new SearchInputDialog<>("menu categories");
+        menuCategorySearchDialog.setContent(menuCategoryDialogPane);
+        menuCategorySearchDialog.setController(menuCategoryDialogController);
+        menuCategorySearchDialog.showAndWait().ifPresent(menuCategoryMatcher -> {
+            try {
+                menuCategories.setAll(menuService.findMenuCategory(menuCategoryMatcher));
+            } catch (ServiceException e) {
+                LOGGER.error("Could not search for menu categories with matcher " + menuCategoryMatcher, e);
+
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error while searching for menu categories");
+                alert.setHeaderText("Could not search for menu categories");
+                alert.setContentText(e.getMessage());
+                alert.showAndWait();
             }
-            DialogMenuCategoryController.resetDialog();
-        }catch (Exception e){
-            LOGGER.error("Search MenuCategory Button Click did not work");
-        }
+        });
     }
 
+    @FXML
     public void buttonMenuCategoryUpdateClicked(ActionEvent actionEvent) {
-        try {
-            LOGGER.info("Update MenuCategory Button Click");
-            Stage stage = new Stage();
-            if(tableViewMenuCategory.getSelectionModel().getSelectedItem() == null){
-                ManagerViewController.showErrorDialog
-                        ("Error", "Input Validation Error", "You have to select a MenuCategory to Update");
-                return;
-            }
-            DialogMenuCategoryController.setThisStage(stage);
-            DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.UPDATE);
-            DialogMenuCategoryController.setMenuCategory(tableViewMenuCategory.getSelectionModel().getSelectedItem());
-            stage.setTitle("Update Menu Category");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
-            Scene scene = new Scene(myPane);
-            stage.setScene(scene);
-            stage.showAndWait();
-            menuCategories.setAll(menuService.getAllMenuCategories());
-            DialogMenuCategoryController.resetDialog();
-        }catch (Exception e){
-            LOGGER.error("Update MenuCategory Button Click did not work" + e);
+        MenuCategory selectedMenuCategory = tableViewMenuCategory.getSelectionModel().getSelectedItem();
+        if (selectedMenuCategory != null) {
+            InputDialog<MenuCategory> menuCategoryInputDialog = new UpdateInputDialog<>("menu category", selectedMenuCategory);
+            menuCategoryInputDialog.setValidator(menuCategoryValidator);
+            menuCategoryInputDialog.setContent(menuCategoryDialogPane);
+            menuCategoryInputDialog.setController(menuCategoryDialogController);
+            menuCategoryInputDialog.showAndWait().ifPresent(editedMenuCategory -> {
+                try {
+                    menuService.updateMenuCategory(editedMenuCategory);
+                    menuCategories.remove(selectedMenuCategory);
+                    menuCategories.add(editedMenuCategory);
+                } catch (ValidationException | ServiceException e) {
+                    LOGGER.error("Could not change menu category " + editedMenuCategory, e);
+
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error while updating menu category");
+                    alert.setHeaderText("Could not update menu category '" + selectedMenuCategory.getName() + "'");
+                    alert.setContentText(e.getMessage());
+                    alert.showAndWait();
+                }
+            });
         }
     }
 
+    @FXML
     public void buttonMenuCategoryAddClicked(ActionEvent actionEvent) {
-        try {
-            LOGGER.info("Add MenuCategory Button Click");
-            Stage stage = new Stage();
-            DialogMenuCategoryController.setThisStage(stage);
-            DialogMenuCategoryController.setDialogEnumeration(DialogEnumeration.ADD);
-            stage.setTitle("Insert Menu Category");
-            AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/DialogMenuCategory.fxml"));
-            Scene scene = new Scene(myPane);
-            stage.setScene(scene);
-            stage.showAndWait();
-            menuCategories.setAll(menuService.getAllMenuCategories());
-            DialogMenuCategoryController.resetDialog();
-        }catch (Exception e){
-            LOGGER.error("Add MenuCategory Button Click did not work" + e);
-        }
-    }
+        InputDialog<MenuCategory> menuCategoryInputDialog = new CreateInputDialog<>("menu category");
+        menuCategoryInputDialog.setValidator(menuCategoryValidator);
+        menuCategoryInputDialog.setContent(menuCategoryDialogPane);
+        menuCategoryInputDialog.setController(menuCategoryDialogController);
+        menuCategoryInputDialog.showAndWait().ifPresent(menuCategory -> {
+            try {
+                menuService.addMenuCategory(menuCategory);
+                menuCategories.add(menuCategory);
+            } catch (ValidationException | ServiceException e) {
+                LOGGER.error("Could not add menu category " + menuCategory, e);
 
-    public void buttonMenuCategoryRemoveClicked(ActionEvent actionEvent) {
-        try {
-            LOGGER.info("Delete MenuCategory Button Click");
-            if(tableViewMenuCategory.getSelectionModel().getSelectedItem() == null){
-                ManagerViewController.showErrorDialog
-                        ("Error", "Input Validation Error", "You have to select a Menu Category to Delete");
-                return;
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error while adding menu category");
+                alert.setHeaderText("Could not add menu category '" + menuCategory.getName() + "'");
+                alert.setContentText(e.getMessage());
+                alert.showAndWait();
             }
-            menuService.removeMenuCategory(tableViewMenuCategory.getSelectionModel().getSelectedItem());
-            menuCategories.setAll(menuService.getAllMenuCategories());
-        }catch (Exception e){
-            LOGGER.error("Loading the Menus Categories failed" + e);
+        });
+    }
+
+    @FXML
+    public void buttonMenuCategoryRemoveClicked(ActionEvent actionEvent) {
+        MenuCategory selectedMenuCategory = tableViewMenuCategory.getSelectionModel().getSelectedItem();
+        if (selectedMenuCategory != null) {
+            try {
+                menuService.removeMenuCategory(selectedMenuCategory);
+                menuCategories.remove(selectedMenuCategory);
+            } catch (ValidationException | ServiceException e) {
+                LOGGER.error("Could not delete menu category " + selectedMenuCategory, e);
+
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error while deleting menu category");
+                alert.setHeaderText("Could not delete menu category '" + selectedMenuCategory.getName() + "'");
+                alert.setContentText(e.getMessage());
+                alert.showAndWait();
+            }
         }
     }
 
+    @FXML
     public void buttonShowAllMenuCategoryClicked(ActionEvent actionEvent) {
+        loadAllMenuCategories();
+    }
+
+    private void loadAllMenuCategories() {
         try {
             menuCategories.setAll(menuService.getAllMenuCategories());
-        } catch (Exception e){
-            LOGGER.error("Loading All Menu Categories failed" + e);
+        } catch (ServiceException e){
+            LOGGER.error("Could not load all menu categories", e);
         }
     }
-
-    @Override
-    public void disable(boolean disabled) {
-
-    }
-
-
 }

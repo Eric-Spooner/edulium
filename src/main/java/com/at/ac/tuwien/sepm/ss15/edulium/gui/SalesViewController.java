@@ -35,7 +35,7 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Created by - on 12.06.2015.
  */
-public class SalesViewController implements Initializable, Controller {
+public class SalesViewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(SalesViewController.class);
 
     @FXML
@@ -149,10 +149,5 @@ public class SalesViewController implements Initializable, Controller {
         } catch (Exception e){
             LOGGER.error("Loading All Sale failed" + e);
         }
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-
     }
 }

@@ -2,21 +2,22 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.Controller;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.GridView;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.stereotype.Controller;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -24,10 +25,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
-/**
- * Created by phili on 6/16/15.
- */
-public class TableViewController implements Initializable, Controller {
+@Controller
+public class TableViewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(TableViewController.class);
 
     @FXML
@@ -89,8 +88,16 @@ public class TableViewController implements Initializable, Controller {
 
             GridView<Table> gridView = new GridView<>();
             gridView.setCellFactory(view -> new TableGridCell());
-
+            gridView.setAlignment(Pos.CENTER);
             gridView.setItems(tables.filtered(table -> table.getSection().equals(item)));
+            gridView.setStyle("-fx-border-color: rgb(0, 0, 0);\n" +
+                    "    -fx-border-radius: 5;\n" +
+                    "    -fx-border-width: 2; \n" +
+                    "    -fx-padding: 10 10 10 10;");
+
+            HBox hBox = new HBox();
+            hBox.setAlignment(Pos.CENTER);
+            hBox.getChildren().add(gridView);
 
             if (item != null) {
                 sectionsMap.put(item, gridView);
@@ -99,8 +106,9 @@ public class TableViewController implements Initializable, Controller {
                 titleLabel.setFont(new Font(20.0));
                 titleLabel.setText(item.getName());
 
-                VBox vBox = new VBox(20);
-                vBox.getChildren().addAll(titleLabel, gridView);
+                VBox vBox = new VBox(15.0);
+                vBox.setAlignment(Pos.CENTER);
+                vBox.getChildren().addAll(titleLabel, hBox);
 
                 setGraphic(vBox);
             }
@@ -119,6 +127,7 @@ public class TableViewController implements Initializable, Controller {
                 return null;
             }
         });
+        tables.startPolling();
 
         sections = new PollingList<>(taskScheduler);
         sections.setInterval(1000);
@@ -130,6 +139,7 @@ public class TableViewController implements Initializable, Controller {
                 return null;
             }
         });
+        sections.startPolling();
 
         ListView<Section> listView = new ListView<>(sections);
         listView.setCellFactory(param -> new SectionListCell());
@@ -170,17 +180,6 @@ public class TableViewController implements Initializable, Controller {
         for(Table t : tables) {
             setTableColor(t, Color.BLACK);
             setTableDisable(t, false);
-        }
-    }
-
-    @Override
-    public void disable(boolean disabled) {
-        if (disabled) {
-            tables.stopPolling();
-            sections.stopPolling();
-        } else {
-            tables.startPolling();
-            sections.startPolling();
         }
     }
 

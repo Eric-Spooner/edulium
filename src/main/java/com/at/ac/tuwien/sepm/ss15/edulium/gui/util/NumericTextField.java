@@ -18,7 +18,9 @@ public class NumericTextField extends TextField
         if (validate(text))
         {
             String newText = replaceBetween(start, end, text);
-            if(newText.isEmpty() || (Double.valueOf(newText) >= minValue && Double.valueOf(newText) <= maxValue)) {
+            if(newText.isEmpty()) {
+                setText("0");
+            } else if (Double.valueOf(newText) >= minValue && Double.valueOf(newText) <= maxValue) {
                 super.replaceText(start, end, text);
             }
         }
@@ -30,10 +32,17 @@ public class NumericTextField extends TextField
         if (validate(text))
         {
             String newText = replaceCurrentSelection(text);
-            if(newText.isEmpty() || (Double.valueOf(newText) >= minValue && Double.valueOf(newText) <= maxValue)) {
+            if(newText.isEmpty()) {
+                setText("0");
+            } else if (Double.valueOf(newText) >= minValue && Double.valueOf(newText) <= maxValue) {
                 super.replaceSelection(text);
             }
         }
+    }
+
+    @Override
+    public void clear() {
+        setText("0");
     }
 
     private String replaceBetween(int start, int end, String text) {
