@@ -21,11 +21,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PrinterInvoiceManager implements InvoiceManager {
     private static final Logger LOGGER = LogManager.getLogger(PrinterInvoiceManager.class);
@@ -41,8 +45,8 @@ public class PrinterInvoiceManager implements InvoiceManager {
     public void manageInvoice(Invoice invoice) throws ServiceException {
         deletePDF();
         generatePDF(invoice);
-        viewPDF();
-//        printPDF();
+//        viewPDF();
+        printPDF();
     }
 
     private void generatePDF(Invoice invoice) throws ServiceException {
@@ -81,7 +85,7 @@ public class PrinterInvoiceManager implements InvoiceManager {
             PdfPCell infoCell = new PdfPCell();
             infoCell.setHorizontalAlignment(Element.ALIGN_CENTER);
             infoCell.setFixedHeight(cHeight);
-            infoCell.setPhrase(new Phrase("Item"));
+            infoCell.setPhrase(new Phrase("Item and info"));
             ordersTable.addCell(infoCell);
             infoCell.setPhrase(new Phrase("Quantity x Price"));
             ordersTable.addCell(infoCell);
@@ -91,27 +95,50 @@ public class PrinterInvoiceManager implements InvoiceManager {
             int index = 1;
             MenuEntry entry;
             TaxRate taxRate;
-            List<TaxRate> rates = new ArrayList<>();
+            Map<Order, Integer> ordersFrequency = new HashMap<>();
+            Map<TaxRate, BigDecimal> ratesAndPrice = new HashMap<>();
+
             for (Order order : invoice.getOrders()) {
                 entry = order.getMenuEntry();
-                taxRate = entry.getTaxRate();
-                if (!rates.contains(taxRate)) {
-                    rates.add(taxRate);
+                if (!ratesAndPrice.containsKey(order.getMenuEntry().getTaxRate())) {
+                    ratesAndPrice.put(entry.getTaxRate(), entry.getPrice());
+                } else {
+                    ratesAndPrice.put(entry.getTaxRate(), ratesAndPrice.get(entry.getTaxRate()).add(entry.getPrice()));
                 }
 
+                if (!ordersFrequency.containsKey(order)) {
+                    ordersFrequency.put(order, 1);
+                } else {
+                    ordersFrequency.put(order, ordersFrequency.get(order) + 1);
+                }
+            }
+
+            for (Map.Entry<Order, Integer> ef : ordersFrequency.entrySet()) {
+                Order order = ef.getKey();
+                String info = order.getAdditionalInformation();
+                entry = order.getMenuEntry();
+                taxRate = entry.getTaxRate();
+
                 PdfPCell cell = new PdfPCell();
-                cell.setFixedHeight(cHeight);
+                if (info == null || info.equals("")) {
+                    cell.setFixedHeight(cHeight);
+                } else {
+                    cell.setFixedHeight(cHeight * 2.2f);
+                    cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                }
+
                 if (index++ % 2 == 0) {
                     cell.setBackgroundColor(BaseColor.WHITE);
                 } else {
                     cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
                 }
-                cell.setPhrase(new Phrase(entry.getName()));
+                cell.setPhrase(new Phrase(entry.getName() + (info == null ? "" : "\n(" + info + ")")));
                 ordersTable.addCell(cell);
-                cell.setPhrase(new Phrase("1" + " x " + order.getBrutto() + " EUR")); // TODO: Set real amount
+                cell.setPhrase(new Phrase(ef.getValue() + " x " + order.getBrutto()));
                 cell.setHorizontalAlignment(Element.ALIGN_RIGHT);
                 ordersTable.addCell(cell);
-                cell.setPhrase(new Phrase(order.getBrutto() + " EUR [" + taxRate.getIdentity() + "]"));
+                cell.setPhrase(new Phrase(order.getBrutto().multiply(new BigDecimal(ef.getValue())) +
+                        " EUR [" + taxRate.getIdentity() + "]"));
                 ordersTable.addCell(cell);
             }
 
@@ -128,12 +155,21 @@ public class PrinterInvoiceManager implements InvoiceManager {
             // write table to page
             ordersTable.writeSelectedRows(0, -1, xPos, yPos -= 15f, canvas);
 
-            yPos -= cHeight * ordersTable.size() + cHeight;
-            for (TaxRate tr : rates) {
-                ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, new Phrase("[" + tr.getIdentity() +
-                "] incl. " + tr.getValue().floatValue() * 100f + "% Tax"), xPos, yPos, 0);
+            yPos -= ordersTable.getTotalHeight() + cHeight;
+            BigDecimal net = invoice.getGross();
+            for (Map.Entry<TaxRate, BigDecimal> tr : ratesAndPrice.entrySet()) {
+                Phrase phrase = new Phrase("[" + tr.getKey().getIdentity() + "] incl. " +
+                        String.format("%.0f", tr.getKey().getValue().multiply(new BigDecimal("100"))) + "% Tax " +
+                        currencyFormat(tr.getKey().getValue().multiply(tr.getValue())));
+
+                ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT, phrase, xPos, yPos, 0);
                 yPos -= 15f;
+
+                net = net.subtract(tr.getKey().getValue().multiply(tr.getValue()));
             }
+
+            ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+                    new Phrase("Net sum: " + currencyFormat(net)), xPos, yPos, 0);
         } catch (DocumentException e) {
             LOGGER.error("An error occurred while creating the PDF stamper", e);
             throw new ServiceException("An error occurred while creating the PDF stamper", e);
@@ -155,6 +191,14 @@ public class PrinterInvoiceManager implements InvoiceManager {
                 reader.close();
             }
         }
+    }
+
+    private String currencyFormat(BigDecimal n) {
+        NumberFormat nf = NumberFormat.getCurrencyInstance();
+        DecimalFormatSymbols decimalFormatSymbols = ((DecimalFormat) nf).getDecimalFormatSymbols();
+        decimalFormatSymbols.setCurrencySymbol("");
+        ((DecimalFormat) nf).setDecimalFormatSymbols(decimalFormatSymbols);
+        return nf.format(n) + " EUR";
     }
 
     // temporary method for viewing the pdf
