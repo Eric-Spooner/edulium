@@ -109,10 +109,10 @@ public class TestTipService extends AbstractServiceTest {
             //THEN
             List<User> userList = userService.findUsers(User.withIdentity("servicetester"));
             assertEquals(1, userList.size());
-            assertTrue(BigDecimal.valueOf(50).compareTo(userList.get(0).getTip()) != 0);
+            assertTrue(BigDecimal.valueOf(50).compareTo(userList.get(0).getTip()) == 0);
 
             userList = userService.findUsers(User.withIdentity("daotester"));
             assertEquals(1, userList.size());
-            assertTrue(BigDecimal.valueOf(50).compareTo(userList.get(0).getTip()) != 0);
+            assertTrue(BigDecimal.valueOf(50).compareTo(userList.get(0).getTip()) == 0);
         }
 }
