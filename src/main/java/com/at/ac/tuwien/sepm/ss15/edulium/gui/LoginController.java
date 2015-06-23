@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
+import com.at.ac.tuwien.sepm.ss15.edulium.security.EduliumAuthentication;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
 import javafx.fxml.FXML;
@@ -120,7 +121,7 @@ public class LoginController implements Initializable {
             Authentication request = new UsernamePasswordAuthenticationToken(user.getIdentity(), "");
             Authentication result = authenticationManager.authenticate(request);
 
-            SecurityContextHolder.getContext().setAuthentication(result);
+            SecurityContextHolder.getContext().setAuthentication(new EduliumAuthentication(result, user));
 
             if (succesfulLoginConsumer != null) {
                 succesfulLoginConsumer.accept(user);

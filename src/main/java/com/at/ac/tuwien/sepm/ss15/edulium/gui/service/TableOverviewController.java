@@ -2,10 +2,13 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -19,16 +22,23 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
 
 @Controller
@@ -47,11 +57,14 @@ public class TableOverviewController implements Initializable {
 
     @Autowired
     private TaskScheduler taskScheduler;
+    private ScheduledFuture<?> scheduledFuture = null;
+
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private InteriorService interiorService;
 
     private TableViewController tableViewController;
-    private PollingList<Order> ordersReadyForDelivery;
     private ObservableList<Table> tablesOfOrders;
 
     private Consumer<Table> onTableClickedConsumer;
@@ -95,36 +108,20 @@ public class TableOverviewController implements Initializable {
         lvDelivery.setCellFactory(param -> new DeliveryCell());
         lvDelivery.setItems(tablesOfOrders);
 
-        ordersReadyForDelivery = new PollingList<>(taskScheduler);
-        ordersReadyForDelivery.setInterval(1000);
-        ordersReadyForDelivery.addListener(new ListChangeListener<Order>() {
-            @Override
-            public void onChanged(Change<? extends Order> c) {
-                while(c.next()) {
-                    for(Order o : c.getRemoved()) {
-                        tablesOfOrders.remove(o.getTable());
-                    }
-                    for(Order o : c.getAddedSubList()) {
-                        if(!tablesOfOrders.contains(o.getTable())) {
-                            tablesOfOrders.add(o.getTable());
-                        }
+        scheduledFuture = taskScheduler.scheduleWithFixedDelay(() -> {
+            Platform.runLater(() -> {
+                // workaround: if user logged out -> exception -> stop polling
+                try {
+                    updateDeliveries();
+                    updateAssignedTables();
+                } catch (AuthenticationCredentialsNotFoundException e) {
+                    if(scheduledFuture != null) {
+                        scheduledFuture.cancel(true);
+                        scheduledFuture = null;
                     }
                 }
-            }
-        });
-
-        ordersReadyForDelivery.setSupplier(() -> {
-            Order matcher = new Order();
-            matcher.setState(Order.State.READY_FOR_DELIVERY);
-
-            try {
-                return orderService.findOrder(matcher);
-            } catch (ServiceException e) {
-                LOGGER.error("Getting orders via user supplier has failed", e);
-                return null;
-            }
-        });
-        ordersReadyForDelivery.startPolling();
+            });
+        }, 1000);
     }
 
     @FXML
@@ -145,4 +142,48 @@ public class TableOverviewController implements Initializable {
         tableViewController.setOnTableClicked(consumer);
     }
 
+    private void updateDeliveries() {
+        Order matcher = new Order();
+        matcher.setState(Order.State.READY_FOR_DELIVERY);
+        List<Order> orders = null;
+
+        try {
+            orders = orderService.findOrder(matcher);
+        } catch (ServiceException e) {
+            LOGGER.error("Getting orders via user supplier has failed", e);
+            return;
+        }
+
+        // display only orders for the tables the user is assigned to
+        User loggedInUser = getLoggedInUser();
+
+        tablesOfOrders.clear();
+        for(Order order : orders) {
+            Table table = order.getTable();
+            if (!tablesOfOrders.contains(table) && table.getUser().equals(loggedInUser)) {
+                tablesOfOrders.add(table);
+            }
+        }
+    }
+
+    private void updateAssignedTables() {
+        Table matcher = new Table();
+        matcher.setUser(getLoggedInUser());
+
+        tableViewController.clear();
+        try {
+            interiorService.findTables(matcher).stream().forEach(t -> tableViewController.setTableColor(t, Color.BLUE));
+        } catch (ServiceException e) {
+            LOGGER.error("Getting user assigned tables failed", e);
+        }
+    }
+
+    private User getLoggedInUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth == null) {
+            return null;
+        }
+
+        return (User) auth.getPrincipal();
+    }
 }
