@@ -5,10 +5,12 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.scene.control.Tab;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * Interface for Automatic Table assignment
  */
+@PreAuthorize("isAuthenticated()")
 public interface TableBusinessLogic extends BusinessLogic {
 
     /**
@@ -18,6 +20,7 @@ public interface TableBusinessLogic extends BusinessLogic {
      * is already paid, the table will again be assigned to the user, which took the new order
      * @param table the table, the order has been placed
      */
+    @PreAuthorize("hasRole('SERVICE')")
     public void addedOrderToTable(Table table, Order order) throws ServiceException, ValidationException;
 
     /**
@@ -25,5 +28,6 @@ public interface TableBusinessLogic extends BusinessLogic {
      * table to null.
      * @param table the table, the orders have been paid
      */
+    @PreAuthorize("hasRole('SERVICE')")
     public void paidOrderFromTable(Table table) throws ServiceException, ValidationException;
 }
