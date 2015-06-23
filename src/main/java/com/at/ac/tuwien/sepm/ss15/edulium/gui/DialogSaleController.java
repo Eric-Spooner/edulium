@@ -78,11 +78,14 @@ public class DialogSaleController implements Initializable{
     public static void setThisStage(Stage thisStage) {
         DialogSaleController.thisStage = thisStage;
     }
+
     public static void setSale(Sale sale) {
         DialogSaleController.sale = sale; }
+
     public static void setDialogEnumeration(DialogEnumeration dialogEnumeration) {
         DialogSaleController.dialogEnumeration = dialogEnumeration;
     }
+    
     public static Sale getSale() {
         return sale;
     }

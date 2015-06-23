@@ -12,11 +12,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-<<<<<<< HEAD
-=======
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
->>>>>>> remotes/origin/general/gui
 import java.util.ArrayList;
 import java.util.List;
 
