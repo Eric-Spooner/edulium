@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -172,13 +173,14 @@ public class MenuEntryViewController implements Initializable {
     @FXML
     public void buttonMenuEntryAvailableClicked(ActionEvent actionEvent) {
         List<MenuEntry> selectedMenuEntries = tableViewMenuEntry.getSelectionModel().getSelectedItems();
+        List<MenuEntry> addMenuEntries = new ArrayList<>();
         for (MenuEntry menuEntry : selectedMenuEntries) {
             try {
                 MenuEntry editedMenuEntry = menuEntry.clone();
                 editedMenuEntry.setAvailable(true);
                 menuService.updateMenuEntry(editedMenuEntry);
 
-                menuEntries.add(editedMenuEntry);
+                addMenuEntries.add(editedMenuEntry);
             } catch (ValidationException | ServiceException e) {
                 LOGGER.error("Could not reset availability of menu entry " + menuEntry, e);
 
@@ -190,6 +192,7 @@ public class MenuEntryViewController implements Initializable {
             }
         }
         menuEntries.removeAll(selectedMenuEntries);
+        menuEntries.addAll(addMenuEntries);
     }
 
     @FXML

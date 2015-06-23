@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -167,13 +168,14 @@ public class EmployeeViewController implements Initializable {
     @FXML
     public void buttonClearTipClicked(ActionEvent actionEvent) {
         List<User> selectedUsers = tableViewEmployee.getSelectionModel().getSelectedItems();
+        List<User> addUsers = new ArrayList<>();
         for (User selectedUser : selectedUsers) {
             try {
                 User editedUser = selectedUser.clone();
                 editedUser.setTip(BigDecimal.ZERO);
                 userService.updateUser(editedUser);
 
-                users.add(editedUser);
+                addUsers.add(editedUser);
             } catch (ValidationException | ServiceException e) {
                 LOGGER.error("Could not clear tip of user " + selectedUser, e);
 
@@ -185,6 +187,7 @@ public class EmployeeViewController implements Initializable {
             }
         }
         users.removeAll(selectedUsers);
+        users.addAll(addUsers);
     }
 
     @FXML
