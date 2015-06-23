@@ -49,7 +49,7 @@ class OrderServiceImpl implements OrderService {
 
         orderValidator.validateForUpdate(order);
 
-        List<Order> preOrders = this.findOrder(order);
+        List<Order> preOrders = this.findOrder(Order.withIdentity(order.getIdentity()));
 
         if(preOrders.size()==0){
             LOGGER.error("The order, you would like to update does not exist");
@@ -157,6 +157,7 @@ class OrderServiceImpl implements OrderService {
             throw new ServiceException("An Error has occurred in the data access object");
         }
     }
+
     @Override
     public void markAsInProgress(Order order) throws ServiceException, ValidationException {
         LOGGER.debug("Entering markAsInProgress with parameter " + order);

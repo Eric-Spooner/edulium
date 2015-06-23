@@ -1,6 +1,6 @@
-MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('cook', 'Crusty Cook', 'ROLE_COOK');
-MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('waiter', 'Wily Waiter', 'ROLE_SERVICE');
-MERGE INTO RestaurantUser (ID, name, userRole) KEY(ID) VALUES ('manager', 'Maverick Manager', 'ROLE_MANAGER');
+MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('cook', 'Crusty Cook', 'ROLE_COOK', 0);
+MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('waiter', 'Wily Waiter', 'ROLE_SERVICE', 0);
+MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('manager', 'Maverick Manager', 'ROLE_MANAGER', 0);
 
 MERGE INTO MenuCategory (ID, name) KEY(ID) VALUES (1, 'starter');
 MERGE INTO MenuCategory (ID, name) KEY(ID) VALUES (2, 'main dish');
@@ -45,14 +45,22 @@ MERGE INTO MenuEntry (ID, name, price, available, description, taxRate_ID, categ
        KEY(ID) Values(3, 'Bananen-Split', 4, true, 'Bananen mit Vanille Eiscreme und Schokosauce', 2, 3);
 MERGE INTO MenuEntry (ID, name, price, available, description, taxRate_ID, category_ID)
        KEY(ID) Values(4, 'Leitungswasser', 1, true, 'Frisches Wiener Leitungswasser', 3, 4);
-
+MERGE INTO MenuEntry (ID, name, price, available, description, taxRate_ID, category_ID)
+       KEY(ID) Values(5, 'Eiskaffee', 3, true, 'Kaffee mit Eis', 2, 3);
+MERGE INTO MenuEntry (ID, name, price, available, description, taxRate_ID, category_ID)
+       KEY(ID) Values(6, 'Kaffee', 1, true, 'erhitzte Hydroxylsäure mit gemahlenen Bohnen', 3, 4);
+MERGE INTO MenuEntry (ID, name, price, available, description, taxRate_ID, category_ID)
+       KEY(ID) Values(7, 'Tee', 1, true, 'erhitzte Hydroxylsäure mit aromatisiertem Beutel', 3, 4);
 
 MERGE INTO Menu(ID,name) KEY(ID) VALUES (1, 'Spring Menu');
 
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (1,1,8);
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (1,2,2.5);
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (1,3,3);
+MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (1,5,1);
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (1,4,0.5);
+MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (1,6,0.5);
+MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (1,7,0.5);
 
 MERGE INTO Menu(ID,name) KEY(ID) VALUES (2, 'Schnitzel Menu');
 

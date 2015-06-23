@@ -6,11 +6,16 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="113.0" prefWidth="275.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.DialogMenuCategoryController">
+<GridPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.MenuCategoryDialogController">
    <children>
-      <Text layoutX="14.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name: " />
-      <TextField fx:id="textFieldName" layoutX="68.0" layoutY="19.0" AnchorPane.leftAnchor="68.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="19.0" />
-      <Button defaultButton="true" layoutX="213.0" layoutY="63.0" mnemonicParsing="false" onAction="#buttonOKClick" text="OK" AnchorPane.bottomAnchor="19.0" AnchorPane.rightAnchor="21.0" />
-      <Button cancelButton="true" layoutX="143.0" layoutY="63.0" mnemonicParsing="false" onAction="#buttonCancelClick" text="Cancel" AnchorPane.bottomAnchor="19.0" AnchorPane.rightAnchor="65.0" />
+      <Text layoutX="14.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Name: " GridPane.halignment="RIGHT" />
+      <TextField fx:id="textFieldName" layoutX="68.0" layoutY="19.0" AnchorPane.leftAnchor="68.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="19.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
    </children>
-</AnchorPane>
+   <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+   </rowConstraints>
+</GridPane>

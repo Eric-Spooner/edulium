@@ -1,6 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
@@ -13,9 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
@@ -24,16 +22,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import static javafx.collections.FXCollections.observableArrayList;
+
 /**
- * Controller used for the Manager View
+ * Controller used for Edit Section window
  */
-@Component
+@Controller
 public class EditSectionController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(EditSectionController.class);
 
@@ -41,22 +42,19 @@ public class EditSectionController implements Initializable {
     private boolean moveTable = false;
     private boolean removeTable = false;
     private boolean updateTable = false;
-    private static final int FACT = 10;
+    private static final int FACT = 40;
     private static final int TABLE_SIZE = 40;
-    @Autowired
-    private InteriorService interiorService;
-
     private static Stage thisStage;
     private static RoomViewController.UpdateCanvas updateCanvas;
     private static ArrayList<Rect> rects = new ArrayList<Rect>();
     private Rect movingRect;
+    private int prevX = 0;
+    private int prevY = 0;
+    private static Long sectionId;
     private static String sectionName;
 
-    public static void setSectionId(Long sectionId) {
-        EditSectionController.sectionId = sectionId;
-    }
-
-    private static Long sectionId;
+    @Autowired
+    private InteriorService interiorService;
 
     @FXML
     private Canvas canvas;
@@ -67,10 +65,36 @@ public class EditSectionController implements Initializable {
     @FXML
     private Label sectionNameLb;
 
+    public static void setSectionId(Long sectionId) {
+        EditSectionController.sectionId = sectionId;
+    }
+
+    // Only called in editing mode, initalizes tables on the canvas
+    public void initTables() {
+        rects.clear();
+        Section sectionMatcher = new Section();
+        sectionMatcher.setIdentity(sectionId);
+
+        try {
+            Section section = interiorService.findSections(sectionMatcher).get(0);
+            sectionName = section.getName();
+            Table tableMatcher = new Table();
+            tableMatcher.setSection(section);
+            for(Table table : interiorService.findTables(tableMatcher)) {
+                Rect rect = new Rect(table.getColumn()*FACT, table.getRow()*FACT, TABLE_SIZE, TABLE_SIZE);
+                rect.setNumber(table.getNumber());
+                rect.setSeats(table.getSeats());
+                rects.add(rect);
+            }
+        } catch(ServiceException e) {
+            showErrorDialog("Error", "Database problem", "Could not access database!");
+        }
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources){
         LOGGER.info("Initializing Edit Section Controller");
-        this.initTables();
+        initTables();
         seatsTF.setText("6");
         numberTF.setText("1");
         sectionNameLb.setText(sectionName);
@@ -105,12 +129,12 @@ public class EditSectionController implements Initializable {
                                 }
                             }
 
-                            Rect rect = new Rect(Math.max(((((int) t.getX()) - TABLE_SIZE / 2) / FACT) * FACT, 0), Math.max(((((int) t.getY()) - TABLE_SIZE / 2) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
+                            Rect rect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE);
                             for (Rect iteratingRect : rects) {
-                                if (iteratingRect.getRect(rect.getX() + 1, rect.getY() + 1) != null ||
-                                        iteratingRect.getRect(rect.getX() + TABLE_SIZE - 1, rect.getY() + 1) != null ||
-                                        iteratingRect.getRect(rect.getX() + 1, rect.getY() + TABLE_SIZE - 1) != null ||
-                                        iteratingRect.getRect(rect.getX() + TABLE_SIZE - 1, rect.getY() + TABLE_SIZE - 1) != null) {
+                                if (iteratingRect.contains(rect.getX() + 1, rect.getY() + 1) ||
+                                        iteratingRect.contains(rect.getX() + TABLE_SIZE - 1, rect.getY() + 1) ||
+                                        iteratingRect.contains(rect.getX() + 1, rect.getY() + TABLE_SIZE - 1) ||
+                                        iteratingRect.contains(rect.getX() + TABLE_SIZE - 1, rect.getY() + TABLE_SIZE - 1)) {
                                     intersectsWithExistingTable = true;
                                 }
                             }
@@ -125,7 +149,7 @@ public class EditSectionController implements Initializable {
                     } else if (removeTable) {
                         Rect deleteRect = null;
                         for (Rect rect : rects) {
-                            if (rect.getRect(t.getX(), t.getY()) != null) {
+                            if (rect.contains(t.getX(), t.getY())) {
                                 deleteRect = rect;
                             }
                         }
@@ -134,7 +158,7 @@ public class EditSectionController implements Initializable {
                         drawCanvas();
                     } else if (updateTable) {
                         for (Rect rect : rects) {
-                            if (rect.getRect(t.getX(), t.getY()) != null) {
+                            if (rect.contains(t.getX(), t.getY())) {
                                 try {
                                     Stage stage = new Stage();
                                     UpdateTableController.setThisStage(stage);
@@ -152,9 +176,10 @@ public class EditSectionController implements Initializable {
                             }
                         }
                     }
-                } catch(NumberFormatException e) {
+                } catch (NumberFormatException e) {
                     showErrorDialog("Error", "Invalid value", "Only valid numbers are allowed!");
                 }
+                drawCanvas();
             }
         });
 
@@ -165,8 +190,22 @@ public class EditSectionController implements Initializable {
                     drawCanvas();
                     GraphicsContext gc = canvas.getGraphicsContext2D();
                     gc.setStroke(Color.GRAY);
-                    gc.strokeRoundRect(Math.max(((((int)t.getX())-TABLE_SIZE/2)/FACT)*FACT, 0), Math.max(((((int)t.getY())-TABLE_SIZE/2)/FACT)*FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
+                    gc.strokeRoundRect(Math.max(((((int)t.getX()))/FACT)*FACT, 0), Math.max(((((int)t.getY()))/FACT)*FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
                     gc.setStroke(Color.BLACK);
+                }
+            }
+        });
+
+        canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent t) {
+                if(moveTable) {
+                    if(movingRect != null) {
+                        Rect movedRect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE);
+                        movedRect.setNumber(movingRect.getNumber());
+                        rects.add(movedRect);
+                        movingRect = null;
+                    }
                 }
             }
         });
@@ -176,25 +215,52 @@ public class EditSectionController implements Initializable {
             public void handle(MouseEvent t) {
                 if(moveTable) {
                     for (Rect rect : rects) {
-                        if (rect.getRect(t.getX(), t.getY()) != null) {
-                            movingRect = rect;
+                        if (rect.contains(t.getX(), t.getY())) {
+                            if(movingRect == null) {
+                                movingRect = rect;
+                            }
                         }
                     }
 
-                    if(movingRect != null) {
-                        Rect movedRect = new Rect(Math.max(((((int) t.getX()) - TABLE_SIZE / 2) / FACT) * FACT, 0), Math.max(((((int) t.getY()) - TABLE_SIZE / 2) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
-                        movedRect.setNumber(movingRect.getNumber());
+                    if(rects.contains(movingRect))
                         rects.remove(movingRect);
-                        rects.add(movedRect);
+
+                    if(movingRect != null) {
                         drawCanvas();
+                        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+                        boolean intersectsWithExistingTable = false;
+                        for (Rect iteratingRect : rects) {
+                            if (iteratingRect.contains(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) ||
+                                    iteratingRect.contains(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) ||
+                                    iteratingRect.contains(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1) ||
+                                    iteratingRect.contains(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1)) {
+                                intersectsWithExistingTable = true;
+                            }
+                        }
+
+                        if (intersectsWithExistingTable) {
+                            gc.strokeRoundRect(Math.max(((((int) prevX)) / FACT) * FACT, 0), Math.max(((((int) prevY)) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
+                            gc.fillText(String.valueOf(movingRect.getNumber()), Math.max(((((int) prevX)) / FACT) * FACT, 0) + TABLE_SIZE / 4, Math.max(((((int) prevY)) / FACT) * FACT, 0) + TABLE_SIZE / 1.5);
+                        } else {
+                            gc.strokeRoundRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
+                            gc.fillText(String.valueOf(movingRect.getNumber()), Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE / 4, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE / 1.5);
+                            prevX = Math.max(((((int) t.getX())) / FACT) * FACT, 0);
+                            prevY = Math.max(((((int) t.getY())) / FACT) * FACT, 0);
+                        }
                     }
+                    /*if(movingRect != null) {
+                        Rect movedRect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
+                        movedRect.setNumber(movingRect.getNumber());
+                        if(rects.contains(movingRect)) {
+                            if (rects.remove(movingRect))
+                                rects.add(movedRect);
+                        }
+                        drawCanvas();
+                    }*/
                 }
             }
         });
-    }
-
-    public static void setInteriorService(InteriorService interiorService) {
-        interiorService = interiorService;
     }
 
     public static void setThisStage(Stage thisStage) {
@@ -203,28 +269,6 @@ public class EditSectionController implements Initializable {
 
     public static void setUpdateCanvas(RoomViewController.UpdateCanvas updateCanvas) {
         EditSectionController.updateCanvas = updateCanvas;
-    }
-
-    // Only called in editing mode, initalizes tables on the canvas
-    public void initTables() {
-        rects.clear();
-        Section sectionMatcher = new Section();
-        sectionMatcher.setIdentity(sectionId);
-
-        try {
-            Section section = interiorService.findSections(sectionMatcher).get(0);
-            sectionName = section.getName();
-            Table tableMatcher = new Table();
-            tableMatcher.setSection(section);
-            for(Table table : interiorService.findTables(tableMatcher)) {
-                Rect rect = new Rect(table.getColumn()*FACT, table.getRow()*FACT, TABLE_SIZE, TABLE_SIZE, interiorService);
-                rect.setNumber(table.getNumber());
-                rect.setSeats(table.getSeats());
-                rects.add(rect);
-            }
-        } catch(ServiceException e) {
-            showErrorDialog("Error", "Database problem", "Could not access database!");
-        }
     }
 
     public void addTableButtonClicked(ActionEvent event) {
@@ -297,6 +341,18 @@ public class EditSectionController implements Initializable {
 
     private void drawCanvas() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        int maxX = (int)canvas.getWidth();
+        int maxY = (int)canvas.getHeight();
+        for(Rect rect : rects) {
+            if(rect.getX()+rect.getW() > maxX-120)
+                maxX = (int)(rect.getX()+rect.getW()+120);
+            if(rect.getY()+rect.getH() > maxY-120)
+                maxY = (int)(rect.getY()+rect.getH()+120);
+        }
+        canvas.setWidth(maxX);
+        canvas.setHeight(maxY);
+
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         for(Rect rect : rects) {
@@ -305,7 +361,6 @@ public class EditSectionController implements Initializable {
         }
     }
 
-    //TODO think of a better solution
     public class UpdateCanvas {
         public void update() {
             drawCanvas();

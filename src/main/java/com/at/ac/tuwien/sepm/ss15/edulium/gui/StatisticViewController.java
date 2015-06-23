@@ -1,8 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.statistics.MenuEntryRevenue;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.StatisticsService;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,6 +13,7 @@ import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -27,7 +26,8 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Controller used for the Statistics View
  */
-public class StatisticViewController implements Initializable, Controller {
+@Controller
+public class StatisticViewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(StatisticViewController.class);
 
     @FXML
@@ -73,12 +73,6 @@ public class StatisticViewController implements Initializable, Controller {
         } catch (Exception e) {
             LOGGER.error("Initialize Statistics View Failed due to" + e);
         }
-    }
-
-
-    @Override
-    public void disable(boolean disabled) {
-
     }
 
     /**

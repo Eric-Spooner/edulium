@@ -17,14 +17,13 @@ import java.util.List;
 /**
  * a simple reservation heuristic
  */
-class SimpleReservationHeuristic implements ReservationHeuristic {
-    @Resource(name = "reservationService")
-    private ReservationService reservationService;
+class SimpleReservationHeuristic extends ReservationHeuristic {
 
     @Override
     public List<Table> getTablesForReservation(Reservation reservation, List<Table> t) throws ValidationException, ServiceException {
-        List<Reservation> reservations = reservationService.findReservationBetween(reservation.getTime(),
-                                                            reservation.getTime().plus(reservation.getDuration()));
+
+        List<Reservation> reservations = getOverlappingReservations(reservation);
+
         // create new arraylist because 't' could be immutable
         ArrayList<Table> tables = new ArrayList<>(t);
 
