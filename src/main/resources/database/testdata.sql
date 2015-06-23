@@ -120,3 +120,8 @@ MERGE INTO ReservationAssoc (reservation_id, table_section, table_number) KEY(re
 VALUES(3, 3, 7);
 MERGE INTO ReservationAssoc (reservation_id, table_section, table_number) KEY(reservation_id, table_section, table_number)
 VALUES(3, 2, 2);
+
+MERGE INTO Sale(ID,name) KEY(ID) VALUES (1, 'Happy Hour');
+MERGE INTO IntermittentSale(ID,monday,tuesday,wednesday,thursday,friday,saturday,sunday, fromDayTime, duration) KEY(ID)
+VALUES (1, false, true, false, false, false, true, true, TIME '12:00:00', 60);
+MERGE INTO SaleAssoc(menuEntry_ID, sale_ID, salePrice) KEY(menuEntry_ID, sale_ID) VALUES (1,1,7);

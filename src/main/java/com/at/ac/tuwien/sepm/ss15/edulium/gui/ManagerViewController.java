@@ -62,6 +62,8 @@ public class ManagerViewController implements Initializable {
     FXMLPane menuEntryViewPane;
     @Resource(name = "menuViewPane")
     FXMLPane menuViewPane;
+    @Resource(name = "salesViewPane")
+    FXMLPane salesViewPane;
     @Resource(name = "statisticViewPane")
     FXMLPane statisticViewPane;
     @Resource(name = "roomViewPane")
@@ -74,6 +76,7 @@ public class ManagerViewController implements Initializable {
         tabPaneManager.getTabs().add(new Tab("MenuCategories", menuCategoryViewPane));
         tabPaneManager.getTabs().add(new Tab("MenuEntries", menuEntryViewPane));
         tabPaneManager.getTabs().add(new Tab("Menus", menuViewPane));
+        tabPaneManager.getTabs().add(new Tab("Sales", salesViewPane));
         tabPaneManager.getTabs().add(new Tab("Statistics", statisticViewPane));
         tabPaneManager.getTabs().add(new Tab("Rooms", roomViewPane));
     }

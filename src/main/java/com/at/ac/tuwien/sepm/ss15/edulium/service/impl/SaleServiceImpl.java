@@ -35,6 +35,14 @@ class SaleServiceImpl implements SaleService {
     private Validator<MenuEntry> menuEntryValidator;
 
     @Override
+    public List<Sale> getAllSales() throws ServiceException {
+        List<Sale> sales = new ArrayList<>();
+        sales.addAll(getAllOnetimeSales());
+        sales.addAll(getAllIntermittentSales());
+        return sales;
+    }
+
+    @Override
     public void addIntermittentSale(IntermittentSale intermittentSale) throws ValidationException, ServiceException {
         LOGGER.debug("Entering addIntermittentSaleEntry with parameter: " + intermittentSale);
 
