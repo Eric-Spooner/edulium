@@ -20,25 +20,8 @@ import java.util.List;
 class SimpleReservationHeuristic extends ReservationHeuristic {
 
     @Override
-    public List<Table> getTablesForReservation(Reservation reservation, List<Table> t) throws ValidationException, ServiceException {
-
-        List<Reservation> reservations = getOverlappingReservations(reservation);
-
-        // create new arraylist because 't' could be immutable
-        ArrayList<Table> tables = new ArrayList<>(t);
-
-        // remove tables which are already reserved
-        Iterator<Table> it = tables.iterator();
-        while(it.hasNext()) {
-            Table table = it.next();
-
-            for(Reservation res : reservations) {
-                if(res.getTables().contains(table)) {
-                    it.remove();
-                    break;
-                }
-            }
-        }
+    public List<Table> getTablesForReservation(Reservation reservation, List<Table> allTables) throws ValidationException, ServiceException {
+        List<Table> tables = getFreeTables(reservation, allTables);
 
         // check if a single table would fit for this reservation
         for(Table table : tables) {

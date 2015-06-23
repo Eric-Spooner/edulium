@@ -15,7 +15,7 @@ import java.util.*;
  * and less tables.
  * Selects only up to 4 tables in a reservation
  */
-class BestFitReservationHeuristic implements ReservationHeuristic {
+class BestFitReservationHeuristic extends ReservationHeuristic {
     @Resource(name = "reservationService")
     private ReservationService reservationService;
 
@@ -26,14 +26,16 @@ class BestFitReservationHeuristic implements ReservationHeuristic {
     private Reservation reservation;
 
     @Override
-    public List<Table> getTablesForReservation(Reservation reservation, List<Table> t) throws ValidationException, ServiceException {
+    public List<Table> getTablesForReservation(Reservation reservation, List<Table> allTables) throws ValidationException, ServiceException {
         this.reservation = reservation;
         this.currentRating = Double.MAX_VALUE;
         this.currentSolution = new ArrayList<>();
 
-        List<Table> tables = getFreeTables(t, reservation);
+        List<Table> tables = getFreeTables(reservation, allTables);
 
-        getSolution(tables);
+        for(int i = 1; i <= MAX_TABLES_PER_RESERVATION; i++) {
+            buildAndCheckSubsets(0, 0, new ArrayList<>(), tables, i);
+        }
 
         if(currentSolution.isEmpty()) {
             throw new ServiceException("could not find free tables");
@@ -42,14 +44,17 @@ class BestFitReservationHeuristic implements ReservationHeuristic {
         return currentSolution;
     }
 
-    private void getSolution(List<Table> tables)
-    {
-        for(int i = 1; i <= MAX_TABLES_PER_RESERVATION; i++) {
-            buildSubsets(0, 0, new ArrayList<>(), tables, i);
-        }
-    }
-
-    private void buildSubsets(int i, int j, List<Table> subset, List<Table> set, int subsetSize) {
+    /**
+     * builds all subsets with the specified size of the given set of tables
+     * rates each subsets and sets the best solution as the currentSolution member variable
+     *
+     * @param i index1
+     * @param j index2
+     * @param subset current subset
+     * @param set set of tables
+     * @param subsetSize size of which subsets should be created
+     */
+    private void buildAndCheckSubsets(int i, int j, List<Table> subset, List<Table> set, int subsetSize) {
         // subset complete
         if (j == subsetSize) {
             double rating = calcRating(subset);
@@ -64,10 +69,14 @@ class BestFitReservationHeuristic implements ReservationHeuristic {
         for (; i < set.size(); ++i) {
             List<Table> tmp = new ArrayList<>(subset);
             tmp.add(set.get(i));
-            buildSubsets(i + 1, j + 1, tmp, set, subsetSize);
+            buildAndCheckSubsets(i + 1, j + 1, tmp, set, subsetSize);
         }
     }
 
+    /**
+     * @param solution set of tables
+     * @return returns a ranking of the given set of tables (the less the better)
+     */
     private double calcRating(List<Table> solution) {
         int numberOfSeats = 0;
         int numberOfTables = solution.size();
@@ -111,28 +120,5 @@ class BestFitReservationHeuristic implements ReservationHeuristic {
         rating += placement;
 
         return rating;
-    }
-
-    private List<Table> getFreeTables(List<Table> t, Reservation reservation) throws ServiceException, ValidationException {
-        List<Reservation> reservations = reservationService.findReservationBetween(reservation.getTime(),
-                reservation.getTime().plus(reservation.getDuration()));
-
-        // create new arraylist because 't' could be immutable
-        ArrayList<Table> tables = new ArrayList<>(t);
-
-        // remove tables which are already reserved
-        Iterator<Table> it = tables.iterator();
-        while (it.hasNext()) {
-            Table table = it.next();
-
-            for (Reservation res : reservations) {
-                if(res.getTables().contains(table)) {
-                    it.remove();
-                    break;
-                }
-            }
-        }
-
-        return  tables;
     }
 }
