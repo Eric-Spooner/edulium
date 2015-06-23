@@ -3,15 +3,10 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.heuristics;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ReservationService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 /**

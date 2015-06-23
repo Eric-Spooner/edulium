@@ -2,7 +2,6 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.Service;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.math.BigDecimal;

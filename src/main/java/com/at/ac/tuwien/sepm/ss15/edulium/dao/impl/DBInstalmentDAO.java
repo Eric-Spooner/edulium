@@ -9,7 +9,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ImmutableValidator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;

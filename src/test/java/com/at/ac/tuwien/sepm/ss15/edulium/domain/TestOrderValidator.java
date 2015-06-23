@@ -4,12 +4,9 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import sun.security.validator.ValidatorException;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
 
 /**
  * Unit Test for the TaxRate validator

@@ -1,7 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
-import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**

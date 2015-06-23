@@ -1,46 +1,14 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
-import javafx.beans.property.SimpleStringProperty;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.control.TableColumn.CellDataFeatures;
-import javafx.stage.Stage;
-import javafx.util.Callback;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URL;
-import java.util.*;
-
-import static javafx.collections.FXCollections.observableArrayList;
-import static javafx.collections.FXCollections.observableList;
+import java.util.ResourceBundle;
 
 /**
  * Controller used for the Manager View

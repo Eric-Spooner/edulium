@@ -1,11 +1,9 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 

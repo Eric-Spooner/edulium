@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.ReservationDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
@@ -14,13 +13,9 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.heuristics.ReservationHeuristic;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mockito.cglib.core.Local;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

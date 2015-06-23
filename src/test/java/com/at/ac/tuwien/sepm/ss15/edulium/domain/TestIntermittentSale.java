@@ -1,16 +1,15 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.HashSet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit Test for the IntermittentSale domain class

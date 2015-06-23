@@ -1,8 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Hashtable;
 import java.util.List;
 
 /**

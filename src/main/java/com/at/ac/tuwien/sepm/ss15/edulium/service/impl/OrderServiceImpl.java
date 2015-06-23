@@ -17,7 +17,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.Arrays;

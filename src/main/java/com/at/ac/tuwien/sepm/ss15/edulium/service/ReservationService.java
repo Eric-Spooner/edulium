@@ -1,12 +1,10 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
