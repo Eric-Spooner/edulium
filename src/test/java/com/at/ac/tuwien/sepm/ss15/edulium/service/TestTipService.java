@@ -1,7 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
@@ -9,20 +8,17 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 /*+
  * Unit Test of the MenuService interface
@@ -73,24 +69,23 @@ public class TestTipService extends AbstractServiceTest {
             Order order1 = createOrder(BigDecimal.valueOf(100),"Order Information", BigDecimal.valueOf(0.2),
                     LocalDateTime.now(), Order.State.QUEUED, 1);
             orderService.addOrder(order1);
+
             Order order2 = createOrder(BigDecimal.valueOf(200),"Order Information", BigDecimal.valueOf(0.2),
                     LocalDateTime.now(), Order.State.QUEUED, 1);
             orderService.addOrder(order2);
-            List<Order> orderList = new LinkedList<>();
-            orderList.add(order1);
-            orderList.add(order2);
+
             Invoice invoice = new Invoice();
-            List<User> userList = userService.findUsers(User.withIdentity("servicetester"));
-            invoice.setCreator(userList.get(0));
+            invoice.setCreator(User.withIdentity("servicetester"));
             invoice.setTime(LocalDateTime.now());
             invoice.setGross(new BigDecimal("300"));
-            invoice.setOrders(orderList);
+            invoice.setOrders(Arrays.asList(order1, order2));
             invoiceService.addInvoice(invoice);
+
             //WHEN
             tipService.divideAndMatchTip(invoice, BigDecimal.valueOf(20));
-            //THEN
-            userList = userService.findUsers(User.withIdentity("servicetester"));
 
+            //THEN
+            List<User> userList = userService.findUsers(User.withIdentity("servicetester"));
             assertEquals(1, userList.size());
             assertTrue(BigDecimal.valueOf(20).compareTo(userList.get(0).getTip()) == 0);
         }
@@ -100,8 +95,9 @@ public class TestTipService extends AbstractServiceTest {
         public void testDivideAndMatchTip_shouldWorkWithMultipleUsers() throws ServiceException, ValidationException {
             //PREPARE
             //The used data is in the testdata.sql file already prepared
-            assertEquals(1, invoiceService.findInvoices(Invoice.withIdentity(1)).size());
-            Invoice invoice = invoiceService.findInvoices(Invoice.withIdentity(1)).get(0);
+            List<Invoice> invoices = invoiceService.findInvoices(Invoice.withIdentity(1));
+            assertFalse("should exist, because invoice was prepared in testdata.sql", invoices.isEmpty());
+            Invoice invoice = invoices.get(0);
 
             //WHEN
             tipService.divideAndMatchTip(invoice, BigDecimal.valueOf(100));
