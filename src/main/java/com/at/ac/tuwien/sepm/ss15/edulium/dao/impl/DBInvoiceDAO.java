@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
     private Validator<Order> orderValidator;
     @Resource(name = "userDAO")
     private DAO<User> userDAO;
+    @Resource(name = "orderDAO")
+    private DAO<Order> orderDAO;
 
     /**
      * Writes the invoice object into the database and sets the identity
@@ -47,8 +50,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
 
         invoiceValidator.validateForCreate(invoice);
 
-        final String query = "INSERT INTO Invoice (invoiceTime, brutto, user_ID) " +
-                "VALUES (?, ?, ?);";
+        final String query = "INSERT INTO Invoice (invoiceTime, brutto, user_ID) VALUES (?, ?, ?)";
+
         try (PreparedStatement stmt = dataSource.getConnection()
                 .prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setTimestamp(1, Timestamp.valueOf(invoice.getTime()));
@@ -60,18 +63,12 @@ class DBInvoiceDAO implements DAO<Invoice> {
             if (key.next()) {
                 invoice.setIdentity(key.getLong(1));
             }
-            key.close();
-
-            try {
-                updateOrders(invoice);
-            } catch (ValidationException e) {
-                LOGGER.info("No orders set for updating their invoice id", e);
-            }
         } catch (SQLException e) {
             LOGGER.error("Failed to insert invoice entry into database", e);
             throw new DAOException("Failed to insert invoice entry into database", e);
         }
 
+        updateOrders(invoice);
         generateHistory(invoice);
     }
 
@@ -84,8 +81,8 @@ class DBInvoiceDAO implements DAO<Invoice> {
 
         invoiceValidator.validateForUpdate(invoice);
 
-        final String query = "UPDATE Invoice SET invoiceTime = ?, brutto = ?, user_ID = ? " +
-                "WHERE id = ?;";
+        final String query = "UPDATE Invoice SET invoiceTime = ?, brutto = ?, user_ID = ? WHERE id = ?";
+
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setTimestamp(1, Timestamp.valueOf(invoice.getTime()));
             stmt.setBigDecimal(2, invoice.getGross());
@@ -96,49 +93,30 @@ class DBInvoiceDAO implements DAO<Invoice> {
                 LOGGER.error("Failed to update invoice entry in database, dataset not found");
                 throw new DAOException("Failed to update invoice entry in database, dataset not found");
             }
-
-            try {
-                updateOrders(invoice);
-            } catch (ValidationException e) {
-                LOGGER.info("No orders set for updating their invoice id", e);
-            }
         } catch (SQLException e) {
             LOGGER.error("Failed to update invoice entry in database", e);
             throw new DAOException("Failed to update invoice entry in database", e);
         }
 
+        updateOrders(invoice);
         generateHistory(invoice);
     }
 
     private void updateOrders(Invoice invoice) throws DAOException, ValidationException {
         LOGGER.debug("Entering updateOrders with parameters: " + invoice);
 
-        invoiceValidator.validateIdentity(invoice);
-
-        // validate orders
-        if (invoice.getOrders() == null) {
-            throw new ValidationException("List of orders in invoice not set");
-        }
-
-        if (invoice.getOrders().isEmpty()) {
-            throw new ValidationException("List of order in invoice is empty");
-        }
-
-        for (Order o : invoice.getOrders()) {
-            orderValidator.validateIdentity(o);
-        }
-
-        final String orderQuery = "UPDATE RestaurantOrder SET invoice_ID = ? WHERE id IN (" +
+        final String orderQuery = "UPDATE RestaurantOrder SET invoice_ID = ? WHERE ID IN (" +
                 invoice.getOrders().stream().map(u -> "?").collect(Collectors.joining(", ")) + ")";
+
         try (PreparedStatement orderStmt = dataSource.getConnection().prepareStatement(orderQuery)) {
             orderStmt.setLong(1, invoice.getIdentity());
 
-            int index = 1;
+            int index = 2;
             for (Order o : invoice.getOrders()) {
                 orderStmt.setLong(index++, o.getIdentity());
             }
 
-            if (orderStmt.executeUpdate() == 0) {
+            if (orderStmt.executeUpdate() != invoice.getOrders().size()) {
                 LOGGER.error("Failed to update order entry in database, dataset not found");
                 throw new DAOException("Failed to update order entry in database, dataset not found");
             }
@@ -375,6 +353,21 @@ class DBInvoiceDAO implements DAO<Invoice> {
         invoice.setIdentity(rs.getLong("ID"));
         invoice.setTime(rs.getTimestamp("invoiceTime").toLocalDateTime());
         invoice.setGross(rs.getBigDecimal("brutto"));
+
+        List<Order> orders = new LinkedList<>();
+        final String query = "SELECT ID FROM RestaurantOrder WHERE invoice_ID = ?";
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setLong(1, invoice.getIdentity());
+
+            ResultSet resultSet = stmt.executeQuery();
+            while (resultSet.next()) {
+                orders.add(Order.withIdentity(resultSet.getLong("ID")));
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Getting orders failed", e);
+            throw new DAOException("Getting orders failed", e);
+        }
+        invoice.setOrders(orderDAO.populate(orders));
 
         return invoice;
     }

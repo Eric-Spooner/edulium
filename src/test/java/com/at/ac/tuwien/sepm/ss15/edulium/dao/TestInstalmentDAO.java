@@ -1,7 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Instalment;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.junit.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,70 @@ public class TestInstalmentDAO extends AbstractDAOTest {
     private ImmutableDAO<Instalment> instalmentDAO;
     @Autowired
     private DAO<Invoice> invoiceDAO;
+    @Autowired
+    private DAO<Order> orderDAO;
+    @Autowired
+    private DAO<MenuEntry> menuEntryDAO;
+    @Autowired
+    private DAO<Table> tableDAO;
+    @Autowired
+    private DAO<MenuCategory> menuCategoryDAO;
+    @Autowired
+    private DAO<TaxRate> taxRateDAO;
+    @Autowired
+    private DAO<User> userDAO;
+    @Autowired
+    private DAO<Section> sectionDAO;
+
+    private Order order;
+
+    @Before
+    public void setUp() throws DAOException, ValidationException {
+        MenuCategory menuCategory = new MenuCategory();
+        menuCategory.setName("cat");
+        menuCategoryDAO.create(menuCategory);
+
+        TaxRate taxRate = new TaxRate();
+        taxRate.setValue(BigDecimal.valueOf(0.5));
+        taxRateDAO.create(taxRate);
+
+        User user = User.withIdentity("usernamedaoinvoice");
+        user.setRole("role");
+        user.setName("name");
+        userDAO.create(user);
+
+        Section section = new Section();
+        section.setName("Garden");
+        sectionDAO.create(section);
+
+        Table table = new Table();
+        table.setColumn(4);
+        table.setRow(3);
+        table.setSeats(5);
+        table.setNumber(1L);
+        table.setSection(section);
+        table.setUser(user);
+        tableDAO.create(table);
+
+        MenuEntry entry = new MenuEntry();
+        entry.setAvailable(true);
+        entry.setName("Entry");
+        entry.setDescription("Desc");
+        entry.setPrice(BigDecimal.valueOf(50.0));
+        entry.setCategory(menuCategory);
+        entry.setTaxRate(taxRate);
+        menuEntryDAO.create(entry);
+
+        order = new Order();
+        order.setTable(table);
+        order.setMenuEntry(entry);
+        order.setBrutto(BigDecimal.valueOf(11.0));
+        order.setTax(BigDecimal.valueOf(0.1));
+        order.setAdditionalInformation("additional info");
+        order.setTime(LocalDateTime.now());
+        order.setState(Order.State.QUEUED);
+        orderDAO.create(order);
+    }
 
     @Test
     public void testCreate_shouldAddObject() throws ValidationException, DAOException {
@@ -27,6 +90,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(getCurrentUser());
+        invoice.setOrders(Arrays.asList(order));
 
         invoiceDAO.create(invoice);
 
@@ -74,6 +138,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(getCurrentUser());
+        invoice.setOrders(Arrays.asList(order));
 
         invoiceDAO.create(invoice);
 
@@ -148,6 +213,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(getCurrentUser());
+        invoice.setOrders(Arrays.asList(order));
 
         invoiceDAO.create(invoice);
 
@@ -179,6 +245,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(getCurrentUser());
+        invoice.setOrders(Arrays.asList(order));
 
         invoiceDAO.create(invoice);
 
@@ -227,6 +294,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(getCurrentUser());
+        invoice.setOrders(Arrays.asList(order));
 
         invoiceDAO.create(invoice);
 

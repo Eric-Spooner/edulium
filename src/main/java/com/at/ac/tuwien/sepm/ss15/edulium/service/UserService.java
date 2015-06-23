@@ -27,7 +27,7 @@ public interface UserService extends Service {
      * @throws ServiceException if the user couldn't be stored
      * @throws ValidationException if the given user is invalid
      */
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasAnyRole('MANAGER','SERVICE')")
     void updateUser(User user) throws ServiceException, ValidationException;
 
     /**

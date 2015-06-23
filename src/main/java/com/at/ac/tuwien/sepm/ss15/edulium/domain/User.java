@@ -9,9 +9,6 @@ public class User {
     private String identity = null;
     private String name = null;
     private String role = null;
-
-
-
     private BigDecimal tip = null;
 
     /**
@@ -107,6 +104,14 @@ public class User {
         if (name != null ? !name.equals(user.name) : user.name != null) return false;
         if (tip != null ? tip.compareTo(user.tip)!=0 : user.tip != null) return false;
         return !(role != null ? !role.equals(user.role) : user.role != null);
+    }
 
+    @Override
+    public int hashCode() {
+        int result = identity != null ? identity.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (role != null ? role.hashCode() : 0);
+        result = 31 * result + (tip != null ? tip.hashCode() : 0);
+        return result;
     }
 }
