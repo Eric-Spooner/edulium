@@ -80,13 +80,4 @@ public class ManagerViewController implements Initializable {
         tabPaneManager.getTabs().add(new Tab("Statistics", statisticViewPane));
         tabPaneManager.getTabs().add(new Tab("Rooms", roomViewPane));
     }
-
-    public static void showErrorDialog(String title, String head, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(head);
-        alert.setContentText(content);
-
-        alert.showAndWait();
-    }
 }

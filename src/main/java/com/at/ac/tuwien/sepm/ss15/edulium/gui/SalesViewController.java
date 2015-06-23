@@ -101,7 +101,7 @@ public class SalesViewController implements Initializable {
             LOGGER.info("Update Sale Button Click");
             Stage stage = new Stage();
             if(tableViewSale.getSelectionModel().getSelectedItem() == null){
-                ManagerViewController.showErrorDialog
+                showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a Sale to Update");
                 return;
             }
@@ -121,7 +121,7 @@ public class SalesViewController implements Initializable {
         try {
             LOGGER.info("Delete Sale Button Click");
             if(tableViewSale.getSelectionModel().getSelectedItem() == null){
-                ManagerViewController.showErrorDialog
+                showErrorDialog
                         ("Error", "Input Validation Error", "You have to select a Sale to Delete");
                 return;
             }
@@ -158,4 +158,13 @@ public class SalesViewController implements Initializable {
             LOGGER.error("Loading All Sale failed" + e);
         }
     }*/
+
+    public void showErrorDialog(String title, String head, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(head);
+        alert.setContentText(content);
+
+        alert.showAndWait();
+    }
 }

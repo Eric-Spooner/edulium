@@ -89,7 +89,7 @@ public class RoomViewController implements Initializable {
                             System.out.println((String.valueOf(clickedSection.getName()) + " clicked" + clickedSection.getIdentity()));
                         }
                     } catch(ServiceException e) {
-                        ManagerViewController.showErrorDialog("Error", "Error", e.getMessage());
+                        showErrorDialog("Error", "Error", e.getMessage());
                     }
                 }
                 if(noSectionClicked)
@@ -133,7 +133,7 @@ public class RoomViewController implements Initializable {
                 }
             }
         } catch(ServiceException e) {
-            ManagerViewController.showErrorDialog("Error", "Error", e.getMessage());
+            showErrorDialog("Error", "Error", e.getMessage());
         }
 
         tablesCanvas.setWidth(canvasWidth);
@@ -178,7 +178,7 @@ public class RoomViewController implements Initializable {
                 prevSection = section;
             }
         } catch(ServiceException e) {
-            ManagerViewController.showErrorDialog("Error", "Error", e.getMessage());
+            showErrorDialog("Error", "Error", e.getMessage());
         }
     }
 
@@ -306,5 +306,14 @@ public class RoomViewController implements Initializable {
             }
         }
         return max*FACT + TABLE_SIZE + 2*SECTION_PADDING;
+    }
+
+    public void showErrorDialog(String title, String head, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(head);
+        alert.setContentText(content);
+
+        alert.showAndWait();
     }
 }

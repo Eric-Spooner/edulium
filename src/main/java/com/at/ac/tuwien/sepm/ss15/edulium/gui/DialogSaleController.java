@@ -195,7 +195,7 @@ public class DialogSaleController implements Initializable{
             allMenuEntries = observableArrayList(menuService.getAllMenuEntries());
             inMenuMenuEntries = observableArrayList(sale.getEntries());
         }catch (Exception e){
-            ManagerViewController.showErrorDialog
+            showErrorDialog
                     ("Error", "Refreshing View", "An Error occured during initializing the View /n" + e.toString());
         }
         if(sale.getName() != null) textFieldName.setText(sale.getName());
@@ -215,12 +215,12 @@ public class DialogSaleController implements Initializable{
     public boolean validateData() {
         LOGGER.info("Dialog Sale OK Button clicked");
         if ((textFieldName.getText() == null || textFieldName.getText().equals(""))) {
-            ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Name must have a value");
+            showErrorDialog("Error", "Input Validation Error", "Name must have a value");
             return false;
         }
         sale.setName(textFieldName.getText());
         if (sale.getEntries().size() == 0) {
-            ManagerViewController.showErrorDialog
+            showErrorDialog
                     ("Error", "Input Validation Error", "There hast to be at least one Menu Entry");
             return false;
         }
@@ -234,7 +234,7 @@ public class DialogSaleController implements Initializable{
                         onetimeSale.setEntries(sale.getEntries());
                         LocalDate fromDate = datePickerFromTime.getValue();
                         if (fromDate == null) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify a date");
                             return false;
                         }
@@ -244,12 +244,12 @@ public class DialogSaleController implements Initializable{
                             hr = new Integer(textFieldFromTimeHr.getText());
                             min = new Integer(textFieldFromTimeMin.getText());
                         } catch (NumberFormatException e) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify valid integer numbers");
                             return false;
                         }
                         if (hr<0 || hr>=24 || min < 0 || min >= 60) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify valid numbers for hour/minutes");
                             return false;
                         }
@@ -258,7 +258,7 @@ public class DialogSaleController implements Initializable{
                         onetimeSale.setFromTime(fromTime);
                         LocalDate toDate = datePickerFromTime.getValue();
                         if (toDate == null) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify a date");
                             return false;
                         }
@@ -266,12 +266,12 @@ public class DialogSaleController implements Initializable{
                             hr = new Integer(textFieldToTimeHr.getText());
                             min = new Integer(textFieldToTimeMin.getText());
                         } catch (NumberFormatException e) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify valid integer numbers");
                             return false;
                         }
                         if (hr<0 || hr>=24 || min < 0 || min >= 60) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify valid numbers for hour/minutes");
                             return false;
                         }
@@ -315,12 +315,12 @@ public class DialogSaleController implements Initializable{
                             hr = new Integer(textFieldBeginningTimeHr.getText());
                             min = new Integer(textFieldBeginningTimeMin.getText());
                         } catch (NumberFormatException e) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify valid integer numbers");
                             return false;
                         }
                         if (hr<0 || hr>=24 || min < 0 || min >= 60) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify valid numbers for hour/minutes");
                             return false;
                         }
@@ -335,13 +335,13 @@ public class DialogSaleController implements Initializable{
                 case UPDATE:
                     if (radioButtonOnetimeSale.isSelected()) {
                         if (! (sale instanceof OnetimeSale)) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Sale Service Error", "An intermittent sale cannot be converted to a onetime sale.");
                             return false;
                         }
                         LocalDate fromDate = datePickerFromTime.getValue();
                         if (fromDate == null) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify a date");
                             return false;
                         }
@@ -351,12 +351,12 @@ public class DialogSaleController implements Initializable{
                             hr = new Integer(textFieldFromTimeHr.getText());
                             min = new Integer(textFieldFromTimeMin.getText());
                         } catch (NumberFormatException e) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify valid integer numbers");
                             return false;
                         }
                         if (hr<0 || hr>=24 || min < 0 || min >= 60) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify valid numbers for hour/minutes");
                             return false;
                         }
@@ -365,7 +365,7 @@ public class DialogSaleController implements Initializable{
                         ((OnetimeSale)sale).setFromTime(fromTime);
                         LocalDate toDate = datePickerFromTime.getValue();
                         if (toDate == null) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify a date");
                             return false;
                         }
@@ -373,12 +373,12 @@ public class DialogSaleController implements Initializable{
                             hr = new Integer(textFieldToTimeHr.getText());
                             min = new Integer(textFieldToTimeMin.getText());
                         } catch (NumberFormatException e) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify valid integer numbers");
                             return false;
                         }
                         if (hr<0 || hr>=24 || min < 0 || min >= 60) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify valid numbers for hour/minutes");
                             return false;
                         }
@@ -388,7 +388,7 @@ public class DialogSaleController implements Initializable{
                         saleService.updateOnetimeSale((OnetimeSale) sale);
                     } else {
                         if (! (sale instanceof IntermittentSale)) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Sale Service Error", "A onetime sale cannot be converted to an intermittent sale.");
                             return false;
                         }
@@ -422,12 +422,12 @@ public class DialogSaleController implements Initializable{
                             hr = new Integer(textFieldBeginningTimeHr.getText());
                             min = new Integer(textFieldBeginningTimeMin.getText());
                         } catch (NumberFormatException e) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify valid integer numbers");
                             return false;
                         }
                         if (hr<0 || hr>=24 || min < 0 || min >= 60) {
-                            ManagerViewController.showErrorDialog
+                            showErrorDialog
                                     ("Error", "Input Validation Error", "Please specify valid numbers for hour/minutes");
                             return false;
                         }
@@ -441,7 +441,7 @@ public class DialogSaleController implements Initializable{
             }
         }catch (Exception e){
             e.printStackTrace();
-            ManagerViewController.showErrorDialog
+            showErrorDialog
                     ("Error", "Sale Service Error", "The Service was unable to handle the required Sale action/n" + e.toString());
             LOGGER.error("The Service was unable to handle the required Sale action " + e);
             return false;
@@ -455,12 +455,12 @@ public class DialogSaleController implements Initializable{
             switch (this.dialogEnumeration) {
                 case UPDATE:
                 case ADD: //There has to be a Price, if the User wants to ADD or UPDATE
-                    ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must have a value");
+                    showErrorDialog("Error", "Input Validation Error", "Price must have a value");
                     return;
             }
         }
         if(tableViewData.getSelectionModel().getSelectedItem() == null){
-            ManagerViewController.showErrorDialog
+            showErrorDialog
                     ("Error", "Input Validation Error", "You have to select a Menu Entry from the left side");
             return;
         }
@@ -473,7 +473,7 @@ public class DialogSaleController implements Initializable{
                 case ADD:
                     price = BigDecimal.valueOf(Double.parseDouble(textFieldPrice.getText()));
                     if (price.compareTo(new BigDecimal(0)) < 0) {
-                        ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must not be negative");
+                        showErrorDialog("Error", "Input Validation Error", "Price must not be negative");
                         return;
                     }
                     menuEntry.setPrice(price);
@@ -484,10 +484,10 @@ public class DialogSaleController implements Initializable{
             sale.setEntries(list);
             inMenuMenuEntries.setAll(sale.getEntries());
         } catch (NumberFormatException e) {
-            ManagerViewController.showErrorDialog("Error", "Input Validation Error", "Price must be a\npositive number");
+            showErrorDialog("Error", "Input Validation Error", "Price must be a\npositive number");
             LOGGER.info("Dialog Sale Add Button Clicked Price must be number " + e);
         } catch (Exception e) {
-            ManagerViewController.showErrorDialog
+            showErrorDialog
                     ("Error", "Data Validation", "An Error occured during adding MenuEntry/n" + e.toString());
             LOGGER.info("Dialog Sale Add Button Menu Entry handling Error" + e);
         }
@@ -495,7 +495,7 @@ public class DialogSaleController implements Initializable{
 
     public void buttonRemoveClick(ActionEvent actionEvent) {
         if(tableViewInMenu.getSelectionModel().getSelectedItem() == null){
-            ManagerViewController.showErrorDialog
+            showErrorDialog
                     ("Error", "Input Validation Error", "You have to select a Menu Entry from the right side");
             return;
         }
@@ -523,7 +523,7 @@ public class DialogSaleController implements Initializable{
 
     public void changeRadio() {
         if (DialogSaleController.dialogEnumeration.equals(DialogEnumeration.UPDATE)) {
-            ManagerViewController.showErrorDialog
+            showErrorDialog
                     ("Error", "Sale Information", "The type of a sale cannot be changed after its creation.");
             if (sale instanceof OnetimeSale) {
                 radioButtonOnetimeSale.setSelected(true);
@@ -552,5 +552,14 @@ public class DialogSaleController implements Initializable{
         textFieldBeginningTimeHr.setDisable(b);
         textFieldBeginningTimeMin.setDisable(b);
         textFieldDuration.setDisable(b);
+    }
+
+    public void showErrorDialog(String title, String head, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(head);
+        alert.setContentText(content);
+
+        alert.showAndWait();
     }
 }
