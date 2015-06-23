@@ -4,7 +4,10 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.TipService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

@@ -7,7 +7,7 @@
     <bean id="employeeViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.EmployeeViewController" scope="prototype" />
 
     <bean id="employeeViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/EmployeeView.fxml" />
+        <property name="FXML" value="gui/EmployeeView.fxml" />
     </bean>
 
 </beans>

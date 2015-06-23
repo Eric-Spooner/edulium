@@ -3,15 +3,10 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.heuristics;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ReservationService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,8 +20,8 @@ class SimpleReservationHeuristic extends ReservationHeuristic {
 
         // check if a single table would fit for this reservation
         for(Table table : tables) {
-            if(table.getSeats() == reservation.getQuantity()) {
-                return Arrays.asList(table);
+            if (table.getSeats().equals(reservation.getQuantity())) {
+                return Collections.singletonList(table);
             }
         }
 

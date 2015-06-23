@@ -7,7 +7,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -48,11 +47,11 @@ public class MenuCategoryViewController implements Initializable {
     private FXMLPane menuCategoryDialogPane;
     private MenuCategoryDialogController menuCategoryDialogController;
 
-    private ObservableList<MenuCategory> menuCategories = FXCollections.observableArrayList();
+    private final ObservableList<MenuCategory> menuCategories = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        menuCategoryDialogController = menuCategoryDialogPane.getController(MenuCategoryDialogController.class);
+        menuCategoryDialogController = menuCategoryDialogPane.getController();
 
         tableViewMenuCategory.setItems(menuCategories);
 
@@ -70,7 +69,7 @@ public class MenuCategoryViewController implements Initializable {
     }
 
     @FXML
-    public void buttonMenuCategorySearchClicked(ActionEvent actionEvent) {
+    public void buttonMenuCategorySearchClicked() {
         SearchInputDialog<MenuCategory> menuCategorySearchDialog = new SearchInputDialog<>("menu categories");
         menuCategorySearchDialog.setContent(menuCategoryDialogPane);
         menuCategorySearchDialog.setController(menuCategoryDialogController);
@@ -90,7 +89,7 @@ public class MenuCategoryViewController implements Initializable {
     }
 
     @FXML
-    public void buttonMenuCategoryUpdateClicked(ActionEvent actionEvent) {
+    public void buttonMenuCategoryUpdateClicked() {
         MenuCategory selectedMenuCategory = tableViewMenuCategory.getSelectionModel().getSelectedItem();
         if (selectedMenuCategory != null) {
             UpdateInputDialog<MenuCategory> menuCategoryInputDialog = new UpdateInputDialog<>("menu category", selectedMenuCategory);
@@ -116,7 +115,7 @@ public class MenuCategoryViewController implements Initializable {
     }
 
     @FXML
-    public void buttonMenuCategoryAddClicked(ActionEvent actionEvent) {
+    public void buttonMenuCategoryAddClicked() {
         CreateInputDialog<MenuCategory> menuCategoryInputDialog = new CreateInputDialog<>("menu category");
         menuCategoryInputDialog.setValidator(menuCategoryValidator);
         menuCategoryInputDialog.setContent(menuCategoryDialogPane);
@@ -138,7 +137,7 @@ public class MenuCategoryViewController implements Initializable {
     }
 
     @FXML
-    public void buttonMenuCategoryRemoveClicked(ActionEvent actionEvent) {
+    public void buttonMenuCategoryRemoveClicked() {
         MenuCategory selectedMenuCategory = tableViewMenuCategory.getSelectionModel().getSelectedItem();
         if (selectedMenuCategory != null) {
             try {
@@ -157,7 +156,7 @@ public class MenuCategoryViewController implements Initializable {
     }
 
     @FXML
-    public void buttonShowAllMenuCategoryClicked(ActionEvent actionEvent) {
+    public void buttonShowAllMenuCategoryClicked() {
         loadAllMenuCategories();
     }
 

@@ -7,7 +7,7 @@
     <bean id="salesViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.SalesViewController" scope="prototype" />
 
     <bean id="salesViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/SalesView.fxml" />
+        <property name="FXML" value="gui/SalesView.fxml" />
     </bean>
 
 </beans>

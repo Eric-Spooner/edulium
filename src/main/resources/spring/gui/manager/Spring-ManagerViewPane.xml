@@ -7,7 +7,7 @@
     <bean id="managerViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.ManagerViewController" scope="prototype" />
 
     <bean id="managerViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/ManagerView.fxml" />
+        <property name="FXML" value="gui/ManagerView.fxml" />
     </bean>
 
 </beans>

@@ -33,11 +33,11 @@ public class ServiceController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         borderPane.setCenter(tableOverviewPane);
 
-        TableOverviewController tableOverviewController = tableOverviewPane.getController(TableOverviewController.class);
-        OrderOverviewController orderOverviewController = orderOverviewPane.getController(OrderOverviewController.class);
+        TableOverviewController tableOverviewController = tableOverviewPane.getController();
+        OrderOverviewController orderOverviewController = orderOverviewPane.getController();
 
-        ReservationOverviewController reservationOverviewController = reservationOverviewPane.getController(ReservationOverviewController.class);
-        ReservationEditViewController reservationEditViewController = reservationEditViewPane.getController(ReservationEditViewController.class);
+        ReservationOverviewController reservationOverviewController = reservationOverviewPane.getController();
+        ReservationEditViewController reservationEditViewController = reservationEditViewPane.getController();
 
         reservationOverviewController.setOnBackButtonAction(event -> borderPane.setCenter(tableOverviewPane));
         tableOverviewController.setOnReservationButtonAction(event -> borderPane.setCenter(reservationOverviewPane));

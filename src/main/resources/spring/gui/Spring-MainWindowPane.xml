@@ -7,7 +7,7 @@
     <bean id="mainWindowController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.MainWindowController" scope="prototype" />
 
     <bean id="mainWindowPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/MainWindow.fxml" />
+        <property name="FXML" value="gui/MainWindow.fxml" />
     </bean>
 
 </beans>

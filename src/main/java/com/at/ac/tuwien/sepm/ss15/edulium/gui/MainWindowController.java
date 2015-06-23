@@ -7,8 +7,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
@@ -34,7 +34,9 @@ public class MainWindowController implements Initializable {
     private Label userNameLabel;
 
     @Resource(name = "loginPane")
-    FXMLPane loginPane;
+    private FXMLPane loginPane;
+    @Autowired
+    private ApplicationContext context;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -44,7 +46,7 @@ public class MainWindowController implements Initializable {
     }
 
     private void initializeLoginController() {
-        LoginController loginController = loginPane.getController(LoginController.class);
+        LoginController loginController = loginPane.getController();
 
         // login
         loginController.setOnSuccessfulLoginAs(user -> {
@@ -80,18 +82,19 @@ public class MainWindowController implements Initializable {
     }
 
     private void showScreen(ScreenType screenType) {
-        ApplicationContext context = EduliumApplicationContext.getContext();
-
         switch (screenType) {
             case ManagerScreen:
+                // create a new manager view for every session
                 FXMLPane managerViewPane = context.getBean("managerViewPane", FXMLPane.class);
                 borderPane.setCenter(managerViewPane);
                 break;
             case CookScreen:
+                // create a new cook view for every session
                 FXMLPane cookViewPane = context.getBean("cookViewPane", FXMLPane.class);
                 borderPane.setCenter(cookViewPane);
                 break;
             case ServiceScreen:
+                // create a new service view for every session
                 FXMLPane serviceViewPane = context.getBean("serviceViewPane", FXMLPane.class);
                 borderPane.setCenter(serviceViewPane);
                 break;

@@ -5,8 +5,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
-import static org.junit.Assert.*;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +14,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+
+import static org.junit.Assert.*;
 
 public class TestPollingList extends AbstractGuiTest {
     @Autowired

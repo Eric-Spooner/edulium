@@ -19,5 +19,5 @@ public interface OrderDAO extends DAO<Order> {
      * @throws DAOException if the data couldn't be retrieved
      * @throws ValidationException if the parameters are invalid
      */
-    List<Order> findBetween(LocalDateTime from, LocalDateTime to) throws DAOException, ValidationException;
+    List<Order> findBetween(LocalDateTime from, LocalDateTime to) throws DAOException;
 }

@@ -1,6 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
@@ -13,7 +13,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
@@ -27,8 +28,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-
-import static javafx.collections.FXCollections.observableArrayList;
 
 /**
  * Controller used for Add section window
@@ -46,7 +45,7 @@ public class AddSectionController implements Initializable {
     private static InteriorService interiorService;
     private static Stage thisStage;
     private static RoomViewController.UpdateCanvas updateCanvas;
-    private static ArrayList<Rect> rects = new ArrayList<Rect>();
+    private static final ArrayList<Rect> rects = new ArrayList<>();
     private Rect movingRect;
     private int prevX = 0;
     private int prevY = 0;
@@ -74,13 +73,13 @@ public class AddSectionController implements Initializable {
                 try {
                     if (createTable) {
                         if (numberTF.getText().isEmpty()) {
-                            showErrorDialog("Error", "Number missing", "Please insert a number for the table!");
+                            showErrorDialog("Number missing", "Please insert a number for the table!");
                         } else if (Long.valueOf(numberTF.getText()) < 1) {
-                            showErrorDialog("Error", "Number invalid", "The table number must be >= 1!");
+                            showErrorDialog("Number invalid", "The table number must be >= 1!");
                         } else if (seatsTF.getText().isEmpty()) {
-                            showErrorDialog("Error", "Seats missing", "Please insert the number of seats for the table!");
+                            showErrorDialog("Seats missing", "Please insert the number of seats for the table!");
                         } else if (Integer.valueOf(seatsTF.getText()) < 0) {
-                            showErrorDialog("Error", "Seats invalid", "The number of seats must be >= 0!");
+                            showErrorDialog("Seats invalid", "The number of seats must be >= 0!");
                         } else {
                             boolean intersectsWithExistingTable = false;
                             GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -147,88 +146,79 @@ public class AddSectionController implements Initializable {
                         }
                     }
                 } catch (NumberFormatException e) {
-                    showErrorDialog("Error", "Invalid value", "Only valid numbers are allowed!");
+                    showErrorDialog("Invalid value", "Only valid numbers are allowed!");
                 }
                 drawCanvas();
             }
         });
 
-        canvas.addEventHandler(MouseEvent.MOUSE_MOVED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent t) {
-                if(createTable) {
+        canvas.addEventHandler(MouseEvent.MOUSE_MOVED, t -> {
+            if(createTable) {
+                drawCanvas();
+                GraphicsContext gc = canvas.getGraphicsContext2D();
+                gc.setStroke(Color.GRAY);
+                gc.strokeRoundRect(Math.max(((((int)t.getX()))/FACT)*FACT, 0), Math.max(((((int)t.getY()))/FACT)*FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
+                gc.setStroke(Color.BLACK);
+            }
+        });
+
+        canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, t -> {
+            if(moveTable) {
+                if(movingRect != null) {
+                    Rect movedRect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
+                    movedRect.setNumber(movingRect.getNumber());
+                    rects.add(movedRect);
+                    movingRect = null;
+                }
+            }
+        });
+
+        canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, t -> {
+            if(moveTable) {
+                for (Rect rect : rects) {
+                    if (rect.getRect(t.getX(), t.getY()) != null) {
+                        if(movingRect == null) {
+                            movingRect = rect;
+                        }
+                    }
+                }
+
+                if(rects.contains(movingRect))
+                    rects.remove(movingRect);
+
+                if(movingRect != null) {
                     drawCanvas();
                     GraphicsContext gc = canvas.getGraphicsContext2D();
-                    gc.setStroke(Color.GRAY);
-                    gc.strokeRoundRect(Math.max(((((int)t.getX()))/FACT)*FACT, 0), Math.max(((((int)t.getY()))/FACT)*FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
-                    gc.setStroke(Color.BLACK);
-                }
-            }
-        });
 
-        canvas.addEventHandler(MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent t) {
-                if(moveTable) {
-                    if(movingRect != null) {
-                        Rect movedRect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
-                        movedRect.setNumber(movingRect.getNumber());
-                        rects.add(movedRect);
-                        movingRect = null;
-                    }
-                }
-            }
-        });
-
-        canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent t) {
-                if(moveTable) {
-                    for (Rect rect : rects) {
-                        if (rect.getRect(t.getX(), t.getY()) != null) {
-                            if(movingRect == null) {
-                                movingRect = rect;
-                            }
+                    boolean intersectsWithExistingTable = false;
+                    for (Rect iteratingRect : rects) {
+                        if (iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) != null ||
+                                iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) != null ||
+                                iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1) != null ||
+                                iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1) != null) {
+                            intersectsWithExistingTable = true;
                         }
                     }
 
-                    if(rects.contains(movingRect))
-                        rects.remove(movingRect);
-
-                    if(movingRect != null) {
-                        drawCanvas();
-                        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-                        boolean intersectsWithExistingTable = false;
-                        for (Rect iteratingRect : rects) {
-                            if (iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) != null ||
-                                    iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) != null ||
-                                    iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1) != null ||
-                                    iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1) != null) {
-                                intersectsWithExistingTable = true;
-                            }
-                        }
-
-                        if (intersectsWithExistingTable) {
-                            gc.strokeRoundRect(Math.max(((((int) prevX)) / FACT) * FACT, 0), Math.max(((((int) prevY)) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
-                            gc.fillText(String.valueOf(movingRect.getNumber()), Math.max(((((int) prevX)) / FACT) * FACT, 0) + TABLE_SIZE / 4, Math.max(((((int) prevY)) / FACT) * FACT, 0) + TABLE_SIZE / 1.5);
-                        } else {
-                            gc.strokeRoundRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
-                            gc.fillText(String.valueOf(movingRect.getNumber()), Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE / 4, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE / 1.5);
-                            prevX = Math.max(((((int) t.getX())) / FACT) * FACT, 0);
-                            prevY = Math.max(((((int) t.getY())) / FACT) * FACT, 0);
-                        }
+                    if (intersectsWithExistingTable) {
+                        gc.strokeRoundRect(Math.max(((((int) prevX)) / FACT) * FACT, 0), Math.max(((((int) prevY)) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
+                        gc.fillText(String.valueOf(movingRect.getNumber()), Math.max(((((int) prevX)) / FACT) * FACT, 0) + TABLE_SIZE / 4, Math.max(((((int) prevY)) / FACT) * FACT, 0) + TABLE_SIZE / 1.5);
+                    } else {
+                        gc.strokeRoundRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, 2, 2);
+                        gc.fillText(String.valueOf(movingRect.getNumber()), Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE / 4, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE / 1.5);
+                        prevX = Math.max(((((int) t.getX())) / FACT) * FACT, 0);
+                        prevY = Math.max(((((int) t.getY())) / FACT) * FACT, 0);
                     }
-                    /*if(movingRect != null) {
-                        Rect movedRect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
-                        movedRect.setNumber(movingRect.getNumber());
-                        if(rects.contains(movingRect)) {
-                            if (rects.remove(movingRect))
-                                rects.add(movedRect);
-                        }
-                        drawCanvas();
-                    }*/
                 }
+                /*if(movingRect != null) {
+                    Rect movedRect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
+                    movedRect.setNumber(movingRect.getNumber());
+                    if(rects.contains(movingRect)) {
+                        if (rects.remove(movingRect))
+                            rects.add(movedRect);
+                    }
+                    drawCanvas();
+                }*/
             }
         });
     }
@@ -245,7 +235,7 @@ public class AddSectionController implements Initializable {
         AddSectionController.updateCanvas = updateCanvas;
     }
 
-    public void addTableButtonClicked(ActionEvent event) {
+    public void addTableButtonClicked() {
         LOGGER.info("Add Table Button Click");
         drawCanvas();
         createTable = true;
@@ -254,7 +244,7 @@ public class AddSectionController implements Initializable {
         updateTable = false;
     }
 
-    public void moveTableButtonClicked(ActionEvent event) {
+    public void moveTableButtonClicked() {
         LOGGER.info("Move Table Button Click");
         drawCanvas();
         moveTable = true;
@@ -263,7 +253,7 @@ public class AddSectionController implements Initializable {
         updateTable = false;
     }
 
-    public void removeTableButtonClicked(ActionEvent event) {
+    public void removeTableButtonClicked() {
         LOGGER.info("Remove Table Button Click");
         drawCanvas();
         removeTable = true;
@@ -272,7 +262,7 @@ public class AddSectionController implements Initializable {
         updateTable = false;
     }
 
-    public void updateTableButtonClicked(ActionEvent event) {
+    public void updateTableButtonClicked() {
         LOGGER.info("Update Table Button Click");
         drawCanvas();
         updateTable = true;
@@ -281,10 +271,10 @@ public class AddSectionController implements Initializable {
         createTable = false;
     }
 
-    public void createButtonClicked(ActionEvent event) {
+    public void createButtonClicked() {
         LOGGER.info("Create Section Button Click");
         if(nameTF.getText().isEmpty()) {
-            showErrorDialog("Error", "Name missing", "Please insert a name for the section!");
+            showErrorDialog("Name missing", "Please insert a name for the section!");
         } else {
             try {
                 Section section = new Section();
@@ -309,9 +299,9 @@ public class AddSectionController implements Initializable {
                 updateCanvas.update();
                 thisStage.close();
             } catch(ServiceException e) {
-                showErrorDialog("Error", "Database problem", "Could not access database!");
+                showErrorDialog("Database problem", "Could not access database!");
             } catch (ValidationException e) {
-                showErrorDialog("Error", "Validation problem", "Validation has failed!");
+                showErrorDialog("Validation problem", "Validation has failed!");
             }
         }
     }
@@ -344,9 +334,9 @@ public class AddSectionController implements Initializable {
         }
     }
 
-    public static void showErrorDialog(String title, String head, String content) {
+    private static void showErrorDialog(String head, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
+        alert.setTitle("Error");
         alert.setHeaderText(head);
         alert.setContentText(content);
 

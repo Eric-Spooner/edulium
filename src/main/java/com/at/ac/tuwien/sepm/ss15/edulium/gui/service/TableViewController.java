@@ -10,7 +10,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.apache.logging.log4j.LogManager;
@@ -38,7 +39,6 @@ public class TableViewController implements Initializable {
     private InteriorService interiorService;
 
     private PollingList<Table> tables;
-    private PollingList<Section> sections;
     private Consumer<Table> tableClickedConsumer = null;
     private final Map<Section, GridView<Table>> sectionsMap = new HashMap<>();
     private Boolean showSeats = false;
@@ -129,7 +129,7 @@ public class TableViewController implements Initializable {
         });
         tables.startPolling();
 
-        sections = new PollingList<>(taskScheduler);
+        PollingList<Section> sections = new PollingList<Section>(taskScheduler);
         sections.setInterval(1000);
         sections.setSupplier(() -> {
             try {

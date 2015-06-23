@@ -10,14 +10,10 @@ import javafx.util.Callback;
 import java.util.HashMap;
 import java.util.Map;
 
-
-/**
- * Created by phili on 6/16/15.
- */
 public class GridView<T> extends GridPane {
 
     private Callback<GridView, GridCell> cellFactory;
-    private Map<T, Node> nodeMap = new HashMap<>();
+    private final Map<T, Node> nodeMap = new HashMap<>();
 
     private int rows = 1;
     private int cols = 1;
@@ -55,24 +51,14 @@ public class GridView<T> extends GridPane {
     }
 
     public void setItems(ObservableList<T> items) {
-        items.addListener(new ListChangeListener<T>() {
-            @Override
-            public void onChanged(Change<? extends T> c) {
-                while(c.next()) {
-                    for (T item : c.getAddedSubList()) {
-                        addCellItem(item);
-                    }
-
-                    for (T item : c.getRemoved()) {
-                        removeCellItem(item);
-                    }
-                }
+        items.addListener((ListChangeListener<T>) c -> {
+            while(c.next()) {
+                c.getAddedSubList().forEach(this::addCellItem);
+                c.getRemoved().forEach(this::removeCellItem);
             }
         });
 
-        for(T item : items) {
-            addCellItem(item);
-        }
+        items.forEach(this::addCellItem);
     }
 
     public final void setCellFactory(Callback<GridView, GridCell> cellFactory) {

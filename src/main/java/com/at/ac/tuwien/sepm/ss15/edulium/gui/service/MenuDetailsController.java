@@ -9,7 +9,6 @@ import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.collections.transformation.SortedList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -136,7 +135,7 @@ public class MenuDetailsController implements Initializable {
     }
 
     @FXML
-    private void onAcceptButtonClicked(ActionEvent actionEvent) {
+    private void onAcceptButtonClicked() {
         if (menuAcceptedConsumer != null) {
             Menu configuredMenu = new Menu();
             configuredMenu.setName(menu.getName());

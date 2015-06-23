@@ -1,73 +1,40 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
-import javafx.beans.property.SimpleStringProperty;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.control.TableColumn.CellDataFeatures;
-import javafx.stage.Stage;
-import javafx.util.Callback;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URL;
-import java.util.*;
-
-import static javafx.collections.FXCollections.observableArrayList;
-import static javafx.collections.FXCollections.observableList;
+import java.util.ResourceBundle;
 
 /**
  * Controller used for the Manager View
  */
 @Controller
 public class ManagerViewController implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(ManagerViewController.class);
 
     @FXML
     private TabPane tabPaneManager;
 
     @Resource(name = "employeeViewPane")
-    FXMLPane employeeViewPane;
+    private FXMLPane employeeViewPane;
     @Resource(name = "taxRateViewPane")
-    FXMLPane taxRateViewPane;
+    private FXMLPane taxRateViewPane;
     @Resource(name = "menuCategoryViewPane")
-    FXMLPane menuCategoryViewPane;
+    private FXMLPane menuCategoryViewPane;
     @Resource(name = "menuEntryViewPane")
-    FXMLPane menuEntryViewPane;
+    private FXMLPane menuEntryViewPane;
     @Resource(name = "menuViewPane")
-    FXMLPane menuViewPane;
+    private FXMLPane menuViewPane;
     @Resource(name = "salesViewPane")
-    FXMLPane salesViewPane;
+    private FXMLPane salesViewPane;
     @Resource(name = "statisticViewPane")
-    FXMLPane statisticViewPane;
+    private FXMLPane statisticViewPane;
     @Resource(name = "roomViewPane")
-    FXMLPane roomViewPane;
+    private FXMLPane roomViewPane;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -79,14 +46,5 @@ public class ManagerViewController implements Initializable {
         tabPaneManager.getTabs().add(new Tab("Sales", salesViewPane));
         tabPaneManager.getTabs().add(new Tab("Statistics", statisticViewPane));
         tabPaneManager.getTabs().add(new Tab("Rooms", roomViewPane));
-    }
-
-    public static void showErrorDialog(String title, String head, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(head);
-        alert.setContentText(content);
-
-        alert.showAndWait();
     }
 }

@@ -1,18 +1,18 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 
-/**
- * Created by Administrator on 23.05.2015.
- */
 public class Rect {
-    private double x, y, w, h;
+    private final double x;
+    private final double y;
+    private final double w;
+    private final double h;
     private Section section;
     private long number;
     private long identity;
-    private InteriorService interiorService;
+    private final InteriorService interiorService;
     private int seats; //optional for creation
 
     public Rect(double x, double y, double w, double h, InteriorService interiorService) {
@@ -20,8 +20,6 @@ public class Rect {
         this.y = y;
         this.w = w;
         this.h = h;
-        this.section = section;
-        this.number = number;
         this.interiorService = interiorService;
     }
 

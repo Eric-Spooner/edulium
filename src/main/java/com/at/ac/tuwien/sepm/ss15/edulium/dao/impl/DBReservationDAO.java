@@ -12,7 +12,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -350,7 +349,7 @@ class DBReservationDAO implements ReservationDAO {
         // get the latest history change number
         final String queryChangeNr = "SELECT MAX(changeNr) FROM ReservationHistory WHERE ID = ?";
 
-        long changeNr = -1;
+        long changeNr;
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryChangeNr)) {
             stmt.setLong(1, reservation.getIdentity());
@@ -376,7 +375,7 @@ class DBReservationDAO implements ReservationDAO {
      * @return Reservation object with the data of the resultSet set
      * @throws SQLException if an error accessing the database occurred
      */
-    private Reservation parseResult(ResultSet result) throws DAOException, SQLException {
+    private Reservation parseResult(ResultSet result) throws SQLException {
         Reservation reservation = new Reservation();
         reservation.setIdentity(result.getLong("ID"));
         reservation.setTime(result.getTimestamp("reservationTime").toLocalDateTime());
@@ -420,7 +419,7 @@ class DBReservationDAO implements ReservationDAO {
      */
     private History<Reservation> historyFromResultSet(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
+        List<User> storedUsers = userDAO.populate(Collections.singletonList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             LOGGER.error("user not found");
             throw new DAOException("user not found");
