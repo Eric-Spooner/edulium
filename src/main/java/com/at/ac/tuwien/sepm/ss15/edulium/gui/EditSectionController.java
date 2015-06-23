@@ -17,12 +17,11 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
 import java.net.URL;
@@ -34,7 +33,7 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Controller used for Edit Section window
  */
-@Controller
+@Component
 public class EditSectionController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(EditSectionController.class);
 
@@ -44,6 +43,7 @@ public class EditSectionController implements Initializable {
     private boolean updateTable = false;
     private static final int FACT = 40;
     private static final int TABLE_SIZE = 40;
+    private static InteriorService interiorService;
     private static Stage thisStage;
     private static RoomViewController.UpdateCanvas updateCanvas;
     private static ArrayList<Rect> rects = new ArrayList<Rect>();
@@ -52,9 +52,6 @@ public class EditSectionController implements Initializable {
     private int prevY = 0;
     private static Long sectionId;
     private static String sectionName;
-
-    @Autowired
-    private InteriorService interiorService;
 
     @FXML
     private Canvas canvas;
@@ -81,7 +78,7 @@ public class EditSectionController implements Initializable {
             Table tableMatcher = new Table();
             tableMatcher.setSection(section);
             for(Table table : interiorService.findTables(tableMatcher)) {
-                Rect rect = new Rect(table.getColumn()*FACT, table.getRow()*FACT, TABLE_SIZE, TABLE_SIZE);
+                Rect rect = new Rect(table.getColumn()*FACT, table.getRow()*FACT, TABLE_SIZE, TABLE_SIZE, interiorService);
                 rect.setNumber(table.getNumber());
                 rect.setSeats(table.getSeats());
                 rects.add(rect);
@@ -129,12 +126,12 @@ public class EditSectionController implements Initializable {
                                 }
                             }
 
-                            Rect rect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE);
+                            Rect rect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
                             for (Rect iteratingRect : rects) {
-                                if (iteratingRect.contains(rect.getX() + 1, rect.getY() + 1) ||
-                                        iteratingRect.contains(rect.getX() + TABLE_SIZE - 1, rect.getY() + 1) ||
-                                        iteratingRect.contains(rect.getX() + 1, rect.getY() + TABLE_SIZE - 1) ||
-                                        iteratingRect.contains(rect.getX() + TABLE_SIZE - 1, rect.getY() + TABLE_SIZE - 1)) {
+                                if (iteratingRect.getRect(rect.getX() + 1, rect.getY() + 1) != null ||
+                                        iteratingRect.getRect(rect.getX() + TABLE_SIZE - 1, rect.getY() + 1) != null ||
+                                        iteratingRect.getRect(rect.getX() + 1, rect.getY() + TABLE_SIZE - 1) != null ||
+                                        iteratingRect.getRect(rect.getX() + TABLE_SIZE - 1, rect.getY() + TABLE_SIZE - 1) != null) {
                                     intersectsWithExistingTable = true;
                                 }
                             }
@@ -149,7 +146,7 @@ public class EditSectionController implements Initializable {
                     } else if (removeTable) {
                         Rect deleteRect = null;
                         for (Rect rect : rects) {
-                            if (rect.contains(t.getX(), t.getY())) {
+                            if (rect.getRect(t.getX(), t.getY()) != null) {
                                 deleteRect = rect;
                             }
                         }
@@ -158,7 +155,7 @@ public class EditSectionController implements Initializable {
                         drawCanvas();
                     } else if (updateTable) {
                         for (Rect rect : rects) {
-                            if (rect.contains(t.getX(), t.getY())) {
+                            if (rect.getRect(t.getX(), t.getY()) != null) {
                                 try {
                                     Stage stage = new Stage();
                                     UpdateTableController.setThisStage(stage);
@@ -169,6 +166,8 @@ public class EditSectionController implements Initializable {
                                     AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/UpdateTable.fxml"));
                                     Scene scene = new Scene(myPane);
                                     stage.setScene(scene);
+                                    stage.initModality(Modality.APPLICATION_MODAL);
+                                    stage.setResizable(false);
                                     stage.showAndWait();
                                 } catch (IOException e) {
                                     LOGGER.error("Unable to Load Update table" + e);
@@ -201,7 +200,7 @@ public class EditSectionController implements Initializable {
             public void handle(MouseEvent t) {
                 if(moveTable) {
                     if(movingRect != null) {
-                        Rect movedRect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE);
+                        Rect movedRect = new Rect(Math.max(((((int) t.getX())) / FACT) * FACT, 0), Math.max(((((int) t.getY())) / FACT) * FACT, 0), TABLE_SIZE, TABLE_SIZE, interiorService);
                         movedRect.setNumber(movingRect.getNumber());
                         rects.add(movedRect);
                         movingRect = null;
@@ -215,7 +214,7 @@ public class EditSectionController implements Initializable {
             public void handle(MouseEvent t) {
                 if(moveTable) {
                     for (Rect rect : rects) {
-                        if (rect.contains(t.getX(), t.getY())) {
+                        if (rect.getRect(t.getX(), t.getY()) != null) {
                             if(movingRect == null) {
                                 movingRect = rect;
                             }
@@ -231,10 +230,10 @@ public class EditSectionController implements Initializable {
 
                         boolean intersectsWithExistingTable = false;
                         for (Rect iteratingRect : rects) {
-                            if (iteratingRect.contains(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) ||
-                                    iteratingRect.contains(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) ||
-                                    iteratingRect.contains(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1) ||
-                                    iteratingRect.contains(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1)) {
+                            if (iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) != null ||
+                                    iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + 1) != null ||
+                                    iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1) != null ||
+                                    iteratingRect.getRect(Math.max(((((int) t.getX())) / FACT) * FACT, 0) + TABLE_SIZE - 1, Math.max(((((int) t.getY())) / FACT) * FACT, 0) + TABLE_SIZE - 1) != null) {
                                 intersectsWithExistingTable = true;
                             }
                         }
@@ -261,6 +260,10 @@ public class EditSectionController implements Initializable {
                 }
             }
         });
+    }
+
+    public static void setInteriorService(InteriorService interiorService) {
+        EditSectionController.interiorService = interiorService;
     }
 
     public static void setThisStage(Stage thisStage) {

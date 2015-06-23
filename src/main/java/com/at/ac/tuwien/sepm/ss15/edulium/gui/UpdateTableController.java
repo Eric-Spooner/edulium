@@ -29,7 +29,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 
 import javax.xml.soap.Text;
 import java.io.IOException;
@@ -44,7 +43,7 @@ import static javafx.collections.FXCollections.observableArrayList;
 /**
  * Controller used for the table update View
  */
-@Controller
+@Component
 public class UpdateTableController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(UpdateTableController.class);
 
