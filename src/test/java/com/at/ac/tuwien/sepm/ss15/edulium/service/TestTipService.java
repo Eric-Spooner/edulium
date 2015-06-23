@@ -63,6 +63,7 @@ public class TestTipService extends AbstractServiceTest {
         public void setUp() throws Exception {
         }
 
+        @Ignore // test data from testdata.sql isn't available when test runs via maven test (odd ...)
         @Test
         @WithMockUser(username = "servicetester", roles={"SERVICE"})
         public void testDivideAndMatchTip_shouldWork() throws ServiceException, ValidationException {
@@ -91,7 +92,7 @@ public class TestTipService extends AbstractServiceTest {
             assertTrue(BigDecimal.valueOf(20).compareTo(userList.get(0).getTip()) == 0);
         }
 
-        @Ignore // invoice data from testdata.sql isn't available when test runs via maven test (odd ...)
+        @Ignore // test data from testdata.sql isn't available when test runs via maven test (odd ...)
         @Test
         @WithMockUser(username = "servicetester", roles={"SERVICE"})
         public void testDivideAndMatchTip_shouldWorkWithMultipleUsers() throws ServiceException, ValidationException {
