@@ -2,10 +2,12 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.AlertPopOver;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.collections.ListChangeListener;
@@ -21,6 +23,8 @@ import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.PopOver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
@@ -56,6 +60,8 @@ public class OrderOverviewController implements Initializable {
     private Button clearSelectionButton;
     @FXML
     private Button selectAllButton;
+    @FXML
+    private Button takeOverButton;
     @FXML
     private Label headerLabel;
 
@@ -94,9 +100,11 @@ public class OrderOverviewController implements Initializable {
         }
     }
 
-    @Autowired
+    @Resource(name = "orderService")
     private OrderService orderService;
-    @Autowired
+    @Resource(name = "interiorService")
+    private InteriorService interiorService;
+    @Resource(name = "taskScheduler")
     private TaskScheduler taskScheduler;
 
     @Resource(name = "tableViewPane")
@@ -112,6 +120,8 @@ public class OrderOverviewController implements Initializable {
     private PollingList<Order> inProgressOrders;
     private PollingList<Order> readyForDeliveryOrders;
     private PollingList<Order> deliveredOrders;
+
+    private Table table;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -337,6 +347,28 @@ public class OrderOverviewController implements Initializable {
         deliveredOrdersView.getSelectionModel().selectAll();
     }
 
+    @FXML
+    public void onTakeOverButtonButtonClicked(ActionEvent actionEvent) {
+        assert table != null;
+
+        User user = getLoggedInUser();
+        if (user != null) {
+            table.setUser(user);
+
+            try {
+                interiorService.updateTable(table);
+                takeOverButton.setVisible(false);
+            } catch (ValidationException | ServiceException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error while setting the responsible waiter for the table");
+                alert.setHeaderText("Could not set '" + user.getName() + "' as responsible waiter for table " +
+                        table.getNumber() + " in " + table.getSection().getName());
+                alert.setContentText(e.getMessage());
+                alert.showAndWait();
+            }
+        }
+    }
+
     private void clearSelection() {
         queuedOrdersView.getSelectionModel().clearSelection();
         inProgressOrdersView.getSelectionModel().clearSelection();
@@ -344,15 +376,26 @@ public class OrderOverviewController implements Initializable {
         deliveredOrdersView.getSelectionModel().clearSelection();
     }
 
+    private User getLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+
+        return (User) authentication.getPrincipal();
+    }
+
     /**
      *
      * @param table (must not be null)
      */
-    public void setTable(Table table)
-    {
+    public void setTable(Table table) {
         assert table != null;
 
+        this.table = table;
+
         headerLabel.setText("Table " + table.getNumber() + " in " + table.getSection().getName());
+        takeOverButton.setVisible(!table.getUser().equals(getLoggedInUser())); // only visible if the waiter isn't already responsible for the table
 
         queuedOrders.setSupplier(() -> {
             try {

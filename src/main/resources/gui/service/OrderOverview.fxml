@@ -11,7 +11,7 @@
    <children>
       <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
          <children>
-            <Button fx:id="backButton" mnemonicParsing="false" text="Back" HBox.hgrow="NEVER">
+            <Button fx:id="backButton" cancelButton="true" mnemonicParsing="false" text="Back" HBox.hgrow="NEVER">
                <font>
                   <Font size="18.0" />
                </font>
@@ -25,6 +25,14 @@
                <HBox.margin>
                   <Insets />
                </HBox.margin></Label>
+            <Button fx:id="takeOverButton" mnemonicParsing="false" onAction="#onTakeOverButtonButtonClicked" text="Take Over" visible="false">
+               <font>
+                  <Font size="18.0" />
+               </font>
+               <HBox.margin>
+                  <Insets right="30.0" />
+               </HBox.margin>
+            </Button>
             <Button fx:id="clearSelectionButton" mnemonicParsing="false" onAction="#onClearSelectionButtonClicked" text="Clear Selection">
                <font>
                   <Font size="18.0" />
@@ -37,6 +45,9 @@
                <font>
                   <Font size="18.0" />
                </font>
+               <HBox.margin>
+                  <Insets right="30.0" />
+               </HBox.margin>
             </Button>
             <Button fx:id="moveToTableButton" mnemonicParsing="false" onAction="#onMoveToTableButtonClicked" text="Move Orders" HBox.hgrow="NEVER">
                <font>
