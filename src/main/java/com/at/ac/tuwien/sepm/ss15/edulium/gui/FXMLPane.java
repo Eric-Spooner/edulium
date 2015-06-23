@@ -5,15 +5,15 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import java.io.IOException;
 
 public class FXMLPane extends AnchorPane {
     private Initializable controller = null;
+    private static ApplicationContext context;
 
     public FXMLPane(String fxml) {
-        ApplicationContext context = EduliumApplicationContext.getContext();
-
         FXMLLoader loader = new FXMLLoader();
         loader.setControllerFactory(aClass -> context.getBean(aClass));
 
@@ -41,5 +41,9 @@ public class FXMLPane extends AnchorPane {
      */
     public <T extends Initializable> T getController(Class<T> aClass) {
         return (T)controller;
+    }
+
+    public static void setApplicationContext(ApplicationContext context) {
+        FXMLPane.context = context;
     }
 }
