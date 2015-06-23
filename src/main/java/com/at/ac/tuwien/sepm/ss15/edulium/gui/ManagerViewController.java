@@ -47,27 +47,26 @@ import static javafx.collections.FXCollections.observableList;
  */
 @Controller
 public class ManagerViewController implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(ManagerViewController.class);
 
     @FXML
     private TabPane tabPaneManager;
 
     @Resource(name = "employeeViewPane")
-    FXMLPane employeeViewPane;
+    private FXMLPane employeeViewPane;
     @Resource(name = "taxRateViewPane")
-    FXMLPane taxRateViewPane;
+    private FXMLPane taxRateViewPane;
     @Resource(name = "menuCategoryViewPane")
-    FXMLPane menuCategoryViewPane;
+    private FXMLPane menuCategoryViewPane;
     @Resource(name = "menuEntryViewPane")
-    FXMLPane menuEntryViewPane;
+    private FXMLPane menuEntryViewPane;
     @Resource(name = "menuViewPane")
-    FXMLPane menuViewPane;
+    private FXMLPane menuViewPane;
     @Resource(name = "salesViewPane")
-    FXMLPane salesViewPane;
+    private FXMLPane salesViewPane;
     @Resource(name = "statisticViewPane")
-    FXMLPane statisticViewPane;
+    private FXMLPane statisticViewPane;
     @Resource(name = "roomViewPane")
-    FXMLPane roomViewPane;
+    private FXMLPane roomViewPane;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
