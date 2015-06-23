@@ -348,7 +348,6 @@ public class OrderOverviewController implements Initializable {
     }
 
     @FXML
-<<<<<<< HEAD
     public void onPayButtonClicked(ActionEvent actionEvent) {
         List<Order> orders = new ArrayList<>();
         orders.addAll(queuedOrdersView.getSelectionModel().getSelectedItems());
