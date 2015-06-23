@@ -117,7 +117,6 @@ public class OrderInputController  implements Initializable {
 
     @Resource(name = "menuCategoryOverviewPane")
     private FXMLPane menuCategoryOverviewPane;
-    private MenuCategoryOverviewController menuCategoryOverviewController;
 
     @Resource(name = "menuEntryOverviewPane")
     private FXMLPane menuEntryOverviewPane;
@@ -125,7 +124,6 @@ public class OrderInputController  implements Initializable {
 
     @Resource(name = "menuOverviewPane")
     private FXMLPane menuOverviewPane;
-    private MenuOverviewController menuOverviewController;
 
     @Resource(name = "menuDetailsPane")
     private FXMLPane menuDetailsPane;
@@ -153,10 +151,10 @@ public class OrderInputController  implements Initializable {
     }
 
     private void initializeControllers() {
-        menuCategoryOverviewController = menuCategoryOverviewPane.getController(MenuCategoryOverviewController.class);
-        menuEntryOverviewController = menuEntryOverviewPane.getController(MenuEntryOverviewController.class);
-        menuOverviewController = menuOverviewPane.getController(MenuOverviewController.class);
-        menuDetailsController = menuDetailsPane.getController(MenuDetailsController.class);
+        MenuCategoryOverviewController menuCategoryOverviewController = menuCategoryOverviewPane.getController();
+        menuEntryOverviewController = menuEntryOverviewPane.getController();
+        MenuOverviewController menuOverviewController = menuOverviewPane.getController();
+        menuDetailsController = menuDetailsPane.getController();
 
         menuCategoryOverviewController.setOnMenuCategoryClicked(menuCategory -> {
             menuEntryOverviewController.setMenuCategory(menuCategory);
@@ -217,9 +215,7 @@ public class OrderInputController  implements Initializable {
 
     private void initializeHeaderButtons() {
         // disable order button if there are no orders
-        orders.addListener((MapChangeListener<OrderBase, Integer>) change -> {
-            orderButton.setDisable(orders.isEmpty());
-        });
+        orders.addListener((MapChangeListener<OrderBase, Integer>) change -> orderButton.setDisable(orders.isEmpty()));
 
         menuCategoryScreenButton = new ToggleButton();
         menuCategoryScreenButton.setText("Categories");
@@ -284,7 +280,7 @@ public class OrderInputController  implements Initializable {
     }
 
     @FXML
-    private void onBackButtonClicked(ActionEvent actionEvent) {
+    private void onBackButtonClicked() {
         showScreen((ScreenType) backButton.getUserData());
     }
 

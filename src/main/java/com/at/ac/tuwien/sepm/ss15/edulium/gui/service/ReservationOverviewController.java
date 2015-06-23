@@ -179,7 +179,7 @@ public class ReservationOverviewController implements Initializable {
 
         lvReservations.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             // set edit button disabled if reservation is bygone
-            boolean disable = newValue == null? true : newValue.getTime().plus(newValue.getDuration()).isBefore(LocalDateTime.now());
+            boolean disable = newValue == null || newValue.getTime().plus(newValue.getDuration()).isBefore(LocalDateTime.now());
             btnEdit.setDisable(disable);
             btnDelete.setDisable(disable);
         });

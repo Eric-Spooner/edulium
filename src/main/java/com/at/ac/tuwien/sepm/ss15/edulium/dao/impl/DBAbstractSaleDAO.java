@@ -104,7 +104,7 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
      *
      * @param sale Sale Is used to identify the SaleAssoc
      */
-    protected void updateSaleAssoc(Sale sale) throws DAOException {
+    private void updateSaleAssoc(Sale sale) throws DAOException {
         LOGGER.debug("Entering updateSaleAssoc with parameters: " + sale);
         // At first, look if the
         // disable all SaleAssoc for now, the update sql query will re-enable all valid

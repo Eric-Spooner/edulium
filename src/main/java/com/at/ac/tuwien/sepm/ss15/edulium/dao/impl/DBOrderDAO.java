@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -183,7 +183,7 @@ class DBOrderDAO implements DAO<Order>, OrderDAO {
     }
 
     @Override
-    public List<Order> findBetween(LocalDateTime from, LocalDateTime to) throws DAOException, ValidationException {
+    public List<Order> findBetween(LocalDateTime from, LocalDateTime to) throws DAOException {
         LOGGER.debug("entering findBetween with parameters "+from+", "+to);
 
         final String query = "SELECT * FROM RestaurantOrder WHERE canceled = false" +
@@ -332,7 +332,7 @@ class DBOrderDAO implements DAO<Order>, OrderDAO {
         order.setTime(result.getTimestamp("orderTime").toLocalDateTime());
         order.setState(Order.State.valueOf(result.getString("state")));
 
-        final List<MenuEntry> menuEntries = menuEntryDAO.populate(Arrays.asList(MenuEntry.withIdentity(result.getLong("menuEntry_ID"))));
+        final List<MenuEntry> menuEntries = menuEntryDAO.populate(Collections.singletonList(MenuEntry.withIdentity(result.getLong("menuEntry_ID"))));
         if (menuEntries.size() != 1) {
             LOGGER.error("retrieving MenuEntry failed");
             throw new DAOException("retrieving MenuEntry failed");
@@ -340,7 +340,7 @@ class DBOrderDAO implements DAO<Order>, OrderDAO {
         order.setMenuEntry(menuEntries.get(0));
 
         Section section = Section.withIdentity(result.getLong("table_section"));
-        final List<Table> tables = tableDAO.populate(Arrays.asList(Table.withIdentity(section, result.getLong("table_number"))));
+        final List<Table> tables = tableDAO.populate(Collections.singletonList(Table.withIdentity(section, result.getLong("table_number"))));
         if (tables.size() != 1) {
             LOGGER.error("retrieving Table failed");
             throw new DAOException("retrieving Table failed");
@@ -358,7 +358,7 @@ class DBOrderDAO implements DAO<Order>, OrderDAO {
          */
     private History<Order> parseHistoryEntry(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
+        List<User> storedUsers = userDAO.populate(Collections.singletonList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             LOGGER.error("user not found");
             throw new DAOException("user not found");

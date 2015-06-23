@@ -25,19 +25,19 @@ class InvoiceServiceImpl implements InvoiceService {
     private static final Logger LOGGER = LogManager.getLogger(InteriorServiceImpl.class);
 
     @Resource(name = "invoiceDAO")
-    DAO<Invoice> invoiceDAO;
+    private DAO<Invoice> invoiceDAO;
 
     @Resource(name = "invoiceDAO")
-    InvoiceDAO findBetweenInvoiceDAO;
+    private InvoiceDAO findBetweenInvoiceDAO;
 
     @Resource(name = "instalmentDAO")
-    ImmutableDAO<Instalment> instalmentDAO;
+    private ImmutableDAO<Instalment> instalmentDAO;
 
     @Resource(name = "invoiceValidator")
-    Validator<Invoice> invoiceValidator;
+    private Validator<Invoice> invoiceValidator;
 
     @Resource(name = "instalmentValidator")
-    ImmutableValidator<Instalment> instalmentValidator;
+    private ImmutableValidator<Instalment> instalmentValidator;
 
     @Override
     public void addInvoice(Invoice invoice) throws ServiceException, ValidationException {
@@ -99,7 +99,7 @@ class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public List<Invoice> findInvoiceBetween(LocalDateTime from, LocalDateTime to) throws ServiceException, ValidationException {
+    public List<Invoice> findInvoiceBetween(LocalDateTime from, LocalDateTime to) throws ServiceException {
         LOGGER.debug("Entering findInvoicesBetween with parameters: " + from + ", "+ to);
 
         try {

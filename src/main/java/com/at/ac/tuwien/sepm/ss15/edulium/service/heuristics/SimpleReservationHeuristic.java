@@ -6,7 +6,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,8 +20,8 @@ class SimpleReservationHeuristic extends ReservationHeuristic {
 
         // check if a single table would fit for this reservation
         for(Table table : tables) {
-            if(table.getSeats() == reservation.getQuantity()) {
-                return Arrays.asList(table);
+            if (table.getSeats().equals(reservation.getQuantity())) {
+                return Collections.singletonList(table);
             }
         }
 

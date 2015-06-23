@@ -182,7 +182,7 @@ class ReservationServiceImpl implements ReservationService {
     }
 
     private Reservation getReservationById(long id) throws ServiceException {
-        List<Reservation> resList = null;
+        List<Reservation> resList;
         try {
             resList = reservationDAO.find(Reservation.withIdentity(id));
         } catch (DAOException e) {

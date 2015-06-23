@@ -46,7 +46,7 @@ public class MainWindowController implements Initializable {
     }
 
     private void initializeLoginController() {
-        LoginController loginController = loginPane.getController(LoginController.class);
+        LoginController loginController = loginPane.getController();
 
         // login
         loginController.setOnSuccessfulLoginAs(user -> {

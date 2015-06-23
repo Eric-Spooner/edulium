@@ -17,7 +17,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -96,7 +95,7 @@ public class TableOverviewController implements Initializable {
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
-        tableViewController = tableViewPane.getController(TableViewController.class);
+        tableViewController = tableViewPane.getController();
         splitPane.getItems().add(0, tableViewPane);
 
         tablesOfOrders = FXCollections.observableArrayList();
@@ -104,24 +103,22 @@ public class TableOverviewController implements Initializable {
         lvDelivery.setCellFactory(param -> new DeliveryCell());
         lvDelivery.setItems(tablesOfOrders);
 
-        scheduledFuture = taskScheduler.scheduleWithFixedDelay(() -> {
-            Platform.runLater(() -> {
-                // workaround: if user logged out -> exception -> stop polling
-                try {
-                    updateDeliveries();
-                    updateAssignedTables();
-                } catch (AuthenticationCredentialsNotFoundException e) {
-                    if(scheduledFuture != null) {
-                        scheduledFuture.cancel(true);
-                        scheduledFuture = null;
-                    }
+        scheduledFuture = taskScheduler.scheduleWithFixedDelay(() -> Platform.runLater(() -> {
+            // workaround: if user logged out -> exception -> stop polling
+            try {
+                updateDeliveries();
+                updateAssignedTables();
+            } catch (AuthenticationCredentialsNotFoundException e) {
+                if(scheduledFuture != null) {
+                    scheduledFuture.cancel(true);
+                    scheduledFuture = null;
                 }
-            });
-        }, 1000);
+            }
+        }), 1000);
     }
 
     @FXML
-    public void on_lvDelivery_clicked(MouseEvent arg0) {
+    public void on_lvDelivery_clicked() {
         Table selectedTable = lvDelivery.getSelectionModel().getSelectedItem();
 
         if(onTableClickedConsumer != null && selectedTable != null) {
@@ -141,7 +138,7 @@ public class TableOverviewController implements Initializable {
     private void updateDeliveries() {
         Order matcher = new Order();
         matcher.setState(Order.State.READY_FOR_DELIVERY);
-        List<Order> orders = null;
+        List<Order> orders;
 
         try {
             orders = orderService.findOrder(matcher);

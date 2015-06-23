@@ -20,7 +20,7 @@ public class FXMLPane extends AnchorPane {
 
     public void setFXML(String fxml) {
         FXMLLoader loader = new FXMLLoader();
-        loader.setControllerFactory(aClass -> context.getBean(aClass));
+        loader.setControllerFactory(context::getBean);
 
         try {
             Node node = loader.load(context.getClassLoader().getResourceAsStream(fxml));
@@ -41,10 +41,9 @@ public class FXMLPane extends AnchorPane {
     }
 
     /**
-     * @param aClass Controller class type
      * @return Controller of this scene as object of class type aClass
      */
-    public <T extends Initializable> T getController(Class<T> aClass) {
+    public <T extends Initializable> T getController() {
         return (T)controller;
     }
 }

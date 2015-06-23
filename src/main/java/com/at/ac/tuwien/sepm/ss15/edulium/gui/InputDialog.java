@@ -9,8 +9,7 @@ import javafx.scene.control.Dialog;
 
 public abstract class InputDialog<Domain> extends Dialog<Domain> {
 
-    private InputDialogController<Domain> controller;
-    private String domainName;
+    private final String domainName;
 
     public InputDialog(String domainName) {
         this.domainName = domainName;
@@ -21,8 +20,6 @@ public abstract class InputDialog<Domain> extends Dialog<Domain> {
     }
 
     public void setController(InputDialogController<Domain> controller) {
-        this.controller = controller;
-
         getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
 
         Node okButton = getDialogPane().lookupButton(ButtonType.OK);

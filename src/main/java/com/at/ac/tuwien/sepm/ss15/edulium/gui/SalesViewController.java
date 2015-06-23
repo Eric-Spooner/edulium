@@ -6,15 +6,12 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.SaleService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Stage;
-import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +24,6 @@ import java.util.ResourceBundle;
 
 import static javafx.collections.FXCollections.observableArrayList;
 
-/**
- * Created by - on 12.06.2015.
- */
 public class SalesViewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(SalesViewController.class);
 
@@ -59,18 +53,16 @@ public class SalesViewController implements Initializable {
         try {
             sales = observableArrayList(saleService.getAllSales());
             tableViewSale.setItems(sales);
-            tableColSaleId.setCellValueFactory(new PropertyValueFactory<Sale, Long>("identity"));
-            tableColSaleName.setCellValueFactory(new PropertyValueFactory<Sale, String>("name"));
-            tableColSaleEntries.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Sale, String>, ObservableValue<String>>() {
-                public ObservableValue<String> call(TableColumn.CellDataFeatures<Sale, String> p) {
-                    // p.getValue() returns the Person instance for a particular TableView row
-                    List<String> list = new LinkedList<String>();
-                    p.getValue().getEntries().forEach(entry -> list.add(entry.getName()));
-                    return new SimpleStringProperty(list.toString());
-                }
+            tableColSaleId.setCellValueFactory(new PropertyValueFactory<>("identity"));
+            tableColSaleName.setCellValueFactory(new PropertyValueFactory<>("name"));
+            tableColSaleEntries.setCellValueFactory(p -> {
+                // p.getValue() returns the Person instance for a particular TableView row
+                List<String> list = new LinkedList<>();
+                p.getValue().getEntries().forEach(entry -> list.add(entry.getName()));
+                return new SimpleStringProperty(list.toString());
             });
 
-            saleDialogController = salesDialogPane.getController(DialogSaleController.class);
+            saleDialogController = salesDialogPane.getController();
             saleDialog = new Dialog<>();
             saleDialog.getDialogPane().setContent(salesDialogPane);
             ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
@@ -82,27 +74,25 @@ public class SalesViewController implements Initializable {
                 }
             });
             final Button cancelButton = (Button) saleDialog.getDialogPane().lookupButton(cancelButtonType);
-            cancelButton.addEventFilter(ActionEvent.ACTION, event -> {
-                saleDialogController.resetDialog();
-            });
+            cancelButton.addEventFilter(ActionEvent.ACTION, event -> saleDialogController.resetDialog());
         }catch (ServiceException e){
             LOGGER.error("Initialize Menu View Failed due to" + e);
         }
 
     }
 
-    public void buttonSaleUpdateClicked(ActionEvent actionEvent) {
+    public void buttonSaleUpdateClicked() {
         try {
             LOGGER.info("Update Sale Button Click");
-            Stage stage = new Stage();
+
             if(tableViewSale.getSelectionModel().getSelectedItem() == null){
                 showErrorDialog
-                        ("Error", "Input Validation Error", "You have to select a Sale to Update");
+                        ("Input Validation Error", "You have to select a Sale to Update");
                 return;
             }
             saleDialogController.resetDialog();
-            saleDialogController.setDialogEnumeration(DialogEnumeration.UPDATE);
-            saleDialogController.setSale(tableViewSale.getSelectionModel().getSelectedItem());
+            DialogSaleController.setDialogEnumeration(DialogEnumeration.UPDATE);
+            DialogSaleController.setSale(tableViewSale.getSelectionModel().getSelectedItem());
             saleDialogController.showSale();
             saleDialog.showAndWait();
             sales.setAll(saleService.getAllSales());
@@ -112,12 +102,12 @@ public class SalesViewController implements Initializable {
         }
     }
 
-    public void buttonSaleRemoveClicked(ActionEvent actionEvent) {
+    public void buttonSaleRemoveClicked() {
         try {
             LOGGER.info("Delete Sale Button Click");
             if(tableViewSale.getSelectionModel().getSelectedItem() == null){
                 showErrorDialog
-                        ("Error", "Input Validation Error", "You have to select a Sale to Delete");
+                        ("Input Validation Error", "You have to select a Sale to Delete");
                 return;
             }
             Sale s = tableViewSale.getSelectionModel().getSelectedItem();
@@ -134,11 +124,11 @@ public class SalesViewController implements Initializable {
         }
     }
 
-    public void buttonSaleAddClicked(ActionEvent actionEvent){
+    public void buttonSaleAddClicked(){
         try {
             LOGGER.info("Add Sale Button Click");
             saleDialogController.resetDialog();
-            saleDialogController.setDialogEnumeration(DialogEnumeration.ADD);
+            DialogSaleController.setDialogEnumeration(DialogEnumeration.ADD);
             saleDialog.showAndWait();
             sales.setAll(saleService.getAllSales());
         }catch (Exception e){
@@ -154,9 +144,9 @@ public class SalesViewController implements Initializable {
         }
     }*/
 
-    public void showErrorDialog(String title, String head, String content) {
+    private void showErrorDialog(String head, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
+        alert.setTitle("Error");
         alert.setHeaderText(head);
         alert.setContentText(content);
 

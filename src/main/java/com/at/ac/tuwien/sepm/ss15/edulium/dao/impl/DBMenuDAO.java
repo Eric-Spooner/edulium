@@ -282,7 +282,7 @@ class DBMenuDAO implements DAO<Menu> {
      * @param menu the menu, the menu Enries should be given back
      * @return
      */
-    private List<MenuEntry> getResultMenuEntries(Menu menu) throws DAOException, ValidationException, SQLException{
+    private List<MenuEntry> getResultMenuEntries(Menu menu) throws DAOException, ValidationException {
         List<MenuEntry> entries = new LinkedList<>();
         HashMap<Long, BigDecimal> menuPrices = new HashMap<>();
 
@@ -342,7 +342,7 @@ class DBMenuDAO implements DAO<Menu> {
         }
         //get the change Nr, for Menu Assoc
         final String queryGetChangeNr = "SELECT MAX(changeNr) FROM MenuHistory WHERE ID = ?";
-        Long resultNr = -1L;
+        Long resultNr;
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(queryGetChangeNr)) {
             stmt.setLong(1, menu.getIdentity());          // dataset id
             ResultSet result = stmt.executeQuery();
@@ -394,7 +394,7 @@ class DBMenuDAO implements DAO<Menu> {
      */
     private History<Menu> parseHistoryEntry(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
+        List<User> storedUsers = userDAO.populate(Collections.singletonList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             LOGGER.error("user not found");
             throw new DAOException("user not found");
@@ -427,7 +427,7 @@ class DBMenuDAO implements DAO<Menu> {
         return menu;
     }
 
-    private List<MenuEntry> getResultHistoryMenuEntries(Menu menu, Long changeNr) throws DAOException, ValidationException, SQLException {
+    private List<MenuEntry> getResultHistoryMenuEntries(Menu menu, Long changeNr) throws DAOException, ValidationException {
         List<MenuEntry> menuEntries = new LinkedList<>();
         String query = "SELECT menuEntry_ID FROM MenuAssocHistory WHERE " +
                 "menu_ID = ? AND changeNr = ? AND disabled = false";

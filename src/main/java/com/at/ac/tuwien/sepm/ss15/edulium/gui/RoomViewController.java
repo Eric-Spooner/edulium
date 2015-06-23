@@ -5,10 +5,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -47,7 +43,7 @@ public class RoomViewController implements Initializable {
     private ScrollPane scrollPaneLeft;
     @FXML
     private AnchorPane tableAnchor;
-    private ArrayList<Rect> rects = new ArrayList<Rect>();
+    private final ArrayList<Rect> rects = new ArrayList<>();
     private double scaleX = 1.0;
     private double scaleY = 1.0;
     private long clickedSectionId = -1;
@@ -68,30 +64,27 @@ public class RoomViewController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         drawCanvas();
 
-        tablesCanvas.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent t) {
-                boolean noSectionClicked = true;
-                for(Rect rect : rects) {
-                    try {
-                        Table clickedTable = rect.getTable(t.getX(), t.getY());
-                        if(clickedTable != null) {
-                            System.out.println((String.valueOf(clickedTable.getNumber()) + " clicked"));
-                        }
-                        Section clickedSection = rect.getSection(t.getX(), t.getY());
-                        if(clickedSection != null) {
-                            noSectionClicked = false;
-                            clickedSectionId = clickedSection.getIdentity();
-                            System.out.println((String.valueOf(clickedSection.getName()) + " clicked" + clickedSection.getIdentity()));
-                        }
-                    } catch(ServiceException e) {
-                        showErrorDialog("Error", "Error", e.getMessage());
+        tablesCanvas.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
+            boolean noSectionClicked = true;
+            for(Rect rect : rects) {
+                try {
+                    Table clickedTable = rect.getTable(t.getX(), t.getY());
+                    if(clickedTable != null) {
+                        System.out.println((String.valueOf(clickedTable.getNumber()) + " clicked"));
                     }
+                    Section clickedSection = rect.getSection(t.getX(), t.getY());
+                    if(clickedSection != null) {
+                        noSectionClicked = false;
+                        clickedSectionId = clickedSection.getIdentity();
+                        System.out.println((String.valueOf(clickedSection.getName()) + " clicked" + clickedSection.getIdentity()));
+                    }
+                } catch(ServiceException e) {
+                    showErrorDialog("Error", e.getMessage());
                 }
-                if(noSectionClicked)
-                    clickedSectionId = -1;
-                drawCanvas();
             }
+            if(noSectionClicked)
+                clickedSectionId = -1;
+            drawCanvas();
         });
 
         scrollPaneLeft.setPrefSize(120, 120);
@@ -129,7 +122,7 @@ public class RoomViewController implements Initializable {
                 }
             }
         } catch(ServiceException e) {
-            showErrorDialog("Error", "Error", e.getMessage());
+            showErrorDialog("Error", e.getMessage());
         }
 
         tablesCanvas.setWidth(canvasWidth);
@@ -174,13 +167,13 @@ public class RoomViewController implements Initializable {
                 prevSection = section;
             }
         } catch(ServiceException e) {
-            showErrorDialog("Error", "Error", e.getMessage());
+            showErrorDialog("Error", e.getMessage());
         }
     }
 
 
 
-    public void buttonAddSectionClicked(ActionEvent actionEvent) {
+    public void buttonAddSectionClicked() {
         LOGGER.info("Add Section Button Click");
         drawCanvas();
         try {
@@ -200,7 +193,7 @@ public class RoomViewController implements Initializable {
         }
     }
 
-    public void buttonEditSectionClicked(ActionEvent actionEvent) {
+    public void buttonEditSectionClicked() {
         LOGGER.info("Edit Section Button Click");
         if(clickedSectionId != -1) {
             drawCanvas();
@@ -223,7 +216,7 @@ public class RoomViewController implements Initializable {
         }
     }
 
-    public void buttonRemoveSectionClicked(ActionEvent event) {
+    public void buttonRemoveSectionClicked() {
         LOGGER.info("Remove Section Button Click");
         if(clickedSectionId != -1) {
             try {
@@ -258,25 +251,20 @@ public class RoomViewController implements Initializable {
         drawCanvas();
     }
 
-    public void setupListeners() {
-        scrollPaneLeft.widthProperty().addListener(new ChangeListener<Number>() {
-            @Override public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) {
-                tablesCanvas.setWidth(tablesCanvas.getWidth() - (oldSceneWidth.intValue() - newSceneWidth.intValue()));
-                scaleX = newSceneWidth.doubleValue()/550.0;
-                scaleX = Math.min(scaleX, 2.0);
-                scaleX = Math.max(scaleX, 0.5);
-                drawCanvas();
-            }
+    private void setupListeners() {
+        scrollPaneLeft.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
+            tablesCanvas.setWidth(tablesCanvas.getWidth() - (oldSceneWidth.intValue() - newSceneWidth.intValue()));
+            scaleX = newSceneWidth.doubleValue()/550.0;
+            scaleX = Math.min(scaleX, 2.0);
+            scaleX = Math.max(scaleX, 0.5);
+            drawCanvas();
         });
-        scrollPaneLeft.heightProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneHeight, Number newSceneHeight) {
-                tablesCanvas.setHeight(tablesCanvas.getHeight() - (oldSceneHeight.intValue() - newSceneHeight.intValue()));
-                scaleY = newSceneHeight.doubleValue()/598.0;
-                scaleY = Math.min(scaleY, 2.0);
-                scaleY = Math.max(scaleY, 0.5);
-                drawCanvas();
-            }
+        scrollPaneLeft.heightProperty().addListener((observableValue, oldSceneHeight, newSceneHeight) -> {
+            tablesCanvas.setHeight(tablesCanvas.getHeight() - (oldSceneHeight.intValue() - newSceneHeight.intValue()));
+            scaleY = newSceneHeight.doubleValue()/598.0;
+            scaleY = Math.min(scaleY, 2.0);
+            scaleY = Math.max(scaleY, 0.5);
+            drawCanvas();
         });
     }
 
@@ -304,9 +292,9 @@ public class RoomViewController implements Initializable {
         return max*FACT + TABLE_SIZE + 2*SECTION_PADDING;
     }
 
-    public void showErrorDialog(String title, String head, String content) {
+    private void showErrorDialog(String head, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
+        alert.setTitle("Error");
         alert.setHeaderText(head);
         alert.setContentText(content);
 

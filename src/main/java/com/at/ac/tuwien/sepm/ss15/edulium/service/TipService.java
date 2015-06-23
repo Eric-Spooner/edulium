@@ -18,5 +18,5 @@ public interface TipService extends Service {
      * @param invoice the invoice, where the tip is included
      */
     @PreAuthorize("hasAnyRole('MANAGER','SERVICE')")
-    public void divideAndMatchTip(Invoice invoice, BigDecimal tip) throws ServiceException, ValidationException;
+    void divideAndMatchTip(Invoice invoice, BigDecimal tip) throws ServiceException, ValidationException;
 }

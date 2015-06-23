@@ -39,7 +39,6 @@ public class TableViewController implements Initializable {
     private InteriorService interiorService;
 
     private PollingList<Table> tables;
-    private PollingList<Section> sections;
     private Consumer<Table> tableClickedConsumer = null;
     private final Map<Section, GridView<Table>> sectionsMap = new HashMap<>();
     private Boolean showSeats = false;
@@ -130,7 +129,7 @@ public class TableViewController implements Initializable {
         });
         tables.startPolling();
 
-        sections = new PollingList<>(taskScheduler);
+        PollingList<Section> sections = new PollingList<Section>(taskScheduler);
         sections.setInterval(1000);
         sections.setSupplier(() -> {
             try {

@@ -7,7 +7,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -59,7 +58,7 @@ public class MenuViewController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        menuDialogController = menuDialogPane.getController(MenuDialogController.class);
+        menuDialogController = menuDialogPane.getController();
 
         // queued
         try {
@@ -69,18 +68,18 @@ public class MenuViewController implements Initializable {
             LOGGER.error("Initialize Menu View Failed due to" + e);
         }
 
-        tableColMenuId.setCellValueFactory(new PropertyValueFactory<Menu, Long>("identity"));
-        tableColMenuName.setCellValueFactory(new PropertyValueFactory<Menu, String>("name"));
+        tableColMenuId.setCellValueFactory(new PropertyValueFactory<>("identity"));
+        tableColMenuName.setCellValueFactory(new PropertyValueFactory<>("name"));
         tableColMenuEntries.setCellValueFactory(p -> {
             // p.getValue() returns the Person instance for a particular TableView row
-            List<String> list = new LinkedList<String>();
+            List<String> list = new LinkedList<>();
             p.getValue().getEntries().forEach(entry->list.add(entry.getName()));
             return new SimpleStringProperty(list.toString());
         });
     }
 
     @FXML
-    public void buttonMenuUpdateClicked(ActionEvent actionEvent) {
+    public void buttonMenuUpdateClicked() {
         Menu selectedMenu = tableViewMenu.getSelectionModel().getSelectedItem();
         if (selectedMenu != null) {
             UpdateInputDialog<Menu> menuInputDialog = new UpdateInputDialog<>("menu", selectedMenu);
@@ -106,7 +105,7 @@ public class MenuViewController implements Initializable {
     }
 
     @FXML
-    public void buttonMenuSearchClicked(ActionEvent actionEvent) {
+    public void buttonMenuSearchClicked() {
         SearchInputDialog<Menu> menuSearchDialog = new SearchInputDialog<>("menus");
         menuSearchDialog.setContent(menuDialogPane);
         menuSearchDialog.setController(menuDialogController);
@@ -126,7 +125,7 @@ public class MenuViewController implements Initializable {
     }
 
     @FXML
-    public void buttonMenuRemoveClicked(ActionEvent actionEvent) {
+    public void buttonMenuRemoveClicked() {
         Menu selectedMenu = tableViewMenu.getSelectionModel().getSelectedItem();
 
         if(selectedMenu != null) {
@@ -146,7 +145,7 @@ public class MenuViewController implements Initializable {
     }
 
     @FXML
-    public void buttonMenuAddClicked(ActionEvent actionEvent){
+    public void buttonMenuAddClicked(){
         CreateInputDialog<Menu> menuInputDialog = new CreateInputDialog<>("menu");
         menuInputDialog.setValidator(menuValidator);
         menuInputDialog.setContent(menuDialogPane);

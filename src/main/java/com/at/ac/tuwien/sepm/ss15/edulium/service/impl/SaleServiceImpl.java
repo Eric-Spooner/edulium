@@ -223,7 +223,7 @@ class SaleServiceImpl implements SaleService {
             if (sale.isAt(LocalDateTime.now())) {
                 for (MenuEntry menuEntry1 : sale.getEntries()) {
                     //If possible, lower the price
-                    if (menuEntry1.getIdentity() == menuEntry.getIdentity()) {
+                    if (menuEntry1.getIdentity().equals(menuEntry.getIdentity())) {
                         price = price.min(menuEntry1.getPrice());
                     }
                 }

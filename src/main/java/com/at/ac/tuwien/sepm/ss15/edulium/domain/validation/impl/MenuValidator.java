@@ -53,7 +53,7 @@ class MenuValidator implements Validator<Menu> {
         if(object.getName() == null){
             throw new ValidationException("Menu name must not be null");
         }
-        if(object.getName() == ""){
+        if(object.getName().isEmpty()){
             throw new ValidationException("Menu name must not be empty");
         }
         if(object.getEntries() == null){

@@ -7,14 +7,11 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.PopOver;
 
-/**
- * Created by phili on 6/18/15.
- */
 public class AlertPopOver extends org.controlsfx.control.PopOver {
 
-    private Button okButton = new Button();
-    private Button cancelButton = new Button();
-    private Label label = new Label();
+    private final Button okButton = new Button();
+    private final Button cancelButton = new Button();
+    private final Label label = new Label();
 
     public AlertPopOver() {
         initLayout();

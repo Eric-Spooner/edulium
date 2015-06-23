@@ -7,7 +7,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -54,11 +53,11 @@ public class EmployeeViewController implements Initializable {
     private FXMLPane userDialogPane;
     private UserDialogController userDialogController;
 
-    private ObservableList<User> users = FXCollections.observableArrayList();
+    private final ObservableList<User> users = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        userDialogController = userDialogPane.getController(UserDialogController.class);
+        userDialogController = userDialogPane.getController();
 
         tableViewEmployee.setItems(users);
         tableViewEmployee.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -80,7 +79,7 @@ public class EmployeeViewController implements Initializable {
     }
 
     @FXML
-    public void buttonEmployeesAddClicked(ActionEvent actionEvent) {
+    public void buttonEmployeesAddClicked() {
         CreateInputDialog<User> userInputDialog = new CreateInputDialog<>("employee");
         userInputDialog.setValidator(userValidator);
         userInputDialog.setContent(userDialogPane);
@@ -102,7 +101,7 @@ public class EmployeeViewController implements Initializable {
     }
 
     @FXML
-    public void buttonEmployeesUpdateClicked(ActionEvent actionEvent) {
+    public void buttonEmployeesUpdateClicked() {
         User selectedUser = tableViewEmployee.getSelectionModel().getSelectedItem();
         if (selectedUser != null) {
             UpdateInputDialog<User> userInputDialog = new UpdateInputDialog<>("employee", selectedUser);
@@ -128,7 +127,7 @@ public class EmployeeViewController implements Initializable {
     }
 
     @FXML
-    public void buttonEmployeesSearchClicked(ActionEvent actionEvent) {
+    public void buttonEmployeesSearchClicked() {
         SearchInputDialog<User> userSearchDialog = new SearchInputDialog<>("employees");
         userSearchDialog.setContent(userDialogPane);
         userSearchDialog.setController(userDialogController);
@@ -148,7 +147,7 @@ public class EmployeeViewController implements Initializable {
     }
 
     @FXML
-    public void buttonEmployeesRemoveClicked(ActionEvent actionEvent) {
+    public void buttonEmployeesRemoveClicked() {
         List<User> selectedUsers = tableViewEmployee.getSelectionModel().getSelectedItems();
         for (User selectedUser : selectedUsers) {
             try {
@@ -167,7 +166,7 @@ public class EmployeeViewController implements Initializable {
     }
 
     @FXML
-    public void buttonClearTipClicked(ActionEvent actionEvent) {
+    public void buttonClearTipClicked() {
         List<User> selectedUsers = tableViewEmployee.getSelectionModel().getSelectedItems();
         List<User> addUsers = new ArrayList<>();
         for (User selectedUser : selectedUsers) {
@@ -192,7 +191,7 @@ public class EmployeeViewController implements Initializable {
     }
 
     @FXML
-    public void buttonEmployeesShowAll(ActionEvent actionEvent) {
+    public void buttonEmployeesShowAll() {
         loadAllUsers();
     }
 

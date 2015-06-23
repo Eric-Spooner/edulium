@@ -19,5 +19,5 @@ public interface InvoiceDAO extends DAO<Invoice> {
      * @throws DAOException if the data couldn't be retrieved
      * @throws ValidationException if the parameters are invalid
      */
-    List<Invoice> findBetween(LocalDateTime from, LocalDateTime to) throws DAOException, ValidationException;
+    List<Invoice> findBetween(LocalDateTime from, LocalDateTime to) throws DAOException;
 }

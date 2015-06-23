@@ -41,9 +41,9 @@ public class StatisticsServiceImpl implements StatisticsService {
             MenuEntry menuEntry = order.getMenuEntry();
             if (occurrences.containsKey(menuEntry)) {
                 Long oldValue = occurrences.get(menuEntry);
-                occurrences.put(menuEntry, new Long(oldValue+1));
+                occurrences.put(menuEntry, oldValue + 1);
             } else {
-                occurrences.put(menuEntry, new Long(1));
+                occurrences.put(menuEntry, (long) 1);
             }
         }
 

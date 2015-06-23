@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -196,7 +196,7 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
      * @throws SQLException If an error, while accessing database results, occurs
      */
     private Instalment parseResult(ResultSet rs) throws DAOException, ValidationException, SQLException {
-        List<Invoice> invoice = invoiceDAO.populate(Arrays.asList(Invoice.withIdentity(rs.getLong("invoice_ID"))));
+        List<Invoice> invoice = invoiceDAO.populate(Collections.singletonList(Invoice.withIdentity(rs.getLong("invoice_ID"))));
         if (invoice.size() != 1) {
             LOGGER.error("Retrieving invoice failed");
             throw new DAOException("Retrieving creator failed");

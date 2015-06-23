@@ -13,9 +13,9 @@ import javax.annotation.Resource;
  */
 class TableValidator implements Validator<Table> {
     @Resource(name = "userValidator")
-    Validator<User> userValidator;
+    private Validator<User> userValidator;
     @Resource(name = "sectionValidator")
-    Validator<Section> sectionValidator;
+    private Validator<Section> sectionValidator;
 
     /**
      * validates the object for the create action

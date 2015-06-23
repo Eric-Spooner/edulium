@@ -2,9 +2,6 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.util;
 
 import javafx.scene.control.TextField;
 
-/**
- * Created by phili on 6/17/15.
- */
 public class NumericTextField extends TextField
 {
 

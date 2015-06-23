@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -22,7 +21,7 @@ public class UpdateTableController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(UpdateTableController.class);
 
     private static Stage thisStage;
-    private static ArrayList<Rect> rects = new ArrayList<Rect>();
+    private static ArrayList<Rect> rects = new ArrayList<>();
     private static Rect clickedRect;
     private static AddSectionController.UpdateCanvas updateAddCanvas;
     private static EditSectionController.UpdateCanvas updateEditCanvas;
@@ -59,22 +58,22 @@ public class UpdateTableController implements Initializable {
         UpdateTableController.updateEditCanvas = updateCanvas;
     }
 
-    public void cancelButtonClicked(ActionEvent actionEvent) {
+    public void cancelButtonClicked() {
         LOGGER.info("Cancel Update Table Button Click");
         thisStage.close();
     }
 
-    public void updateButtonClicked(ActionEvent actionEvent) {
+    public void updateButtonClicked() {
         LOGGER.info("Update Table Button Click");
         try {
             if (numberTF.getText().isEmpty()) {
-                showErrorDialog("Error", "Number missing", "Please insert a number for the table!");
+                showErrorDialog("Number missing", "Please insert a number for the table!");
             } else if (Long.valueOf(numberTF.getText()) < 1) {
-                showErrorDialog("Error", "Number invalid", "The table number must be >= 1!");
+                showErrorDialog("Number invalid", "The table number must be >= 1!");
             } else if (seatsTF.getText().isEmpty()) {
-                showErrorDialog("Error", "Seats missing", "Please insert the number of seats for the table!");
+                showErrorDialog("Seats missing", "Please insert the number of seats for the table!");
             } else if (Integer.valueOf(seatsTF.getText()) < 0) {
-                showErrorDialog("Error", "Seats invalid", "The number of seats must be >= 0!");
+                showErrorDialog("Seats invalid", "The number of seats must be >= 0!");
             } else {
                 //Check if table number is not used in this section
                 for (Rect iteratingRect : rects) {
@@ -95,13 +94,13 @@ public class UpdateTableController implements Initializable {
                 thisStage.close();
             }
         } catch(NumberFormatException e) {
-            showErrorDialog("Error", "Invalid value", "Only valid numbers are allowed!");
+            showErrorDialog("Invalid value", "Only valid numbers are allowed!");
         }
     }
 
-    public static void showErrorDialog(String title, String head, String content) {
+    private static void showErrorDialog(String head, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
+        alert.setTitle("Error");
         alert.setHeaderText(head);
         alert.setContentText(content);
 

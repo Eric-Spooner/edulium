@@ -147,9 +147,7 @@ public class OrderOverviewController implements Initializable {
         queuedOrdersView.setCellFactory(view -> new OrderCell());
         queuedOrdersView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        queuedOrdersView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<Order>) c -> {
-            cancelButton.setDisable(c.getList().isEmpty());
-        });
+        queuedOrdersView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<Order>) c -> cancelButton.setDisable(c.getList().isEmpty()));
     }
 
     private void initializeInProgressOrders() {
@@ -175,9 +173,7 @@ public class OrderOverviewController implements Initializable {
         readyForDeliveryOrdersView.setCellFactory(view -> new OrderCell());
         readyForDeliveryOrdersView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        readyForDeliveryOrdersView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<Order>) c -> {
-            deliverButton.setDisable(c.getList().isEmpty());
-        });
+        readyForDeliveryOrdersView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<Order>) c -> deliverButton.setDisable(c.getList().isEmpty()));
     }
 
     private void initializeDeliveredOrders() {
@@ -223,7 +219,7 @@ public class OrderOverviewController implements Initializable {
     }
 
     private void initializeMoveToTablePopOver() {
-        TableViewController tableViewController = tableViewPane.getController(TableViewController.class);
+        TableViewController tableViewController = tableViewPane.getController();
         tableViewController.setOnTableClicked(table -> {
             try {
                 List<Order> orders = new ArrayList<>(); // TODO maybe replace this by a "merged observable list"
@@ -266,7 +262,7 @@ public class OrderOverviewController implements Initializable {
     }
 
     private void initializeNewOrderPopOver() {
-        OrderInputController orderInputController = orderInputPane.getController(OrderInputController.class);
+        OrderInputController orderInputController = orderInputPane.getController();
         orderInputController.setOnDone(action -> newOrderPopOver.hide());
 
         orderInputPane.setStyle("-fx-padding: 5px;");
@@ -280,7 +276,7 @@ public class OrderOverviewController implements Initializable {
     }
 
     @FXML
-    public void onCancelButtonClicked(ActionEvent actionEvent) {
+    public void onCancelButtonClicked() {
         if (cancelPopOver.isShowing()) {
             cancelPopOver.hide();
         } else {
@@ -289,7 +285,7 @@ public class OrderOverviewController implements Initializable {
     }
 
     @FXML
-    public void onDeliverButtonClicked(ActionEvent actionEvent) {
+    public void onDeliverButtonClicked() {
         try {
             for (Order order : readyForDeliveryOrdersView.getSelectionModel().getSelectedItems()) {
                 orderService.markAsDelivered(order);
@@ -312,7 +308,7 @@ public class OrderOverviewController implements Initializable {
     }
 
     @FXML
-    public void onMoveToTableButtonClicked(ActionEvent actionEvent) {
+    public void onMoveToTableButtonClicked() {
         if (moveToTablePopOver.isShowing()) {
             moveToTablePopOver.hide();
         } else if (!queuedOrdersView.getSelectionModel().getSelectedItems().isEmpty() ||
@@ -324,7 +320,7 @@ public class OrderOverviewController implements Initializable {
     }
 
     @FXML
-    public void onNewOrderButtonClicked(ActionEvent actionEvent) {
+    public void onNewOrderButtonClicked() {
         if (newOrderPopOver.isShowing()) {
             newOrderPopOver.hide();
         } else {
@@ -333,12 +329,12 @@ public class OrderOverviewController implements Initializable {
     }
 
     @FXML
-    public void onClearSelectionButtonClicked(ActionEvent actionEvent) {
+    public void onClearSelectionButtonClicked() {
         clearSelection();
     }
 
     @FXML
-    public void onSelectAllButtonClicked(ActionEvent actionEvent) {
+    public void onSelectAllButtonClicked() {
         queuedOrdersView.getSelectionModel().selectAll();
         inProgressOrdersView.getSelectionModel().selectAll();
         readyForDeliveryOrdersView.getSelectionModel().selectAll();
@@ -346,7 +342,7 @@ public class OrderOverviewController implements Initializable {
     }
 
     @FXML
-    public void onTakeOverButtonButtonClicked(ActionEvent actionEvent) {
+    public void onTakeOverButtonButtonClicked() {
         assert table != null;
 
         User user = getLoggedInUser();
@@ -447,7 +443,7 @@ public class OrderOverviewController implements Initializable {
         });
         deliveredOrders.startPolling();
 
-        OrderInputController orderInputController = orderInputPane.getController(OrderInputController.class);
+        OrderInputController orderInputController = orderInputPane.getController();
         orderInputController.setTable(table);
     }
 

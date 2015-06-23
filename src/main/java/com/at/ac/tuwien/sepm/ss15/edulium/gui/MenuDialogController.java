@@ -7,7 +7,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -62,7 +61,7 @@ public class MenuDialogController implements Initializable, InputDialogControlle
     private TableColumn<MenuEntry, BigDecimal> tableColPriceInMen;
 
     private ObservableList<MenuEntry> allMenuEntries;
-    private ObservableList<MenuEntry> selectedMenuEntries = FXCollections.observableArrayList();
+    private final ObservableList<MenuEntry> selectedMenuEntries = FXCollections.observableArrayList();
 
     private Long identity = null;
 
@@ -74,23 +73,23 @@ public class MenuDialogController implements Initializable, InputDialogControlle
 
 
         // setup table which contains all menuEntries
-        tableColNameData.setCellValueFactory(new PropertyValueFactory<MenuEntry, String>("name"));
+        tableColNameData.setCellValueFactory(new PropertyValueFactory<>("name"));
         tableColCategoryData.setCellValueFactory(p -> {
             // p.getValue() returns the Person instance for a particular TableView row
             return new SimpleStringProperty(p.getValue().getCategory().getName());
         });
-        tableColPriceData.setCellValueFactory(new PropertyValueFactory<MenuEntry, BigDecimal>("price"));
+        tableColPriceData.setCellValueFactory(new PropertyValueFactory<>("price"));
 
         allMenuEntries = FXCollections.observableArrayList(getAllMenuEntries());
         tableViewAll.setItems(allMenuEntries);
 
         // setup table which contains added menuEntries
-        tableColNameInMenu.setCellValueFactory(new PropertyValueFactory<MenuEntry, String>("name"));
+        tableColNameInMenu.setCellValueFactory(new PropertyValueFactory<>("name"));
         tableColCategoryInMen.setCellValueFactory(p -> {
             // p.getValue() returns the Person instance for a particular TableView row
             return new SimpleStringProperty(p.getValue().getCategory().getName());
         });
-        tableColPriceInMen.setCellValueFactory(new PropertyValueFactory<MenuEntry, BigDecimal>("price"));
+        tableColPriceInMen.setCellValueFactory(new PropertyValueFactory<>("price"));
 
         tableViewInMenu.setItems(selectedMenuEntries);
     }
@@ -128,11 +127,11 @@ public class MenuDialogController implements Initializable, InputDialogControlle
     }
 
     @FXML
-    public void buttonAddClick(ActionEvent actionEvent) {
+    public void buttonAddClick() {
         MenuEntry selectedEntry = tableViewAll.getSelectionModel().getSelectedItem();
 
         if(selectedEntry != null) {
-            BigDecimal entryPrice = null;
+            BigDecimal entryPrice;
             try {
                 entryPrice = new BigDecimal(textFieldPrice.getText());
             } catch (NumberFormatException e) {
@@ -153,7 +152,7 @@ public class MenuDialogController implements Initializable, InputDialogControlle
     }
 
     @FXML
-    public void buttonRemoveClick(ActionEvent actionEvent) {
+    public void buttonRemoveClick() {
         MenuEntry selectedEntry = tableViewInMenu.getSelectionModel().getSelectedItem();
         if(selectedEntry != null) {
             selectedMenuEntries.remove(selectedEntry);
@@ -190,7 +189,7 @@ public class MenuDialogController implements Initializable, InputDialogControlle
     }
 
     private MenuEntry getMenuEntryByIdentity(long id) {
-        List<MenuEntry> entries = null;
+        List<MenuEntry> entries;
         try {
             entries = menuService.findMenuEntry(MenuEntry.withIdentity(id));
         } catch (ServiceException e) {

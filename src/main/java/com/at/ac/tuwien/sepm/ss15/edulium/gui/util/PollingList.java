@@ -31,7 +31,7 @@ public class PollingList<E> extends ObservableListBase<E> {
         @Override
         public void run() {
             assert supplier != null;
-            List<E> suppliedElementsList = null;
+            List<E> suppliedElementsList;
 
             try {
                 suppliedElementsList = supplier.get();
@@ -45,30 +45,27 @@ public class PollingList<E> extends ObservableListBase<E> {
             }
             Set<E> suppliedElements = new HashSet<>(suppliedElementsList);
 
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    beginChange();
+            Platform.runLater(() -> {
+                beginChange();
 
-                    // remove elements
-                    for (int index = elements.size() - 1; index >= 0; index--) {
-                        E element = elements.get(index);
+                // remove elements
+                for (int index = elements.size() - 1; index >= 0; index--) {
+                    E element = elements.get(index);
 
-                        if (!suppliedElements.contains(element)) {
-                            nextRemove(index, element);
-                            elements.remove(index);
-                        }
+                    if (!suppliedElements.contains(element)) {
+                        nextRemove(index, element);
+                        elements.remove(index);
                     }
-
-                    // add new elements
-                    suppliedElements.removeAll(elements); // remove all unchanged elements -> items to add
-                    if (!suppliedElements.isEmpty()) {
-                        nextAdd(elements.size(), elements.size() + suppliedElements.size());  // [start index, end index[
-                        elements.addAll(suppliedElements);
-                    }
-
-                    endChange();
                 }
+
+                // add new elements
+                suppliedElements.removeAll(elements); // remove all unchanged elements -> items to add
+                if (!suppliedElements.isEmpty()) {
+                    nextAdd(elements.size(), elements.size() + suppliedElements.size());  // [start index, end index[
+                    elements.addAll(suppliedElements);
+                }
+
+                endChange();
             });
         }
     }
