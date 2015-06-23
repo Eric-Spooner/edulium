@@ -9,10 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 @Controller
@@ -61,6 +59,7 @@ public class EmployeeViewController implements Initializable {
         userDialogController = userDialogPane.getController(UserDialogController.class);
 
         tableViewEmployee.setItems(users);
+        tableViewEmployee.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         employeeId.setCellValueFactory(new PropertyValueFactory<>("identity"));
         employeeName.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -148,11 +147,10 @@ public class EmployeeViewController implements Initializable {
 
     @FXML
     public void buttonEmployeesRemoveClicked(ActionEvent actionEvent) {
-        User selectedUser = tableViewEmployee.getSelectionModel().getSelectedItem();
-        if (selectedUser != null) {
+        List<User> selectedUsers = tableViewEmployee.getSelectionModel().getSelectedItems();
+        for (User selectedUser : selectedUsers) {
             try {
                 userService.deleteUser(selectedUser);
-                users.remove(selectedUser);
             } catch (ValidationException | ServiceException e) {
                 LOGGER.error("Could not delete user " + selectedUser, e);
 
@@ -163,18 +161,18 @@ public class EmployeeViewController implements Initializable {
                 alert.showAndWait();
             }
         }
+        users.removeAll(selectedUsers);
     }
 
     @FXML
     public void buttonClearTipClicked(ActionEvent actionEvent) {
-        User selectedUser = tableViewEmployee.getSelectionModel().getSelectedItem();
-        if (selectedUser != null) {
+        List<User> selectedUsers = tableViewEmployee.getSelectionModel().getSelectedItems();
+        for (User selectedUser : selectedUsers) {
             try {
                 User editedUser = selectedUser.clone();
                 editedUser.setTip(BigDecimal.ZERO);
                 userService.updateUser(editedUser);
 
-                users.remove(selectedUser);
                 users.add(editedUser);
             } catch (ValidationException | ServiceException e) {
                 LOGGER.error("Could not clear tip of user " + selectedUser, e);
@@ -186,6 +184,7 @@ public class EmployeeViewController implements Initializable {
                 alert.showAndWait();
             }
         }
+        users.removeAll(selectedUsers);
     }
 
     @FXML
