@@ -17,6 +17,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -80,6 +81,18 @@ public class OrderOverviewController implements Initializable {
             layout.getChildren().setAll(nameLabel, additionalInformationLabel);
 
             setGraphic(layout);
+
+            addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                final int index = getIndex();
+                if (index >= 0) {
+                    if (getListView().getSelectionModel().isSelected(index)) {
+                        getListView().getSelectionModel().clearSelection(index);
+                    } else {
+                        getListView().getSelectionModel().select(index);
+                    }
+                    event.consume();
+                }
+            });
         }
 
         @Override
