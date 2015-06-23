@@ -471,7 +471,7 @@ public class TestInteriorService extends AbstractServiceTest {
         table1.setSeats(3);
         table1.setColumn(14);
         table1.setRow(5);
-        table1.setNumber((long) 1);
+        table1.setNumber((long) 10);
         table1.setUser(user2);
         table1.setSection(section3);
 
@@ -479,7 +479,7 @@ public class TestInteriorService extends AbstractServiceTest {
         table2.setSeats(13);
         table2.setColumn(14);
         table2.setRow(15);
-        table2.setNumber((long) 1);
+        table2.setNumber((long) 10);
         table2.setUser(user2);
         table2.setSection(section2);
 
@@ -487,7 +487,7 @@ public class TestInteriorService extends AbstractServiceTest {
         table3.setSeats(3);
         table3.setColumn(24);
         table3.setRow(15);
-        table3.setNumber((long) 3);
+        table3.setNumber((long) 30);
         table3.setUser(user3);
         table3.setSection(section3);
 
@@ -497,7 +497,7 @@ public class TestInteriorService extends AbstractServiceTest {
 
         // WHEN
         Table matcher = new Table();
-        matcher.setNumber(1L); // table 1 and table 2
+        matcher.setNumber(10L); // table 1 and table 2
         List<Table> objects = interiorService.findTables(matcher);
         // THEN
         Assert.assertEquals(2, objects.size());
@@ -505,7 +505,7 @@ public class TestInteriorService extends AbstractServiceTest {
         Assert.assertTrue(objects.contains(table2));
 
         // WHEN
-        matcher.setNumber(3L); // table 3
+        matcher.setNumber(30L); // table 3
         objects = interiorService.findTables(matcher);
         // THEN
         Assert.assertEquals(1, objects.size());

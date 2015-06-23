@@ -77,19 +77,29 @@ MERGE INTO Menu(ID,name) KEY(ID) VALUES (4, 'Bananen Menu');
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (4,3,3);
 MERGE INTO MenuAssoc(menu_ID, menuEntry_ID, menuPrice) KEY(menu_ID, menuEntry_ID) VALUES (4,4,0.5);
 
+MERGE INTO Invoice (id, invoiceTime, brutto, user_ID, canceled) KEY(id)
+VALUES(1, TIMESTAMP '2015-01-01 12:00:00', 18.50, 'waiter', false);
+MERGE INTO Invoice (id, invoiceTime, brutto, user_ID, canceled) KEY(id)
+VALUES(2, TIMESTAMP '2015-01-01 12:00:00', 12.75, 'waiter', false);
+MERGE INTO Invoice (id, invoiceTime, brutto, user_ID, canceled) KEY(id)
+VALUES(3, TIMESTAMP '2015-01-02 12:00:00', 48.00, 'waiter', false);
+MERGE INTO Invoice (id, invoiceTime, brutto, user_ID, canceled) KEY(id)
+VALUES(4, TIMESTAMP '2015-01-03 12:00:00', 118.00, 'waiter', false);
+MERGE INTO Invoice (id, invoiceTime, brutto, user_ID, canceled) KEY(id)
+VALUES(5, TIMESTAMP '2015-01-05 12:00:00', 3.50, 'waiter', false);
 
-MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, info,  state)
-KEY (id, table_section, table_number) VALUES (1, 1, 1, 1, 10, 0.01, '', 'QUEUED');
-MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, info, state)
-KEY (id, table_section, table_number) VALUES (2, 1, 1, 2, 10, 0.01, '','QUEUED');
-MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, info, state)
-KEY (id, table_section, table_number) VALUES (3, 1, 1, 3, 10, 0.01, 'Info' , 'IN_PROGRESS');
-MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, info, state)
-KEY (id, table_section, table_number) VALUES (4, 1, 1, 4, 10, 0.01, '','QUEUED');
-MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, info, state)
-KEY (id, table_section, table_number) VALUES (5, 1, 1, 3, 10, 0.01, 'Without salt' , 'READY_FOR_DELIVERY');
-MERGE INTO RestaurantOrder (id, table_section, table_number , menuEntry_ID, brutto, tax, info, state)
-KEY (id, table_section, table_number) VALUES (6, 1, 1, 2, 10, 0.01, '' , 'DELIVERED');
+MERGE INTO RestaurantOrder (id, invoice_id, table_section, table_number , menuEntry_ID, orderTime, brutto, tax, info,  state)
+KEY (id, table_section, table_number) VALUES (1, 1, 1, 1, 1, TIMESTAMP '2015-01-01 12:00:00', 10, 0.01, '', 'QUEUED');
+MERGE INTO RestaurantOrder (id, invoice_id, table_section, table_number , menuEntry_ID, orderTime, brutto, tax, info, state)
+KEY (id, table_section, table_number) VALUES (2, 2, 1, 1, 2, TIMESTAMP '2015-01-01 12:00:00', 10, 0.01, '','QUEUED');
+MERGE INTO RestaurantOrder (id, invoice_id, table_section, table_number , menuEntry_ID, orderTime, brutto, tax, info, state)
+KEY (id, table_section, table_number) VALUES (3, 3, 1, 1, 3, TIMESTAMP '2015-01-02 12:00:00', 10, 0.01, 'Info' , 'IN_PROGRESS');
+MERGE INTO RestaurantOrder (id, invoice_id, table_section, table_number , menuEntry_ID, orderTime, brutto, tax, info, state)
+KEY (id, table_section, table_number) VALUES (4, 4, 1, 1, 4, TIMESTAMP '2015-01-03 12:00:00', 10, 0.01, '','QUEUED');
+MERGE INTO RestaurantOrder (id, invoice_id, table_section, table_number , menuEntry_ID, orderTime, brutto, tax, info, state)
+KEY (id, table_section, table_number) VALUES (5, 5, 1, 1, 3, TIMESTAMP '2015-01-05 12:00:00', 10, 0.01, 'Without salt' , 'READY_FOR_DELIVERY');
+MERGE INTO RestaurantOrder (id, invoice_id, table_section, table_number , menuEntry_ID, orderTime, brutto, tax, info, state)
+KEY (id, table_section, table_number) VALUES (6, 4, 1, 1, 2, TIMESTAMP '2015-01-03 12:00:00', 10, 0.01, '' , 'DELIVERED');
 
 MERGE INTO Reservation(id, reservationTime, name, quantity, duration) KEY(id)
 VALUES(1, TIMESTAMP '2015-01-01 12:00:00', 'peter', 4, 12000000);

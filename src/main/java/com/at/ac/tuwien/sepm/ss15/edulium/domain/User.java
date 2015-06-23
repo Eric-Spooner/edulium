@@ -117,4 +117,14 @@ public class User {
         result = 31 * result + (role != null ? role.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public User clone() {
+        User user = new User();
+        user.setIdentity(identity);
+        user.setName(name);
+        user.setRole(role);
+        user.setTip(tip);
+        return user;
+    }
 }

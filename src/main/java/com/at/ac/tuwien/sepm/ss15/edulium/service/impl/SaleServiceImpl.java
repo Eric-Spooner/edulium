@@ -12,6 +12,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+<<<<<<< HEAD
+=======
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+>>>>>>> remotes/origin/general/gui
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +34,8 @@ class SaleServiceImpl implements SaleService {
     private Validator<IntermittentSale> intermittentSaleValidator;
     @Autowired
     private Validator<OnetimeSale> onetimeSaleValidator;
+    @Autowired
+    private Validator<MenuEntry> menuEntryValidator;
 
     @Override
     public List<Sale> getAllSales() throws ServiceException {
@@ -196,5 +203,33 @@ class SaleServiceImpl implements SaleService {
             LOGGER.error("An Error has occurred in the data access object", e);
             throw new ServiceException("An Error has occurred in the data access object", e);
         }
+    }
+
+    @Override
+    public void applySales(MenuEntry menuEntry) throws ValidationException, ServiceException {
+        LOGGER.debug("Entering applySales with parameter: "+ menuEntry);
+
+        menuEntryValidator.validateForUpdate(menuEntry);
+
+        BigDecimal price = menuEntry.getPrice();
+
+        //Get all sales
+        List<Sale> sales = new ArrayList<>();
+        sales.addAll(getAllIntermittentSales());
+        sales.addAll(getAllOnetimeSales());
+
+        //Look at all sales
+        for (Sale sale : sales) {
+            if (sale.isAt(LocalDateTime.now())) {
+                for (MenuEntry menuEntry1 : sale.getEntries()) {
+                    //If possible, lower the price
+                    if (menuEntry1.getIdentity() == menuEntry.getIdentity()) {
+                        price = price.min(menuEntry1.getPrice());
+                    }
+                }
+            }
+        }
+
+        menuEntry.setPrice(price);
     }
 }
