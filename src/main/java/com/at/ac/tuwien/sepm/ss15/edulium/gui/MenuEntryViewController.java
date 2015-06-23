@@ -178,7 +178,6 @@ public class MenuEntryViewController implements Initializable {
                 editedMenuEntry.setAvailable(true);
                 menuService.updateMenuEntry(editedMenuEntry);
 
-                menuEntries.remove(menuEntry);
                 menuEntries.add(editedMenuEntry);
             } catch (ValidationException | ServiceException e) {
                 LOGGER.error("Could not reset availability of menu entry " + menuEntry, e);
@@ -190,6 +189,7 @@ public class MenuEntryViewController implements Initializable {
                 alert.showAndWait();
             }
         }
+        menuEntries.removeAll(selectedMenuEntries);
     }
 
     @FXML
