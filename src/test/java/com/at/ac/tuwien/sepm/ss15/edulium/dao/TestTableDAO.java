@@ -5,6 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import javafx.scene.control.Tab;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -1110,5 +1111,35 @@ public class TestTableDAO extends AbstractDAOTest {
 
         // WHEN
         List<Table> result = tableDAO.populate(invalidTables);
+    }
+
+    @Test
+    public void testUpdate_setTableUserAndSetUserToNullAgain() throws DAOException, ValidationException {
+        // PREPARE
+        // get test user
+        User user = getCurrentUser();
+
+        // GIVEN
+        // create data
+        Table table1 = new Table();
+        table1.setSeats(3);
+        table1.setColumn(4);
+        table1.setRow(5);
+        table1.setNumber((long) 10);
+        table1.setSection(section1);
+        LocalDateTime createTime = LocalDateTime.now();
+        tableDAO.create(table1);
+
+        //WHEN
+        table1.setUser(user);
+        tableDAO.update(table1);
+        table1.setUser(null);
+        tableDAO.update(table1);
+
+        //THEN
+        List<Table> tables = tableDAO.find(Table.withIdentity(table1.getSection(), table1.getNumber()));
+
+        assertEquals(1, tables.size());
+        assertEquals(null, tables.get(0).getUser());
     }
 }
