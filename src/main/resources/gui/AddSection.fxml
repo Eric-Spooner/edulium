@@ -10,7 +10,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="827.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.AddSectionController">
    <children>
-      <ScrollPane layoutX="14.0" layoutY="14.0" prefHeight="576.0" prefWidth="649.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="164.0" AnchorPane.topAnchor="14.0">
+      <ScrollPane layoutX="14.0" layoutY="14.0" prefHeight="576.0" prefWidth="649.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="164.0" AnchorPane.topAnchor="14.0">
          <content>
             <Canvas fx:id="canvas" height="565.0" width="638.0" />
          </content>
