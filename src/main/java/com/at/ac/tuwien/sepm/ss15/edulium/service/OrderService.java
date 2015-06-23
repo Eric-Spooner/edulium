@@ -7,6 +7,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -58,6 +59,15 @@ public interface OrderService extends Service {
      * @throws ServiceException if an error processing the request ocurred
      */
     List<Order> findOrder(Order template) throws ServiceException;
+
+    /**
+     * returns all orders in the given interval
+     * @param from start of the interval
+     * @param to end of the interval
+     * @throws ServiceException if an error processing the request ocurred
+     * @throws ValidationException if the parameters are invalid
+     */
+    List<Order> findOrderBetween(LocalDateTime from, LocalDateTime to) throws ServiceException, ValidationException;
 
     /**
      * returns all orders from the underlying datasource

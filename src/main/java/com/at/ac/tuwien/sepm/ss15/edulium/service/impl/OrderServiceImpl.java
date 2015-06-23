@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.OrderDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
@@ -16,7 +17,9 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,6 +34,8 @@ class OrderServiceImpl implements OrderService {
     private InvoiceService invoiceService;
     @Resource(name = "orderDAO")
     private DAO<Order> orderDAO;
+    @Resource(name = "orderDAO")
+    private OrderDAO findBetweenOrderDAO;
     @Resource(name = "orderValidator")
     private Validator<Order> orderValidator;
 
@@ -125,6 +130,18 @@ class OrderServiceImpl implements OrderService {
 
         try {
             return orderDAO.find(template);
+        } catch (DAOException e) {
+            LOGGER.error("An Error has occurred in the data access object", e);
+            throw new ServiceException("An Error has occurred in the data access object");
+        }
+    }
+
+    @Override
+    public List<Order> findOrderBetween(LocalDateTime from, LocalDateTime to) throws ServiceException, ValidationException {
+        LOGGER.debug("Entering findOrderBetween with parameters: " + from +", "+ to);
+
+        try {
+            return findBetweenOrderDAO.findBetween(from, to);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
             throw new ServiceException("An Error has occurred in the data access object");

@@ -45,9 +45,10 @@
     <import resource="service/Spring-MenuService.xml"/>
     <import resource="service/Spring-TaxRateService.xml" />
     <import resource="service/Spring-InteriorService.xml" />
-    <import resource="service/Spring-OrderService.xml" />
     <import resource="service/Spring-InvoiceService.xml" />
     <import resource="service/Spring-ReservationService.xml" />
+    <import resource="service/Spring-OrderService.xml" />
+    <import resource="service/Spring-StatisticsService.xml" />
     <import resource="service/Spring-InvoiceManager.xml" />
     <import resource="service/Spring-SaleService.xml" />
 

@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.OrderDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +26,7 @@ import java.util.stream.Collectors;
  * H2 Database Implementation of the Order DAO interface
  */
 @PreAuthorize("isAuthenticated()")
-class DBOrderDAO implements DAO<Order> {
+class DBOrderDAO implements DAO<Order>, OrderDAO {
     private static final Logger LOGGER = LogManager.getLogger(DBOrderDAO.class);
 
     @Resource(name = "dataSource")
@@ -176,6 +178,36 @@ class DBOrderDAO implements DAO<Order> {
         } catch (SQLException e) {
             LOGGER.error("searching for menu entries failed", e);
             throw new DAOException("searching for menu entries failed", e);
+        }
+
+        return objects;
+    }
+
+    @Override
+    public List<Order> findBetween(LocalDateTime from, LocalDateTime to) throws DAOException, ValidationException {
+        LOGGER.debug("entering findBetween with parameters "+from+", "+to);
+
+        final String query = "SELECT * FROM RestaurantOrder WHERE canceled = false" +
+                " AND orderTime >= ISNULL(?, orderTime)" +
+                " AND orderTime <= ISNULL(?, orderTime)";
+
+        final List<Order> objects = new ArrayList<>();
+
+        try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
+            stmt.setObject(1, from != null ? Timestamp.valueOf(from) : null);
+            stmt.setObject(2, to != null ? Timestamp.valueOf(to) : null);
+
+            ResultSet result = stmt.executeQuery();
+            while (result.next()) {
+                try {
+                    objects.add(parseResult(result));
+                } catch (ValidationException e) {
+                    LOGGER.warn("parsing the result '" + result + "' failed", e);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("searching for all entries failed", e);
+            throw new DAOException("searching for all entries failed", e);
         }
 
         return objects;
