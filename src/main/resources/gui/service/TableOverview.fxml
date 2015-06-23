@@ -21,7 +21,7 @@
       </Pane>
    </bottom>
    <center>
-      <SplitPane fx:id="splitPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+      <SplitPane fx:id="splitPane" dividerPositions="0.8" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <items>
             <VBox alignment="TOP_CENTER" spacing="10.0">
                <children>

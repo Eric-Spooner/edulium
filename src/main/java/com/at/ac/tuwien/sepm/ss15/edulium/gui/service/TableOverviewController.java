@@ -13,8 +13,12 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,8 +66,21 @@ public class TableOverviewController implements Initializable {
             }
 
             if(item != null) {
-                setText(item.getSection().getName() + "\nTable: " + item.getNumber());
-                setFont(new Font(25.0));
+
+                Label sectionLabel = new Label();
+                sectionLabel.setFont(new Font(20.0));
+                sectionLabel.setText(item.getSection().getName());
+
+                Label tableLabel = new Label();
+                tableLabel.setFont(new Font(20.0));
+                tableLabel.setText("Table: " + item.getNumber());
+
+                HBox hBox = new HBox(20.0);
+                hBox.setAlignment(Pos.CENTER);
+                hBox.setPadding(new Insets(10.0, 10.0, 10.0, 10.0));
+                hBox.getChildren().addAll(sectionLabel, tableLabel);
+
+                setGraphic(hBox);
             }
         }
     }
