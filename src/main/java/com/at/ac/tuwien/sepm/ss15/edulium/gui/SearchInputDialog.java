@@ -1,5 +1,7 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+
 public class SearchInputDialog<Domain> extends InputDialog<Domain> {
 
     public SearchInputDialog(String domainName) {
@@ -14,5 +16,10 @@ public class SearchInputDialog<Domain> extends InputDialog<Domain> {
         controller.prepareForSearch();
 
         super.setController(controller);
+    }
+
+    @Override
+    protected void validate(Domain domainObject) throws ValidationException {
+
     }
 }

@@ -91,7 +91,6 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         MenuCategory cat = new MenuCategory();
         Long identity = (long) 1;
         cat.setIdentity(identity);
-        cat.setName("cat");
 
         // generate identity which is not used by any persistent object
         try {
@@ -103,6 +102,8 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
             // exception should not occur here
             fail();
         }
+
+        cat.setName("new");
 
         // WHEN
         menuCategoryDAO.update(cat);
@@ -126,7 +127,6 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         // THEN
         // check if category was removed
         assertTrue(menuCategoryDAO.find(MenuCategory.withIdentity(cat.getIdentity())).isEmpty());
-        assertTrue(menuCategoryDAO.getAll().isEmpty());
     }
 
     @Test(expected = ValidationException.class)
@@ -245,14 +245,10 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
     }
 
     @Test
-    public void testGetAll_shouldReturnEmptyList() throws DAOException {
-        // WHEN / THEN
-        assertTrue(menuCategoryDAO.getAll().isEmpty());
-    }
-
-    @Test
     public void testGetAll_shouldReturnObjects() throws DAOException, ValidationException {
         // GIVEN
+        int sizeBefore = menuCategoryDAO.getAll().size();
+
         MenuCategory cat1 = new MenuCategory();
         MenuCategory cat2 = new MenuCategory();
         MenuCategory cat3 = new MenuCategory();
@@ -267,7 +263,7 @@ public class TestMenuCategoryDAO extends AbstractDAOTest {
         List<MenuCategory> objects = menuCategoryDAO.getAll();
 
         // THEN
-        assertEquals(3, objects.size());
+        assertEquals(sizeBefore +  3, objects.size());
         assertTrue(objects.contains(cat1));
         assertTrue(objects.contains(cat2));
         assertTrue(objects.contains(cat3));

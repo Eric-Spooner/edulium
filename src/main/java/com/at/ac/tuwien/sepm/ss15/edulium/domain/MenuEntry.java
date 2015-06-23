@@ -172,4 +172,17 @@ public class MenuEntry {
         result = 31 * result + (category != null ? category.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public MenuEntry clone() {
+        MenuEntry menuEntry = new MenuEntry();
+        menuEntry.setIdentity(identity);
+        menuEntry.setPrice(price);
+        menuEntry.setTaxRate(taxRate);
+        menuEntry.setCategory(category);
+        menuEntry.setAvailable(available);
+        menuEntry.setDescription(description);
+        menuEntry.setName(name);
+        return menuEntry;
+    }
 }

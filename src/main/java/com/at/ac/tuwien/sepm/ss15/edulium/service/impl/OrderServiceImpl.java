@@ -3,17 +3,24 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.OrderDAO;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.SaleService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
+
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,11 +28,15 @@ import java.util.List;
  */
 class OrderServiceImpl implements OrderService {
     private static final Logger LOGGER = LogManager.getLogger(TaxRateServiceImpl.class);
-    @Autowired
+    @Resource(name = "saleService")
+    private SaleService saleService;
+    @Resource(name = "invoiceService")
+    private InvoiceService invoiceService;
+    @Resource(name = "orderDAO")
     private DAO<Order> orderDAO;
-    @Autowired
+    @Resource(name = "orderDAO")
     private OrderDAO findBetweenOrderDAO;
-    @Autowired
+    @Resource(name = "orderValidator")
     private Validator<Order> orderValidator;
 
 
@@ -36,6 +47,10 @@ class OrderServiceImpl implements OrderService {
         orderValidator.validateForCreate(order);
 
         try {
+            //Check if a sale is active and let the price be updated
+            MenuEntry entry = order.getMenuEntry();
+            saleService.applySales(entry);
+            //Create the order with the updated price
             orderDAO.create(order);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
@@ -57,7 +72,9 @@ class OrderServiceImpl implements OrderService {
         }else {
             Order preOrder = preOrders.get(0);
             //if the order already had an invoice it is not allowed to be changed
-            if(false){ //TODO: ! Invoice.find(invoice with order).isEmpty()
+            Invoice invoice = new Invoice();
+            invoice.setOrders(Arrays.asList(order));
+            if(invoiceService.findInvoices(invoice).size()>0){
                 LOGGER.error("It is not allowed to change an order with invoice");
                 throw new ServiceException("It is not allowed to change an order with invoice");
             }
@@ -78,7 +95,6 @@ class OrderServiceImpl implements OrderService {
                     throw new ServiceException("It is not allowed to change the time of the order");
                 }
             }
-
             try {
                 orderDAO.update(order);
             } catch (DAOException e) {
@@ -155,6 +171,17 @@ class OrderServiceImpl implements OrderService {
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
             throw new ServiceException("An Error has occurred in the data access object");
+        }
+    }
+
+    @Override
+    public User getOrderSubmitter(Order order) throws ServiceException, ValidationException {
+        orderValidator.validateIdentity(order);
+        if(this.getOrderHistory(order).size()>0) {
+            History<Order> history = this.getOrderHistory(order).get(0);
+            return history.getUser();
+        }else{
+            throw new ServiceException("THere should be at least one History entry for the order");
         }
     }
 

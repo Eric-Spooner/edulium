@@ -49,12 +49,14 @@
     <import resource="service/Spring-ReservationService.xml" />
     <import resource="service/Spring-OrderService.xml" />
     <import resource="service/Spring-StatisticsService.xml" />
+    <import resource="service/Spring-InvoiceManager.xml" />
     <import resource="service/Spring-SaleService.xml" />
 
     <!-- GUI beans -->
     <import resource="gui/Spring-LoginPane.xml" />
     <import resource="gui/Spring-MainWindowPane.xml" />
     <import resource="gui/cook/Spring-CookViewPane.xml" />
+    <import resource="gui/manager/Spring-TaxRateDialogPane.xml" />
     <import resource="gui/manager/Spring-MenuCategoryDialogPane.xml" />
     <import resource="gui/manager/Spring-MenuEntryDialogPane.xml" />
     <import resource="gui/manager/Spring-UserDialogs.xml" />
@@ -78,6 +80,5 @@
     <import resource="gui/service/Spring-MenuEntryOverviewPane.xml" />
     <import resource="gui/service/Spring-MenuOverviewPane.xml" />
     <import resource="gui/service/Spring-MenuDetailsPane.xml" />
-
 
 </beans>
