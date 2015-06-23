@@ -12,7 +12,6 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         ApplicationContext context = new ClassPathXmlApplicationContext("spring/Spring-Edulium.xml");
-        FXMLPane.setApplicationContext(context);
 
         FXMLPane mainWindowPane = context.getBean("mainWindowPane", FXMLPane.class);
         primaryStage.setScene(new Scene(mainWindowPane));

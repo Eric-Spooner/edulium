@@ -7,7 +7,7 @@
     <bean id="tableViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.service.TableViewController" scope="prototype" />
 
     <bean id="tableViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/service/TableView.fxml" />
+        <property name="FXML" value="gui/service/TableView.fxml" />
     </bean>
 
 </beans>

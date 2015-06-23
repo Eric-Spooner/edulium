@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Controller;
@@ -16,7 +17,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 @Controller
-public class MainWindowController implements Initializable, ApplicationContextAware {
+public class MainWindowController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(MainWindowController.class);
 
     private enum ScreenType {
@@ -35,8 +36,8 @@ public class MainWindowController implements Initializable, ApplicationContextAw
 
     @Resource(name = "loginPane")
     private FXMLPane loginPane;
-
-    private ApplicationContext applicationContext;
+    @Autowired
+    private ApplicationContext context;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -85,27 +86,22 @@ public class MainWindowController implements Initializable, ApplicationContextAw
         switch (screenType) {
             case ManagerScreen:
                 // create a new manager view for every session
-                FXMLPane managerViewPane = applicationContext.getBean("managerViewPane", FXMLPane.class);
+                FXMLPane managerViewPane = context.getBean("managerViewPane", FXMLPane.class);
                 borderPane.setCenter(managerViewPane);
                 break;
             case CookScreen:
                 // create a new cook view for every session
-                FXMLPane cookViewPane = applicationContext.getBean("cookViewPane", FXMLPane.class);
+                FXMLPane cookViewPane = context.getBean("cookViewPane", FXMLPane.class);
                 borderPane.setCenter(cookViewPane);
                 break;
             case ServiceScreen:
                 // create a new service view for every session
-                FXMLPane serviceViewPane = applicationContext.getBean("serviceViewPane", FXMLPane.class);
+                FXMLPane serviceViewPane = context.getBean("serviceViewPane", FXMLPane.class);
                 borderPane.setCenter(serviceViewPane);
                 break;
             case LoginScreen:
             default:
                 borderPane.setCenter(loginPane);
         }
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
     }
 }

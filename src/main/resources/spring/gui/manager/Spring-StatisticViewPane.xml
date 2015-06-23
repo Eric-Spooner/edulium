@@ -7,7 +7,7 @@
     <bean id="statisticViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.StatisticViewController" scope="prototype" />
 
     <bean id="statisticViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/StatisticView.fxml" />
+        <property name="FXML" value="gui/StatisticView.fxml" />
     </bean>
 
 </beans>

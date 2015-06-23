@@ -7,7 +7,7 @@
     <bean id="salesDialogController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.DialogSaleController" scope="prototype" />
 
     <bean id="salesDialogPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/DialogSale.fxml" />
+        <property name="FXML" value="gui/DialogSale.fxml" />
     </bean>
 
 </beans>

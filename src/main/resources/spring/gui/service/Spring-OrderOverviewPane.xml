@@ -7,7 +7,7 @@
     <bean id="orderOverviewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.service.OrderOverviewController" scope="prototype" />
 
     <bean id="orderOverviewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/service/OrderOverview.fxml" />
+        <property name="FXML" value="gui/service/OrderOverview.fxml" />
     </bean>
 
 </beans>
