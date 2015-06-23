@@ -1,5 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
@@ -7,9 +8,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.AlertPopOver;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
 import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -21,15 +20,14 @@ import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.PopOver;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -64,6 +62,8 @@ public class OrderOverviewController implements Initializable {
     private Button takeOverButton;
     @FXML
     private Label headerLabel;
+    @FXML
+    private Button payButton;
 
     private class OrderCell extends ListCell<Order> {
         private final Label nameLabel;
@@ -102,6 +102,10 @@ public class OrderOverviewController implements Initializable {
 
     @Resource(name = "orderService")
     private OrderService orderService;
+    @Resource(name = "invoiceService")
+    private InvoiceService invoiceService;
+    @Resource(name = "invoiceManager")
+    private InvoiceManager invoiceManager;
     @Resource(name = "interiorService")
     private InteriorService interiorService;
     @Resource(name = "taskScheduler")
@@ -331,6 +335,34 @@ public class OrderOverviewController implements Initializable {
             newOrderPopOver.hide();
         } else {
             newOrderPopOver.show(newOrderButton);
+        }
+    }
+
+    @FXML
+    public void onPayButtonClicked(ActionEvent actionEvent) {
+        List<Order> orders = new ArrayList<>();
+        orders.addAll(queuedOrdersView.getSelectionModel().getSelectedItems());
+        orders.addAll(inProgressOrdersView.getSelectionModel().getSelectedItems());
+        orders.addAll(readyForDeliveryOrdersView.getSelectionModel().getSelectedItems());
+        orders.addAll(deliveredOrdersView.getSelectionModel().getSelectedItems());
+
+        Invoice invoice = new Invoice();
+        invoice.setOrders(orders);
+        invoice.setTime(LocalDateTime.now());
+        invoice.setCreator(getLoggedInUser());
+
+        try {
+            invoiceService.addInvoice(invoice);
+        } catch (ServiceException e) {
+            e.printStackTrace(); // TODO: handle exception
+        } catch (ValidationException e) {
+            e.printStackTrace(); // TODO: handle exception
+        }
+
+        try {
+            invoiceManager.manageInvoice(invoice);
+        } catch (ServiceException e) {
+            e.printStackTrace(); // TODO: handle exception
         }
     }
 
