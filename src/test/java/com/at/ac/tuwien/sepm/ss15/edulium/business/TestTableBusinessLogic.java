@@ -1,13 +1,11 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.business;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
 import javafx.scene.control.Tab;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +13,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -32,6 +31,8 @@ public class TestTableBusinessLogic extends AbstractBusinessLogicTest {
     private TableBusinessLogic tableBusinessLogic;
     @Autowired
     private MenuService menuService;
+    @Autowired
+    private InvoiceService invoiceService;
 
     private Order createOrder(BigDecimal value, String additionalInformation,
                               BigDecimal taxRate, LocalDateTime time, Order.State state, int MenuEntryID) throws ServiceException{
@@ -80,7 +81,40 @@ public class TestTableBusinessLogic extends AbstractBusinessLogicTest {
     }
 
     @Test
-    public void testPaidOrderFromTable_ShouldSetTableUserToNull(){
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
+    public void testPaidOrderFromTable_ShouldSetTableUserToNull() throws ValidationException, ServiceException{
+        //Prepare
+        Order order = createOrder(BigDecimal.valueOf(500), "Order Information", BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.QUEUED, 1);
+        orderService.addOrder(order);
+        Section section = new Section();
+        section.setName("New Section");
+        interiorService.addSection(section);
+        Table table = new Table();
+        table.setColumn(100);
+        table.setRow(100);
+        table.setSeats(5);
+        table.setSection(section);
+        table.setNumber(50L);
+        interiorService.addTable(table);
+        order.setTable(table);
+        orderService.updateOrder(order);
+        tableBusinessLogic.addedOrderToTable(table,order);
 
+        Invoice invoice = new Invoice();
+        invoice.setOrders(Arrays.asList(order));
+        invoice.setCreator(orderService.getOrderSubmitter(order));
+        invoice.setGross(order.getBrutto());
+        invoice.setTime(LocalDateTime.now());
+        invoiceService.addInvoice(invoice);
+
+        //WHEN
+        tableBusinessLogic.paidOrderFromTable(table);
+
+        //THEN
+        List<Table> results = interiorService.findTables(Table.withIdentity(section, table.getNumber()));
+
+        assertEquals(1, results.size());
+        assertEquals(null, results.get(0).getUser());
     }
 }

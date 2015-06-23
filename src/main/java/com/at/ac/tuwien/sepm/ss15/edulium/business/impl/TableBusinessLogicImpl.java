@@ -1,14 +1,17 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.business.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.business.TableBusinessLogic;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -19,6 +22,8 @@ class TableBusinessLogicImpl implements TableBusinessLogic {
     private OrderService orderService;
     @Resource(name = "interiorService")
     private InteriorService interiorService;
+    @Resource(name = "invoiceService")
+    private InvoiceService invoiceService;
 
     @Override
     public void addedOrderToTable(Table table, Order order) throws ServiceException, ValidationException{
@@ -51,7 +56,9 @@ class TableBusinessLogicImpl implements TableBusinessLogic {
             return true;
         }else {
             for(Order order:orderList){
-                if(!order.getState().equals(Order.State.PAID)){
+                Invoice invTemplate = new Invoice();
+                invTemplate.setOrders(Arrays.asList(order));
+                if(invoiceService.findInvoices(invTemplate).isEmpty()){
                     return false;
                 }
             }

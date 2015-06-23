@@ -20,8 +20,7 @@ public class Order {
         QUEUED,
         IN_PROGRESS,
         READY_FOR_DELIVERY,
-        DELIVERED,
-        PAID
+        DELIVERED
     }
 
     /**
