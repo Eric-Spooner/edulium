@@ -132,7 +132,7 @@ public class TestUserService extends AbstractServiceTest {
         user.setIdentity("cook1");
         user.setRole("ROLE_SERVICE"); // change cook to service
 
-        Mockito.when(userDAO.find(user)).thenReturn(Arrays.asList(cookUser));
+        Mockito.when(userDAO.find(User.withIdentity(user.getIdentity()))).thenReturn(Arrays.asList(cookUser));
         Mockito.when(userDAO.find(cookRoleMatcher)).thenReturn(Arrays.asList(cookUser));
 
         // WHEN
@@ -151,7 +151,7 @@ public class TestUserService extends AbstractServiceTest {
         user.setIdentity("manager1");
         user.setRole("ROLE_SERVICE"); // change manager to service
 
-        Mockito.when(userDAO.find(user)).thenReturn(Arrays.asList(managerUser));
+        Mockito.when(userDAO.find(User.withIdentity(user.getIdentity()))).thenReturn(Arrays.asList(managerUser));
         Mockito.when(userDAO.find(managerRoleMatcher)).thenReturn(Arrays.asList(managerUser));
 
         // WHEN
@@ -222,7 +222,7 @@ public class TestUserService extends AbstractServiceTest {
         user.setRole("ROLE_SERVICE"); // change cook to service to simulate wrong role input (only identity must be valid
                                       // for delete but real role of the user must be checked)
 
-        Mockito.when(userDAO.find(user)).thenReturn(Arrays.asList(cookUser));
+        Mockito.when(userDAO.find(User.withIdentity(user.getIdentity()))).thenReturn(Arrays.asList(cookUser));
         Mockito.when(userDAO.find(cookRoleMatcher)).thenReturn(Arrays.asList(cookUser));
 
         // WHEN
@@ -241,7 +241,7 @@ public class TestUserService extends AbstractServiceTest {
         user.setRole("ROLE_SERVICE"); // change manager to service to simulate wrong role input (only identity must be valid
                                       // for delete but real role of the user must be checked)
 
-        Mockito.when(userDAO.find(user)).thenReturn(Arrays.asList(managerUser));
+        Mockito.when(userDAO.find(User.withIdentity(user.getIdentity()))).thenReturn(Arrays.asList(managerUser));
         Mockito.when(userDAO.find(managerRoleMatcher)).thenReturn(Arrays.asList(managerUser));
 
         // WHEN
