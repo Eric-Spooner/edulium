@@ -1,5 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.business.TableBusinessLogic;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.ImmutableDAO;
@@ -39,6 +40,9 @@ class InvoiceServiceImpl implements InvoiceService {
     @Resource(name = "instalmentValidator")
     private ImmutableValidator<Instalment> instalmentValidator;
 
+    @Resource(name = "tableBusinessLogic")
+    private TableBusinessLogic tableBusinessLogic;
+
     @Override
     public void addInvoice(Invoice invoice) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addInvoice with parameters: " + invoice);
@@ -47,6 +51,8 @@ class InvoiceServiceImpl implements InvoiceService {
 
         try {
             invoiceDAO.create(invoice);
+
+            tableBusinessLogic.paidOrder(invoice.getOrders().get(0));
         } catch (DAOException e) {
             throw new ServiceException("Could not add invoice", e);
         }
