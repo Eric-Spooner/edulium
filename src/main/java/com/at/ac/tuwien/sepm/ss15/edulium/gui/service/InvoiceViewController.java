@@ -53,6 +53,7 @@ public class InvoiceViewController  implements Initializable {
     private OrderService orderService;
 
     private PollingList<Order> allOrders;
+    private PollingList<Invoice> allInvoices;
 
     private class OrderCell extends ListCell<Order> {
         private final Label nameLabel;
@@ -114,7 +115,7 @@ public class InvoiceViewController  implements Initializable {
                 increaseAmountButton.setDisable(available.equals(0));
                 decreaseAmountButton.setDisable(amount.equals(0));
 
-                nameLabel.setText(group.getMenuEntry().getName());
+                nameLabel.setText(group.getMenuEntry().getName());setText(group.getMenuEntry().getName());
                 additionalInformationLabel.setText(group.getAdditionalInformation());
                 amountLabel.setText(amount.toString());
                 availableLabel.setText("(" + available.toString() + ")");
@@ -123,6 +124,26 @@ public class InvoiceViewController  implements Initializable {
             } else {
                 layout.setVisible(false);
             }
+        }
+    }
+
+    private class InvoiceCell extends ListCell<Invoice> {
+        private final Label nameLabel;
+        private final Label grossLabel;
+
+        public InvoiceCell() {
+            nameLabel = new Label();
+            grossLabel = new Label();
+        }
+
+        @Override
+        protected void updateItem(Invoice item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (item == null)
+                return;
+            nameLabel.setText("" + item.getIdentity());
+            grossLabel.setText("" + item.getGross());
         }
     }
 
@@ -135,8 +156,22 @@ public class InvoiceViewController  implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         initializeAllOrders();
         initializeOrdersView();
+        initializeAllInvoices();
+        initializeInvoiceView();
 
         reset();
+    }
+
+    private void initializeAllInvoices() {
+        allInvoices = new PollingList<>(taskScheduler);
+        allInvoices.setInterval(1000);
+    }
+
+    private void initializeInvoiceView() {
+//        SortedList<Invoice> sortedInvoices = new SortedList<Invoice>(allInvoices);
+        invoiceView.setCellFactory(view -> new InvoiceCell());
+        invoiceView.setItems(allInvoices);
+        invoiceView.setStyle("-fx-font-size: 18px;");
     }
 
     @FXML
@@ -172,6 +207,7 @@ public class InvoiceViewController  implements Initializable {
         manageInvoice(invoice);
 
         allOrders.immediateUpdate();
+        allInvoices.immediateUpdate();
     }
 
     private void manageInvoice(Invoice invoice) {
@@ -312,6 +348,7 @@ public class InvoiceViewController  implements Initializable {
         this.table = table;
 
         allOrders.stopPolling();
+        allInvoices.stopPolling();
 
         allOrders.setSupplier(() -> {
             try {
@@ -332,9 +369,23 @@ public class InvoiceViewController  implements Initializable {
             }
         });
 
+        allInvoices.setSupplier(() -> {
+            try {
+                Order orderMatcher = new Order();
+                orderMatcher.setTable(table);
+                List<Order> orderListMatcher = orderService.findOrder(orderMatcher);
+                Invoice invoiceMatcher = new Invoice();
+                invoiceMatcher.setOrders(orderListMatcher);
+                return invoiceService.findInvoices(invoiceMatcher);
+            } catch (ServiceException e) {
+                return null;
+            }
+        });
+
         reset();
 
         allOrders.startPolling();
+        allInvoices.startPolling();
     }
 
     private void reset() {
