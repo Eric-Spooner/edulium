@@ -23,6 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.PopOver;
 import org.controlsfx.control.SegmentedButton;
 import org.springframework.stereotype.Controller;
 
@@ -167,23 +168,7 @@ public class OrderInputController  implements Initializable {
             headerLabel.setText(menu.getName());
         });
 
-        menuEntryOverviewController.setOnMenuEntryClicked(menuEntry -> {
-            Order order = new Order();
-            order.setMenuEntry(menuEntry);
-            order.setAdditionalInformation("blablabla");
-
-            orders.compute(new OrderSingleMenuEntry(order), (key, amount) -> (amount == null) ? 1 : amount + 1);
-        });
-
-        menuEntryOverviewController.setOnMenuEntryLongPressed(menuEntry -> {
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Additional Info");
-            dialog.setHeaderText("Enter Additional Info");
-
-            Order order = new Order();
-            order.setMenuEntry(menuEntry);
-            dialog.showAndWait().ifPresent(info -> order.setAdditionalInformation(info));
-
+        menuEntryOverviewController.setOnMenuEntryClicked(order -> {
             orders.compute(new OrderSingleMenuEntry(order), (key, amount) -> (amount == null) ? 1 : amount + 1);
         });
 
