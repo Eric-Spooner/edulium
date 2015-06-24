@@ -189,8 +189,8 @@ public class MenuDetailsController implements Initializable {
         vBox.getChildren().addAll(textField, okButton);
 
         popOver.setContentNode(vBox);
-        popOver.setAutoHide(false);
-        popOver.setHideOnEscape(false);
+        popOver.setAutoHide(true);
+        popOver.setHideOnEscape(true);
 
         popOver.show(button);
     }
