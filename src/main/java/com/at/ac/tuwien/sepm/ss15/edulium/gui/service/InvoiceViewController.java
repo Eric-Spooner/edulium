@@ -169,19 +169,26 @@ public class InvoiceViewController  implements Initializable {
             return;
         }
 
+        manageInvoice(invoice);
+
         allOrders.immediateUpdate();
     }
 
-    private void handleInvoiceWithPaymentTypeAndAdditionalInfo(String type, String additionalInfo) {
+    private void manageInvoice(Invoice invoice) {
+        try {
+            invoiceManager.manageInvoice(invoice);
+        } catch (ServiceException e) {
+            LOGGER.error("An error occurred while trying to manage the invoice", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Invoice manager failure");
+            alert.setHeaderText("The invoice manager failed unexpectedly");
+            alert.setContentText(e.toString());
 
-        LocalDateTime creationTime = LocalDateTime.now();
+            alert.showAndWait();
+        }
+    }
 
-        Instalment instalment = new Instalment();
-        instalment.setInvoice(null); // TODO
-        instalment.setType(type);
-        instalment.setPaymentInfo(additionalInfo);
-        instalment.setTime(creationTime);
-
+    private void addInstalment(Instalment instalment) {
         try {
             invoiceService.addInstalment(instalment);
         } catch (ServiceException e) {
@@ -203,18 +210,6 @@ public class InvoiceViewController  implements Initializable {
 
             alert.showAndWait();
             return;
-        }
-
-        try {
-            invoiceManager.manageInvoice(null); // TODO
-        } catch (ServiceException e) {
-            LOGGER.error("An error occurred while trying to manage the invoice", e);
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Invoice manager failure");
-            alert.setHeaderText("The invoice manager failed unexpectedly");
-            alert.setContentText(e.toString());
-
-            alert.showAndWait();
         }
     }
 
