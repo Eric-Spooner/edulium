@@ -1,5 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.business.TableBusinessLogic;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
@@ -115,6 +116,8 @@ public class OrderOverviewController implements Initializable {
     private OrderService orderService;
     @Resource(name = "interiorService")
     private InteriorService interiorService;
+    @Resource(name = "tableBusinessLogic")
+    private TableBusinessLogic tableBusinessLogic;
     @Resource(name = "taskScheduler")
     private TaskScheduler taskScheduler;
 
@@ -213,6 +216,8 @@ public class OrderOverviewController implements Initializable {
                     orderService.cancelOrder(order);
                 }
 
+                tableBusinessLogic.removedOrderFromTable(table);
+
                 queuedOrdersView.getSelectionModel().clearSelection();
             } catch (ValidationException | ServiceException e) {
                 LOGGER.error("Cancel orders did not work", e);
@@ -233,7 +238,7 @@ public class OrderOverviewController implements Initializable {
 
     private void initializeMoveToTablePopOver() {
         TableViewController tableViewController = tableViewPane.getController();
-        tableViewController.setOnTableClicked(table -> {
+        tableViewController.setOnTableClicked(newTable -> {
             try {
                 List<Order> orders = new ArrayList<>(); // TODO maybe replace this by a "merged observable list"
                 orders.addAll(queuedOrdersView.getSelectionModel().getSelectedItems());
@@ -242,9 +247,11 @@ public class OrderOverviewController implements Initializable {
                 orders.addAll(deliveredOrdersView.getSelectionModel().getSelectedItems());
 
                 for (Order order : orders) {
-                    order.setTable(table);
+                    order.setTable(newTable);
                     orderService.updateOrder(order);
                 }
+
+                tableBusinessLogic.movedOrders(table, newTable, orders);
 
                 clearSelection();
             } catch (ValidationException | ServiceException e) {
