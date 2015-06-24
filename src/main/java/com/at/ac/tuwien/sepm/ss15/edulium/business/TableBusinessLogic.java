@@ -7,6 +7,8 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.scene.control.Tab;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.util.List;
+
 /**
  * Interface for Automatic Table assignment
  */
@@ -30,4 +32,18 @@ public interface TableBusinessLogic extends BusinessLogic {
      */
     @PreAuthorize("hasRole('SERVICE')")
     public void paidOrderFromTable(Table table) throws ServiceException, ValidationException;
+
+    /**
+     *  Function is used to set the Table User new, if orders are beeing moved
+     *  if there are open orders left on the tableOld, the user will not be changed
+     *  If there are no open orders left on the tableOld, the user will be set to null
+     *  If there are open orders on the new table the user of the new table will not be changed
+     *  if there are no open orders on the new table the user of the new table will be set to the
+     *  user on the old table
+     * @param tableOld the table, the orders are now
+     * @param tableNew the table, the orders should move to
+     * @param ordersToMove the orders, which should be moved from old to new
+     */
+    @PreAuthorize("hasRole('SERVICE')")
+    public void moveOrders(Table tableOld, Table tableNew, List<Order> ordersToMove) throws ServiceException, ValidationException;
 }

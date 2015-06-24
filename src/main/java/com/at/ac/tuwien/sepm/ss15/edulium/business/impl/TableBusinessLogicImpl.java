@@ -27,7 +27,7 @@ class TableBusinessLogicImpl implements TableBusinessLogic {
 
     @Override
     public void addedOrderToTable(Table table, Order order) throws ServiceException, ValidationException{
-        if(table.getUser() == null || checkIfEveryOrderIsPaid(table)) {
+        if(table.getUser() == null || checkIfNoOpenOrdersOnTable(table)) {
             table.setUser(orderService.getOrderSubmitter(order));
             interiorService.updateTable(table);
         }
@@ -35,9 +35,25 @@ class TableBusinessLogicImpl implements TableBusinessLogic {
 
     @Override
     public void paidOrderFromTable(Table table) throws ServiceException, ValidationException{
-        if(checkIfEveryOrderIsPaid(table)){
+        if(checkIfNoOpenOrdersOnTable(table)){
             table.setUser(null);
             interiorService.updateTable(table);
+        }
+    }
+
+    @Override
+    public void moveOrders(Table tableOld, Table tableNew, List<Order> ordersToMove) throws ServiceException, ValidationException{
+        if(checkIfNoOpenOrdersOnTable(tableNew)){
+            tableNew.setUser(tableOld.getUser());
+            interiorService.updateTable(tableNew);
+        }
+        Order template = new Order();
+        template.setTable(tableOld);
+        List<Order> orderList = orderService.findOrder(template);
+        ordersToMove.forEach(order -> orderList.remove(order));
+        if(checkIfEveryOrderIsPaid(orderList)){
+            tableOld.setUser(null);
+            interiorService.updateTable(tableOld);
         }
     }
 
@@ -48,21 +64,29 @@ class TableBusinessLogicImpl implements TableBusinessLogic {
      *         false... if there are not paid orders on the table
      * @throws ServiceException
      */
-    private boolean checkIfEveryOrderIsPaid(Table table) throws ServiceException{
+    private boolean checkIfNoOpenOrdersOnTable(Table table) throws ServiceException{
         Order template = new Order();
         template.setTable(table);
         List<Order> orderList = orderService.findOrder(template);
-        if(orderList.isEmpty()){
-            return true;
-        }else {
-            for(Order order:orderList){
-                Invoice invTemplate = new Invoice();
-                invTemplate.setOrders(Arrays.asList(order));
-                if(invoiceService.findInvoices(invTemplate).isEmpty()){
-                    return false;
-                }
-            }
-            return true;
-        }
+        return checkIfEveryOrderIsPaid(orderList);
     }
+
+    /**
+     * This function is used, to check if the given orders have been paid already
+     * @param orders
+     * @return false, if there is one ore more open orders
+     *         true, if every order has an invoice
+     */
+    private boolean checkIfEveryOrderIsPaid(List<Order> orders) throws ServiceException{
+        for(Order order:orders){
+            Invoice invTemplate = new Invoice();
+            invTemplate.setOrders(Arrays.asList(order));
+            if(invoiceService.findInvoices(invTemplate).isEmpty()){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
 }

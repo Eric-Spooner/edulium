@@ -45,7 +45,6 @@ public class TestTableBusinessLogic extends AbstractBusinessLogicTest {
         order.setAdditionalInformation(additionalInformation);
         order.setTime(time);
         order.setState(state);
-
         return order;
     }
 
@@ -116,5 +115,95 @@ public class TestTableBusinessLogic extends AbstractBusinessLogicTest {
 
         assertEquals(1, results.size());
         assertEquals(null, results.get(0).getUser());
+    }
+
+    @Test
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
+    public void testMoveOrders_NewTableShouldGetOldUserOldTableUserShouldBeNull() throws ValidationException, ServiceException{
+        //Prepare
+        Order order = createOrder(BigDecimal.valueOf(500), "Order Information", BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.QUEUED, 1);
+        orderService.addOrder(order);
+        Section section = new Section();
+        section.setName("New Section");
+        interiorService.addSection(section);
+        Table tableOld = new Table();
+        tableOld.setColumn(100);
+        tableOld.setRow(100);
+        tableOld.setSeats(5);
+        tableOld.setSection(section);
+        tableOld.setNumber(50L);
+        interiorService.addTable(tableOld);
+        Table tableNew = new Table();
+        tableNew.setColumn(200);
+        tableNew.setRow(200);
+        tableNew.setSeats(5);
+        tableNew.setSection(section);
+        tableNew.setNumber(51L);
+        interiorService.addTable(tableNew);
+        order.setTable(tableOld);
+        orderService.updateOrder(order);
+        tableBusinessLogic.addedOrderToTable(tableOld,order);
+
+        //WHEN
+        tableBusinessLogic.moveOrders(tableOld, tableNew, Arrays.asList(order));
+        order.setTable(tableNew);
+
+        //THEN
+        List<Table> resultsOld = interiorService.findTables(Table.withIdentity(section, tableOld.getNumber()));
+        assertEquals(1, resultsOld.size());
+        assertEquals(null, resultsOld.get(0).getUser());
+
+        List<Table> resultsNew = interiorService.findTables(Table.withIdentity(section, tableNew.getNumber()));
+        assertEquals(1, resultsNew.size());
+        assertEquals(orderService.getOrderSubmitter(order), resultsNew.get(0).getUser());
+    }
+
+    @Test
+    @WithMockUser(username = "servicetester", roles={"SERVICE"})
+    public void testMoveOrders_NewTableShouldGetOldUserOldTableUserShouldNotBeChanged() throws ValidationException, ServiceException{
+        //Prepare
+        Order order = createOrder(BigDecimal.valueOf(500), "Order Information", BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.QUEUED, 1);
+        orderService.addOrder(order);
+        Order order2 = createOrder(BigDecimal.valueOf(500), "Order Information", BigDecimal.valueOf(0.2),
+                LocalDateTime.now(), Order.State.QUEUED, 1);
+        orderService.addOrder(order2);
+        Section section = new Section();
+        section.setName("New Section");
+        interiorService.addSection(section);
+        Table tableOld = new Table();
+        tableOld.setColumn(100);
+        tableOld.setRow(100);
+        tableOld.setSeats(5);
+        tableOld.setSection(section);
+        tableOld.setNumber(50L);
+        interiorService.addTable(tableOld);
+        Table tableNew = new Table();
+        tableNew.setColumn(200);
+        tableNew.setRow(200);
+        tableNew.setSeats(5);
+        tableNew.setSection(section);
+        tableNew.setNumber(51L);
+        interiorService.addTable(tableNew);
+        order.setTable(tableOld);
+        orderService.updateOrder(order);
+        order2.setTable(tableOld);
+        orderService.updateOrder(order2);
+        tableBusinessLogic.addedOrderToTable(tableOld,order);
+        tableBusinessLogic.addedOrderToTable(tableOld,order2);
+
+        //WHEN
+        tableBusinessLogic.moveOrders(tableOld, tableNew, Arrays.asList(order));
+        order.setTable(tableNew);
+
+        //THEN
+        List<Table> resultsOld = interiorService.findTables(Table.withIdentity(section, tableOld.getNumber()));
+        assertEquals(1, resultsOld.size());
+        assertEquals(orderService.getOrderSubmitter(order), resultsOld.get(0).getUser());
+
+        List<Table> resultsNew = interiorService.findTables(Table.withIdentity(section, tableNew.getNumber()));
+        assertEquals(1, resultsNew.size());
+        assertEquals(orderService.getOrderSubmitter(order), resultsNew.get(0).getUser());
     }
 }
