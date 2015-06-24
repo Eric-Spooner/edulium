@@ -243,8 +243,9 @@ class PrinterInvoiceManager implements InvoiceManager {
      * Sends the PDF to the default set printer
      */
     private void printPDF() throws ServiceException {
+        PDDocument document = null;
         try {
-            PDDocument document = PDDocument.load(outputFilePath);
+            document = PDDocument.load(outputFilePath);
             PrinterJob job = PrinterJob.getPrinterJob();
             if (job == null) {
                 LOGGER.error("Default printer not configured");
@@ -259,6 +260,14 @@ class PrinterInvoiceManager implements InvoiceManager {
         } catch (PrinterException e) {
             LOGGER.error("An error occurred while trying to print the invoice", e);
             throw new ServiceException("An error occurred while trying to print the invoice", e);
+        } finally {
+            try {
+                if (document != null) {
+                    document.close();
+                }
+            } catch (IOException e) {
+                LOGGER.error("Closing the document failed", e);
+            }
         }
     }
 
