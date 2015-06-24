@@ -182,6 +182,36 @@ public class InvoiceViewController  implements Initializable {
     }
 
     @FXML
+    public void onCashButtonClicked() {
+        Instalment instalment = new Instalment();
+        instalment.setTime(LocalDateTime.now());
+        instalment.setType("CASH");
+        instalment.setPaymentInfo("Paid in cash");
+        instalment.setInvoice(null); // TODO get selected invoice
+        addInstalment(instalment);
+    }
+
+    @FXML
+    public void onCreditButtonClicked() {
+        Instalment instalment = new Instalment();
+        instalment.setTime(LocalDateTime.now());
+        instalment.setType("CREDIT");
+        instalment.setPaymentInfo("Paid by credit card");
+        instalment.setInvoice(null); // TODO get selected invoice
+        addInstalment(instalment);
+    }
+
+    @FXML
+    public void onDebitButtonClicked() {
+        Instalment instalment = new Instalment();
+        instalment.setTime(LocalDateTime.now());
+        instalment.setType("DEBIT");
+        instalment.setPaymentInfo("Paid by debit card");
+        instalment.setInvoice(null); // TODO get selected invoice
+        addInstalment(instalment);
+    }
+
+    @FXML
     public void onCreateInvoiceButtonClicked() {
         Invoice invoice = new Invoice();
         invoice.setOrders(getSelectedOrdersForInvoice());
@@ -384,7 +414,7 @@ public class InvoiceViewController  implements Initializable {
                 Invoice invoiceMatcher = new Invoice();
                 invoiceMatcher.setOrders(orderListMatcher);
                 return invoiceService.findInvoices(invoiceMatcher).stream()
-                        .filter(invoice -> !invoice.getClosed()).collect(Collectors.toList());
+                        .filter(invoice -> invoice != null && !invoice.getClosed()).collect(Collectors.toList());
             } catch (ServiceException e) {
                 return null;
             }
