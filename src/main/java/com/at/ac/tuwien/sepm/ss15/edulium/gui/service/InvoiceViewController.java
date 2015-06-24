@@ -62,7 +62,7 @@ public class InvoiceViewController  implements Initializable {
         private final Button increaseAmountButton;
         private final Button decreaseAmountButton;
         private final HBox layout;
-        private Order order = null;
+        private Order group = null;
 
         public OrderCell() {
             nameLabel = new Label();
@@ -85,12 +85,12 @@ public class InvoiceViewController  implements Initializable {
             increaseAmountButton = new Button();
             increaseAmountButton.setText("+");
             increaseAmountButton.setMinSize(40, 40);
-            increaseAmountButton.setOnAction(action -> ordersForInvoice.computeIfPresent(order, (key, amount) -> amount + 1));
+            increaseAmountButton.setOnAction(action -> ordersForInvoice.computeIfPresent(group, (key, amount) -> amount + 1));
 
             decreaseAmountButton = new Button();
             decreaseAmountButton.setText("-");
             decreaseAmountButton.setMinSize(40, 40);
-            decreaseAmountButton.setOnAction(action -> ordersForInvoice.computeIfPresent(order, (key, amount) -> amount - 1));
+            decreaseAmountButton.setOnAction(action -> ordersForInvoice.computeIfPresent(group, (key, amount) -> amount - 1));
 
             layout = new HBox();
             layout.setSpacing(5);
@@ -103,22 +103,19 @@ public class InvoiceViewController  implements Initializable {
         protected void updateItem(Order item, boolean empty) {
             super.updateItem(item, empty);
 
-            order = item;
+            group = item;
 
-            if (order != null) {
-                Integer amount = ordersForInvoice.get(order);
-                Integer maximum = orders.get(order);
+            Set<Order> ordersInGroup = orders.get(group);
+            Integer amount = ordersForInvoice.get(group);
 
-                assert amount != null;
-                assert maximum != null;
-
-                Integer available = maximum - amount;
+            if (group != null && ordersInGroup != null & amount != null) {
+                Integer available = ordersInGroup.size() - amount;
 
                 increaseAmountButton.setDisable(available.equals(0));
                 decreaseAmountButton.setDisable(amount.equals(0));
 
-                nameLabel.setText(order.getMenuEntry().getName());
-                additionalInformationLabel.setText(order.getAdditionalInformation());
+                nameLabel.setText(group.getMenuEntry().getName());
+                additionalInformationLabel.setText(group.getAdditionalInformation());
                 amountLabel.setText(amount.toString());
                 availableLabel.setText("(" + available.toString() + ")");
 
@@ -131,7 +128,7 @@ public class InvoiceViewController  implements Initializable {
 
     private Table table;
 
-    private final Map<Order, Integer> orders = new HashMap<>();
+    private final Map<Order, Set<Order>> orders = new HashMap<>();
     private final ObservableMap<Order, Integer> ordersForInvoice = FXCollections.observableHashMap();
 
     @Override
@@ -145,7 +142,7 @@ public class InvoiceViewController  implements Initializable {
     @FXML
     public void onCreateInvoiceButtonClicked() {
         Invoice invoice = new Invoice();
-        invoice.setOrders(null); // TODO
+        invoice.setOrders(getSelectedOrdersForInvoice());
         invoice.setTime(LocalDateTime.now());
         invoice.setCreator(getLoggedInUser());
 
@@ -171,6 +168,8 @@ public class InvoiceViewController  implements Initializable {
             alert.showAndWait();
             return;
         }
+
+        allOrders.immediateUpdate();
     }
 
     private void handleInvoiceWithPaymentTypeAndAdditionalInfo(String type, String additionalInfo) {
@@ -233,44 +232,62 @@ public class InvoiceViewController  implements Initializable {
         allOrders.setInterval(1000);
         allOrders.addListener((ListChangeListener<Order>) change -> {
             while (change.next()) {
-                for (Order order : cloneOrders(change.getRemoved())) {
-                    Integer count = orders.get(order);
-                    if (count == null) {
+                for (Order order : change.getRemoved()) {
+                    Order group = stripDownOrder(order);
+
+                    Set<Order> ordersInGroup = orders.get(group);
+                    if (ordersInGroup == null) {
                         continue;
-                    } else if (count == 1) {
-                        orders.remove(order);
-                        ordersForInvoice.remove(order);
+                    } else if (ordersInGroup.size() == 1) {
+                        orders.remove(group);
+                        ordersForInvoice.remove(group);
                     } else {
-                        orders.put(order, count - 1);
-                        ordersForInvoice.compute(order, (key, value) -> (value >= count ? count - 1 : value));
+                        ordersInGroup.remove(order);
+                        orders.put(group, ordersInGroup);
+
+                        ordersForInvoice.compute(group, (key, value) -> value > ordersInGroup.size() ? ordersInGroup.size() : value);
                     }
                 }
-                for (Order order : cloneOrders(change.getAddedSubList())) {
-                    Integer count = orders.get(order);
-                    if (count == null) {
-                        orders.put(order, 1);
-                        ordersForInvoice.put(order, 0);
-                    } else {
-                        orders.put(order, count + 1);
+                for (Order order : change.getAddedSubList()) {
+                    Order group = stripDownOrder(order);
+
+                    Set<Order> ordersInGroup = orders.get(group);
+                    if (ordersInGroup == null) {
+                        ordersInGroup = new HashSet<>();
+                        ordersForInvoice.put(group, 0);
                     }
+
+                    ordersInGroup.add(order);
+                    orders.put(group, ordersInGroup);
                 }
             }
         });
     }
 
-    private List<Order> cloneOrders(List<? extends Order> orderList) {
-        List<Order> cloned = new ArrayList<>();
-        for (Order o : orderList) {
-            Order order = new Order();
-            order.setBrutto(o.getBrutto());
-            order.setAdditionalInformation(o.getAdditionalInformation());
-            order.setTax(o.getTax());
-            order.setMenuEntry(o.getMenuEntry());
+    private Order stripDownOrder(Order o) {
+        Order order = new Order();
+        order.setBrutto(o.getBrutto());
+        order.setAdditionalInformation(o.getAdditionalInformation());
+        order.setTax(o.getTax());
+        order.setMenuEntry(o.getMenuEntry());
+        return order;
+    }
 
-            cloned.add(order);
+    private List<Order> getSelectedOrdersForInvoice() {
+        List<Order> selectedOrders = new ArrayList<>();
+
+        for (Map.Entry<Order, Integer> entry : ordersForInvoice.entrySet()) {
+            Order group = entry.getKey();
+            Integer amount = entry.getValue();
+
+            // get as many orders from the current "order group" as the user has selected
+            Iterator<Order> it = orders.get(group).iterator();
+            for (int i = 0; i < amount && it.hasNext(); i++) {
+                selectedOrders.add(it.next());
+            }
         }
 
-        return cloned;
+        return selectedOrders;
     }
 
     private void initializeOrdersView() {
@@ -301,6 +318,8 @@ public class InvoiceViewController  implements Initializable {
     public void setTable(Table table) {
         this.table = table;
 
+        allOrders.stopPolling();
+
         allOrders.setSupplier(() -> {
             try {
                 Order orderMatcher = new Order();
@@ -319,9 +338,10 @@ public class InvoiceViewController  implements Initializable {
                 return null;
             }
         });
-        allOrders.startPolling();
 
         reset();
+
+        allOrders.startPolling();
     }
 
     private void reset() {
