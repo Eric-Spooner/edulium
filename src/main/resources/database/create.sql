@@ -339,3 +339,5 @@ CREATE TABLE IF NOT EXISTS RestaurantOrderHistory (
     FOREIGN KEY(table_section, table_number) REFERENCES RestaurantTable(section_ID, number),
     PRIMARY KEY(ID, changeNr)
 );
+
+MERGE INTO RestaurantUser (ID, name, userRole, tip) KEY(ID) VALUES ('manager', 'Maverick Manager', 'ROLE_MANAGER', 0);
