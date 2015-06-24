@@ -2,13 +2,10 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceSigningService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import javax.annotation.Resource;
 
 /**
  * ONLY FOR DEMONSTRATION PURPOSE
@@ -18,14 +15,13 @@ import javax.annotation.Resource;
 class DummyInvoiceSigningService implements InvoiceSigningService {
     private static final Logger LOGGER = LogManager.getLogger(DummyInvoiceSigningService.class);
 
-    @Resource(name = "invoiceValidator")
-    private Validator<Invoice> invoiceValidator;
-
     @Override
     public void signInvoice(Invoice invoice) throws ServiceException, ValidationException {
         LOGGER.debug("Enter signInvoice with parameter: " + invoice);
 
-        invoiceValidator.validateForCreate(invoice);
+        if (invoice == null) {
+            throw new ServiceException("Invoice must not be null");
+        }
 
         // unset identity and signature, so that we can hash the invoice without them
         Long identity = invoice.getIdentity();

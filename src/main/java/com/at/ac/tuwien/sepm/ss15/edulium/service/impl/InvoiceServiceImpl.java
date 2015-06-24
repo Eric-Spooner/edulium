@@ -50,10 +50,11 @@ class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void addInvoice(Invoice invoice) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addInvoice with parameters: " + invoice);
-        updateGross(invoice);
-        invoiceValidator.validateForCreate(invoice);
 
+        updateGross(invoice);
         invoiceSigningService.signInvoice(invoice);
+
+        invoiceValidator.validateForCreate(invoice);
 
         try {
             invoiceDAO.create(invoice);
@@ -67,10 +68,11 @@ class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void updateInvoice(Invoice invoice) throws ServiceException, ValidationException {
         LOGGER.debug("Entering updateInvoice with parameters: " + invoice);
-        updateGross(invoice);
-        invoiceValidator.validateForUpdate(invoice);
 
+        updateGross(invoice);
         invoiceSigningService.signInvoice(invoice);
+
+        invoiceValidator.validateForUpdate(invoice);
 
         try {
             invoiceDAO.update(invoice);
