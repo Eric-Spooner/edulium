@@ -28,7 +28,9 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 class PrinterInvoiceManager implements InvoiceManager {
@@ -97,10 +99,11 @@ class PrinterInvoiceManager implements InvoiceManager {
             int index = 1;
             MenuEntry entry;
             TaxRate taxRate;
+            List<Order> orders = clone(invoice.getOrders());
             Map<Order, Integer> ordersFrequency = new HashMap<>();
             Map<TaxRate, BigDecimal> ratesAndPrice = new HashMap<>();
 
-            for (Order order : invoice.getOrders()) {
+            for (Order order : orders) {
                 entry = order.getMenuEntry();
                 if (!ratesAndPrice.containsKey(order.getMenuEntry().getTaxRate())) {
                     ratesAndPrice.put(entry.getTaxRate(), entry.getPrice());
@@ -197,6 +200,21 @@ class PrinterInvoiceManager implements InvoiceManager {
                 reader.close();
             }
         }
+    }
+
+    private List<Order> clone(List<Order> orderList) {
+        List<Order> cloned = new ArrayList<>();
+        for (Order o : orderList) {
+            Order order = new Order();
+            order.setBrutto(o.getBrutto());
+            order.setAdditionalInformation(o.getAdditionalInformation());
+            order.setTax(o.getTax());
+            order.setMenuEntry(o.getMenuEntry());
+
+            cloned.add(order);
+        }
+
+        return cloned;
     }
 
     private String currencyFormat(BigDecimal n) {

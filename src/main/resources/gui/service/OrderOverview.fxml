@@ -63,6 +63,11 @@
                <HBox.margin>
                   <Insets />
                </HBox.margin></Button>
+            <Button fx:id="payButton" mnemonicParsing="false" onAction="#onPayButtonClicked" text="Pay" HBox.hgrow="NEVER">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
          </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
