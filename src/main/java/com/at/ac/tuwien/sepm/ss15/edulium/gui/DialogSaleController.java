@@ -300,6 +300,13 @@ public class DialogSaleController implements Initializable{
                         if (checkBoxSunday.isSelected()) {
                             weekDays.add(DayOfWeek.SUNDAY);
                         }
+
+                        if(weekDays.isEmpty()) {
+                            showErrorDialog
+                                    ("Input Validation Error", "There should be at least one day of sale");
+                            return false;
+                        }
+
                         intermittentSale.setDaysOfSale(weekDays);
                         Integer hr;
                         Integer min;
@@ -407,6 +414,13 @@ public class DialogSaleController implements Initializable{
                         if (checkBoxSunday.isSelected()) {
                             weekDays.add(DayOfWeek.SUNDAY);
                         }
+
+                        if(weekDays.isEmpty()) {
+                            showErrorDialog
+                                    ("Input Validation Error", "There should be at least one day of sale");
+                            return false;
+                        }
+
                         ((IntermittentSale)sale).setDaysOfSale(weekDays);
                         Integer hr;
                         Integer min;
