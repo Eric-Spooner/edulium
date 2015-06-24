@@ -452,7 +452,7 @@ public class OrderOverviewController implements Initializable {
     }
 
     @FXML
-    public void onPayButtonClicked(ActionEvent actionEvent) {
+    public void onPayButtonClicked() {
         if (paymentTypePopover.isShowing()) {
             paymentTypePopover.hide();
         } else {
