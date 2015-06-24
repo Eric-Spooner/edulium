@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.business.TableBusinessLogic;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
@@ -116,8 +115,6 @@ public class OrderOverviewController implements Initializable {
     private OrderService orderService;
     @Resource(name = "interiorService")
     private InteriorService interiorService;
-    @Resource(name = "tableBusinessLogic")
-    private TableBusinessLogic tableBusinessLogic;
     @Resource(name = "taskScheduler")
     private TaskScheduler taskScheduler;
 
@@ -216,8 +213,6 @@ public class OrderOverviewController implements Initializable {
                     orderService.cancelOrder(order);
                 }
 
-                tableBusinessLogic.removedOrderFromTable(table);
-
                 queuedOrdersView.getSelectionModel().clearSelection();
             } catch (ValidationException | ServiceException e) {
                 LOGGER.error("Cancel orders did not work", e);
@@ -250,8 +245,6 @@ public class OrderOverviewController implements Initializable {
                     order.setTable(newTable);
                     orderService.updateOrder(order);
                 }
-
-                tableBusinessLogic.movedOrders(table, newTable, orders);
 
                 clearSelection();
             } catch (ValidationException | ServiceException e) {

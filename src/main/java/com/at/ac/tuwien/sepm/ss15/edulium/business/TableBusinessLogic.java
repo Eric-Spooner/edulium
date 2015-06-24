@@ -20,30 +20,21 @@ public interface TableBusinessLogic extends BusinessLogic {
      * took the order
      * If the table is assigned at the moment, but has no orders, or every order, which is on the table
      * is already paid, the table will again be assigned to the user, which took the new order
-     * @param table the table, the order has been placed
      */
     @PreAuthorize("hasRole('SERVICE')")
-    public void addedOrderToTable(Table table, Order order) throws ServiceException, ValidationException;
+    void addedOrder(Order order) throws ServiceException, ValidationException;
 
     /**
      * Checks if every order, which has been placed at the table has been paid, and resets the assignment of the
      * table to null.
-     * @param table the table, the orders have been paid
      */
     @PreAuthorize("hasRole('SERVICE')")
-    public void removedOrderFromTable(Table table) throws ServiceException, ValidationException;
+    void paidOrder(Order order) throws ServiceException, ValidationException;
 
     /**
-     *  Function is used to set the Table User new, if orders are beeing moved
-     *  if there are open orders left on the tableOld, the user will not be changed
-     *  If there are no open orders left on the tableOld, the user will be set to null
-     *  If there are open orders on the new table the user of the new table will not be changed
-     *  if there are no open orders on the new table the user of the new table will be set to the
-     *  user on the old table
-     * @param tableOld the table, the orders are now
-     * @param tableNew the table, the orders should move to
-     * @param ordersToMove the orders, which should be moved from old to new
+     * Checks if every order, which has been removed from the table, and resets the assignment of the
+     * table to null.
      */
     @PreAuthorize("hasRole('SERVICE')")
-    public void movedOrders(Table tableOld, Table tableNew, List<Order> ordersToMove) throws ServiceException, ValidationException;
+    void removedOrder(Order order) throws ServiceException, ValidationException;
 }

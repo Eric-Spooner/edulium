@@ -380,6 +380,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         // GIVEN
         Order order = new Order();
         order.setIdentity(1L);
+        order.setTable(Table.withIdentity(Section.withIdentity(1L), 1L));
 
         // WHEN
         orderValidator.validateForDelete(order);

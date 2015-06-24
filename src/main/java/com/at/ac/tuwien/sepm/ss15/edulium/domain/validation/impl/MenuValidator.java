@@ -63,7 +63,7 @@ class MenuValidator implements Validator<Menu> {
             throw new ValidationException("There should be at least one menu entry");
         }
         for(MenuEntry entry:object.getEntries()){
-            menuEntryValidator.validateForUpdate(entry);
+            menuEntryValidator.validateIdentity(entry);
         }
     }
 }
