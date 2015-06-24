@@ -8,11 +8,12 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.collections.*;
 import javafx.collections.transformation.SortedList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
@@ -67,12 +68,14 @@ public class InvoiceViewController  implements Initializable {
             increaseAmountButton = new Button();
             increaseAmountButton.setText("+");
             increaseAmountButton.setMinSize(40, 40);
-            increaseAmountButton.setOnAction(action -> ordersForInvoice.computeIfPresent(order, (key, amount) -> amount + 1));
+            increaseAmountButton.setOnAction(action -> ordersForInvoice
+                    .computeIfPresent(order, (key, amount) -> amount + 1));
 
             decreaseAmountButton = new Button();
             decreaseAmountButton.setText("-");
             decreaseAmountButton.setMinSize(40, 40);
-            decreaseAmountButton.setOnAction(action -> ordersForInvoice.computeIfPresent(order, (key, amount) -> amount == 1 ? null : amount - 1));
+            decreaseAmountButton.setOnAction(action -> ordersForInvoice
+                    .computeIfPresent(order, (key, amount) -> amount == 1 ? null : amount - 1));
 
             layout = new HBox();
             layout.setSpacing(5);
@@ -114,6 +117,11 @@ public class InvoiceViewController  implements Initializable {
         initializeOrdersView();
 
         reset();
+    }
+
+    @FXML
+    public void onCreateInvoiceButtonClicked() {
+        System.out.println("BLAAAAAAA");
     }
 
     private void initializeAllOrders() {
