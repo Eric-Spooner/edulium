@@ -153,7 +153,7 @@ public class TableOverviewController implements Initializable {
         tablesOfOrders.clear();
         for(Order order : orders) {
             Table table = order.getTable();
-            if (!tablesOfOrders.contains(table) && table.getUser().equals(loggedInUser)) {
+            if (!tablesOfOrders.contains(table) && table.getUser() != null && table.getUser().equals(loggedInUser)) {
                 tablesOfOrders.add(table);
             }
         }
