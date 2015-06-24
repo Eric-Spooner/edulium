@@ -9,13 +9,13 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.collections.*;
 import javafx.collections.transformation.SortedList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
@@ -138,6 +138,11 @@ public class InvoiceViewController  implements Initializable {
         initializeOrdersView();
 
         reset();
+    }
+
+    @FXML
+    public void onCreateInvoiceButtonClicked() {
+        System.out.println("BLAAAAAAA");
     }
 
     private void initializeAllOrders() {
