@@ -283,6 +283,7 @@ public class TestOrderDAO extends AbstractDAOTest {
         Long identity = (long) 100;
         Order order = new Order();
         order.setIdentity(identity);
+        order.setTable(Table.withIdentity(Section.withIdentity(1L), 1L));
 
         // generate identity which is not used by any persistent object
         try {

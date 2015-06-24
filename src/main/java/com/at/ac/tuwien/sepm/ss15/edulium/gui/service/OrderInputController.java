@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.business.TableBusinessLogic;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
@@ -25,7 +24,6 @@ import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.SegmentedButton;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
@@ -132,8 +130,6 @@ public class OrderInputController  implements Initializable {
 
     @Resource(name = "orderService")
     private OrderService orderService;
-    @Resource(name = "tableBusinessLogic")
-    private TableBusinessLogic tableBusinessLogic;
 
     private Table table;
 
@@ -254,8 +250,6 @@ public class OrderInputController  implements Initializable {
     @FXML
     private void onOrderButtonClicked(ActionEvent actionEvent) {
         try {
-            boolean invokeBusinessLogicOrderAdded = true;
-
             for (Map.Entry<OrderBase, Integer> entry : orders.entrySet()) {
                 for (Order o : entry.getKey().getOrders()) { // a menu can contain more than one order
                     MenuEntry menuEntry = o.getMenuEntry();
@@ -273,12 +267,6 @@ public class OrderInputController  implements Initializable {
                     Integer amount = entry.getValue();
                     for (int i = 0; i < amount; i++) {
                         orderService.addOrder(order);
-                    }
-
-                    if (invokeBusinessLogicOrderAdded) {
-                        // invoke addedOrderToTable only once because it's quite expensive
-                        tableBusinessLogic.addedOrderToTable(table, order);
-                        invokeBusinessLogicOrderAdded = false;
                     }
                 }
             }

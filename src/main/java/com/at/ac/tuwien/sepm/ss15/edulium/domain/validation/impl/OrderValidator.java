@@ -46,6 +46,8 @@ class OrderValidator implements Validator<Order> {
             throw new ValidationException("order must not be null");
         }
         validateIdentity(order);
+
+        tableValidator.validateIdentity(order.getTable());
     }
 
     @Override
@@ -84,7 +86,7 @@ class OrderValidator implements Validator<Order> {
             throw new ValidationException("State must not be null");
         }
 
-        menuEntryValidator.validateForUpdate(order.getMenuEntry());
-        tableValidator.validateForUpdate(order.getTable());
+        menuEntryValidator.validateIdentity(order.getMenuEntry());
+        tableValidator.validateIdentity(order.getTable());
     }
 }

@@ -75,3 +75,6 @@ MERGE INTO RestaurantOrderHistory(ID, invoice_ID, table_section, table_number, m
 MERGE INTO RestaurantOrderHistory(ID, invoice_ID, table_section, table_number, menuEntry_ID, orderTime, brutto, tax,
      info, state, canceled,changeTime,changeUser,changeNr) KEY(ID, changeNr, table_section, table_number)
      VALUES (3, 1, 1, 1, 1, CURRENT_TIMESTAMP, 100, 0.01, '', 'DELIVERED', FALSE, CURRENT_TIMESTAMP, 'daotester',1);
+MERGE INTO RestaurantOrderHistory(ID, invoice_ID, table_section, table_number, menuEntry_ID, orderTime, brutto, tax,
+     info, state, canceled,changeTime,changeUser,changeNr) KEY(ID, changeNr, table_section, table_number)
+     VALUES (4, 1, 1, 1, 1, CURRENT_TIMESTAMP, 100, 0.01, '', 'DELIVERED', FALSE, CURRENT_TIMESTAMP, 'daotester',1);

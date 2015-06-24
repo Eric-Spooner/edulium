@@ -5,6 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
@@ -26,26 +27,41 @@ class TableBusinessLogicImpl implements TableBusinessLogic {
     private InvoiceService invoiceService;
 
     @Override
-    public void addedOrderToTable(Table table, Order order) throws ServiceException, ValidationException{
-        if(table.getUser() == null || checkIfNoOpenOrdersOnTable(table)) {
+    public void addedOrder(Order order) throws ServiceException, ValidationException {
+        assert order != null;
+        assert order.getTable() != null;
+
+        List<Table> tables = interiorService.findTables(order.getTable());
+        if (tables.isEmpty()) {
+            throw new ServiceException("Table not found");
+        }
+        Table table = tables.get(0);
+
+        if (table.getUser() == null || checkIfNoOpenOrdersOnTable(table)) {
             table.setUser(orderService.getOrderSubmitter(order));
             interiorService.updateTable(table);
         }
     }
 
     @Override
-    public void removedOrderFromTable(Table table) throws ServiceException, ValidationException{
-        if(checkIfNoOpenOrdersOnTable(table)){
-            table.setUser(null);
-            interiorService.updateTable(table);
-        }
+    public void paidOrder(Order order) throws ServiceException, ValidationException {
+        removedOrder(order); // same logic as removedOrder
     }
 
     @Override
-    public void movedOrders(Table tableOld, Table tableNew, List<Order> ordersToMove) throws ServiceException, ValidationException {
-        if (!ordersToMove.isEmpty()) {
-            addedOrderToTable(tableNew, ordersToMove.get(0));
-            removedOrderFromTable(tableOld);
+    public void removedOrder(Order order) throws ServiceException, ValidationException {
+        assert order != null;
+        assert order.getTable() != null;
+
+        List<Table> tables = interiorService.findTables(order.getTable());
+        if (tables.isEmpty()) {
+            throw new ServiceException("Table not found");
+        }
+        Table table = tables.get(0);
+
+        if (checkIfNoOpenOrdersOnTable(table)){
+            table.setUser(null);
+            interiorService.updateTable(table);
         }
     }
 
@@ -79,6 +95,4 @@ class TableBusinessLogicImpl implements TableBusinessLogic {
         }
         return true;
     }
-
-
 }
