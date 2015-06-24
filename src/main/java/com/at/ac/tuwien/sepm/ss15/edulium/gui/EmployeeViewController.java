@@ -149,9 +149,11 @@ public class EmployeeViewController implements Initializable {
     @FXML
     public void buttonEmployeesRemoveClicked() {
         List<User> selectedUsers = tableViewEmployee.getSelectionModel().getSelectedItems();
+        List<User> removedUsers = new ArrayList<>();
         for (User selectedUser : selectedUsers) {
             try {
                 userService.deleteUser(selectedUser);
+                removedUsers.add(selectedUser);
             } catch (ValidationException | ServiceException e) {
                 LOGGER.error("Could not delete user " + selectedUser, e);
 
@@ -162,7 +164,7 @@ public class EmployeeViewController implements Initializable {
                 alert.showAndWait();
             }
         }
-        users.removeAll(selectedUsers);
+        users.removeAll(removedUsers);
     }
 
     @FXML
