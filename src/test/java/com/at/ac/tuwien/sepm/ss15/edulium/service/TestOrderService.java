@@ -116,7 +116,7 @@ public class TestOrderService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testUpdateOrder_shouldUpdate() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = Order.withIdentity(1L);
+        Order order  = Order.withIdentity(10L);
 
         Order orderUpd = createOrder(BigDecimal.valueOf(500),"Order Information 2", BigDecimal.valueOf(0.2),
                 LocalDateTime.now(), Order.State.QUEUED, 1);
@@ -230,8 +230,7 @@ public class TestOrderService extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void testCancelOrder_shouldRemove() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Order order  = Order.withIdentity(1L);
-
+        Order order  = Order.withIdentity(10L);
 
         Order orderUpd = createOrder(BigDecimal.valueOf(500),"Order Information 2", BigDecimal.valueOf(0.2),
                 LocalDateTime.now(), Order.State.QUEUED, 1);

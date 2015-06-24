@@ -1,5 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.business.TableBusinessLogic;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.OrderDAO;
@@ -37,7 +38,8 @@ class OrderServiceImpl implements OrderService {
     private OrderDAO findBetweenOrderDAO;
     @Resource(name = "orderValidator")
     private Validator<Order> orderValidator;
-
+    @Resource(name = "tableBusinessLogic")
+    private TableBusinessLogic tableBusinessLogic;
 
     @Override
     public void addOrder(Order order) throws ServiceException, ValidationException {
@@ -49,8 +51,11 @@ class OrderServiceImpl implements OrderService {
             //Check if a sale is active and let the price be updated
             MenuEntry entry = order.getMenuEntry();
             saleService.applySales(entry);
+
             //Create the order with the updated price
             orderDAO.create(order);
+
+            tableBusinessLogic.addedOrder(order);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
             throw new ServiceException("An Error has occurred in the data access object");
@@ -96,6 +101,12 @@ class OrderServiceImpl implements OrderService {
             }
             try {
                 orderDAO.update(order);
+
+                if (!order.getTable().equals(preOrder.getTable())) {
+                    // order has been moved to another table
+                    tableBusinessLogic.removedOrder(preOrder);
+                    tableBusinessLogic.addedOrder(order);
+                }
             } catch (DAOException e) {
                 LOGGER.error("An Error has occurred in the data access object", e);
                 throw new ServiceException("An Error has occurred in the data access object");
@@ -116,6 +127,8 @@ class OrderServiceImpl implements OrderService {
         }else {
             try {
                 orderDAO.delete(order);
+
+                tableBusinessLogic.removedOrder(order);
             } catch (DAOException e) {
                 LOGGER.error("An Error has occurred in the data access object", e);
                 throw new ServiceException("An Error has occurred in the data access object");
@@ -126,7 +139,6 @@ class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> findOrder(Order template) throws ServiceException {
         LOGGER.debug("Entering findOrder with parameter: " + template);
-
         try {
             return orderDAO.find(template);
         } catch (DAOException e) {

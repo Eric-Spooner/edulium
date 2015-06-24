@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -30,7 +31,9 @@ import static org.junit.Assert.assertTrue;
  * Created by phili on 6/15/15.
  */
 public class TestBestFitReservationHeuristic extends AbstractServiceTest {
-    ReservationHeuristic reservationHeuristic = new BestFitReservationHeuristic();
+
+    @Autowired
+    ReservationHeuristic reservationHeuristic;
 
     @Mock
     ReservationService reservationService;

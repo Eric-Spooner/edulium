@@ -1,5 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.util;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -14,6 +15,7 @@ public class GridView<T> extends GridPane {
 
     private Callback<GridView, GridCell> cellFactory;
     private final Map<T, Node> nodeMap = new HashMap<>();
+    private ObservableList<T> items;
 
     private int rows = 1;
     private int cols = 1;
@@ -51,6 +53,7 @@ public class GridView<T> extends GridPane {
     }
 
     public void setItems(ObservableList<T> items) {
+        this.items = items;
         items.addListener((ListChangeListener<T>) c -> {
             while(c.next()) {
                 c.getAddedSubList().forEach(this::addCellItem);
@@ -66,6 +69,13 @@ public class GridView<T> extends GridPane {
     }
 
     public Node getNode(T item) {
+        if(!nodeMap.containsKey(item)) {
+            for(Map.Entry<T, Node> entry : nodeMap.entrySet()) {
+                if(entry.getKey().equals(item)) {
+                    return entry.getValue();
+                }
+            }
+        }
         return nodeMap.get(item);
     }
 
@@ -76,6 +86,7 @@ public class GridView<T> extends GridPane {
 
         GridCell cellItem = cellFactory.call(this);
         cellItem.updateItem(item);
+
         nodeMap.put(item, cellItem.getNode());
 
         // add dummy elements to add rows

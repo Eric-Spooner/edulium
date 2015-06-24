@@ -24,7 +24,6 @@ import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.SegmentedButton;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
@@ -129,7 +128,7 @@ public class OrderInputController  implements Initializable {
     private FXMLPane menuDetailsPane;
     private MenuDetailsController menuDetailsController;
 
-    @Autowired
+    @Resource(name = "orderService")
     private OrderService orderService;
 
     private Table table;

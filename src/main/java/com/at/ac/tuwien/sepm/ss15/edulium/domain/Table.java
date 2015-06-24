@@ -141,6 +141,7 @@ public class Table {
         if (row != null ? !row.equals(table.row) : table.row != null) return false;
         if (seats != null ? !seats.equals(table.seats) : table.seats != null) return false;
         if (section != null ? !section.equals(table.section) : table.section != null) return false;
+        if (user != null ? !user.equals(table.user) : table.user != null) return false;
 
         return true;
     }

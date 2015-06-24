@@ -240,7 +240,7 @@ public class OrderOverviewController implements Initializable {
 
     private void initializeMoveToTablePopOver() {
         TableViewController tableViewController = tableViewPane.getController();
-        tableViewController.setOnTableClicked(table -> {
+        tableViewController.setOnTableClicked(newTable -> {
             try {
                 List<Order> orders = new ArrayList<>(); // TODO maybe replace this by a "merged observable list"
                 orders.addAll(queuedOrdersView.getSelectionModel().getSelectedItems());
@@ -249,7 +249,7 @@ public class OrderOverviewController implements Initializable {
                 orders.addAll(deliveredOrdersView.getSelectionModel().getSelectedItems());
 
                 for (Order order : orders) {
-                    order.setTable(table);
+                    order.setTable(newTable);
                     orderService.updateOrder(order);
                 }
 
@@ -478,12 +478,16 @@ public class OrderOverviewController implements Initializable {
 
         User user = getLoggedInUser();
         if (user != null) {
-            table.setUser(user);
+            User previousUser = table.getUser();
 
             try {
+                table.setUser(user);
                 interiorService.updateTable(table);
+
                 takeOverButton.setVisible(false);
             } catch (ValidationException | ServiceException e) {
+                table.setUser(previousUser);
+
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error while setting the responsible waiter for the table");
                 alert.setHeaderText("Could not set '" + user.getName() + "' as responsible waiter for table " +
@@ -520,7 +524,7 @@ public class OrderOverviewController implements Initializable {
         this.table = table;
 
         headerLabel.setText("Table " + table.getNumber() + " in " + table.getSection().getName());
-        takeOverButton.setVisible(!table.getUser().equals(getLoggedInUser())); // only visible if the waiter isn't already responsible for the table
+        takeOverButton.setVisible(table.getUser() == null ? true : !table.getUser().equals(getLoggedInUser())); // only visible if the waiter isn't already responsible for the table
 
         queuedOrders.setSupplier(() -> {
             try {

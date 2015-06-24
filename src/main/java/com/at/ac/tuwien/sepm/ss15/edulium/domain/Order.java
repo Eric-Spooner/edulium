@@ -169,8 +169,7 @@ public class Order {
 
         Order order = (Order) o;
 
-        if (additionalInformation != null ? !additionalInformation.equals(order.additionalInformation) : order.additionalInformation != null)
-            return false;
+
         if (brutto != null ? (brutto.compareTo(order.getBrutto())!=0) : order.brutto != null) return false;
         if (identity != null ? !identity.equals(order.identity) : order.identity != null) return false;
         if (menuEntry != null ? !menuEntry.equals(order.menuEntry) : order.menuEntry != null) return false;
@@ -178,8 +177,8 @@ public class Order {
         if (tax != null ? (tax.compareTo(order.getTax())!=0) : order.brutto != null) return false;
         if (time != null ? !time.equals(order.time) : order.time != null) return false;
         if (state != null ? !state.equals(order.state) : order.state != null) return false;
-
-        return true;
+        return !(additionalInformation != null ? (order.additionalInformation != null ? !additionalInformation.equals(order.additionalInformation) : !additionalInformation.isEmpty()) :
+                                                 (order.additionalInformation != null ? !order.additionalInformation.isEmpty() : false));
     }
 
     @Override

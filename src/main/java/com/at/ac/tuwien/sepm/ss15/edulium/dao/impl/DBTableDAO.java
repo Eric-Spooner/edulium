@@ -90,13 +90,17 @@ class DBTableDAO implements DAO<Table> {
         validator.validateForUpdate(table);
 
         final String query = "UPDATE RestaurantTable SET " +
-                "seats = ?, tableRow = ?, tableColumn = ?, user_ID = ISNULL(?, user_ID) WHERE number = ? AND section_ID = ?";
+                "seats = ?, tableRow = ?, tableColumn = ?, user_ID = ? WHERE number = ? AND section_ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setInt(1, table.getSeats());
             stmt.setInt(2, table.getRow());
             stmt.setInt(3, table.getColumn());
-            stmt.setString(4, table.getUser() != null ? table.getUser().getIdentity() : null); // optional
+            if(table.getUser() == null){
+                stmt.setObject(4,null);
+            }else {
+                stmt.setString(4, table.getUser().getIdentity());
+            }
             stmt.setLong(5, table.getNumber());
             stmt.setLong(6, table.getSection().getIdentity());
 

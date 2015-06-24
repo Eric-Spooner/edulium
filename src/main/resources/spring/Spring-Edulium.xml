@@ -53,6 +53,9 @@
     <import resource="service/Spring-InvoiceManager.xml" />
     <import resource="service/Spring-SaleService.xml" />
 
+    <!-- Business Logic beans -->
+    <import resource="business/Spring-TableBusinessLogic.xml" />
+
     <!-- GUI beans -->
     <import resource="gui/Spring-LoginPane.xml" />
     <import resource="gui/Spring-MainWindowPane.xml" />
