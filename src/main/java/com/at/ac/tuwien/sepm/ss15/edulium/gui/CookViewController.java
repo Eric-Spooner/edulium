@@ -249,7 +249,7 @@ public class CookViewController implements Initializable {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Putting State to in Progress");
                 alert.setHeaderText("The State shifting did not work");
-                alert.setContentText(e.toString());
+                alert.setContentText(e.getMessage());
 
                 alert.showAndWait();
             } finally {
@@ -273,7 +273,7 @@ public class CookViewController implements Initializable {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Putting State to in Ready to Deliver");
                 alert.setHeaderText("The State shifting did not work");
-                alert.setContentText(e.toString());
+                alert.setContentText(e.getMessage());
 
                 alert.showAndWait();
             } finally {

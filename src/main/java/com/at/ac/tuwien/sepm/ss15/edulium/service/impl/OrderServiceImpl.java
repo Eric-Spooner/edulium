@@ -118,19 +118,26 @@ class OrderServiceImpl implements OrderService {
 
         orderValidator.validateForDelete(order);
 
-        if(order.getState() != Order.State.QUEUED){
+        if (order.getState() != Order.State.QUEUED){
             LOGGER.error("The precondition of the function is not True, the order is not in State QUEUED");
-            throw new
-                    ServiceException("The precondition of the function is not True, the order is not in State QUEUED");
-        }else {
-            try {
-                orderDAO.delete(order);
+            throw new ServiceException("The precondition of the function is not True, the order is not in State QUEUED");
+        }
 
-                tableBusinessLogic.removedOrder(order);
-            } catch (DAOException e) {
-                LOGGER.error("An Error has occurred in the data access object", e);
-                throw new ServiceException("An Error has occurred in the data access object");
-            }
+        // check if invoice has been paid already
+        Invoice invoiceMatcher = new Invoice();
+        invoiceMatcher.setOrders(Collections.singletonList(order));
+        if (!invoiceService.findInvoices(invoiceMatcher).isEmpty()) {
+            LOGGER.error("The order has already been paid, can't cancel order");
+            throw new ServiceException("The order '" + order.getMenuEntry().getName() + "' has already been paid, can't cancel order");
+        }
+
+        try {
+            orderDAO.delete(order);
+
+            tableBusinessLogic.removedOrder(order);
+        } catch (DAOException e) {
+            LOGGER.error("An Error has occurred in the data access object", e);
+            throw new ServiceException("An Error has occurred in the data access object");
         }
     }
 

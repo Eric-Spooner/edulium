@@ -226,7 +226,8 @@ public class OrderOverviewController implements Initializable {
 
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Cancel orders failed");
-                alert.setContentText(e.toString());
+                alert.setHeaderText("Cancel orders did not work");
+                alert.setContentText(e.getMessage());
 
                 alert.showAndWait();
             } finally {
@@ -259,7 +260,8 @@ public class OrderOverviewController implements Initializable {
 
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Move orders failed");
-                alert.setContentText(e.toString());
+                alert.setHeaderText("Move orders did not work");
+                alert.setContentText(e.getMessage());
 
                 alert.showAndWait();
             } finally {
@@ -328,7 +330,7 @@ public class OrderOverviewController implements Initializable {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Putting State to Delivered");
             alert.setHeaderText("The State shifting did not work");
-            alert.setContentText(e.toString());
+            alert.setContentText(e.getMessage());
 
             alert.showAndWait();
         } finally {
