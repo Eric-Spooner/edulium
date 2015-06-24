@@ -178,7 +178,7 @@ public class OrderInputController  implements Initializable {
 
             for(Order order : entries) {
                 String info = order.getAdditionalInformation();
-                order.setAdditionalInformation(menu.getName() + " - " + (info == null? "" : info));
+                order.setAdditionalInformation(menu.getName() + " - " + (info == null ? "" : info));
             }
             orders.compute(new OrderMenu(menu, entries), (key, amount) -> (amount == null) ? 1 : amount + 1);
         });
@@ -260,7 +260,8 @@ public class OrderInputController  implements Initializable {
 
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Adding orders failed");
-            alert.setContentText(e.toString());
+            alert.setHeaderText("Adding orders did not work");
+            alert.setContentText(e.getMessage());
 
             alert.showAndWait();
         }

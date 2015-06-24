@@ -153,7 +153,7 @@ public class InvoiceViewController  implements Initializable {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Failed to create the invoice");
             alert.setHeaderText("An error occurred while trying to create the invoice");
-            alert.setContentText(e.toString());
+            alert.setContentText(e.getMessage());
 
             alert.showAndWait();
             return;
@@ -163,7 +163,7 @@ public class InvoiceViewController  implements Initializable {
             alert.setTitle("Invoice validation failed");
             alert.setHeaderText("The information provided for the invoice is incomplete " +
                     "or violates the invoice validation");
-            alert.setContentText(e.toString());
+            alert.setContentText(e.getMessage());
 
             alert.showAndWait();
             return;
@@ -182,7 +182,7 @@ public class InvoiceViewController  implements Initializable {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Invoice manager failure");
             alert.setHeaderText("The invoice manager failed unexpectedly");
-            alert.setContentText(e.toString());
+            alert.setContentText(e.getMessage());
 
             alert.showAndWait();
         }
@@ -196,7 +196,7 @@ public class InvoiceViewController  implements Initializable {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Failed to create the instalment");
             alert.setHeaderText("An error occurred while trying to create the instalment");
-            alert.setContentText(e.toString());
+            alert.setContentText(e.getMessage());
 
             alert.showAndWait();
         } catch (ValidationException e) {
@@ -205,7 +205,7 @@ public class InvoiceViewController  implements Initializable {
             alert.setTitle("Instalment validation failed");
             alert.setHeaderText("The information provided for the instalment is incomplete " +
                     "or violates the instalment validation");
-            alert.setContentText(e.toString());
+            alert.setContentText(e.getMessage());
 
             alert.showAndWait();
         }
