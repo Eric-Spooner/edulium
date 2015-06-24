@@ -172,15 +172,15 @@ public class OrderInputController  implements Initializable {
             orders.compute(new OrderSingleMenuEntry(order), (key, amount) -> (amount == null) ? 1 : amount + 1);
         });
 
-        menuDetailsController.setOnMenuAccepted(configuredMenu -> {
-            List<Order> entries = new ArrayList<>();
-            for (MenuEntry menuEntry : configuredMenu.getEntries()) {
-                Order order = new Order();
-                order.setMenuEntry(menuEntry);
-                order.setAdditionalInformation(configuredMenu.getName() + " - " + "blablabla");
-                entries.add(order);
+        menuDetailsController.setOnMenuAccepted(entries -> {
+            Menu menu = new Menu();
+            menu.setName(menuDetailsController.getMenuName());
+
+            for(Order order : entries) {
+                String info = order.getAdditionalInformation();
+                order.setAdditionalInformation(menu.getName() + " - " + (info == null? "" : info));
             }
-            orders.compute(new OrderMenu(configuredMenu, entries), (key, amount) -> (amount == null) ? 1 : amount + 1);
+            orders.compute(new OrderMenu(menu, entries), (key, amount) -> (amount == null) ? 1 : amount + 1);
         });
     }
 
