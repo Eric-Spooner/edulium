@@ -144,21 +144,9 @@ public class InvoiceViewController  implements Initializable {
 
     @FXML
     public void onCreateInvoiceButtonClicked() {
-
-    }
-
-    private void handleInvoiceWithPaymentTypeAndAdditionalInfo(String type, String additionalInfo) {
-        List<Order> orders = new ArrayList<>();
-//        orders.addAll(queuedOrdersView.getSelectionModel().getSelectedItems());
-//        orders.addAll(inProgressOrdersView.getSelectionModel().getSelectedItems());
-//        orders.addAll(readyForDeliveryOrdersView.getSelectionModel().getSelectedItems());
-//        orders.addAll(deliveredOrdersView.getSelectionModel().getSelectedItems());
-
-        LocalDateTime creationTime = LocalDateTime.now();
-
         Invoice invoice = new Invoice();
-        invoice.setOrders(orders);
-        invoice.setTime(creationTime);
+        invoice.setOrders(null); // TODO
+        invoice.setTime(LocalDateTime.now());
         invoice.setCreator(getLoggedInUser());
 
         try {
@@ -183,9 +171,14 @@ public class InvoiceViewController  implements Initializable {
             alert.showAndWait();
             return;
         }
+    }
+
+    private void handleInvoiceWithPaymentTypeAndAdditionalInfo(String type, String additionalInfo) {
+
+        LocalDateTime creationTime = LocalDateTime.now();
 
         Instalment instalment = new Instalment();
-        instalment.setInvoice(invoice);
+        instalment.setInvoice(null); // TODO
         instalment.setType(type);
         instalment.setPaymentInfo(additionalInfo);
         instalment.setTime(creationTime);
@@ -214,7 +207,7 @@ public class InvoiceViewController  implements Initializable {
         }
 
         try {
-            invoiceManager.manageInvoice(invoice);
+            invoiceManager.manageInvoice(null); // TODO
         } catch (ServiceException e) {
             LOGGER.error("An error occurred while trying to manage the invoice", e);
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -313,15 +306,15 @@ public class InvoiceViewController  implements Initializable {
                 Order orderMatcher = new Order();
                 orderMatcher.setTable(table);
                 return orderService.findOrder(orderMatcher).stream().filter(order -> {
-                                        // show only orders which don't belong to an invoice yet
-                                        try {
-                                            Invoice invoiceMatcher = new Invoice();
-                                            invoiceMatcher.setOrders(Collections.singletonList(order));
-                                            return invoiceService.findInvoices(invoiceMatcher).isEmpty();
-                                        } catch (ServiceException e) {
-                                            return true;
-                                        }
-                                    }).collect(Collectors.toList());
+                    // show only orders which don't belong to an invoice yet
+                    try {
+                        Invoice invoiceMatcher = new Invoice();
+                        invoiceMatcher.setOrders(Collections.singletonList(order));
+                        return invoiceService.findInvoices(invoiceMatcher).isEmpty();
+                    } catch (ServiceException e) {
+                        return true;
+                    }
+                }).collect(Collectors.toList());
             } catch (ServiceException e) {
                 return null;
             }
