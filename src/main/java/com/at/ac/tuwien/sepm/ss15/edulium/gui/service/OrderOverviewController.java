@@ -125,13 +125,13 @@ public class OrderOverviewController implements Initializable {
     private FXMLPane tableViewPane; // for move to table pop over
     @Resource(name = "orderInputPane")
     private FXMLPane orderInputPane;
-    @Resource(name = "paymentSelectionPane")
-    private FXMLPane paymentSelectionPane;
+    @Resource(name = "invoiceViewPane")
+    private FXMLPane invoiceViewPane;
 
     private AlertPopOver cancelPopOver;
     private PopOver moveToTablePopOver;
     private PopOver newOrderPopOver;
-    private PopOver paymentTypePopover;
+    private PopOver invoiceViewPopover;
 
     private PollingList<Order> queuedOrders;
     private PollingList<Order> inProgressOrders;
@@ -150,7 +150,7 @@ public class OrderOverviewController implements Initializable {
         initializeCancelPopOver();
         initializeMoveToTablePopOver();
         initializeNewOrderPopOver();
-        initializePaymentTypePopover();
+        initializeInvoiceViewPopover();
 
         cancelButton.setDisable(true);
         deliverButton.setDisable(true);
@@ -295,28 +295,14 @@ public class OrderOverviewController implements Initializable {
         newOrderPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
     }
 
-    private void initializePaymentTypePopover() {
-        PaymentSelectionController paymentSelectionController = paymentSelectionPane.getController();
-        paymentSelectionController.getCashButton().setOnAction(event -> {
-            paymentTypePopover.hide();
-            handleInvoiceWithPaymentTypeAndAdditionalInfo("CASH", "Paid in cash");
-        });
-        paymentSelectionController.getCreditButton().setOnAction(event -> {
-            paymentTypePopover.hide();
-            handleInvoiceWithPaymentTypeAndAdditionalInfo("CREDIT", "Paid by credit card");
-        });
-        paymentSelectionController.getDebitButton().setOnAction(event -> {
-            paymentTypePopover.hide();
-            handleInvoiceWithPaymentTypeAndAdditionalInfo("DEBIT", "Paid by debit card");
-        });
+    private void initializeInvoiceViewPopover() {
+        invoiceViewPane.setStyle("-fx-padding: 5px");
 
-        paymentSelectionPane.setStyle("-fx-padding: 5px");
-
-        paymentTypePopover = new PopOver(paymentSelectionPane);
-        paymentTypePopover.setHideOnEscape(true);
-        paymentTypePopover.setAutoHide(true);
-        paymentTypePopover.setDetachable(false);
-        paymentTypePopover.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
+        invoiceViewPopover = new PopOver(invoiceViewPane);
+        invoiceViewPopover.setHideOnEscape(true);
+        invoiceViewPopover.setAutoHide(true);
+        invoiceViewPopover.setDetachable(false);
+        invoiceViewPopover.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
     }
 
     private void handleInvoiceWithPaymentTypeAndAdditionalInfo(String type, String additionalInfo) {
@@ -453,10 +439,10 @@ public class OrderOverviewController implements Initializable {
 
     @FXML
     public void onPayButtonClicked() {
-        if (paymentTypePopover.isShowing()) {
-            paymentTypePopover.hide();
+        if (invoiceViewPopover.isShowing()) {
+            invoiceViewPopover.hide();
         } else {
-            paymentTypePopover.show(payButton);
+            invoiceViewPopover.show(payButton);
         }
     }
 
@@ -580,6 +566,9 @@ public class OrderOverviewController implements Initializable {
 
         OrderInputController orderInputController = orderInputPane.getController();
         orderInputController.setTable(table);
+
+        InvoiceViewController invoiceViewController = invoiceViewPane.getController();
+        invoiceViewController.setTable(table);
     }
 
     public void setOnBackButtonAction(EventHandler<ActionEvent> event) {
