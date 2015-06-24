@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -338,5 +339,15 @@ public class CookViewController implements Initializable {
             ManagerViewController.showErrorDialog("Error", "Cook View open Menu Categories Error", "Open the Cook View Menu Categories selection Dialog failed \n"  + e.toString());
         }
 */
+    }
+
+    public void btnClearSelection(ActionEvent actionEvent) {
+        tableViewQueued.getSelectionModel().clearSelection();
+        tableViewInProgress.getSelectionModel().clearSelection();
+    }
+
+    public void btnSelectAll(ActionEvent actionEvent) {
+        tableViewQueued.getSelectionModel().selectAll();
+        tableViewInProgress.getSelectionModel().selectAll();
     }
 }
