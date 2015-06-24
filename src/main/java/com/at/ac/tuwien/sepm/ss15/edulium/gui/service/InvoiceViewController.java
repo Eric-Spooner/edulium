@@ -1,9 +1,9 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceManager;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
@@ -12,19 +12,19 @@ import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,6 +42,17 @@ public class InvoiceViewController  implements Initializable {
     private Label headerLabel;
     @FXML
     private HBox headerLayout;
+
+    @Resource(name = "taskScheduler")
+    private TaskScheduler taskScheduler;
+    @Resource(name = "invoiceManager")
+    private InvoiceManager invoiceManager;
+    @Resource(name = "invoiceService")
+    private InvoiceService invoiceService;
+    @Resource(name = "orderService")
+    private OrderService orderService;
+
+    private PollingList<Order> allOrders;
 
     private class OrderCell extends ListCell<Order> {
         private final Label nameLabel;
@@ -115,15 +126,6 @@ public class InvoiceViewController  implements Initializable {
         }
     }
 
-    @Resource(name = "orderService")
-    private OrderService orderService;
-    @Resource(name = "invoiceService")
-    private InvoiceService invoiceService;
-    @Resource(name = "taskScheduler")
-    private TaskScheduler taskScheduler;
-
-    private PollingList<Order> allOrders;
-
     private Table table;
 
     private final Map<Order, Set<Order>> orders = new HashMap<>();
@@ -144,6 +146,94 @@ public class InvoiceViewController  implements Initializable {
         // TODO create invoice
 
         allOrders.immediateUpdate();
+    }
+
+    private void handleInvoiceWithPaymentTypeAndAdditionalInfo(String type, String additionalInfo) {
+        List<Order> orders = new ArrayList<>();
+//        orders.addAll(queuedOrdersView.getSelectionModel().getSelectedItems());
+//        orders.addAll(inProgressOrdersView.getSelectionModel().getSelectedItems());
+//        orders.addAll(readyForDeliveryOrdersView.getSelectionModel().getSelectedItems());
+//        orders.addAll(deliveredOrdersView.getSelectionModel().getSelectedItems());
+
+        LocalDateTime creationTime = LocalDateTime.now();
+
+        Invoice invoice = new Invoice();
+        invoice.setOrders(orders);
+        invoice.setTime(creationTime);
+        invoice.setCreator(getLoggedInUser());
+
+        try {
+            invoiceService.addInvoice(invoice);
+        } catch (ServiceException e) {
+            LOGGER.error("An error occurred while trying to create the invoice", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Failed to create the invoice");
+            alert.setHeaderText("An error occurred while trying to create the invoice");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+            return;
+        } catch (ValidationException e) {
+            LOGGER.error("Validation of the invoice failed", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Invoice validation failed");
+            alert.setHeaderText("The information provided for the invoice is incomplete " +
+                    "or violates the invoice validation");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+            return;
+        }
+
+        Instalment instalment = new Instalment();
+        instalment.setInvoice(invoice);
+        instalment.setType(type);
+        instalment.setPaymentInfo(additionalInfo);
+        instalment.setTime(creationTime);
+
+        try {
+            invoiceService.addInstalment(instalment);
+        } catch (ServiceException e) {
+            LOGGER.error("An error occurred while trying to create the instalment");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Failed to create the instalment");
+            alert.setHeaderText("An error occurred while trying to create the instalment");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+            return;
+        } catch (ValidationException e) {
+            LOGGER.error("Validation of the instalment failed", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Instalment validation failed");
+            alert.setHeaderText("The information provided for the instalment is incomplete " +
+                    "or violates the instalment validation");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+            return;
+        }
+
+        try {
+            invoiceManager.manageInvoice(invoice);
+        } catch (ServiceException e) {
+            LOGGER.error("An error occurred while trying to manage the invoice", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Invoice manager failure");
+            alert.setHeaderText("The invoice manager failed unexpectedly");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+        }
+    }
+
+    private User getLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+
+        return (User) authentication.getPrincipal();
     }
 
     private void initializeAllOrders() {
