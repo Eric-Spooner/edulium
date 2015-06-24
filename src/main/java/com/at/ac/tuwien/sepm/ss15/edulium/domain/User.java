@@ -102,8 +102,9 @@ public class User {
 
         if (identity != null ? !identity.equals(user.identity) : user.identity != null) return false;
         if (name != null ? !name.equals(user.name) : user.name != null) return false;
-        if (tip != null ? tip.compareTo(user.tip)!=0 : user.tip != null) return false;
-        return !(role != null ? !role.equals(user.role) : user.role != null);
+        if (role != null ? !role.equals(user.role) : user.role != null) return false;
+        return !(tip != null ? (user.tip != null ? tip.compareTo(user.tip) != 0 : tip.compareTo(BigDecimal.ZERO) != 0) :
+                               (user.tip != null ? user.tip.compareTo(BigDecimal.ZERO) != 0 : false));
     }
 
     @Override
@@ -111,7 +112,7 @@ public class User {
         int result = identity != null ? identity.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (role != null ? role.hashCode() : 0);
-        result = 31 * result + (tip != null ? tip.hashCode() : 0);
+        result = 31 * result + (tip != null ? tip.hashCode() : BigDecimal.ZERO.hashCode());
         return result;
     }
 
