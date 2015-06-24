@@ -1,15 +1,11 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.AlertPopOver;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
 import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -29,6 +25,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -63,6 +60,8 @@ public class OrderOverviewController implements Initializable {
     private Button takeOverButton;
     @FXML
     private Label headerLabel;
+    @FXML
+    private Button payButton;
 
     private class OrderCell extends ListCell<Order> {
         private final Label nameLabel;
@@ -113,6 +112,10 @@ public class OrderOverviewController implements Initializable {
 
     @Resource(name = "orderService")
     private OrderService orderService;
+    @Resource(name = "invoiceService")
+    private InvoiceService invoiceService;
+    @Resource(name = "invoiceManager")
+    private InvoiceManager invoiceManager;
     @Resource(name = "interiorService")
     private InteriorService interiorService;
     @Resource(name = "taskScheduler")
@@ -122,10 +125,13 @@ public class OrderOverviewController implements Initializable {
     private FXMLPane tableViewPane; // for move to table pop over
     @Resource(name = "orderInputPane")
     private FXMLPane orderInputPane;
+    @Resource(name = "invoiceViewPane")
+    private FXMLPane invoiceViewPane;
 
     private AlertPopOver cancelPopOver;
     private PopOver moveToTablePopOver;
     private PopOver newOrderPopOver;
+    private PopOver invoiceViewPopover;
 
     private PollingList<Order> queuedOrders;
     private PollingList<Order> inProgressOrders;
@@ -144,6 +150,7 @@ public class OrderOverviewController implements Initializable {
         initializeCancelPopOver();
         initializeMoveToTablePopOver();
         initializeNewOrderPopOver();
+        initializeInvoiceViewPopover();
 
         cancelButton.setDisable(true);
         deliverButton.setDisable(true);
@@ -288,6 +295,95 @@ public class OrderOverviewController implements Initializable {
         newOrderPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
     }
 
+    private void initializeInvoiceViewPopover() {
+        invoiceViewPane.setStyle("-fx-padding: 5px");
+
+        invoiceViewPopover = new PopOver(invoiceViewPane);
+        invoiceViewPopover.setHideOnEscape(true);
+        invoiceViewPopover.setAutoHide(true);
+        invoiceViewPopover.setDetachable(false);
+        invoiceViewPopover.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
+    }
+
+    private void handleInvoiceWithPaymentTypeAndAdditionalInfo(String type, String additionalInfo) {
+        List<Order> orders = new ArrayList<>();
+        orders.addAll(queuedOrdersView.getSelectionModel().getSelectedItems());
+        orders.addAll(inProgressOrdersView.getSelectionModel().getSelectedItems());
+        orders.addAll(readyForDeliveryOrdersView.getSelectionModel().getSelectedItems());
+        orders.addAll(deliveredOrdersView.getSelectionModel().getSelectedItems());
+
+        LocalDateTime creationTime = LocalDateTime.now();
+
+        Invoice invoice = new Invoice();
+        invoice.setOrders(orders);
+        invoice.setTime(creationTime);
+        invoice.setCreator(getLoggedInUser());
+
+        try {
+            invoiceService.addInvoice(invoice);
+        } catch (ServiceException e) {
+            LOGGER.error("An error occurred while trying to create the invoice", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Failed to create the invoice");
+            alert.setHeaderText("An error occurred while trying to create the invoice");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+            return;
+        } catch (ValidationException e) {
+            LOGGER.error("Validation of the invoice failed", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Invoice validation failed");
+            alert.setHeaderText("The information provided for the invoice is incomplete " +
+                    "or violates the invoice validation");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+            return;
+        }
+
+        Instalment instalment = new Instalment();
+        instalment.setInvoice(invoice);
+        instalment.setType(type);
+        instalment.setPaymentInfo(additionalInfo);
+        instalment.setTime(creationTime);
+
+        try {
+            invoiceService.addInstalment(instalment);
+        } catch (ServiceException e) {
+            LOGGER.error("An error occurred while trying to create the instalment");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Failed to create the instalment");
+            alert.setHeaderText("An error occurred while trying to create the instalment");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+            return;
+        } catch (ValidationException e) {
+            LOGGER.error("Validation of the instalment failed", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Instalment validation failed");
+            alert.setHeaderText("The information provided for the instalment is incomplete " +
+                    "or violates the instalment validation");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+            return;
+        }
+
+        try {
+            invoiceManager.manageInvoice(invoice);
+        } catch (ServiceException e) {
+            LOGGER.error("An error occurred while trying to manage the invoice", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Invoice manager failure");
+            alert.setHeaderText("The invoice manager failed unexpectedly");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+        }
+    }
+
     @FXML
     public void onCancelButtonClicked() {
         if (cancelPopOver.isShowing()) {
@@ -342,6 +438,14 @@ public class OrderOverviewController implements Initializable {
     }
 
     @FXML
+    public void onPayButtonClicked() {
+        if (invoiceViewPopover.isShowing()) {
+            invoiceViewPopover.hide();
+        } else {
+            invoiceViewPopover.show(payButton);
+        }
+    }
+
     public void onClearSelectionButtonClicked() {
         clearSelection();
     }
@@ -462,6 +566,9 @@ public class OrderOverviewController implements Initializable {
 
         OrderInputController orderInputController = orderInputPane.getController();
         orderInputController.setTable(table);
+
+        InvoiceViewController invoiceViewController = invoiceViewPane.getController();
+        invoiceViewController.setTable(table);
     }
 
     public void setOnBackButtonAction(EventHandler<ActionEvent> event) {
