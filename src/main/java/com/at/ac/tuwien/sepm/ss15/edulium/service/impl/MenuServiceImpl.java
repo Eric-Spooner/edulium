@@ -149,6 +149,13 @@ class MenuServiceImpl implements MenuService {
 
         menuCategoryValidator.validateForDelete(menuCategory);
 
+        // check if the menu category is still in use
+        MenuEntry menuEntryMatcher = new MenuEntry();
+        menuEntryMatcher.setCategory(MenuCategory.withIdentity(menuCategory.getIdentity()));
+        if (!findMenuEntry(menuEntryMatcher).isEmpty()) {
+            throw new ServiceException("Category is still in use, the category can't be deleted");
+        }
+
         try {
             menuCategoryDAO.delete(menuCategory);
         } catch (DAOException e) {

@@ -170,23 +170,25 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
         final String query;
 
         if (invoice.getOrders() != null && invoice.getOrders().size() > 0) {
-            query = "SELECT * FROM Invoice i WHERE " +
+            query = "SELECT * FROM InvoiceExtended i WHERE " +
                     "i.ID = ISNULL(?, i.ID) AND " +
                     "i.invoiceTime = ISNULL(?, i.invoiceTime) AND " +
                     "i.brutto = ISNULL(?, i.brutto) AND " +
                     "i.user_ID = ISNULL(?, i.user_ID) AND " +
-                    "canceled = FALSE AND " +
+                    "i.closed = ISNULL(?, i.closed) AND " +
+                    "i.canceled = FALSE AND " +
                     "EXISTS (SELECT 1 FROM RestaurantOrder o " +
                     "WHERE o.invoice_ID = i.ID AND o.ID IN (" +
                     invoice.getOrders().stream().map(o -> "?").collect(Collectors.joining(", ")) +
                     ") AND o.canceled = FALSE);";
         } else {
-            query = "SELECT * FROM Invoice i WHERE " +
+            query = "SELECT * FROM InvoiceExtended i WHERE " +
                     "i.ID = ISNULL(?, i.ID) AND " +
                     "i.invoiceTime = ISNULL(?, i.invoiceTime) AND " +
                     "i.brutto = ISNULL(?, i.brutto) AND " +
                     "i.user_ID = ISNULL(?, i.user_ID) AND " +
-                    "canceled = FALSE;";
+                    "i.closed = ISNULL(?, i.closed) AND " +
+                    "i.canceled = FALSE;";
         }
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
@@ -194,9 +196,10 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
             stmt.setObject(2, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
             stmt.setObject(3, invoice.getGross());
             stmt.setObject(4, invoice.getCreator() == null ? null : invoice.getCreator().getIdentity());
+            stmt.setObject(5, invoice.getClosed());
 
             if (invoice.getOrders() != null && invoice.getOrders().size() > 0) {
-                int index = 5;
+                int index = 6;
                 for (Order order : invoice.getOrders()) {
                     stmt.setLong(index++, order.getIdentity());
                 }
@@ -225,7 +228,7 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
 
         final List<Invoice> results = new ArrayList<>();
 
-        final String query = "SELECT * FROM Invoice WHERE canceled = FALSE" +
+        final String query = "SELECT * FROM InvoiceExtended WHERE canceled = FALSE" +
                 " AND invoiceTime >= ISNULL(?, invoiceTime)" +
                 " AND invoiceTime <= ISNULL(?, invoiceTime)";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
@@ -257,7 +260,7 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
 
         final List<Invoice> results = new ArrayList<>();
 
-        final String query = "SELECT * FROM Invoice WHERE canceled = FALSE";
+        final String query = "SELECT * FROM InvoiceExtended WHERE canceled = FALSE";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {

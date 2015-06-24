@@ -518,7 +518,7 @@ public class DialogSaleController implements Initializable{
         saleForInit.setEntries(new LinkedList<>());
         inMenuMenuEntries.clear();
         try {
-            allMenuEntries = observableArrayList(menuService.getAllMenuEntries());
+            allMenuEntries.setAll(menuService.getAllMenuEntries());
         }catch (Exception e){
             showErrorDialog
                     ("Refreshing View", "An Error occured during resetting the View /n" + e.toString());

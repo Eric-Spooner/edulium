@@ -11,11 +11,15 @@
    <items>
       <VBox>
          <children>
-            <Text layoutX="200.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="QUEUED">
-               <font>
-                  <Font size="25.0" />
-               </font>
-            </Text>
+            <HBox prefHeight="52.0" prefWidth="518.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="QUEUED">
+                     <font>
+                        <Font size="25.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
             <TableView fx:id="tableViewQueued" layoutX="11.0" layoutY="54.0" prefHeight="399.0" prefWidth="516.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="54.0" VBox.vgrow="ALWAYS">
                <columns>
                   <TableColumn fx:id="tableColQueudTisch" prefWidth="67.0" text="Table" />
@@ -30,13 +34,17 @@
             <Button cancelButton="true" layoutX="248.0" layoutY="459.0" mnemonicParsing="false" onAction="#btnQueuedToInProgress" prefHeight="72.0" prefWidth="121.0" text="&gt;&gt;" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="248.0" AnchorPane.rightAnchor="248.0" />
          </children>
       </VBox>
-      <VBox>
+      <VBox prefHeight="651.0" prefWidth="514.0">
          <children>
-            <Text layoutX="172.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="IN PROGRESS" AnchorPane.topAnchor="14.0224609375">
-               <font>
-                  <Font size="25.0" />
-               </font>
-            </Text>
+            <HBox prefHeight="50.0" prefWidth="512.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="IN PROGRESS">
+                     <font>
+                        <Font size="25.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
             <TableView fx:id="tableViewInProgress" layoutX="10.0" layoutY="54.0" prefHeight="399.0" prefWidth="516.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="54.0" VBox.vgrow="ALWAYS">
                <columns>
                   <TableColumn fx:id="tableColProgTisch" prefWidth="67.0" text="Table" />
@@ -50,11 +58,25 @@
       </VBox>
       <VBox>
          <children>
-            <Text layoutX="172.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="READY FOR DELIVERY" AnchorPane.topAnchor="14.0224609375">
-               <font>
-                  <Font size="25.0" />
-               </font>
-            </Text>
+            <HBox prefHeight="49.0" prefWidth="523.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="READY FOR DELIVERY" wrappingWidth="269.31982421875">
+                     <font>
+                        <Font size="25.0" />
+                     </font>
+                  </Text>
+                  <HBox prefHeight="34.0" prefWidth="163.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#btnClearSelection" prefHeight="52.0" prefWidth="145.0" text="Clear Selection" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="34.0" prefWidth="108.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#btnSelectAll" prefHeight="49.0" prefWidth="107.0" text="Select All" />
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
             <TableView fx:id="tableViewReadyForDelivery" layoutX="10.0" layoutY="54.0" prefHeight="399.0" prefWidth="516.0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="54.0" VBox.vgrow="ALWAYS">
                <columns>
                   <TableColumn fx:id="tableColDeliveryTable" prefWidth="67.0" text="Table" />
