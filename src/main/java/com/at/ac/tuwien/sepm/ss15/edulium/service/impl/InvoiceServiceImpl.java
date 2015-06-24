@@ -27,10 +27,7 @@ class InvoiceServiceImpl implements InvoiceService {
     private static final Logger LOGGER = LogManager.getLogger(InteriorServiceImpl.class);
 
     @Resource(name = "invoiceDAO")
-    private DAO<Invoice> invoiceDAO;
-
-    @Resource(name = "invoiceDAO")
-    private InvoiceDAO findBetweenInvoiceDAO;
+    private InvoiceDAO invoiceDAO;
 
     @Resource(name = "instalmentDAO")
     private ImmutableDAO<Instalment> instalmentDAO;
@@ -127,7 +124,7 @@ class InvoiceServiceImpl implements InvoiceService {
         LOGGER.debug("Entering findInvoicesBetween with parameters: " + from + ", "+ to);
 
         try {
-            return findBetweenInvoiceDAO.findBetween(from, to);
+            return invoiceDAO.findBetween(from, to);
         } catch (DAOException e) {
             throw new ServiceException("Could not find invoices", e);
         }
