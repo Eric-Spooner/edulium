@@ -210,7 +210,7 @@ class PrinterInvoiceManager implements InvoiceManager {
     /**
      * Opens the PDF with the default application for opening PDFs
      */
-    private void viewPDF() throws ServiceException {
+    private void viewPDF() {
         if (Desktop.isDesktopSupported()) {
             File file = new File(outputFilePath);
             try {

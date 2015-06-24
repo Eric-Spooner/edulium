@@ -104,7 +104,7 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
         generateHistory(invoice);
     }
 
-    private void updateOrders(Invoice invoice) throws DAOException, ValidationException {
+    private void updateOrders(Invoice invoice) throws DAOException {
         LOGGER.debug("Entering updateOrders with parameters: " + invoice);
 
         final String orderQuery = "UPDATE RestaurantOrder SET invoice_ID = ? WHERE ID IN (" +
@@ -220,7 +220,7 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
     }
 
     @Override
-    public List<Invoice> findBetween(LocalDateTime from, LocalDateTime to) throws DAOException, ValidationException {
+    public List<Invoice> findBetween(LocalDateTime from, LocalDateTime to) throws DAOException {
         LOGGER.debug("entering findBetween with parameters "+from+", "+to);
 
         final List<Invoice> results = new ArrayList<>();

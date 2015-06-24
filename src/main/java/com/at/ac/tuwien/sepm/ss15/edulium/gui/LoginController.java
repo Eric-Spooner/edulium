@@ -7,7 +7,9 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.GridCell;
@@ -22,10 +24,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * Controller used for the Manager View
@@ -50,7 +50,7 @@ public class LoginController implements Initializable {
     private Consumer<String> logoutConsumer = null;
 
     private class UserButtonCell extends GridCell<User> {
-        private Button button = new Button();
+        private final Button button = new Button();
         private User user = null;
 
         public UserButtonCell() {
@@ -74,15 +74,12 @@ public class LoginController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         users = new PollingList<>(taskScheduler);
         users.setInterval(1000);
-        users.setSupplier(new Supplier<List<User>>() {
-            @Override
-            public List<User> get() {
-                try {
-                    return userService.getAllUsers();
-                } catch (ServiceException e) {
-                    LOGGER.error("Getting all users via user supplier has failed", e);
-                    return null;
-                }
+        users.setSupplier(() -> {
+            try {
+                return userService.getAllUsers();
+            } catch (ServiceException e) {
+                LOGGER.error("Getting all users via user supplier has failed", e);
+                return null;
             }
         });
         users.startPolling();

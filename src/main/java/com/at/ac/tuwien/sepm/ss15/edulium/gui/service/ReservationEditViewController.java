@@ -70,12 +70,12 @@ public class ReservationEditViewController implements Initializable {
     private Reservation reservation;
     private Mode mode;
 
-    private Set<Table> selectedTables = new HashSet<>();
-    private Set<Table> occupiedTables = new HashSet<>();
+    private final Set<Table> selectedTables = new HashSet<>();
+    private final Set<Table> occupiedTables = new HashSet<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        tableViewController = tableViewPane.getController(TableViewController.class);
+        tableViewController = tableViewPane.getController();
         tableViewController.showSeats(true);
 
         splitPane.getItems().add(0, tableViewPane);
@@ -150,7 +150,7 @@ public class ReservationEditViewController implements Initializable {
         onCanceledConsumer = consumer;
     }
 
-    public void updateUI() {
+    private void updateUI() {
         // clear table view controller
         tableViewController.clear();
 
@@ -234,9 +234,7 @@ public class ReservationEditViewController implements Initializable {
         autoPopOver.getOkButton().setText("Ok");
         autoPopOver.getCancelButton().setVisible(false);
 
-        autoPopOver.getOkButton().setOnAction(event -> {
-            autoPopOver.hide();
-        });
+        autoPopOver.getOkButton().setOnAction(event -> autoPopOver.hide());
     }
 
     private void setReservationData() {

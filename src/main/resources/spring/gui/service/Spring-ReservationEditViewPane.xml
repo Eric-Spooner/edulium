@@ -7,7 +7,7 @@
     <bean id="reservationEditViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.service.ReservationEditViewController" scope="prototype" />
 
     <bean id="reservationEditViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/service/ReservationEditView.fxml" />
+        <property name="FXML" value="gui/service/ReservationEditView.fxml" />
     </bean>
 
 </beans>

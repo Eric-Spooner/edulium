@@ -4,18 +4,23 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Component
 public class FXMLPane extends AnchorPane {
+
+    @Autowired
+    private ApplicationContext context;
+
     private Initializable controller = null;
 
-    public FXMLPane(String fxml) {
-        ApplicationContext context = EduliumApplicationContext.getContext();
-
+    public void setFXML(String fxml) {
         FXMLLoader loader = new FXMLLoader();
-        loader.setControllerFactory(aClass -> context.getBean(aClass));
+        loader.setControllerFactory(context::getBean);
 
         try {
             Node node = loader.load(context.getClassLoader().getResourceAsStream(fxml));
@@ -36,10 +41,9 @@ public class FXMLPane extends AnchorPane {
     }
 
     /**
-     * @param aClass Controller class type
      * @return Controller of this scene as object of class type aClass
      */
-    public <T extends Initializable> T getController(Class<T> aClass) {
+    public <T extends Initializable> T getController() {
         return (T)controller;
     }
 }

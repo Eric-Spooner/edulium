@@ -5,7 +5,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 
@@ -14,9 +13,9 @@ import javax.annotation.Resource;
  */
 class TableValidator implements Validator<Table> {
     @Resource(name = "userValidator")
-    Validator<User> userValidator;
+    private Validator<User> userValidator;
     @Resource(name = "sectionValidator")
-    Validator<Section> sectionValidator;
+    private Validator<Section> sectionValidator;
 
     /**
      * validates the object for the create action

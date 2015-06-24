@@ -33,7 +33,6 @@ public class MenuCategoryOverviewController implements Initializable {
     @Autowired
     private TaskScheduler taskScheduler;
 
-    private PollingList<MenuCategory> menuCategories;
     private SortedList<MenuCategory> sortedMenuCategories;
 
     private Consumer<MenuCategory> menuCategoryClickedConsumer = null;
@@ -61,7 +60,7 @@ public class MenuCategoryOverviewController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        menuCategories = new PollingList<>(taskScheduler);
+        PollingList<MenuCategory> menuCategories = new PollingList<>(taskScheduler);
         menuCategories.setInterval(1000);
         menuCategories.setSupplier(() -> {
             try {

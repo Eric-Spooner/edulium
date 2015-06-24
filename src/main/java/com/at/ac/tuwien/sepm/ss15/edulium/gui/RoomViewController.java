@@ -2,48 +2,38 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
-import static javafx.collections.FXCollections.observableArrayList;
 
 /**
  * Controller used for Room view in Manager Window
  */
-@Controller
 public class RoomViewController implements Initializable {
     private static final Logger LOGGER = LogManager.getLogger(RoomViewController.class);
 
@@ -53,7 +43,7 @@ public class RoomViewController implements Initializable {
     private ScrollPane scrollPaneLeft;
     @FXML
     private AnchorPane tableAnchor;
-    private ArrayList<Rect> rects = new ArrayList<Rect>();
+    private final ArrayList<Rect> rects = new ArrayList<>();
     private double scaleX = 1.0;
     private double scaleY = 1.0;
     private long clickedSectionId = -1;
@@ -74,35 +64,27 @@ public class RoomViewController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         drawCanvas();
 
-        tablesCanvas.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent t) {
-                boolean noSectionClicked = true;
-                for(Rect rect : rects) {
-                    if (rect.contains(t.getX(), t.getY())) {
-                        try {
-                            List<Table> tables = interiorService.findTables(Table.withIdentity(Section.withIdentity(rect.getIdentity()), rect.getNumber()));
-                            if (!tables.isEmpty()) {
-                                Table clickedTable = tables.get(0);
-                                System.out.println((String.valueOf(clickedTable.getNumber()) + " clicked"));
-                            }
-
-                            List<Section> sections = interiorService.findSections(Section.withIdentity(rect.getIdentity()));
-                            if (!sections.isEmpty()) {
-                                Section clickedSection = sections.get(0);
-                                noSectionClicked = false;
-                                clickedSectionId = clickedSection.getIdentity();
-                                System.out.println((String.valueOf(clickedSection.getName()) + " clicked" + clickedSection.getIdentity()));
-                            }
-                        } catch (ServiceException e) {
-                            ManagerViewController.showErrorDialog("Error", "Error", e.getMessage());
-                        }
+        tablesCanvas.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
+            boolean noSectionClicked = true;
+            for(Rect rect : rects) {
+                try {
+                    Table clickedTable = rect.getTable(t.getX(), t.getY());
+                    if(clickedTable != null) {
+                        System.out.println((String.valueOf(clickedTable.getNumber()) + " clicked"));
                     }
+                    Section clickedSection = rect.getSection(t.getX(), t.getY());
+                    if(clickedSection != null) {
+                        noSectionClicked = false;
+                        clickedSectionId = clickedSection.getIdentity();
+                        System.out.println((String.valueOf(clickedSection.getName()) + " clicked" + clickedSection.getIdentity()));
+                    }
+                } catch(ServiceException e) {
+                    showErrorDialog("Error", e.getMessage());
                 }
-                if(noSectionClicked)
-                    clickedSectionId = -1;
-                drawCanvas();
             }
+            if(noSectionClicked)
+                clickedSectionId = -1;
+            drawCanvas();
         });
 
         scrollPaneLeft.setPrefSize(120, 120);
@@ -140,7 +122,7 @@ public class RoomViewController implements Initializable {
                 }
             }
         } catch(ServiceException e) {
-            ManagerViewController.showErrorDialog("Error", "Error", e.getMessage());
+            showErrorDialog("Error", e.getMessage());
         }
 
         tablesCanvas.setWidth(canvasWidth);
@@ -166,7 +148,7 @@ public class RoomViewController implements Initializable {
                     gc.setStroke(Color.RED);
                 gc.strokeRoundRect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY, 10, 10);
                 gc.setStroke(Color.BLACK);
-                Rect rectSection = new Rect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY);
+                Rect rectSection = new Rect(x*scaleX, y*scaleY, calculateWidth(section)*scaleX, calculateHeight(section)*scaleY, interiorService);
                 rectSection.setIdentity(section.getIdentity());
                 rects.add(rectSection);
                 gc.setFont(new Font(gc.getFont().getName(), 20 * scaleText));
@@ -174,9 +156,9 @@ public class RoomViewController implements Initializable {
                 Table matcher = new Table();
                 matcher.setSection(section);
                 for (Table table : interiorService.findTables(matcher)) {
-                    Rect rectTable = new Rect(((x+SECTION_PADDING)+(table.getColumn()*FACT))*scaleX, ((y+SECTION_PADDING)+(table.getRow()*FACT))*scaleY, TABLE_SIZE*scaleX, TABLE_SIZE*scaleY);
+                    Rect rectTable = new Rect(((x+SECTION_PADDING)+(table.getColumn()*FACT))*scaleX, ((y+SECTION_PADDING)+(table.getRow()*FACT))*scaleY, TABLE_SIZE*scaleX, TABLE_SIZE*scaleY, interiorService);
                     rectTable.setNumber(table.getNumber());
-                    rectTable.setIdentity(section.getIdentity());
+                    rectTable.setSection(section);
                     gc.strokeRoundRect(rectTable.getX(), rectTable.getY(), rectTable.getW(), rectTable.getH(), 2, 2);
                     rects.add(rectTable);
                     gc.fillText(String.valueOf(table.getNumber()), ((x+SECTION_PADDING)+(table.getColumn()*FACT)+TABLE_SIZE/4)*scaleX, ((y+SECTION_PADDING)+(table.getRow()*FACT)+TABLE_SIZE/1.5)*scaleY);
@@ -185,35 +167,39 @@ public class RoomViewController implements Initializable {
                 prevSection = section;
             }
         } catch(ServiceException e) {
-            ManagerViewController.showErrorDialog("Error", "Error", e.getMessage());
+            showErrorDialog("Error", e.getMessage());
         }
     }
 
 
 
-    public void buttonAddSectionClicked(ActionEvent actionEvent) {
+    public void buttonAddSectionClicked() {
         LOGGER.info("Add Section Button Click");
         drawCanvas();
         try {
             Stage stage = new Stage();
+            AddSectionController.setInteriorService(interiorService);
             AddSectionController.setThisStage(stage);
             AddSectionController.setUpdateCanvas(new UpdateCanvas());
             stage.setTitle("Add Section");
             AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/AddSection.fxml"));
             Scene scene = new Scene(myPane);
             stage.setScene(scene);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
             stage.showAndWait();
         } catch (IOException e) {
             LOGGER.error("Unable to Load Add Section" + e);
         }
     }
 
-    public void buttonEditSectionClicked(ActionEvent actionEvent) {
+    public void buttonEditSectionClicked() {
         LOGGER.info("Edit Section Button Click");
         if(clickedSectionId != -1) {
             drawCanvas();
             try {
                 Stage stage = new Stage();
+                EditSectionController.setInteriorService(interiorService);
                 EditSectionController.setThisStage(stage);
                 EditSectionController.setUpdateCanvas(new UpdateCanvas());
                 EditSectionController.setSectionId(clickedSectionId);
@@ -221,6 +207,8 @@ public class RoomViewController implements Initializable {
                 AnchorPane myPane = FXMLLoader.load(getClass().getResource("/gui/EditSection.fxml"));
                 Scene scene = new Scene(myPane);
                 stage.setScene(scene);
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setResizable(false);
                 stage.showAndWait();
             } catch (IOException e) {
                 LOGGER.error("Unable to Load Edit Section" + e);
@@ -228,7 +216,7 @@ public class RoomViewController implements Initializable {
         }
     }
 
-    public void buttonRemoveSectionClicked(ActionEvent event) {
+    public void buttonRemoveSectionClicked() {
         LOGGER.info("Remove Section Button Click");
         if(clickedSectionId != -1) {
             try {
@@ -263,26 +251,20 @@ public class RoomViewController implements Initializable {
         drawCanvas();
     }
 
-    public void setupListeners() {
-        scrollPaneLeft.widthProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) {
-                tablesCanvas.setWidth(tablesCanvas.getWidth() - (oldSceneWidth.intValue() - newSceneWidth.intValue()));
-                scaleX = newSceneWidth.doubleValue() / 550.0;
-                scaleX = Math.min(scaleX, 2.0);
-                scaleX = Math.max(scaleX, 0.5);
-                drawCanvas();
-            }
+    private void setupListeners() {
+        scrollPaneLeft.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {
+            tablesCanvas.setWidth(tablesCanvas.getWidth() - (oldSceneWidth.intValue() - newSceneWidth.intValue()));
+            scaleX = newSceneWidth.doubleValue()/550.0;
+            scaleX = Math.min(scaleX, 2.0);
+            scaleX = Math.max(scaleX, 0.5);
+            drawCanvas();
         });
-        scrollPaneLeft.heightProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number oldSceneHeight, Number newSceneHeight) {
-                tablesCanvas.setHeight(tablesCanvas.getHeight() - (oldSceneHeight.intValue() - newSceneHeight.intValue()));
-                scaleY = newSceneHeight.doubleValue()/598.0;
-                scaleY = Math.min(scaleY, 2.0);
-                scaleY = Math.max(scaleY, 0.5);
-                drawCanvas();
-            }
+        scrollPaneLeft.heightProperty().addListener((observableValue, oldSceneHeight, newSceneHeight) -> {
+            tablesCanvas.setHeight(tablesCanvas.getHeight() - (oldSceneHeight.intValue() - newSceneHeight.intValue()));
+            scaleY = newSceneHeight.doubleValue()/598.0;
+            scaleY = Math.min(scaleY, 2.0);
+            scaleY = Math.max(scaleY, 0.5);
+            drawCanvas();
         });
     }
 
@@ -308,5 +290,14 @@ public class RoomViewController implements Initializable {
             }
         }
         return max*FACT + TABLE_SIZE + 2*SECTION_PADDING;
+    }
+
+    private void showErrorDialog(String head, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(head);
+        alert.setContentText(content);
+
+        alert.showAndWait();
     }
 }

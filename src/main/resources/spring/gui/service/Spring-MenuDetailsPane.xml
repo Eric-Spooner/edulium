@@ -7,7 +7,7 @@
     <bean id="menuDetailsController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.service.MenuDetailsController" scope="prototype" />
 
     <bean id="menuDetailsPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/service/MenuDetails.fxml" />
+        <property name="FXML" value="gui/service/MenuDetails.fxml" />
     </bean>
 
 </beans>

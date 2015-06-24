@@ -7,7 +7,7 @@
     <bean id="taxRateViewController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.TaxRateViewController" scope="prototype" />
 
     <bean id="taxRateViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/TaxRateView.fxml" />
+        <property name="FXML" value="gui/TaxRateView.fxml" />
     </bean>
 
 </beans>

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 class IntermittentSaleValidator implements Validator<IntermittentSale> {
     @Autowired
+    private
     Validator<MenuEntry> menuEntryValidator;
 
     @Override

@@ -17,10 +17,9 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -73,7 +72,7 @@ class OrderServiceImpl implements OrderService {
             Order preOrder = preOrders.get(0);
             //if the order already had an invoice it is not allowed to be changed
             Invoice invoice = new Invoice();
-            invoice.setOrders(Arrays.asList(order));
+            invoice.setOrders(Collections.singletonList(order));
             if(invoiceService.findInvoices(invoice).size()>0){
                 LOGGER.error("It is not allowed to change an order with invoice");
                 throw new ServiceException("It is not allowed to change an order with invoice");
@@ -136,7 +135,7 @@ class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<Order> findOrderBetween(LocalDateTime from, LocalDateTime to) throws ServiceException, ValidationException {
+    public List<Order> findOrderBetween(LocalDateTime from, LocalDateTime to) throws ServiceException {
         LOGGER.debug("Entering findOrderBetween with parameters: " + from +", "+ to);
 
         try {

@@ -5,7 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 
 public class UpdateInputDialog<Domain> extends InputDialog<Domain> {
 
-    private Domain domainObject;
+    private final Domain domainObject;
     private Validator<Domain> validator;
 
     public UpdateInputDialog(String domainName, Domain domainObject) {

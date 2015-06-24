@@ -2,7 +2,6 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
@@ -21,7 +20,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 
 /**
@@ -106,7 +104,7 @@ abstract class DBAbstractSaleDAO<T extends Sale> implements DAO<T> {
      *
      * @param sale Sale Is used to identify the SaleAssoc
      */
-    protected void updateSaleAssoc(Sale sale) throws DAOException {
+    private void updateSaleAssoc(Sale sale) throws DAOException {
         LOGGER.debug("Entering updateSaleAssoc with parameters: " + sale);
         // At first, look if the
         // disable all SaleAssoc for now, the update sql query will re-enable all valid

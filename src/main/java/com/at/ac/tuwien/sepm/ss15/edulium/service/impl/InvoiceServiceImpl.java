@@ -17,27 +17,27 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 class InvoiceServiceImpl implements InvoiceService {
     private static final Logger LOGGER = LogManager.getLogger(InteriorServiceImpl.class);
 
     @Resource(name = "invoiceDAO")
-    DAO<Invoice> invoiceDAO;
+    private DAO<Invoice> invoiceDAO;
 
     @Resource(name = "invoiceDAO")
-    InvoiceDAO findBetweenInvoiceDAO;
+    private InvoiceDAO findBetweenInvoiceDAO;
 
     @Resource(name = "instalmentDAO")
-    ImmutableDAO<Instalment> instalmentDAO;
+    private ImmutableDAO<Instalment> instalmentDAO;
 
     @Resource(name = "invoiceValidator")
-    Validator<Invoice> invoiceValidator;
+    private Validator<Invoice> invoiceValidator;
 
     @Resource(name = "instalmentValidator")
-    ImmutableValidator<Instalment> instalmentValidator;
+    private ImmutableValidator<Instalment> instalmentValidator;
 
     @Override
     public void addInvoice(Invoice invoice) throws ServiceException, ValidationException {
@@ -99,7 +99,7 @@ class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public List<Invoice> findInvoiceBetween(LocalDateTime from, LocalDateTime to) throws ServiceException, ValidationException {
+    public List<Invoice> findInvoiceBetween(LocalDateTime from, LocalDateTime to) throws ServiceException {
         LOGGER.debug("Entering findInvoicesBetween with parameters: " + from + ", "+ to);
 
         try {

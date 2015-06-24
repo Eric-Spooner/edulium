@@ -3,7 +3,6 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 

@@ -7,7 +7,7 @@
     <bean id="loginController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.LoginController" scope="prototype" />
 
     <bean id="loginPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/Login.fxml" />
+        <property name="FXML" value="gui/Login.fxml" />
     </bean>
 
 </beans>

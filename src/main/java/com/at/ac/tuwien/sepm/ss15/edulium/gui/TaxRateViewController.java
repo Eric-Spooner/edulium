@@ -1,30 +1,24 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.TaxRateService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -59,7 +53,7 @@ public class TaxRateViewController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        taxRateDialogController = taxRateDialogPane.getController(TaxRateDialogController.class);
+        taxRateDialogController = taxRateDialogPane.getController();
 
         // queued
         try {
@@ -72,7 +66,7 @@ public class TaxRateViewController implements Initializable {
         }
     }
 
-    public void buttonTaxRateRemoveClicked(ActionEvent actionEvent) {
+    public void buttonTaxRateRemoveClicked() {
         TaxRate selectedTaxRate = tableViewTaxRate.getSelectionModel().getSelectedItem();
         if(selectedTaxRate == null) {
             return;
@@ -93,7 +87,7 @@ public class TaxRateViewController implements Initializable {
     }
 
     @FXML
-    public void buttonTaxRateUpdateClicked(ActionEvent actionEvent) {
+    public void buttonTaxRateUpdateClicked() {
         TaxRate selectedTaxRate = tableViewTaxRate.getSelectionModel().getSelectedItem();
         if (selectedTaxRate != null) {
             UpdateInputDialog<TaxRate> taxRateInputDialog = new UpdateInputDialog<>("tax rate", selectedTaxRate);
@@ -119,7 +113,7 @@ public class TaxRateViewController implements Initializable {
     }
 
     @FXML
-    public void buttonTaxRateAddClicked(ActionEvent actionEvent) {
+    public void buttonTaxRateAddClicked() {
         CreateInputDialog<TaxRate> taxRateInputDialog = new CreateInputDialog<>("tax rate");
         taxRateInputDialog.setValidator(taxRateValidator);
         taxRateInputDialog.setContent(taxRateDialogPane);

@@ -3,10 +3,10 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Controller;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -52,11 +53,11 @@ public class EmployeeViewController implements Initializable {
     private FXMLPane userDialogPane;
     private UserDialogController userDialogController;
 
-    private ObservableList<User> users = FXCollections.observableArrayList();
+    private final ObservableList<User> users = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        userDialogController = userDialogPane.getController(UserDialogController.class);
+        userDialogController = userDialogPane.getController();
 
         tableViewEmployee.setItems(users);
         tableViewEmployee.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -78,7 +79,7 @@ public class EmployeeViewController implements Initializable {
     }
 
     @FXML
-    public void buttonEmployeesAddClicked(ActionEvent actionEvent) {
+    public void buttonEmployeesAddClicked() {
         CreateInputDialog<User> userInputDialog = new CreateInputDialog<>("employee");
         userInputDialog.setValidator(userValidator);
         userInputDialog.setContent(userDialogPane);
@@ -100,7 +101,7 @@ public class EmployeeViewController implements Initializable {
     }
 
     @FXML
-    public void buttonEmployeesUpdateClicked(ActionEvent actionEvent) {
+    public void buttonEmployeesUpdateClicked() {
         User selectedUser = tableViewEmployee.getSelectionModel().getSelectedItem();
         if (selectedUser != null) {
             UpdateInputDialog<User> userInputDialog = new UpdateInputDialog<>("employee", selectedUser);
@@ -126,7 +127,7 @@ public class EmployeeViewController implements Initializable {
     }
 
     @FXML
-    public void buttonEmployeesSearchClicked(ActionEvent actionEvent) {
+    public void buttonEmployeesSearchClicked() {
         SearchInputDialog<User> userSearchDialog = new SearchInputDialog<>("employees");
         userSearchDialog.setContent(userDialogPane);
         userSearchDialog.setController(userDialogController);
@@ -146,7 +147,7 @@ public class EmployeeViewController implements Initializable {
     }
 
     @FXML
-    public void buttonEmployeesRemoveClicked(ActionEvent actionEvent) {
+    public void buttonEmployeesRemoveClicked() {
         List<User> selectedUsers = tableViewEmployee.getSelectionModel().getSelectedItems();
         for (User selectedUser : selectedUsers) {
             try {
@@ -165,15 +166,16 @@ public class EmployeeViewController implements Initializable {
     }
 
     @FXML
-    public void buttonClearTipClicked(ActionEvent actionEvent) {
+    public void buttonClearTipClicked() {
         List<User> selectedUsers = tableViewEmployee.getSelectionModel().getSelectedItems();
+        List<User> addUsers = new ArrayList<>();
         for (User selectedUser : selectedUsers) {
             try {
                 User editedUser = selectedUser.clone();
                 editedUser.setTip(BigDecimal.ZERO);
                 userService.updateUser(editedUser);
 
-                users.add(editedUser);
+                addUsers.add(editedUser);
             } catch (ValidationException | ServiceException e) {
                 LOGGER.error("Could not clear tip of user " + selectedUser, e);
 
@@ -185,10 +187,11 @@ public class EmployeeViewController implements Initializable {
             }
         }
         users.removeAll(selectedUsers);
+        users.addAll(addUsers);
     }
 
     @FXML
-    public void buttonEmployeesShowAll(ActionEvent actionEvent) {
+    public void buttonEmployeesShowAll() {
         loadAllUsers();
     }
 

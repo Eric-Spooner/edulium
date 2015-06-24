@@ -61,7 +61,7 @@ public interface InvoiceService extends Service {
      * @throws ServiceException if an error processing the request ocurred
      * @throws ValidationException if the parameters are invalid
      */
-    List<Invoice> findInvoiceBetween(LocalDateTime from, LocalDateTime to) throws ServiceException, ValidationException;
+    List<Invoice> findInvoiceBetween(LocalDateTime from, LocalDateTime to) throws ServiceException;
 
     /**
      * @return Returns all stored sections

@@ -7,7 +7,7 @@
     <bean id="serviceController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.service.ServiceController" scope="prototype" />
 
     <bean id="serviceViewPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/service/ServiceView.fxml" />
+        <property name="FXML" value="gui/service/ServiceView.fxml" />
     </bean>
 
 </beans>

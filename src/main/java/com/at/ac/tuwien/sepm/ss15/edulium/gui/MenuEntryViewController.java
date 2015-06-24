@@ -8,7 +8,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -21,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -56,11 +56,11 @@ public class MenuEntryViewController implements Initializable {
     private FXMLPane menuEntryDialogPane;
     private MenuEntryDialogController menuEntryDialogController;
 
-    private ObservableList<MenuEntry> menuEntries = FXCollections.observableArrayList();
+    private final ObservableList<MenuEntry> menuEntries = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        menuEntryDialogController = menuEntryDialogPane.getController(MenuEntryDialogController.class);
+        menuEntryDialogController = menuEntryDialogPane.getController();
 
         tableViewMenuEntry.setItems(menuEntries);
         tableViewMenuEntry.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -83,7 +83,7 @@ public class MenuEntryViewController implements Initializable {
     }
 
     @FXML
-    public void buttonMenuEntryRemoveClicked(ActionEvent actionEvent) {
+    public void buttonMenuEntryRemoveClicked() {
         List<MenuEntry> selectedMenuEntries = tableViewMenuEntry.getSelectionModel().getSelectedItems();
         for (MenuEntry menuEntry : selectedMenuEntries) {
             try {
@@ -102,7 +102,7 @@ public class MenuEntryViewController implements Initializable {
     }
 
     @FXML
-    public void buttonMenuEntrySearchClicked(ActionEvent actionEvent) {
+    public void buttonMenuEntrySearchClicked() {
         SearchInputDialog<MenuEntry> menuEntrySearchDialog = new SearchInputDialog<>("menu entries");
         menuEntrySearchDialog.setContent(menuEntryDialogPane);
         menuEntrySearchDialog.setController(menuEntryDialogController);
@@ -122,7 +122,7 @@ public class MenuEntryViewController implements Initializable {
     }
 
     @FXML
-    public void buttonMenuEntryUpdateClicked(ActionEvent actionEvent) {
+    public void buttonMenuEntryUpdateClicked() {
         MenuEntry selectedMenuEntry = tableViewMenuEntry.getSelectionModel().getSelectedItem();
         if (selectedMenuEntry != null) {
             UpdateInputDialog<MenuEntry> menuEntryInputDialog = new UpdateInputDialog<>("menu entry", selectedMenuEntry);
@@ -148,7 +148,7 @@ public class MenuEntryViewController implements Initializable {
     }
 
     @FXML
-    public void buttonMenuEntryAddClicked(ActionEvent actionEvent) {
+    public void buttonMenuEntryAddClicked() {
         CreateInputDialog<MenuEntry> menuEntryInputDialog = new CreateInputDialog<>("menu entry");
         menuEntryInputDialog.setValidator(menuEntryValidator);
         menuEntryInputDialog.setContent(menuEntryDialogPane);
@@ -170,15 +170,16 @@ public class MenuEntryViewController implements Initializable {
     }
 
     @FXML
-    public void buttonMenuEntryAvailableClicked(ActionEvent actionEvent) {
+    public void buttonMenuEntryAvailableClicked() {
         List<MenuEntry> selectedMenuEntries = tableViewMenuEntry.getSelectionModel().getSelectedItems();
+        List<MenuEntry> addMenuEntries = new ArrayList<>();
         for (MenuEntry menuEntry : selectedMenuEntries) {
             try {
                 MenuEntry editedMenuEntry = menuEntry.clone();
                 editedMenuEntry.setAvailable(true);
                 menuService.updateMenuEntry(editedMenuEntry);
 
-                menuEntries.add(editedMenuEntry);
+                addMenuEntries.add(editedMenuEntry);
             } catch (ValidationException | ServiceException e) {
                 LOGGER.error("Could not reset availability of menu entry " + menuEntry, e);
 
@@ -190,10 +191,11 @@ public class MenuEntryViewController implements Initializable {
             }
         }
         menuEntries.removeAll(selectedMenuEntries);
+        menuEntries.addAll(addMenuEntries);
     }
 
     @FXML
-    public void buttonShowAllMenuEntryClicked(ActionEvent actionEvent) {
+    public void buttonShowAllMenuEntryClicked() {
         loadAllMenuEntries();
     }
 

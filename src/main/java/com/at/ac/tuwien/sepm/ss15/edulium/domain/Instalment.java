@@ -7,12 +7,12 @@ import java.time.LocalDateTime;
  * Domain object representing an instalment
  */
 public class Instalment {
-    Long identity;
-    LocalDateTime time;
-    String paymentInfo;
-    String type;
-    BigDecimal amount;
-    Invoice invoice;
+    private Long identity;
+    private LocalDateTime time;
+    private String paymentInfo;
+    private String type;
+    private BigDecimal amount;
+    private Invoice invoice;
 
     /**
      * Creates a new instalment object and assigns the given identity to it

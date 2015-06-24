@@ -12,18 +12,11 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
-import javafx.util.Callback;
+import javafx.scene.input.MouseEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.CheckListView;
@@ -32,13 +25,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Controller;
 
-import javax.annotation.Resource;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.Supplier;
 
 import static javafx.collections.FXCollections.observableArrayList;
 
@@ -103,19 +94,17 @@ public class CookViewController implements Initializable {
 
     private PopOver menuSelectionPopOver;
 
-    public void initMenuSelectionPopOver(){
+    private void initMenuSelectionPopOver(){
         try {
             CheckListView<MenuCategory> listView = new CheckListView<>();
             listView.setItems(observableArrayList(menuService.getAllMenuCategories()));
             listView.getItems().forEach(MenuCategory -> listView.getCheckModel().check(MenuCategory));
-            listView.getCheckModel().getCheckedItems().addListener(new ListChangeListener<MenuCategory>() {
-                public void onChanged(ListChangeListener.Change<? extends MenuCategory> c) {
-                    checkedCategories.clear();
-                    checkedCategories.addAll(listView.getCheckModel().getCheckedItems());
-                    ordersQueuedFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
-                    ordersReadyForDeliverFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
-                    ordersInProgressFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
-                }
+            listView.getCheckModel().getCheckedItems().addListener((ListChangeListener.Change<? extends MenuCategory> c) -> {
+                checkedCategories.clear();
+                checkedCategories.addAll(listView.getCheckModel().getCheckedItems());
+                ordersQueuedFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
+                ordersReadyForDeliverFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
+                ordersInProgressFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
             });
             // set up listview (listeners; set observablelist,...)
             menuSelectionPopOver = new PopOver(listView);
@@ -143,131 +132,110 @@ public class CookViewController implements Initializable {
         // queued
         ordersQueued = new PollingList<>(taskScheduler);
         ordersQueued.setInterval(1000);
-        ordersQueued.setSupplier(new Supplier<List<Order>>() {
-            @Override
-            public List<Order> get() {
-                try {
-                    Order matcher = new Order();
-                    matcher.setState(Order.State.QUEUED);
-                    return orderService.findOrder(matcher);
-                } catch (ServiceException e) {
-                    LOGGER.error("Getting all queued orders via order supplier has failed", e);
-                    return null;
-                }
+        ordersQueued.setSupplier(() -> {
+            try {
+                Order matcher = new Order();
+                matcher.setState(Order.State.QUEUED);
+                return orderService.findOrder(matcher);
+            } catch (ServiceException e) {
+                LOGGER.error("Getting all queued orders via order supplier has failed", e);
+                return null;
             }
         });
         ordersQueued.startPolling();
-        ordersQueuedFiltered = new FilteredList<Order>(ordersQueued);
+        ordersQueuedFiltered = new FilteredList<>(ordersQueued);
         ordersQueuedFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
         SortedList<Order> sortedDataQueued = new SortedList<>(ordersQueuedFiltered);
         sortedDataQueued.comparatorProperty().bind(tableViewQueued.comparatorProperty());
         tableViewQueued.setItems(sortedDataQueued);
         tableViewQueued.setStyle("-fx-font-size: 25px;");
         tableViewQueued.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        tableViewQueued.setRowFactory(new Callback<TableView<Order>, TableRow<Order>>() {
-            @Override
-            public TableRow<Order> call(TableView<Order> tableView) {
-                final TableRow<Order> row = new TableRow<>();
-                row.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        final int index = row.getIndex();
-                        if (index >= 0 && index < tableView.getItems().size() && tableView.getSelectionModel().isSelected(index)) {
-                            tableView.getSelectionModel().clearSelection();
-                            event.consume();
-                        } else if (index >= 0 && index < tableView.getItems().size()) {
-                            tableView.getSelectionModel().select(index);
-                            event.consume();
-                        }
-                    }
-                });
-                return row;
-            }
+        tableViewQueued.setRowFactory(tableView -> {
+            final TableRow<Order> row = new TableRow<>();
+            row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                final int index = row.getIndex();
+                if (index >= 0 && index < tableView.getItems().size() && tableView.getSelectionModel().isSelected(index)) {
+                    tableView.getSelectionModel().clearSelection();
+                    event.consume();
+                } else if (index >= 0 && index < tableView.getItems().size()) {
+                    tableView.getSelectionModel().select(index);
+                    event.consume();
+                }
+            });
+            return row;
         });
-        tableColQueudTisch.setCellValueFactory(p -> new SimpleObjectProperty<Long>(p.getValue().getTable().getNumber()));
+        tableColQueudTisch.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getTable().getNumber()));
         tableColQueudMenuEntry.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getMenuEntry().getName()));
-        tableColQueudTime.setCellValueFactory(p -> new SimpleObjectProperty<Long>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes()));
-        tableColQueudAddInfo.setCellValueFactory(new PropertyValueFactory<Order, String>("additionalInformation"));
+        tableColQueudTime.setCellValueFactory(p -> new SimpleObjectProperty<>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes()));
+        tableColQueudAddInfo.setCellValueFactory(new PropertyValueFactory<>("additionalInformation"));
         // in progress
         ordersInProgress = new PollingList<>(taskScheduler);
         ordersInProgress.setInterval(1000);
-        ordersInProgress.setSupplier(new Supplier<List<Order>>() {
-            @Override
-            public List<Order> get() {
-                try {
-                    Order matcher = new Order();
-                    matcher.setState(Order.State.IN_PROGRESS);
-                    return orderService.findOrder(matcher);
-                } catch (ServiceException e) {
-                    LOGGER.error("Getting all orders in progress via order supplier has failed", e);
-                    return null;
-                }
+        ordersInProgress.setSupplier(() -> {
+            try {
+                Order matcher = new Order();
+                matcher.setState(Order.State.IN_PROGRESS);
+                return orderService.findOrder(matcher);
+            } catch (ServiceException e) {
+                LOGGER.error("Getting all orders in progress via order supplier has failed", e);
+                return null;
             }
         });
         ordersInProgress.startPolling();
-        ordersInProgressFiltered = new FilteredList<Order>(ordersInProgress);
+        ordersInProgressFiltered = new FilteredList<>(ordersInProgress);
         ordersInProgressFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
         SortedList<Order> sortedDataInProgress = new SortedList<>(ordersInProgressFiltered);
         sortedDataInProgress.comparatorProperty().bind(tableViewInProgress.comparatorProperty());
         tableViewInProgress.setItems(sortedDataInProgress);
         tableViewInProgress.setStyle("-fx-font-size: 25px;");
         tableViewInProgress.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        tableViewInProgress.setRowFactory(new Callback<TableView<Order>, TableRow<Order>>() {
-            @Override
-            public TableRow<Order> call(TableView<Order> tableView) {
-                final TableRow<Order> row = new TableRow<>();
-                row.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        final int index = row.getIndex();
-                        if (index >= 0 && index < tableView.getItems().size() && tableView.getSelectionModel().isSelected(index)) {
-                            tableView.getSelectionModel().clearSelection();
-                            event.consume();
-                        } else if (index >= 0 && index < tableView.getItems().size()) {
-                            tableView.getSelectionModel().select(index);
-                            event.consume();
-                        }
-                    }
-                });
-                return row;
-            }
+        tableViewInProgress.setRowFactory(tableView -> {
+            final TableRow<Order> row = new TableRow<>();
+            row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+                final int index = row.getIndex();
+                if (index >= 0 && index < tableView.getItems().size() && tableView.getSelectionModel().isSelected(index)) {
+                    tableView.getSelectionModel().clearSelection();
+                    event.consume();
+                } else if (index >= 0 && index < tableView.getItems().size()) {
+                    tableView.getSelectionModel().select(index);
+                    event.consume();
+                }
+            });
+            return row;
         });
-        tableColProgTisch.setCellValueFactory(p -> new SimpleObjectProperty<Long>(p.getValue().getTable().getNumber()));
+        tableColProgTisch.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getTable().getNumber()));
         tableColProgMenuEntry.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getMenuEntry().getName()));
-        tableColProgTime.setCellValueFactory(p -> new SimpleObjectProperty<Long>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes()));
-        tableColProgAddInfo.setCellValueFactory(new PropertyValueFactory<Order, String>("additionalInformation"));
+        tableColProgTime.setCellValueFactory(p -> new SimpleObjectProperty<>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes()));
+        tableColProgAddInfo.setCellValueFactory(new PropertyValueFactory<>("additionalInformation"));
 
         // ready for delivery
         ordersReadyForDelivery = new PollingList<>(taskScheduler);
         ordersReadyForDelivery.setInterval(1000);
-        ordersReadyForDelivery.setSupplier(new Supplier<List<Order>>() {
-            @Override
-            public List<Order> get() {
-                try {
-                    Order matcher = new Order();
-                    matcher.setState(Order.State.READY_FOR_DELIVERY);
-                    return orderService.findOrder(matcher);
-                } catch (ServiceException e) {
-                    LOGGER.error("Getting all ready for delivery orders via order supplier has failed", e);
-                    return null;
-                }
+        ordersReadyForDelivery.setSupplier(() -> {
+            try {
+                Order matcher = new Order();
+                matcher.setState(Order.State.READY_FOR_DELIVERY);
+                return orderService.findOrder(matcher);
+            } catch (ServiceException e) {
+                LOGGER.error("Getting all ready for delivery orders via order supplier has failed", e);
+                return null;
             }
         });
         ordersReadyForDelivery.startPolling();
-        ordersReadyForDeliverFiltered = new FilteredList<Order>(ordersReadyForDelivery);
+        ordersReadyForDeliverFiltered = new FilteredList<>(ordersReadyForDelivery);
         ordersReadyForDeliverFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
         SortedList<Order> sortedDataReady = new SortedList<>(ordersReadyForDeliverFiltered);
         sortedDataReady.comparatorProperty().bind(tableViewInProgress.comparatorProperty());
         tableViewReadyForDelivery.setItems(sortedDataReady);
         tableViewReadyForDelivery.setStyle("-fx-font-size: 25px;");
-        tableColDeliveryTable.setCellValueFactory(p -> new SimpleObjectProperty<Long>(p.getValue().getTable().getNumber()));
+        tableColDeliveryTable.setCellValueFactory(p -> new SimpleObjectProperty<>(p.getValue().getTable().getNumber()));
         tableColDeliveryMenuEntry.setCellValueFactory(p -> new SimpleStringProperty(p.getValue().getMenuEntry().getName()));
-        tableColDeliveryTime.setCellValueFactory(p -> new SimpleObjectProperty<Long>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes()));
-        tableColDeliveryAddInfo.setCellValueFactory(new PropertyValueFactory<Order, String>("additionalInformation"));
+        tableColDeliveryTime.setCellValueFactory(p -> new SimpleObjectProperty<>(Duration.between(p.getValue().getTime(), LocalDateTime.now()).toMinutes()));
+        tableColDeliveryAddInfo.setCellValueFactory(new PropertyValueFactory<>("additionalInformation"));
     }
 
 
-    public void btnInProgressToReadyToDeliver(ActionEvent actionEvent) {
+    public void btnInProgressToReadyToDeliver() {
         LOGGER.info("Entered btnInProgressToReadyToDeliver");
 
         if (tableViewInProgress.getSelectionModel().getSelectedItems() != null) {
@@ -291,7 +259,7 @@ public class CookViewController implements Initializable {
         }
     }
 
-    public void btnQueuedToInProgress(ActionEvent actionEvent) {
+    public void btnQueuedToInProgress() {
         LOGGER.info("Entered btnQueuedToInProgress");
 
         if (tableViewInProgress.getSelectionModel().getSelectedItems() != null) {
@@ -315,7 +283,7 @@ public class CookViewController implements Initializable {
         }
     }
 
-    public void btnSelectShownCats(ActionEvent actionEvent){
+    public void btnSelectShownCats(){
         if (menuSelectionPopOver.isShowing()) {
             menuSelectionPopOver.hide();
         } else {

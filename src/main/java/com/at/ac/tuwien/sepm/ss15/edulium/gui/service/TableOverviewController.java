@@ -4,13 +4,11 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
-import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -19,9 +17,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
@@ -100,7 +95,7 @@ public class TableOverviewController implements Initializable {
 
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
-        tableViewController = tableViewPane.getController(TableViewController.class);
+        tableViewController = tableViewPane.getController();
         splitPane.getItems().add(0, tableViewPane);
 
         tablesOfOrders = FXCollections.observableArrayList();
@@ -108,24 +103,22 @@ public class TableOverviewController implements Initializable {
         lvDelivery.setCellFactory(param -> new DeliveryCell());
         lvDelivery.setItems(tablesOfOrders);
 
-        scheduledFuture = taskScheduler.scheduleWithFixedDelay(() -> {
-            Platform.runLater(() -> {
-                // workaround: if user logged out -> exception -> stop polling
-                try {
-                    updateDeliveries();
-                    updateAssignedTables();
-                } catch (AuthenticationCredentialsNotFoundException e) {
-                    if(scheduledFuture != null) {
-                        scheduledFuture.cancel(true);
-                        scheduledFuture = null;
-                    }
+        scheduledFuture = taskScheduler.scheduleWithFixedDelay(() -> Platform.runLater(() -> {
+            // workaround: if user logged out -> exception -> stop polling
+            try {
+                updateDeliveries();
+                updateAssignedTables();
+            } catch (AuthenticationCredentialsNotFoundException e) {
+                if(scheduledFuture != null) {
+                    scheduledFuture.cancel(true);
+                    scheduledFuture = null;
                 }
-            });
-        }, 1000);
+            }
+        }), 1000);
     }
 
     @FXML
-    public void on_lvDelivery_clicked(MouseEvent arg0) {
+    public void on_lvDelivery_clicked() {
         Table selectedTable = lvDelivery.getSelectionModel().getSelectedItem();
 
         if(onTableClickedConsumer != null && selectedTable != null) {
@@ -145,7 +138,7 @@ public class TableOverviewController implements Initializable {
     private void updateDeliveries() {
         Order matcher = new Order();
         matcher.setState(Order.State.READY_FOR_DELIVERY);
-        List<Order> orders = null;
+        List<Order> orders;
 
         try {
             orders = orderService.findOrder(matcher);

@@ -7,7 +7,7 @@
     <bean id="menuEntryDialogController" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.MenuEntryDialogController" scope="prototype" />
 
     <bean id="menuEntryDialogPane" class="com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane" scope="prototype">
-        <constructor-arg name="fxml" value="gui/DialogMenuEntry.fxml" />
+        <property name="FXML" value="gui/DialogMenuEntry.fxml" />
     </bean>
 
 </beans>

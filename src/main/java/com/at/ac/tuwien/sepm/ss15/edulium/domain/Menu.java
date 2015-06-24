@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**

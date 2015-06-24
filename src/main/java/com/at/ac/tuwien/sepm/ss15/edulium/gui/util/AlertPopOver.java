@@ -1,28 +1,17 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.util;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.controlsfx.control.PopOver;
 
-import java.util.function.Consumer;
-
-/**
- * Created by phili on 6/18/15.
- */
 public class AlertPopOver extends org.controlsfx.control.PopOver {
 
-    private Button okButton = new Button();
-    private Button cancelButton = new Button();
-    private Label label = new Label();
+    private final Button okButton = new Button();
+    private final Button cancelButton = new Button();
+    private final Label label = new Label();
 
     public AlertPopOver() {
         initLayout();
