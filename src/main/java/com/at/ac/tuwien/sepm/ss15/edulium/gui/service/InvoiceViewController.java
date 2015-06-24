@@ -416,9 +416,9 @@ public class InvoiceViewController  implements Initializable {
                 orderMatcher.setTable(table);
                 List<Order> orderListMatcher = orderService.findOrder(orderMatcher);
                 Invoice invoiceMatcher = new Invoice();
+                invoiceMatcher.setClosed(false);
                 invoiceMatcher.setOrders(orderListMatcher);
-                return invoiceService.findInvoices(invoiceMatcher).stream()
-                        .filter(invoice -> invoice != null && !invoice.getClosed()).collect(Collectors.toList());
+                return invoiceService.findInvoices(invoiceMatcher);
             } catch (ServiceException e) {
                 return null;
             }
