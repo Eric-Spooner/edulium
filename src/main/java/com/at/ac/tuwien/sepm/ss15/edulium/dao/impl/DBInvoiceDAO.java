@@ -52,13 +52,14 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
 
         invoiceValidator.validateForCreate(invoice);
 
-        final String query = "INSERT INTO Invoice (invoiceTime, brutto, user_ID) VALUES (?, ?, ?)";
+        final String query = "INSERT INTO Invoice (invoiceTime, brutto, user_ID, signature) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement stmt = dataSource.getConnection()
                 .prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setTimestamp(1, Timestamp.valueOf(invoice.getTime()));
             stmt.setBigDecimal(2, invoice.getGross());
             stmt.setString(3, invoice.getCreator().getIdentity());
+            stmt.setString(4, invoice.getSignature());
             stmt.executeUpdate();
 
             ResultSet key = stmt.getGeneratedKeys();
@@ -83,13 +84,14 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
 
         invoiceValidator.validateForUpdate(invoice);
 
-        final String query = "UPDATE Invoice SET invoiceTime = ?, brutto = ?, user_ID = ? WHERE id = ?";
+        final String query = "UPDATE Invoice SET invoiceTime = ?, brutto = ?, user_ID = ?, signature = ? WHERE id = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setTimestamp(1, Timestamp.valueOf(invoice.getTime()));
             stmt.setBigDecimal(2, invoice.getGross());
             stmt.setString(3, invoice.getCreator().getIdentity());
-            stmt.setLong(4, invoice.getIdentity());
+            stmt.setString(4, invoice.getSignature());
+            stmt.setLong(5, invoice.getIdentity());
 
             if (stmt.executeUpdate() == 0) {
                 LOGGER.error("Failed to update invoice entry in database, dataset not found");
@@ -175,6 +177,7 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
                     "i.invoiceTime = ISNULL(?, i.invoiceTime) AND " +
                     "i.brutto = ISNULL(?, i.brutto) AND " +
                     "i.user_ID = ISNULL(?, i.user_ID) AND " +
+                    "i.signature = ISNULL(?, i.signature) AND " +
                     "i.closed = ISNULL(?, i.closed) AND " +
                     "i.canceled = FALSE AND " +
                     "EXISTS (SELECT 1 FROM RestaurantOrder o " +
@@ -187,6 +190,7 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
                     "i.invoiceTime = ISNULL(?, i.invoiceTime) AND " +
                     "i.brutto = ISNULL(?, i.brutto) AND " +
                     "i.user_ID = ISNULL(?, i.user_ID) AND " +
+                    "i.signature = ISNULL(?, i.signature) AND " +
                     "i.closed = ISNULL(?, i.closed) AND " +
                     "i.canceled = FALSE;";
         }
@@ -196,10 +200,11 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
             stmt.setObject(2, invoice.getTime() == null ? null : Timestamp.valueOf(invoice.getTime()));
             stmt.setObject(3, invoice.getGross());
             stmt.setObject(4, invoice.getCreator() == null ? null : invoice.getCreator().getIdentity());
-            stmt.setObject(5, invoice.getClosed());
+            stmt.setObject(5, invoice.getSignature());
+            stmt.setObject(6, invoice.getClosed());
 
             if (invoice.getOrders() != null && invoice.getOrders().size() > 0) {
-                int index = 6;
+                int index = 7;
                 for (Order order : invoice.getOrders()) {
                     stmt.setLong(index++, order.getIdentity());
                 }
@@ -387,6 +392,7 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
         invoice.setIdentity(rs.getLong("ID"));
         invoice.setTime(rs.getTimestamp("invoiceTime").toLocalDateTime());
         invoice.setGross(rs.getBigDecimal("brutto"));
+        invoice.setSignature(rs.getString("signature"));
 
         List<Order> orders = new LinkedList<>();
         final String query = "SELECT ID FROM RestaurantOrder WHERE invoice_ID = ?";

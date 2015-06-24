@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -115,7 +116,7 @@ public class InvoiceViewController  implements Initializable {
                 increaseAmountButton.setDisable(available.equals(0));
                 decreaseAmountButton.setDisable(amount.equals(0));
 
-                nameLabel.setText(group.getMenuEntry().getName());setText(group.getMenuEntry().getName());
+                nameLabel.setText(group.getMenuEntry().getName());
                 additionalInformationLabel.setText(group.getAdditionalInformation());
                 amountLabel.setText(amount.toString());
                 availableLabel.setText("(" + available.toString() + ")");
@@ -179,6 +180,39 @@ public class InvoiceViewController  implements Initializable {
         invoiceView.setCellFactory(view -> new InvoiceCell());
         invoiceView.setItems(allInvoices);
         invoiceView.setStyle("-fx-font-size: 18px;");
+    }
+
+    @FXML
+    public void onCashButtonClicked() {
+        Instalment instalment = new Instalment();
+        instalment.setTime(LocalDateTime.now());
+        instalment.setAmount(new BigDecimal("5")); // TODO: get value from text field
+        instalment.setType("CASH");
+        instalment.setPaymentInfo("Paid in cash");
+        instalment.setInvoice(null); // TODO get selected invoice
+        addInstalment(instalment);
+    }
+
+    @FXML
+    public void onCreditButtonClicked() {
+        Instalment instalment = new Instalment();
+        instalment.setTime(LocalDateTime.now());
+        instalment.setAmount(new BigDecimal("5")); // TODO: get value from text field
+        instalment.setType("CREDIT");
+        instalment.setPaymentInfo("Paid by credit card");
+        instalment.setInvoice(null); // TODO get selected invoice
+        addInstalment(instalment);
+    }
+
+    @FXML
+    public void onDebitButtonClicked() {
+        Instalment instalment = new Instalment();
+        instalment.setTime(LocalDateTime.now());
+        instalment.setAmount(new BigDecimal("5")); // TODO: get value from text field
+        instalment.setType("DEBIT");
+        instalment.setPaymentInfo("Paid by debit card");
+        instalment.setInvoice(null); // TODO get selected invoice
+        addInstalment(instalment);
     }
 
     @FXML
@@ -383,7 +417,8 @@ public class InvoiceViewController  implements Initializable {
                 List<Order> orderListMatcher = orderService.findOrder(orderMatcher);
                 Invoice invoiceMatcher = new Invoice();
                 invoiceMatcher.setOrders(orderListMatcher);
-                return invoiceService.findInvoices(invoiceMatcher);
+                return invoiceService.findInvoices(invoiceMatcher).stream()
+                        .filter(invoice -> invoice != null && !invoice.getClosed()).collect(Collectors.toList());
             } catch (ServiceException e) {
                 return null;
             }

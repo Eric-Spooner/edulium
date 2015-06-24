@@ -13,6 +13,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ImmutableValidator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceSigningService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,10 +44,20 @@ class InvoiceServiceImpl implements InvoiceService {
     @Resource(name = "tableBusinessLogic")
     private TableBusinessLogic tableBusinessLogic;
 
+    @Resource(name = "invoiceSigningService")
+    private InvoiceSigningService invoiceSigningService;
+
     @Override
     public void addInvoice(Invoice invoice) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addInvoice with parameters: " + invoice);
+
+        if (invoice == null) {
+            throw new ValidationException("Invoice must not be null");
+        }
+
         updateGross(invoice);
+        invoiceSigningService.signInvoice(invoice);
+
         invoiceValidator.validateForCreate(invoice);
 
         try {
@@ -61,7 +72,14 @@ class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void updateInvoice(Invoice invoice) throws ServiceException, ValidationException {
         LOGGER.debug("Entering updateInvoice with parameters: " + invoice);
+
+        if (invoice == null) {
+            throw new ValidationException("Invoice must not be null");
+        }
+
         updateGross(invoice);
+        invoiceSigningService.signInvoice(invoice);
+
         invoiceValidator.validateForUpdate(invoice);
 
         try {
@@ -141,23 +159,12 @@ class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void addInstalment(Instalment instalment) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addInstalment with parameters: " + instalment);
-        updateAmount(instalment);
         instalmentValidator.validateForCreate(instalment);
 
         try {
             instalmentDAO.create(instalment);
         } catch (DAOException e) {
             throw new ServiceException("Could not add instalment", e);
-        }
-    }
-
-    private void updateAmount(Instalment instalment) {
-        if (instalment.getInvoice().getOrders() != null) {
-            BigDecimal amount = BigDecimal.ZERO;
-            for (Order o : instalment.getInvoice().getOrders()) {
-                amount = amount.add(o.getBrutto());
-            }
-            instalment.setAmount(amount);
         }
     }
 

@@ -83,6 +83,14 @@ class InvoiceValidator implements Validator<Invoice> {
             throw new ValidationException("The total gross amount cannot be negative");
         }
 
+        if (invoice.getSignature() == null) {
+            throw new ValidationException("Signature cannot be null");
+        }
+
+        if (invoice.getSignature().isEmpty()) {
+            throw new ValidationException("Signature cannot be empty");
+        }
+
         if (invoice.getOrders() == null) {
             throw new ValidationException("Orders cannot be null");
         }

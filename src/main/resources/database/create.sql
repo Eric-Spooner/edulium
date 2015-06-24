@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS Invoice (
     ID IDENTITY,
     invoiceTime TIMESTAMP,
     brutto DECIMAL(20, 2),
+    signature VARCHAR(100),
     user_ID VARCHAR(25) REFERENCES RestaurantUser(ID),
     canceled BOOLEAN DEFAULT FALSE
 );
@@ -30,6 +31,7 @@ CREATE TABLE IF NOT EXISTS InvoiceHistory (
     ID BIGINT REFERENCES Invoice(ID),
     invoiceTime TIMESTAMP,
     brutto DECIMAL(20, 2),
+    signature VARCHAR(100),
     user_ID VARCHAR(25) REFERENCES RestaurantUser(ID),
     canceled BOOLEAN,
     changeTime TIMESTAMP,
