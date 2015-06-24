@@ -179,7 +179,6 @@ public class OrderInputController  implements Initializable {
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Additional Info");
             dialog.setHeaderText("Enter Additional Info");
-
             Order order = new Order();
             order.setMenuEntry(menuEntry);
             dialog.showAndWait().ifPresent(info -> order.setAdditionalInformation(info));

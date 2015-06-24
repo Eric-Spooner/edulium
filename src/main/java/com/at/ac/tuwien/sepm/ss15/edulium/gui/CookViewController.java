@@ -30,6 +30,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 import static javafx.collections.FXCollections.observableArrayList;
 
@@ -106,6 +107,16 @@ public class CookViewController implements Initializable {
                 ordersReadyForDeliverFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
                 ordersInProgressFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
             });
+            Preferences prefs = Preferences.userNodeForPackage(CookViewController.class);
+            prefs.clear();
+            for(MenuCategory category: menuService.getAllMenuCategories()){
+
+                if(checkedCategories.contains(category)) {
+                    prefs.putBoolean(category.getIdentity().toString(), true);
+                }else {
+                    prefs.putBoolean(category.getIdentity().toString(), false);
+                }
+            }
             // set up listview (listeners; set observablelist,...)
             menuSelectionPopOver = new PopOver(listView);
             // setup menuSelectionPopOver
@@ -115,7 +126,7 @@ public class CookViewController implements Initializable {
             menuSelectionPopOver.setMinSize(1200, 700);
             menuSelectionPopOver.setStyle("-fx-font-size: 25px;");
             menuSelectionPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
-        }catch (ServiceException e ){
+        }catch (Exception e ){
             LOGGER.error("Init Cook View Menu Categories failed", e);
         }
     }
@@ -123,9 +134,13 @@ public class CookViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         initMenuSelectionPopOver();
-
         try {
-            checkedCategories = menuService.getAllMenuCategories();
+            for(MenuCategory menuCategory: menuService.getAllMenuCategories()){
+                Preferences prefs = Preferences.userNodeForPackage(CookViewController.class);
+                if(prefs.getBoolean(menuCategory.getIdentity().toString(), true)) {
+                    checkedCategories.add(menuCategory);
+                }
+            }
         }catch (ServiceException e ){
             LOGGER.error("Getting all MenuCategories has failed", e);
         }
