@@ -207,4 +207,18 @@ public class Order {
         result = 31 * result + (state != null ? state.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public Order clone() {
+        Order order = new Order();
+        order.setIdentity(identity);
+        order.setAdditionalInformation(additionalInformation);
+        order.setMenuEntry(menuEntry == null? null : menuEntry.clone());
+        order.setBrutto(brutto);
+        order.setState(state);
+        order.setTax(tax);
+        order.setTime(time);
+        order.setTable(table == null ? null : table.clone());
+        return order;
+    }
 }

@@ -77,4 +77,12 @@ public class Section {
         result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public Section clone() {
+        Section section = new Section();
+        section.setIdentity(identity);
+        section.setName(name);
+        return section;
+    }
 }

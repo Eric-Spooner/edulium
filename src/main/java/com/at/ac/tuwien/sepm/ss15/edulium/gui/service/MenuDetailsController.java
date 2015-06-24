@@ -147,7 +147,13 @@ public class MenuDetailsController implements Initializable {
     @FXML
     private void onAcceptButtonClicked() {
         if (menuAcceptedConsumer != null) {
-            menuAcceptedConsumer.accept(new ArrayList(selectedMenuEntries.values()));
+            ArrayList<Order> orders = new ArrayList<>();
+            for(Order order : selectedMenuEntries.values()) {
+                orders.add(order.clone());
+                order.setAdditionalInformation("");
+            }
+
+            menuAcceptedConsumer.accept(orders);
         }
     }
 

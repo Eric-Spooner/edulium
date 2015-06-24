@@ -76,4 +76,13 @@ public class TaxRate {
         result = 31 * result + (value != null ? value.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public TaxRate clone() {
+        TaxRate tax = new TaxRate();
+        tax.setValue(value);
+        tax.setIdentity(identity);
+        return tax;
+    }
+
 }
