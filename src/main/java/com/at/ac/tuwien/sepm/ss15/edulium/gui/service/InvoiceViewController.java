@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -185,6 +186,7 @@ public class InvoiceViewController  implements Initializable {
     public void onCashButtonClicked() {
         Instalment instalment = new Instalment();
         instalment.setTime(LocalDateTime.now());
+        instalment.setAmount(new BigDecimal("5")); // TODO: get value from text field
         instalment.setType("CASH");
         instalment.setPaymentInfo("Paid in cash");
         instalment.setInvoice(null); // TODO get selected invoice
@@ -195,6 +197,7 @@ public class InvoiceViewController  implements Initializable {
     public void onCreditButtonClicked() {
         Instalment instalment = new Instalment();
         instalment.setTime(LocalDateTime.now());
+        instalment.setAmount(new BigDecimal("5")); // TODO: get value from text field
         instalment.setType("CREDIT");
         instalment.setPaymentInfo("Paid by credit card");
         instalment.setInvoice(null); // TODO get selected invoice
@@ -205,6 +208,7 @@ public class InvoiceViewController  implements Initializable {
     public void onDebitButtonClicked() {
         Instalment instalment = new Instalment();
         instalment.setTime(LocalDateTime.now());
+        instalment.setAmount(new BigDecimal("5")); // TODO: get value from text field
         instalment.setType("DEBIT");
         instalment.setPaymentInfo("Paid by debit card");
         instalment.setInvoice(null); // TODO get selected invoice

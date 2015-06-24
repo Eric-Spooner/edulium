@@ -151,23 +151,12 @@ class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void addInstalment(Instalment instalment) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addInstalment with parameters: " + instalment);
-        updateAmount(instalment);
         instalmentValidator.validateForCreate(instalment);
 
         try {
             instalmentDAO.create(instalment);
         } catch (DAOException e) {
             throw new ServiceException("Could not add instalment", e);
-        }
-    }
-
-    private void updateAmount(Instalment instalment) {
-        if (instalment.getInvoice().getOrders() != null) {
-            BigDecimal amount = BigDecimal.ZERO;
-            for (Order o : instalment.getInvoice().getOrders()) {
-                amount = amount.add(o.getBrutto());
-            }
-            instalment.setAmount(amount);
         }
     }
 

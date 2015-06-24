@@ -5,6 +5,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.TaxRate;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceManager;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceSigningService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.itextpdf.text.*;
 import com.itextpdf.text.Rectangle;
@@ -14,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageable;
 
+import javax.annotation.Resource;
 import java.awt.*;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
@@ -32,12 +34,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.List;
 
 class PrinterInvoiceManager implements InvoiceManager {
     private static final Logger LOGGER = LogManager.getLogger(PrinterInvoiceManager.class);
 
     private static final String templatePath = "src/main/resources/invoice_templates/template.pdf";
     private static final String outputFilePath = "target/last_invoice.pdf";
+
+    @Resource(name = "invoiceSigningService")
+    private InvoiceSigningService invoiceSigningService;
 
     /**
      * Generates a PDF document from the given invoice and sends it to
@@ -175,9 +181,10 @@ class PrinterInvoiceManager implements InvoiceManager {
 
                 net = net.subtract(tr.getKey().getValue().multiply(tr.getValue()));
             }
-
             ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
                     new Phrase("Net sum: " + currencyFormat(net)), xPos, yPos, 0);
+            ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+                    new Phrase("Signature: " + invoice.getSignature()), xPos, yPos -= 30, 0);
         } catch (DocumentException e) {
             LOGGER.error("An error occurred while creating the PDF stamper", e);
             throw new ServiceException("An error occurred while creating the PDF stamper", e);
