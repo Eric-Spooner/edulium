@@ -126,7 +126,6 @@ class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> findOrder(Order template) throws ServiceException {
         LOGGER.debug("Entering findOrder with parameter: " + template);
-
         try {
             return orderDAO.find(template);
         } catch (DAOException e) {

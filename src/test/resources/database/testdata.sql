@@ -62,6 +62,9 @@ MERGE INTO RestaurantOrder(ID, invoice_ID,  table_section, table_number, menuEnt
 MERGE INTO RestaurantOrder(ID, invoice_ID,  table_section, table_number, menuEntry_ID, orderTime, brutto,
     tax, state) KEY(ID, table_section, table_number) VALUES (3, 1, 1, 1, 1,
     CURRENT_TIMESTAMP, 100, 0.01, 'DELIVERED');
+MERGE INTO RestaurantOrder(ID, table_section, table_number, menuEntry_ID, orderTime, brutto,
+        tax, state, canceled) KEY(ID, table_section, table_number) VALUES (4, 1, 1, 1,
+        CURRENT_TIMESTAMP, 100, 0.01, 'QUEUED', FALSE);
 
 MERGE INTO RestaurantOrderHistory(ID, invoice_ID, table_section, table_number, menuEntry_ID, orderTime, brutto, tax,
      info, state, canceled,changeTime,  changeUser,changeNr) KEY(ID, changeNr, table_section, table_number)

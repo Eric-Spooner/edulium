@@ -656,7 +656,7 @@ public class TestOrderDAO extends AbstractDAOTest {
     @Test
     public void testCreate_shouldAddOrderWithoutAdditionalInformation() throws DAOException, ValidationException {
         // GIVEN
-        Order order = createOrder(BigDecimal.valueOf(500), null, BigDecimal.valueOf(0.2),
+        Order order = createOrder(BigDecimal.valueOf(500), "", BigDecimal.valueOf(0.2),
                 LocalDateTime.now(), Order.State.IN_PROGRESS);
         // WHEN
         orderDAO.create(order);
@@ -671,7 +671,7 @@ public class TestOrderDAO extends AbstractDAOTest {
     @Test
     public void testUpdate_shouldUpdateOrderWithoutAdditionalInformation() throws DAOException, ValidationException {
         //  GIVEN
-        Order order= createOrder(BigDecimal.valueOf(500), null, BigDecimal.valueOf(0.2),
+        Order order= createOrder(BigDecimal.valueOf(500), "", BigDecimal.valueOf(0.2),
                 LocalDateTime.now(), Order.State.IN_PROGRESS);
         orderDAO.create(order);
 
@@ -679,7 +679,7 @@ public class TestOrderDAO extends AbstractDAOTest {
         assertEquals(1, orderDAO.find(Order.withIdentity(order.getIdentity())).size());
 
         // WHEN
-        Order order2 = createOrder(BigDecimal.valueOf(1000), null,
+        Order order2 = createOrder(BigDecimal.valueOf(1000), "",
                 BigDecimal.valueOf(0.02), LocalDateTime.now(), Order.State.READY_FOR_DELIVERY);
         order2.setIdentity(order.getIdentity());
         orderDAO.update(order2);
