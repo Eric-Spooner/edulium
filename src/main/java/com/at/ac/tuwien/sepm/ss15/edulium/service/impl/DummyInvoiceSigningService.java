@@ -20,7 +20,7 @@ class DummyInvoiceSigningService implements InvoiceSigningService {
         LOGGER.debug("Enter signInvoice with parameter: " + invoice);
 
         if (invoice == null) {
-            throw new ServiceException("Invoice must not be null");
+            throw new ValidationException("Invoice must not be null");
         }
 
         // unset identity and signature, so that we can hash the invoice without them
