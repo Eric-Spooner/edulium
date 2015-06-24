@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS Instalment (
 
 CREATE VIEW IF NOT EXISTS InvoiceExtended AS
     SELECT *, ((SELECT SUM(inst.amount)
-                FROM Instalment AS inst JOIN Invoice AS inv ON inst.invoice_ID = inv.ID) >= brutto) AS completed
+                FROM Instalment AS inst JOIN Invoice AS inv ON inst.invoice_ID = inv.ID) >= brutto) AS closed
     FROM Invoice;
 
 CREATE TABLE IF NOT EXISTS RestaurantSection (
