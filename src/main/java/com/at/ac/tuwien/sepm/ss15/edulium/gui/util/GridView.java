@@ -54,12 +54,14 @@ public class GridView<T> extends GridPane {
 
     public void setItems(ObservableList<T> items) {
         this.items = items;
+
         items.addListener((ListChangeListener<T>) c -> {
             while(c.next()) {
                 c.getAddedSubList().forEach(this::addCellItem);
                 c.getRemoved().forEach(this::removeCellItem);
             }
         });
+
 
         items.forEach(this::addCellItem);
     }
