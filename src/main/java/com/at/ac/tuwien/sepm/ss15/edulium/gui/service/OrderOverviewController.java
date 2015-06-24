@@ -360,12 +360,16 @@ public class OrderOverviewController implements Initializable {
 
         User user = getLoggedInUser();
         if (user != null) {
-            table.setUser(user);
+            User previousUser = table.getUser();
 
             try {
+                table.setUser(user);
                 interiorService.updateTable(table);
+
                 takeOverButton.setVisible(false);
             } catch (ValidationException | ServiceException e) {
+                table.setUser(previousUser);
+
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error while setting the responsible waiter for the table");
                 alert.setHeaderText("Could not set '" + user.getName() + "' as responsible waiter for table " +
