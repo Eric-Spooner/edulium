@@ -9,6 +9,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -91,7 +92,12 @@ public class TableViewController implements Initializable {
             }
 
             if (item != null) {
-                GridView<Table> gridView = sectionsMap.get(item);
+                //GridView<Table> gridView = sectionsMap.get(item);
+                GridView<Table> gridView = new GridView<Table>();
+                gridView.setCellFactory(view -> new TableGridCell());
+                gridView.setItems(tables.filtered(table -> table.getSection().equals(item)));
+                sectionsMap.put(item, gridView);
+
                 gridView.setAlignment(Pos.CENTER);
 
                 gridView.setStyle("-fx-border-color: rgb(0, 0, 0);\n" +
@@ -142,21 +148,6 @@ public class TableViewController implements Initializable {
             }
         });
         sections.startPolling();
-
-        sections.addListener(new ListChangeListener<Section>() {
-            @Override
-            public void onChanged(Change<? extends Section> c) {
-                while(c.next()) {
-                    c.getRemoved().forEach(s -> sectionsMap.remove(s));
-                    c.getAddedSubList().forEach(s -> {
-                        GridView<Table> gridView = new GridView<Table>();
-                        gridView.setItems(tables.filtered(table -> table.getSection().equals(s)));
-                        gridView.setCellFactory(view -> new TableGridCell());
-                        sectionsMap.put(s, gridView);
-                    });
-                }
-            }
-        });
 
         ListView<Section> listView = new ListView<>(sections);
         listView.setCellFactory(param -> new SectionListCell());

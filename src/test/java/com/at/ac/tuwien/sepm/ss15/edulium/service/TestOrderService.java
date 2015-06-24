@@ -1,7 +1,10 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.business.TableBusinessLogic;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
@@ -35,6 +38,8 @@ public class TestOrderService extends AbstractServiceTest {
     private DAO<Order> orderDAO;
     @Mock
     Validator<Order> orderValidator;
+    @Mock
+    private TableBusinessLogic tableBusinessLogic;
 
 
     @Autowired
@@ -51,6 +56,7 @@ public class TestOrderService extends AbstractServiceTest {
         MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(getTargetObject(orderService), "orderDAO", orderDAO);
         ReflectionTestUtils.setField(getTargetObject(orderService), "orderValidator", orderValidator);
+        ReflectionTestUtils.setField(getTargetObject(orderService), "tableBusinessLogic", tableBusinessLogic);
     }
 
 
@@ -59,7 +65,8 @@ public class TestOrderService extends AbstractServiceTest {
 
         Order order = new Order();
         order.setTable(interiorService.getAllTables().get(1));
-        order.setMenuEntry(menuService.getAllMenuEntries().get(MenuEntryID));
+        System.out.println(menuService.getAllMenuEntries());
+        order.setMenuEntry(menuService.findMenuEntry(MenuEntry.withIdentity(MenuEntryID)).get(0));
         order.setBrutto(value);
         order.setTax(taxRate);
         order.setAdditionalInformation(additionalInformation);
