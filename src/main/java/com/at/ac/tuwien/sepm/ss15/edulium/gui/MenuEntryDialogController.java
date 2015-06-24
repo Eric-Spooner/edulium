@@ -95,7 +95,10 @@ public class MenuEntryDialogController implements Initializable, InputDialogCont
                 event.consume();
             }
         });
+        fillCatsAndTaxRates();
+    }
 
+    private void fillCatsAndTaxRates(){
         try {
             List<TaxRate> taxRates = taxRateService.getAllTaxRates();
             dropTaxRate.getItems().setAll(taxRates);
@@ -119,6 +122,7 @@ public class MenuEntryDialogController implements Initializable, InputDialogCont
         textFieldPrice.clear();
         textFieldDesription.clear();
         checkAvailable.setSelected(true);
+        fillCatsAndTaxRates();
         dropMenuCategory.getSelectionModel().selectFirst();
         dropTaxRate.getSelectionModel().selectFirst();
         identity = null;
@@ -132,6 +136,7 @@ public class MenuEntryDialogController implements Initializable, InputDialogCont
         textFieldPrice.setText(menuEntry.getPrice().toString());
         checkAvailable.setSelected(menuEntry.getAvailable());
         textFieldDesription.setText(menuEntry.getDescription());
+        fillCatsAndTaxRates();
         dropMenuCategory.getSelectionModel().select(menuEntry.getCategory());
         dropTaxRate.getSelectionModel().select(menuEntry.getTaxRate());
         identity = menuEntry.getIdentity();
@@ -143,6 +148,7 @@ public class MenuEntryDialogController implements Initializable, InputDialogCont
         textFieldPrice.clear();
         textFieldDesription.clear();
         checkAvailable.setSelected(true);
+        fillCatsAndTaxRates();
         dropMenuCategory.getSelectionModel().select(-1);
         dropTaxRate.getSelectionModel().select(-1);
         identity = null;
