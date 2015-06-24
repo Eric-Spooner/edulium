@@ -413,7 +413,7 @@ public class OrderOverviewController implements Initializable {
         this.table = table;
 
         headerLabel.setText("Table " + table.getNumber() + " in " + table.getSection().getName());
-        takeOverButton.setVisible(!table.getUser().equals(getLoggedInUser())); // only visible if the waiter isn't already responsible for the table
+        takeOverButton.setVisible(table.getUser() == null ? true : !table.getUser().equals(getLoggedInUser())); // only visible if the waiter isn't already responsible for the table
 
         queuedOrders.setSupplier(() -> {
             try {
