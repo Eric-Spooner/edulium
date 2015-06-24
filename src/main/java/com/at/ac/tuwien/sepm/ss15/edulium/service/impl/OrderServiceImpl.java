@@ -51,10 +51,8 @@ class OrderServiceImpl implements OrderService {
             //Check if a sale is active and let the price be updated
             MenuEntry entry = order.getMenuEntry();
             saleService.applySales(entry);
-
             //Create the order with the updated price
             orderDAO.create(order);
-
             tableBusinessLogic.addedOrder(order);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
