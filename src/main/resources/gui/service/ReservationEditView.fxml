@@ -64,7 +64,12 @@
                         <Insets top="10.0" />
                      </VBox.margin>
                   </Label>
-                  <BigDecimalField prefWidth="80" fx:id="tfDuration" prefHeight="40.0"  text="1"/>
+                  <HBox alignment="TOP_CENTER" spacing="20.0">
+                     <children>
+                     <BigDecimalField prefWidth="150" fx:id="tfDuration" prefHeight="40.0"  text="1"/>
+                     <Label prefHeight="22.0"  text="Hours" />
+                     </children>
+                  </HBox>
                   <Label text="Date:">
                      <font>
                         <Font size="15.0" />

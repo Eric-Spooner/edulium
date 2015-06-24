@@ -11,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import jfxtras.labs.scene.control.BigDecimalField;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class MenuDialogController implements Initializable, InputDialogControlle
     @FXML
     private TextField textFieldName;
     @FXML
-    private TextField textFieldPrice;
+    private BigDecimalField textFieldPrice;
     @FXML
     private Button buttonAdd;
     @FXML
@@ -69,7 +70,8 @@ public class MenuDialogController implements Initializable, InputDialogControlle
     public void initialize(URL location, ResourceBundle resources) {
         LOGGER.info("Initialize Dialog Menu");
 
-        textFieldPrice.textProperty().addListener(t -> updateAddButton());
+        textFieldPrice.numberProperty().addListener(t -> updateAddButton());
+        textFieldPrice.setMinValue(BigDecimal.valueOf(0));
 
 
         // setup table which contains all menuEntries
@@ -114,7 +116,7 @@ public class MenuDialogController implements Initializable, InputDialogControlle
         resetDialog();
         textFieldPrice.setVisible(false);
         tableColPriceInMen.setVisible(false);
-        textFieldPrice.setText("0.0");
+        textFieldPrice.setNumber(textFieldPrice.getMinValue());
     }
 
     @Override
@@ -133,7 +135,7 @@ public class MenuDialogController implements Initializable, InputDialogControlle
         if(selectedEntry != null) {
             BigDecimal entryPrice;
             try {
-                entryPrice = new BigDecimal(textFieldPrice.getText());
+                entryPrice = textFieldPrice.getNumber();
             } catch (NumberFormatException e) {
                 LOGGER.error("invalid number", e);
 
@@ -178,14 +180,14 @@ public class MenuDialogController implements Initializable, InputDialogControlle
         tableColPriceInMen.setVisible(true);
         textFieldPrice.setVisible(true);
         textFieldName.setText("");
-        textFieldPrice.setText("");
+        textFieldPrice.setNumber(textFieldPrice.getMinValue());
         selectedMenuEntries.clear();
         allMenuEntries.setAll(getAllMenuEntries());
         identity = null;
     }
 
     private void updateAddButton() {
-        buttonAdd.setDisable(tableViewAll.getSelectionModel().isEmpty() || textFieldPrice.getText().isEmpty());
+        buttonAdd.setDisable(tableViewAll.getSelectionModel().isEmpty() || textFieldPrice.getNumber() == null);
     }
 
     private MenuEntry getMenuEntryByIdentity(long id) {

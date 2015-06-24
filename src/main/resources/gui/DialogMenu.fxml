@@ -5,6 +5,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import jfxtras.labs.scene.control.BigDecimalField?>
 <VBox spacing="10.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.MenuDialogController">
    <children>
       <HBox layoutX="14.0" layoutY="14.0" spacing="10.0">
@@ -19,7 +20,7 @@
             <VBox alignment="CENTER" layoutX="434.0" layoutY="119.0" spacing="10.0" HBox.hgrow="NEVER">
                <children>
                   <Text layoutX="443.0" layoutY="131.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Menu Price:" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
-                  <TextField fx:id="textFieldPrice" layoutX="434.0" layoutY="143.0" prefWidth="100.0" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
+                  <BigDecimalField fx:id="textFieldPrice" layoutX="434.0" layoutY="143.0" prefWidth="100.0" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
                   <Button fx:id="buttonAdd" disable="true" layoutX="447.0" layoutY="182.0" mnemonicParsing="false" onAction="#buttonAddClick" prefWidth="100.0" text="Add" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
                   <Button fx:id="buttonRemove" disable="true" layoutX="445.0" layoutY="224.0" mnemonicParsing="false" onAction="#buttonRemoveClick" prefWidth="100.0" text="Remove" AnchorPane.leftAnchor="434.0" AnchorPane.rightAnchor="434.0" />
                </children>
