@@ -116,6 +116,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(getCurrentUser());
         invoice.setOrders(Arrays.asList(order1, order2, order3));
+        invoice.setSignature("signature");
 
         // WHEN
         invoiceDAO.create(invoice);
@@ -154,6 +155,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice.setGross(new BigDecimal("26.7"));
         invoice.setCreator(getCurrentUser());
         invoice.setOrders(Arrays.asList(order1));
+        invoice.setSignature("signature");
         invoiceDAO.create(invoice);
 
         // WHEN
@@ -176,7 +178,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
     @Test(expected = DAOException.class)
     public void testUpdate_updatingNotPersistentObjectShouldFail() throws ValidationException, DAOException {
         // GIVEN
-        Long identity = 1L;
+        Long identity = 10L;
 
         while (!invoiceDAO.find(Invoice.withIdentity(identity)).isEmpty()) {
             identity++;
@@ -188,6 +190,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice.setGross(new BigDecimal("2"));
         invoice.setTime(LocalDateTime.now());
         invoice.setCreator(getCurrentUser());
+        invoice.setSignature("signature");
         invoice.setOrders(Arrays.asList(order1, order2, order3));
         invoiceDAO.update(invoice);
     }
@@ -199,6 +202,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice.setGross(new BigDecimal("20"));
         invoice.setTime(LocalDateTime.now());
         invoice.setCreator(getCurrentUser());
+        invoice.setSignature("signature");
         invoice.setOrders(Arrays.asList(order1, order2, order3));
 
         // WHEN/THEN
@@ -212,6 +216,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("22.0"));
         invoice.setCreator(getCurrentUser());
+        invoice.setSignature("signature");
         invoice.setOrders(Arrays.asList(order1, order2, order3));
         invoiceDAO.create(invoice);
 
@@ -233,7 +238,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
     @Test(expected = DAOException.class)
     public void testDelete_deletingNotPersistentObjectShouldFail() throws ValidationException, DAOException {
         // GIVEN
-        Long identity = 1L;
+        Long identity = 10L;
 
         while (!invoiceDAO.find(Invoice.withIdentity(identity)).isEmpty()) {
             identity++;
@@ -256,14 +261,17 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         inv1.setGross(new BigDecimal("11.0"));
         inv1.setCreator(getCurrentUser());
         inv1.setOrders(Arrays.asList(order1));
+        inv1.setSignature("sig1");
         inv2.setTime(now);
         inv2.setGross(new BigDecimal("12.0"));
         inv2.setCreator(getCurrentUser());
         inv2.setOrders(Arrays.asList(order2));
+        inv2.setSignature("sig2");
         inv3.setTime(now);
         inv3.setGross(new BigDecimal("13.0"));
         inv3.setCreator(getCurrentUser());
         inv3.setOrders(Arrays.asList(order3));
+        inv3.setSignature("sig3");
 
         invoiceDAO.create(inv1);
         invoiceDAO.create(inv2);
@@ -316,6 +324,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice.setGross(new BigDecimal("9.5"));
         invoice.setCreator(creator);
         invoice.setOrders(Arrays.asList(order1, order2, order3));
+        invoice.setSignature("signature");
 
         invoiceDAO.create(invoice);
 
@@ -342,14 +351,17 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         inv1.setGross(new BigDecimal("11.0"));
         inv1.setCreator(getCurrentUser());
         inv1.setOrders(Arrays.asList(order1));
+        inv1.setSignature("signature1");
         inv2.setTime(now);
         inv2.setGross(new BigDecimal("12.0"));
         inv2.setCreator(getCurrentUser());
         inv2.setOrders(Arrays.asList(order2));
+        inv2.setSignature("signature2");
         inv3.setTime(now);
         inv3.setGross(new BigDecimal("13.0"));
         inv3.setCreator(getCurrentUser());
         inv3.setOrders(Arrays.asList(order3));
+        inv3.setSignature("signature3");
 
         invoiceDAO.create(inv1);
         invoiceDAO.create(inv2);
@@ -378,6 +390,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoiceA.setTime(createTime);
         invoiceA.setCreator(getCurrentUser());
         invoiceA.setOrders(Arrays.asList(order1));
+        invoiceA.setSignature("signatureA");
         invoiceDAO.create(invoiceA);
 
         // Update
@@ -387,6 +400,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoiceB.setGross(new BigDecimal("24"));
         invoiceB.setCreator(getCurrentUser());
         invoiceB.setOrders(Arrays.asList(order2, order3));
+        invoiceB.setSignature("signatureB");
         invoiceDAO.update(invoiceB);
 
         // Delete
@@ -461,6 +475,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice1.setGross(new BigDecimal("11.0"));
         invoice1.setCreator(getCurrentUser());
         invoice1.setOrders(Arrays.asList(order1));
+        invoice1.setSignature("signature1");
 
         invoiceDAO.create(invoice1);
         assertEquals(1, invoiceDAO.find(invoice1).size());
@@ -471,6 +486,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice2.setGross(new BigDecimal("12.0"));
         invoice2.setCreator(getCurrentUser());
         invoice2.setOrders(Arrays.asList(order2));
+        invoice2.setSignature("signature2");
 
         invoiceDAO.create(invoice2);
         assertEquals(1, invoiceDAO.find(invoice2).size());
@@ -481,6 +497,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice3.setGross(new BigDecimal("13.0"));
         invoice3.setCreator(getCurrentUser());
         invoice3.setOrders(Arrays.asList(order3));
+        invoice3.setSignature("signature3");
 
         invoiceDAO.create(invoice3);
         assertEquals(1, invoiceDAO.find(invoice3).size());
@@ -510,6 +527,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice1.setGross(new BigDecimal("11.0"));
         invoice1.setCreator(getCurrentUser());
         invoice1.setOrders(Arrays.asList(order1));
+        invoice1.setSignature("signature1");
 
         invoiceDAO.create(invoice1);
         assertEquals(1, invoiceDAO.find(invoice1).size());
@@ -522,6 +540,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice2.setGross(new BigDecimal("12.0"));
         invoice2.setCreator(getCurrentUser());
         invoice2.setOrders(Arrays.asList(order2));
+        invoice2.setSignature("signature2");
 
         invoiceDAO.create(invoice2);
         assertEquals(1, invoiceDAO.find(invoice2).size());
@@ -534,6 +553,7 @@ public class TestInvoiceDAO extends AbstractDAOTest {
         invoice3.setGross(new BigDecimal("13.0"));
         invoice3.setCreator(getCurrentUser());
         invoice3.setOrders(Arrays.asList(order3));
+        invoice3.setSignature("signature3");
 
         invoiceDAO.create(invoice3);
         assertEquals(1, invoiceDAO.find(invoice3).size());
