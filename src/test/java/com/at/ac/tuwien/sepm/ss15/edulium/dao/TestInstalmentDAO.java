@@ -92,6 +92,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(getCurrentUser());
         invoice.setOrders(Arrays.asList(order));
+        invoice.setSignature("signature");
 
         invoiceDAO.create(invoice);
 
@@ -140,6 +141,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(getCurrentUser());
         invoice.setOrders(Arrays.asList(order));
+        invoice.setSignature("signature");
 
         invoiceDAO.create(invoice);
 
@@ -215,6 +217,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(getCurrentUser());
         invoice.setOrders(Arrays.asList(order));
+        invoice.setSignature("signature");
 
         invoiceDAO.create(invoice);
 
@@ -247,6 +250,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(getCurrentUser());
         invoice.setOrders(Arrays.asList(order));
+        invoice.setSignature("signature");
 
         invoiceDAO.create(invoice);
 
@@ -296,6 +300,7 @@ public class TestInstalmentDAO extends AbstractDAOTest {
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(getCurrentUser());
         invoice.setOrders(Arrays.asList(order));
+        invoice.setSignature("signature");
 
         invoiceDAO.create(invoice);
 
