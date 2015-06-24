@@ -48,6 +48,11 @@ CREATE TABLE IF NOT EXISTS Instalment (
     PRIMARY KEY(ID, invoice_ID)
 );
 
+CREATE VIEW IF NOT EXISTS InvoiceExtended AS
+    SELECT *, ((SELECT SUM(inst.amount)
+                FROM Instalment AS inst JOIN Invoice AS inv ON inst.invoice_ID = inv.ID) >= brutto) AS completed
+    FROM Invoice;
+
 CREATE TABLE IF NOT EXISTS RestaurantSection (
     ID IDENTITY,
     name VARCHAR(100),
