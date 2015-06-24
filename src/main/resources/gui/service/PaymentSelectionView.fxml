@@ -7,17 +7,17 @@
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="94.0" prefWidth="322.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.service.PaymentSelectionController">
    <children>
-      <Button fx:id="cashButton" layoutX="31.0" layoutY="30.0" mnemonicParsing="false" onAction="#onCashButtonClicked" text="Cash">
+      <Button fx:id="cashButton" layoutX="31.0" layoutY="30.0" mnemonicParsing="false" text="Cash">
          <font>
             <Font size="18.0" />
          </font>
       </Button>
-      <Button fx:id="creditButton" layoutX="124.0" layoutY="30.0" mnemonicParsing="false" onAction="#onCreditButtonClicked" text="Credit">
+      <Button fx:id="creditButton" layoutX="124.0" layoutY="30.0" mnemonicParsing="false" text="Credit">
          <font>
             <Font size="18.0" />
          </font>
       </Button>
-      <Button fx:id="debitButton" layoutX="224.0" layoutY="30.0" mnemonicParsing="false" onAction="#onDebitButtonClicked" text="Debit">
+      <Button fx:id="debitButton" layoutX="224.0" layoutY="30.0" mnemonicParsing="false" text="Debit">
          <font>
             <Font size="18.0" />
          </font>

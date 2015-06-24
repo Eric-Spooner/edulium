@@ -1,8 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.FXMLPane;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.AlertPopOver;
@@ -27,6 +25,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -297,6 +296,20 @@ public class OrderOverviewController implements Initializable {
     }
 
     private void initializePaymentTypePopover() {
+        PaymentSelectionController paymentSelectionController = paymentSelectionPane.getController();
+        paymentSelectionController.getCashButton().setOnAction(event -> {
+            paymentTypePopover.hide();
+            handleInvoiceWithPaymentTypeAndAdditionalInfo("CASH", "Paid in cash");
+        });
+        paymentSelectionController.getCreditButton().setOnAction(event -> {
+            paymentTypePopover.hide();
+            handleInvoiceWithPaymentTypeAndAdditionalInfo("CREDIT", "Paid by credit card");
+        });
+        paymentSelectionController.getDebitButton().setOnAction(event -> {
+            paymentTypePopover.hide();
+            handleInvoiceWithPaymentTypeAndAdditionalInfo("DEBIT", "Paid by debit card");
+        });
+
         paymentSelectionPane.setStyle("-fx-padding: 5px");
 
         paymentTypePopover = new PopOver(paymentSelectionPane);
@@ -304,6 +317,85 @@ public class OrderOverviewController implements Initializable {
         paymentTypePopover.setAutoHide(true);
         paymentTypePopover.setDetachable(false);
         paymentTypePopover.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
+    }
+
+    private void handleInvoiceWithPaymentTypeAndAdditionalInfo(String type, String additionalInfo) {
+        List<Order> orders = new ArrayList<>();
+        orders.addAll(queuedOrdersView.getSelectionModel().getSelectedItems());
+        orders.addAll(inProgressOrdersView.getSelectionModel().getSelectedItems());
+        orders.addAll(readyForDeliveryOrdersView.getSelectionModel().getSelectedItems());
+        orders.addAll(deliveredOrdersView.getSelectionModel().getSelectedItems());
+
+        LocalDateTime creationTime = LocalDateTime.now();
+
+        Invoice invoice = new Invoice();
+        invoice.setOrders(orders);
+        invoice.setTime(creationTime);
+        invoice.setCreator(getLoggedInUser());
+
+        try {
+            invoiceService.addInvoice(invoice);
+        } catch (ServiceException e) {
+            LOGGER.error("An error occurred while trying to create the invoice", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Failed to create the invoice");
+            alert.setHeaderText("An error occurred while trying to create the invoice");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+            return;
+        } catch (ValidationException e) {
+            LOGGER.error("Validation of the invoice failed", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Invoice validation failed");
+            alert.setHeaderText("The information provided for the invoice is incomplete " +
+                    "or violates the invoice validation");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+            return;
+        }
+
+        Instalment instalment = new Instalment();
+        instalment.setInvoice(invoice);
+        instalment.setType(type);
+        instalment.setPaymentInfo(additionalInfo);
+        instalment.setTime(creationTime);
+
+        try {
+            invoiceService.addInstalment(instalment);
+        } catch (ServiceException e) {
+            LOGGER.error("An error occurred while trying to create the instalment");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Failed to create the instalment");
+            alert.setHeaderText("An error occurred while trying to create the instalment");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+            return;
+        } catch (ValidationException e) {
+            LOGGER.error("Validation of the instalment failed", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Instalment validation failed");
+            alert.setHeaderText("The information provided for the instalment is incomplete " +
+                    "or violates the instalment validation");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+            return;
+        }
+
+        try {
+            invoiceManager.manageInvoice(invoice);
+        } catch (ServiceException e) {
+            LOGGER.error("An error occurred while trying to manage the invoice", e);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Invoice manager failure");
+            alert.setHeaderText("The invoice manager failed unexpectedly");
+            alert.setContentText(e.toString());
+
+            alert.showAndWait();
+        }
     }
 
     @FXML
@@ -366,31 +458,6 @@ public class OrderOverviewController implements Initializable {
         } else {
             paymentTypePopover.show(payButton);
         }
-
-//        List<Order> orders = new ArrayList<>();
-//        orders.addAll(queuedOrdersView.getSelectionModel().getSelectedItems());
-//        orders.addAll(inProgressOrdersView.getSelectionModel().getSelectedItems());
-//        orders.addAll(readyForDeliveryOrdersView.getSelectionModel().getSelectedItems());
-//        orders.addAll(deliveredOrdersView.getSelectionModel().getSelectedItems());
-//
-//        Invoice invoice = new Invoice();
-//        invoice.setOrders(orders);
-//        invoice.setTime(LocalDateTime.now());
-//        invoice.setCreator(getLoggedInUser());
-//
-//        try {
-//            invoiceService.addInvoice(invoice);
-//        } catch (ServiceException e) {
-//            e.printStackTrace(); // TODO: handle exception
-//        } catch (ValidationException e) {
-//            e.printStackTrace(); // TODO: handle exception
-//        }
-//
-//        try {
-//            invoiceManager.manageInvoice(invoice);
-//        } catch (ServiceException e) {
-//            e.printStackTrace(); // TODO: handle exception
-//        }
     }
 
     public void onClearSelectionButtonClicked() {

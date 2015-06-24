@@ -3,8 +3,6 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 
 import java.net.URL;
@@ -12,8 +10,6 @@ import java.util.ResourceBundle;
 
 @Controller
 public class PaymentSelectionController implements Initializable {
-    private static final Logger LOGGER = LogManager.getLogger(PaymentSelectionController.class);
-
     @FXML
     private Button cashButton;
     @FXML
@@ -26,18 +22,15 @@ public class PaymentSelectionController implements Initializable {
 
     }
 
-    @FXML
-    public void onCashButtonClicked() {
-
+    public Button getCashButton() {
+        return cashButton;
     }
 
-    @FXML
-    public void onCreditButtonClicked() {
-
+    public Button getCreditButton() {
+        return creditButton;
     }
 
-    @FXML
-    public void onDebitButtonClicked() {
-
+    public Button getDebitButton() {
+        return debitButton;
     }
 }
