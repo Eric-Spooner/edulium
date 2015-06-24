@@ -472,7 +472,17 @@ public class DialogSaleController implements Initializable{
                     break;
             }
             List<MenuEntry> list = sale.getEntries();
-            list.add(menuEntry);
+            boolean alreadyThere = false;
+            for (MenuEntry e : list) {
+                if (e.getIdentity() == menuEntry.getIdentity()) {
+                    alreadyThere = true;
+                }
+            }
+            if (alreadyThere) {
+                showErrorDialog("Input Validation Error", "The same Menu entry should not be in the list twice.");
+            } else {
+                list.add(menuEntry);
+            }
             sale.setEntries(list);
             inMenuMenuEntries.setAll(sale.getEntries());
         } catch (NumberFormatException e) {
