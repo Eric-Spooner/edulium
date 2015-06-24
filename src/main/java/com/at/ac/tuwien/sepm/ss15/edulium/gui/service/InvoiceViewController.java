@@ -199,7 +199,6 @@ public class InvoiceViewController  implements Initializable {
             alert.setContentText(e.toString());
 
             alert.showAndWait();
-            return;
         } catch (ValidationException e) {
             LOGGER.error("Validation of the instalment failed", e);
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -209,7 +208,6 @@ public class InvoiceViewController  implements Initializable {
             alert.setContentText(e.toString());
 
             alert.showAndWait();
-            return;
         }
     }
 
