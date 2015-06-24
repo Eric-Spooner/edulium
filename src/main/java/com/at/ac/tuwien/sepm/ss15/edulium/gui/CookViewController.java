@@ -12,6 +12,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -28,8 +29,10 @@ import org.springframework.stereotype.Controller;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 import static javafx.collections.FXCollections.observableArrayList;
 
@@ -98,13 +101,25 @@ public class CookViewController implements Initializable {
         try {
             CheckListView<MenuCategory> listView = new CheckListView<>();
             listView.setItems(observableArrayList(menuService.getAllMenuCategories()));
-            listView.getItems().forEach(MenuCategory -> listView.getCheckModel().check(MenuCategory));
+            checkedCategories.forEach(MenuCategory -> listView.getCheckModel().check(MenuCategory));
             listView.getCheckModel().getCheckedItems().addListener((ListChangeListener.Change<? extends MenuCategory> c) -> {
                 checkedCategories.clear();
                 checkedCategories.addAll(listView.getCheckModel().getCheckedItems());
                 ordersQueuedFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
                 ordersReadyForDeliverFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
                 ordersInProgressFiltered.setPredicate(order -> checkedCategories.contains(order.getMenuEntry().getCategory()));
+                try {
+                    for(MenuCategory category: menuService.getAllMenuCategories()){
+                        Preferences prefs = Preferences.userNodeForPackage(CookViewController.class);
+                        if(checkedCategories.contains(category)) {
+                            prefs.putBoolean(category.getIdentity().toString(), true);
+                        }else {
+                            prefs.putBoolean(category.getIdentity().toString(), false);
+                        }
+                    }
+                }catch (Exception e){
+                    //TODO add Error Dialog
+                }
             });
             // set up listview (listeners; set observablelist,...)
             menuSelectionPopOver = new PopOver(listView);
@@ -115,20 +130,26 @@ public class CookViewController implements Initializable {
             menuSelectionPopOver.setMinSize(1200, 700);
             menuSelectionPopOver.setStyle("-fx-font-size: 25px;");
             menuSelectionPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
-        }catch (ServiceException e ){
+        }catch (Exception e ){
             LOGGER.error("Init Cook View Menu Categories failed", e);
         }
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        initMenuSelectionPopOver();
-
+        checkedCategories = new LinkedList<>();
         try {
-            checkedCategories = menuService.getAllMenuCategories();
+            Preferences prefs = Preferences.userNodeForPackage(CookViewController.class);
+            checkedCategories.clear();
+            for(MenuCategory menuCategory: menuService.getAllMenuCategories()){
+                if(prefs.getBoolean(menuCategory.getIdentity().toString(), true)) {
+                    checkedCategories.add(menuCategory);
+                }
+            }
         }catch (ServiceException e ){
             LOGGER.error("Getting all MenuCategories has failed", e);
         }
+        initMenuSelectionPopOver();
         // queued
         ordersQueued = new PollingList<>(taskScheduler);
         ordersQueued.setInterval(1000);
@@ -287,6 +308,17 @@ public class CookViewController implements Initializable {
         if (menuSelectionPopOver.isShowing()) {
             menuSelectionPopOver.hide();
         } else {
+            try {
+                Preferences prefs = Preferences.userNodeForPackage(CookViewController.class);
+                checkedCategories.clear();
+                for(MenuCategory menuCategory: menuService.getAllMenuCategories()){
+                    if(prefs.getBoolean(menuCategory.getIdentity().toString(), false)) {
+                        checkedCategories.add(menuCategory);
+                    }
+                }
+            }catch (ServiceException e ){
+                LOGGER.error("Getting all MenuCategories has failed", e);
+            }
             menuSelectionPopOver.show(btnOpenMenuCats);
         }
         /*try {
@@ -307,5 +339,15 @@ public class CookViewController implements Initializable {
             ManagerViewController.showErrorDialog("Error", "Cook View open Menu Categories Error", "Open the Cook View Menu Categories selection Dialog failed \n"  + e.toString());
         }
 */
+    }
+
+    public void btnClearSelection(ActionEvent actionEvent) {
+        tableViewQueued.getSelectionModel().clearSelection();
+        tableViewInProgress.getSelectionModel().clearSelection();
+    }
+
+    public void btnSelectAll(ActionEvent actionEvent) {
+        tableViewQueued.getSelectionModel().selectAll();
+        tableViewInProgress.getSelectionModel().selectAll();
     }
 }
