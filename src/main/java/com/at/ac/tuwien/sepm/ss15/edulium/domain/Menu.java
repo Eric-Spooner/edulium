@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -93,5 +92,13 @@ public class Menu{
                 ", name='" + name + '\'' +
                 ", entries=" + entries +
                 '}';
+    }
+
+    @Override
+    public int hashCode() {
+        int result = identity != null ? identity.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (entries != null ? entries.hashCode() : 0);
+        return result;
     }
 }

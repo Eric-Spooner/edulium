@@ -1,12 +1,10 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
@@ -14,6 +12,7 @@ import java.util.List;
 /**
  * Service interface for the MenuCategory, MenuEntry and Menu domain objects
  */
+@PreAuthorize("isAuthenticated()")
 public interface MenuService extends Service {
     /**
      * adds a MenuEntry to the underlying datasource

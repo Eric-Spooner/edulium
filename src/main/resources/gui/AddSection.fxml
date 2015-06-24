@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="827.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.AddSectionController">
+   <children>
+      <ScrollPane layoutX="14.0" layoutY="14.0" prefHeight="576.0" prefWidth="649.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="164.0" AnchorPane.topAnchor="14.0">
+         <content>
+            <Canvas fx:id="canvas" height="565.0" width="638.0" />
+         </content>
+      </ScrollPane>
+      <Button layoutX="693.0" layoutY="95.0" mnemonicParsing="false" onAction="#addTableButtonClicked" prefHeight="25.0" prefWidth="103.0" text="Add Table" AnchorPane.rightAnchor="31.0" AnchorPane.topAnchor="95.0" />
+      <TextField fx:id="seatsTF" layoutX="749.0" layoutY="53.0" prefHeight="25.0" prefWidth="47.0" AnchorPane.rightAnchor="31.0" AnchorPane.topAnchor="53.0" />
+      <Label layoutX="677.0" layoutY="58.0" text="Seats:" AnchorPane.rightAnchor="111.0" AnchorPane.topAnchor="58.0" />
+      <Label layoutX="677.0" layoutY="22.0" text="Number:" AnchorPane.rightAnchor="92.0" AnchorPane.topAnchor="22.0" />
+      <TextField fx:id="numberTF" layoutX="749.0" layoutY="17.0" prefHeight="25.0" prefWidth="47.0" AnchorPane.rightAnchor="31.0" AnchorPane.topAnchor="17.0" />
+      <Label layoutX="693.0" layoutY="474.0" text="Section name:" AnchorPane.bottomAnchor="105.0" AnchorPane.rightAnchor="41.0" />
+      <TextField fx:id="nameTF" layoutX="693.0" layoutY="504.0" prefHeight="25.0" prefWidth="103.0" AnchorPane.bottomAnchor="65.0" AnchorPane.rightAnchor="31.0" />
+      <Button layoutX="693.0" layoutY="546.0" mnemonicParsing="false" onAction="#createButtonClicked" prefHeight="25.0" prefWidth="103.0" text="Create" AnchorPane.bottomAnchor="23.0" AnchorPane.rightAnchor="31.0" />
+      <Button layoutX="693.0" layoutY="128.0" mnemonicParsing="false" onAction="#moveTableButtonClicked" prefHeight="25.0" prefWidth="103.0" text="Move Table" AnchorPane.rightAnchor="31.0" AnchorPane.topAnchor="128.0" />
+      <Button layoutX="693.0" layoutY="161.0" mnemonicParsing="false" onAction="#removeTableButtonClicked" prefHeight="25.0" prefWidth="103.0" text="Remove Table" AnchorPane.rightAnchor="31.0" AnchorPane.topAnchor="161.0" />
+      <Button layoutX="693.0" layoutY="194.0" mnemonicParsing="false" onAction="#updateTableButtonClicked" prefHeight="25.0" prefWidth="103.0" text="Update Table" AnchorPane.rightAnchor="31.0" AnchorPane.topAnchor="194.0" />
+   </children>
+</AnchorPane>

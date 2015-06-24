@@ -2,14 +2,15 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -24,6 +25,8 @@ class UserServiceImpl implements UserService {
     private DAO<User> userDAO;
     @Resource(name = "userValidator")
     private Validator<User> userValidator;
+    @Resource(name = "interiorService")
+    private InteriorService interiorService;
 
     @Override
     public void addUser(User user) throws ServiceException, ValidationException {
@@ -44,6 +47,22 @@ class UserServiceImpl implements UserService {
 
         userValidator.validateForUpdate(user);
 
+        if (isManager(user)) {
+            // the user is a manager, we need to perform some additional checks
+
+            if (!user.getRole().equals("ROLE_MANAGER") && getNumberOfManagers() < 2) {
+                // the role has been changed and we have only one manager left
+                throw new ServiceException("Only one remaining manager exists, the role can't be changed");
+            }
+        } else if (isWaiter(user)) {
+            // the user is a waiter, we need to perform some additional checks
+
+            if (!user.getRole().equals("ROLE_SERVICE") && isResponsibleForTables(user)) {
+                // the role has been changed but the user is still responsible for some tables
+                throw new ServiceException("User is still responsible for some tables, the user can't be deleted");
+            }
+        }
+
         try {
             userDAO.update(user);
         } catch (DAOException e) {
@@ -56,6 +75,20 @@ class UserServiceImpl implements UserService {
         LOGGER.debug("Entering deleteUser with parameters: " + user);
 
         userValidator.validateForDelete(user);
+
+        if (isManager(user)) {
+            // the user is a manager, we need to perform some additional checks
+
+            if (getNumberOfManagers() < 2) {
+                // only one manager left
+                throw new ServiceException("Only one remaining manager exists, the user can't be deleted");
+            }
+        }
+
+        // check if user is still responsible for some tables
+        if (isResponsibleForTables(user)) {
+            throw new ServiceException("User is still responsible for some tables, the user can't be deleted");
+        }
 
         try {
             userDAO.delete(user);
@@ -84,5 +117,62 @@ class UserServiceImpl implements UserService {
         } catch (DAOException e) {
             throw new ServiceException("Searching for users has failed", e);
         }
+    }
+
+    /**
+     * Checks if the given user has the MANAGER role.
+     * Uses the persistent version of user to perform the check.
+     * @param user User
+     * @return True if the user is a manager, false otherwise.
+     * @throws ServiceException When the user doesn't exist
+     */
+    private boolean isManager(User user) throws ServiceException {
+        List<User> existingUsers = findUsers(User.withIdentity(user.getIdentity()));
+        if (existingUsers.isEmpty()) {
+            throw new ServiceException("User does not exist");
+        }
+
+        User existingUser = existingUsers.get(0);
+        return existingUser.getRole().equals("ROLE_MANAGER");
+    }
+
+    /**
+     * Checks if the given user has the SERVICE role.
+     * Uses the persistent version of user to perform the check.
+     * @param user User
+     * @return True if the user is a waiter, false otherwise.
+     * @throws ServiceException When the user doesn't exist
+     */
+    private boolean isWaiter(User user) throws ServiceException {
+        List<User> existingUsers = findUsers(User.withIdentity(user.getIdentity()));
+        if (existingUsers.isEmpty()) {
+            throw new ServiceException("User does not exist");
+        }
+
+        User existingUser = existingUsers.get(0);
+        return existingUser.getRole().equals("ROLE_SERVICE");
+    }
+
+    /**
+     * Gets the number of available managers.
+     * @return Number of managers
+     * @throws ServiceException
+     */
+    private int getNumberOfManagers() throws ServiceException {
+        User managerMatcher = new User();
+        managerMatcher.setRole("ROLE_MANAGER");
+        return findUsers(managerMatcher).size();
+    }
+
+    /**
+     * Checks if the given user is responsible for tables.
+     * @param user User
+     * @return True if user is responsible for some tables, false otherwise.
+     * @throws ServiceException
+     */
+    private boolean isResponsibleForTables(User user) throws ServiceException {
+        Table tableMatcher = new Table();
+        tableMatcher.setUser(user);
+        return !interiorService.findTables(tableMatcher).isEmpty();
     }
 }

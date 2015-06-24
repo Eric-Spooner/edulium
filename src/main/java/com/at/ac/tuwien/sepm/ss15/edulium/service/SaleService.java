@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.OnetimeSale;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +14,12 @@ import java.util.List;
  * Service interface for sales.
  */
 public interface SaleService extends Service {
+    /**
+     * returns all sales from the underlying datasource
+     * @throws ServiceException if an error in the service or persistence layer has occurred
+     */
+    List<Sale> getAllSales() throws ServiceException;
+
     /**
      * adds a intermittentSale to the underlying datasource
      * @param intermittentSale intermittentSale to add

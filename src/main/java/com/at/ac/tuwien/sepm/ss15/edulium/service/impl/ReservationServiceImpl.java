@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.ReservationDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
@@ -14,13 +13,9 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.heuristics.ReservationHeuristic;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mockito.cglib.core.Local;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,10 +38,10 @@ class ReservationServiceImpl implements ReservationService {
         LOGGER.debug("Entering addReservation with parameter: " + reservation);
 
         reservationValidator.validateForCreate(reservation);
+
         validateReservationTime(reservation);
 
         try {
-            reservation.setTables(reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables()));
             reservationDAO.create(reservation);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
@@ -74,20 +69,6 @@ class ReservationServiceImpl implements ReservationService {
         validateReservationTime(reservation);
 
         try {
-            // check if reservation time or seats will be changed
-            if(reservation.getQuantity() != originalReservation.getQuantity() ||
-                    reservation.getTime() != originalReservation.getTime() ||
-                    reservation.getDuration() != originalReservation.getDuration()) {
-
-                // delete tables from reservation
-                Reservation tmpRes = Reservation.withIdentity(reservation.getIdentity());
-                tmpRes.setTables(new ArrayList<>());
-                reservationDAO.update(tmpRes);
-
-                // get new tables
-                reservation.setTables(reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables()));
-            }
-
             reservationDAO.update(reservation);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
@@ -110,6 +91,35 @@ class ReservationServiceImpl implements ReservationService {
             LOGGER.error("An Error has occurred in the data access object", e);
             throw new ServiceException("An Error has occurred in the data access object");
         }
+    }
+
+    @Override
+    public void findTablesForReservation(Reservation reservation) throws ServiceException, ValidationException {
+        LOGGER.debug("Entering findTablesForReservation with parameter: " + reservation);
+
+        // validate reservation
+        if (reservation.getTime() == null) {
+            throw new ValidationException("time must not be null");
+        }
+
+        if (reservation.getDuration() == null) {
+            throw new ValidationException("duration must not be null");
+        }
+
+        if (reservation.getQuantity() == null) {
+            throw new ValidationException("quantity must not be null");
+        }
+
+        validateReservationTime(reservation);
+
+        List<Table> tables = reservationHeuristic.getTablesForReservation(reservation, interiorService.getAllTables());
+
+        if (tables.isEmpty()) {
+            LOGGER.debug("no free tables found");
+            throw new ServiceException("no free tables found");
+        }
+
+        reservation.setTables(tables);
     }
 
     @Override
@@ -172,7 +182,7 @@ class ReservationServiceImpl implements ReservationService {
     }
 
     private Reservation getReservationById(long id) throws ServiceException {
-        List<Reservation> resList = null;
+        List<Reservation> resList;
         try {
             resList = reservationDAO.find(Reservation.withIdentity(id));
         } catch (DAOException e) {
@@ -180,7 +190,7 @@ class ReservationServiceImpl implements ReservationService {
             throw new ServiceException("An Error has occurred in the data access object");
         }
 
-        if(resList.isEmpty()) {
+        if(resList.size() != 1) {
             LOGGER.error("reservation not found");
             throw new ServiceException("reservation not found");
         }

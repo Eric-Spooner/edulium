@@ -4,7 +4,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 
@@ -84,6 +83,7 @@ class ReservationValidator implements Validator<Reservation> {
         if (reservation.getTables().isEmpty()) {
             throw new ValidationException("tables must not be empty");
         }
+
         for (Table table : reservation.getTables()) {
             tableValidator.validateIdentity(table);
         }

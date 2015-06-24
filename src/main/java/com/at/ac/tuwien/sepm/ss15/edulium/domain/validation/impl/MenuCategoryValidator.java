@@ -1,8 +1,8 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 
 /**
  * validator implementation for the MenuCategory domain object

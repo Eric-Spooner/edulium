@@ -3,6 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.ImmutableDAO;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.InvoiceDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Instalment;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
@@ -17,28 +18,32 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 class InvoiceServiceImpl implements InvoiceService {
     private static final Logger LOGGER = LogManager.getLogger(InteriorServiceImpl.class);
 
     @Resource(name = "invoiceDAO")
-    DAO<Invoice> invoiceDAO;
+    private DAO<Invoice> invoiceDAO;
+
+    @Resource(name = "invoiceDAO")
+    private InvoiceDAO findBetweenInvoiceDAO;
 
     @Resource(name = "instalmentDAO")
-    ImmutableDAO<Instalment> instalmentDAO;
+    private ImmutableDAO<Instalment> instalmentDAO;
 
     @Resource(name = "invoiceValidator")
-    Validator<Invoice> invoiceValidator;
+    private Validator<Invoice> invoiceValidator;
 
     @Resource(name = "instalmentValidator")
-    ImmutableValidator<Instalment> instalmentValidator;
+    private ImmutableValidator<Instalment> instalmentValidator;
 
     @Override
     public void addInvoice(Invoice invoice) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addInvoice with parameters: " + invoice);
-        invoiceValidator.validateForCreate(invoice);
         updateGross(invoice);
+        invoiceValidator.validateForCreate(invoice);
 
         try {
             invoiceDAO.create(invoice);
@@ -50,8 +55,8 @@ class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void updateInvoice(Invoice invoice) throws ServiceException, ValidationException {
         LOGGER.debug("Entering updateInvoice with parameters: " + invoice);
-        invoiceValidator.validateForUpdate(invoice);
         updateGross(invoice);
+        invoiceValidator.validateForUpdate(invoice);
 
         try {
             invoiceDAO.update(invoice);
@@ -94,6 +99,17 @@ class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    public List<Invoice> findInvoiceBetween(LocalDateTime from, LocalDateTime to) throws ServiceException {
+        LOGGER.debug("Entering findInvoicesBetween with parameters: " + from + ", "+ to);
+
+        try {
+            return findBetweenInvoiceDAO.findBetween(from, to);
+        } catch (DAOException e) {
+            throw new ServiceException("Could not find invoices", e);
+        }
+    }
+
+    @Override
     public List<Invoice> getAllInvoices() throws ServiceException {
         LOGGER.debug("Entering getAllInvoices");
 
@@ -119,12 +135,23 @@ class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void addInstalment(Instalment instalment) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addInstalment with parameters: " + instalment);
+        updateAmount(instalment);
         instalmentValidator.validateForCreate(instalment);
 
         try {
             instalmentDAO.create(instalment);
         } catch (DAOException e) {
             throw new ServiceException("Could not add instalment", e);
+        }
+    }
+
+    private void updateAmount(Instalment instalment) {
+        if (instalment.getInvoice().getOrders() != null) {
+            BigDecimal amount = BigDecimal.ZERO;
+            for (Order o : instalment.getInvoice().getOrders()) {
+                amount = amount.add(o.getBrutto());
+            }
+            instalment.setAmount(amount);
         }
     }
 

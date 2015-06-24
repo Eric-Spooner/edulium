@@ -311,13 +311,14 @@ CREATE TABLE IF NOT EXISTS RestaurantOrder (
     table_section BIGINT,
     table_number BIGINT,
     menuEntry_ID BIGINT REFERENCES MenuEntry(ID),
-    orderTime TIMESTAMP,
+    orderTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     brutto DECIMAL(20, 2),
     tax DECIMAL(3, 2),
     info TEXT,
     state VARCHAR(20),
     canceled BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY(table_section, table_number) REFERENCES RestaurantTable(section_ID, number)
+    FOREIGN KEY(table_section, table_number) REFERENCES RestaurantTable(section_ID, number),
+    PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS RestaurantOrderHistory (
@@ -326,7 +327,7 @@ CREATE TABLE IF NOT EXISTS RestaurantOrderHistory (
     table_section BIGINT,
     table_number BIGINT,
     menuEntry_ID BIGINT REFERENCES MenuEntry(ID),
-    orderTime TIMESTAMP,
+    orderTime TIMESTAMP  DEFAULT CURRENT_TIMESTAMP,
     brutto DECIMAL(20, 2),
     tax DECIMAL(3, 2),
     info TEXT,

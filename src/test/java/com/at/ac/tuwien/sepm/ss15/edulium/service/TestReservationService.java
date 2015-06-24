@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.ReservationDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
@@ -21,9 +20,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit Test for the ReservationService class
@@ -59,8 +60,8 @@ public class TestReservationService extends AbstractServiceTest {
         return t;
     }
 
-    private Reservation createReservation(int day, int hour, int min, List<Table> tables) {
-        Reservation reservation = new Reservation();
+    private Reservation createReservation(long id, int day, int hour, int min, List<Table> tables) {
+        Reservation reservation = Reservation.withIdentity(id);
         reservation.setDuration(Duration.ofMinutes(min));
         reservation.setTime(LocalDateTime.of(2099, 1, day, hour, 0));
         reservation.setTables(tables);
@@ -95,18 +96,18 @@ public class TestReservationService extends AbstractServiceTest {
 
     @Test
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
-    public void testAddReservation_shouldCreateReservation1() throws ServiceException, ValidationException, DAOException {
+    public void testFindTablesForReservation_shouldReturn() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t1));
-        Reservation res2 = createReservation(1, 18, 120, Arrays.asList(t5));
-        Reservation res = createReservation(1, 18, 150, null);
+        Reservation res1 = createReservation(1L, 1, 18, 120, Arrays.asList(t1));
+        Reservation res2 = createReservation(2L, 1, 18, 120, Arrays.asList(t5));
+        Reservation res = createReservation(3L, 1, 18, 150, null);
         res.setQuantity(4);
 
         Mockito.when(reservationDAO.findBetween(res.getTime(), res.getTime().plus(res.getDuration())))
                 .thenReturn(Arrays.asList(res1, res2));
 
         // WHEN
-        reservationService.addReservation(res);
+        reservationService.findTablesForReservation(res);
 
         // THEN
         int seats = 0;
@@ -114,23 +115,20 @@ public class TestReservationService extends AbstractServiceTest {
             seats += t.getSeats();
         }
         assertTrue(seats >= res.getQuantity());
-
-        // check if reservation is stored
-        Mockito.verify(reservationDAO).create(res);
     }
 
     @Test
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
-    public void testAddReservation_shouldCreateReservation2() throws ServiceException, ValidationException, DAOException {
+    public void testFindTablesForReservation_shouldReturn2() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t3));
-        Reservation res = createReservation(1, 17, 150, null);
+        Reservation res1 = createReservation(1L, 1, 18, 120, Arrays.asList(t3));
+        Reservation res = createReservation(2L, 1, 17, 150, null);
         res.setQuantity(6);
 
         Mockito.when(reservationDAO.findBetween(res.getTime(), res.getTime().plus(res.getDuration())))
                 .thenReturn(Arrays.asList(res1));
         // WHEN
-        reservationService.addReservation(res);
+        reservationService.findTablesForReservation(res);
 
         // THEN
         int seats = 0;
@@ -138,23 +136,20 @@ public class TestReservationService extends AbstractServiceTest {
             seats += t.getSeats();
         }
         assertTrue(seats >= res.getQuantity());
-
-        // check if reservation is stored
-        Mockito.verify(reservationDAO).create(res);
     }
 
     @Test
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
-    public void testAddReservation_shouldCreateReservation3() throws ServiceException, ValidationException, DAOException {
+    public void testFindTablesForReservation_shouldReturn3() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t3));
-        Reservation res = createReservation(1, 19, 120, null);
+        Reservation res1 = createReservation(1L, 1, 18, 120, Arrays.asList(t3));
+        Reservation res = createReservation(2L, 1, 19, 120, null);
         res.setQuantity(12);
         Mockito.when(reservationDAO.findBetween(res.getTime(), res.getTime().plus(res.getDuration())))
                 .thenReturn(Arrays.asList(res1));
 
         // WHEN
-        reservationService.addReservation(res);
+        reservationService.findTablesForReservation(res);
 
         // THEN
         // no single table and no tables next to each other are available
@@ -164,18 +159,15 @@ public class TestReservationService extends AbstractServiceTest {
             seats += t.getSeats();
         }
         assertTrue(seats >= res.getQuantity());
-
-        // check if reservation is stored
-        Mockito.verify(reservationDAO).create(res);
     }
 
     @Test(expected = ServiceException.class)
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
-    public void testAddReservation_notEnoughTablesFreeShouldFail() throws ServiceException, ValidationException, DAOException {
+    public void testFindTablesForReservation_notEnoughTablesFreeShouldFail() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t3));
-        Reservation res2 = createReservation(1, 17, 240, Arrays.asList(t5, t6));
-        Reservation res = createReservation(1, 19, 120, null);
+        Reservation res1 = createReservation(1L, 1, 18, 120, Arrays.asList(t3));
+        Reservation res2 = createReservation(2L, 1, 17, 240, Arrays.asList(t5, t6));
+        Reservation res = createReservation(3L, 1, 19, 120, null);
         res.setQuantity(12);
 
         Mockito.when(reservationDAO.findBetween(res.getTime(), res.getTime().plus(res.getDuration())))
@@ -183,9 +175,7 @@ public class TestReservationService extends AbstractServiceTest {
 
         // WHEN
         // tables for max 9 persons free
-        reservationService.addReservation(res);
-
-        System.out.println(res);
+        reservationService.findTablesForReservation(res);
     }
 
     @Test(expected = ServiceException.class)

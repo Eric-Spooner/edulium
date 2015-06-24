@@ -161,4 +161,28 @@ public class MenuEntry {
 
     }
 
+    @Override
+    public int hashCode() {
+        int result = identity != null ? identity.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (price != null ? price.hashCode() : 0);
+        result = 31 * result + (available != null ? available.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (taxRate != null ? taxRate.hashCode() : 0);
+        result = 31 * result + (category != null ? category.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public MenuEntry clone() {
+        MenuEntry menuEntry = new MenuEntry();
+        menuEntry.setIdentity(identity);
+        menuEntry.setPrice(price);
+        menuEntry.setTaxRate(taxRate);
+        menuEntry.setCategory(category);
+        menuEntry.setAvailable(available);
+        menuEntry.setDescription(description);
+        menuEntry.setName(name);
+        return menuEntry;
+    }
 }

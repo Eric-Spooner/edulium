@@ -1,12 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * domain object which represents a section in the restaurant
  */
@@ -76,5 +69,12 @@ public class Section {
         if (name != null ? !name.equals(section.name) : section.name != null) return false;
 
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = identity != null ? identity.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        return result;
     }
 }

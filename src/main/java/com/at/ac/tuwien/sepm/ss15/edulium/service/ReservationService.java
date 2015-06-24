@@ -1,12 +1,10 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,11 +15,8 @@ public interface ReservationService extends Service {
 
     /**
      * adds the reservation to the underlying datasource;
-     * if the tables parameter of reservation is empty or null, this method automatically
-     * chooses tables for the reservation
      * @param reservation reservation to add
      * @throws ServiceException if an error in the service or persistence layer has occurred
-     *                          or no fitting tables could be found (if tables are assigned automatically)
      * @throws ValidationException if the reservation object is not valid for this action
      */
     @PreAuthorize("hasRole('SERVICE')")
@@ -44,6 +39,14 @@ public interface ReservationService extends Service {
      */
     @PreAuthorize("hasRole('SERVICE')")
     void cancelReservation(Reservation reservation) throws ServiceException, ValidationException;
+
+    /**
+     * finds free tables for the reservation and sets them.
+     * @param reservation reservation
+     * @throws ServiceException if an error processing the request ocurred or no tables are free
+     * @throws ValidationException if the data is invalid
+     */
+    void findTablesForReservation(Reservation reservation) throws ServiceException, ValidationException;
 
     /**
      * returns all reservations from the underlying datasource which paramters

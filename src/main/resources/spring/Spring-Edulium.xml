@@ -5,6 +5,7 @@
                            http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <import resource="Spring-Context.xml" />
+    <import resource="Spring-Scheduler.xml" />
     <import resource="Spring-Security.xml" />
     <import resource="Spring-DataSource.xml" />
 
@@ -44,11 +45,47 @@
     <import resource="service/Spring-MenuService.xml"/>
     <import resource="service/Spring-TaxRateService.xml" />
     <import resource="service/Spring-InteriorService.xml" />
-    <import resource="service/Spring-OrderService.xml" />
     <import resource="service/Spring-InvoiceService.xml" />
     <import resource="service/Spring-ReservationService.xml" />
+    <import resource="service/Spring-OrderService.xml" />
+    <import resource="service/Spring-StatisticsService.xml" />
     <import resource="service/Spring-TipService.xml" />
     <import resource="service/Spring-InvoiceManager.xml" />
     <import resource="service/Spring-SaleService.xml" />
+
+    <!-- Business Logic beans -->
+    <import resource="business/Spring-TableBusinessLogic.xml" />
+
+    <!-- GUI beans -->
+    <import resource="gui/Spring-LoginPane.xml" />
+    <import resource="gui/Spring-MainWindowPane.xml" />
+    <import resource="gui/cook/Spring-CookViewPane.xml" />
+    <import resource="gui/manager/Spring-TaxRateDialogPane.xml" />
+    <import resource="gui/manager/Spring-MenuCategoryDialogPane.xml" />
+    <import resource="gui/manager/Spring-MenuEntryDialogPane.xml" />
+    <import resource="gui/manager/Spring-UserDialogs.xml" />
+    <import resource="gui/manager/Spring-EmployeeViewPane.xml" />
+    <import resource="gui/manager/Spring-ManagerViewPane.xml" />
+    <import resource="gui/manager/Spring-MenuViewPane.xml" />
+    <import resource="gui/manager/Spring-MenuEntryViewPane.xml" />
+    <import resource="gui/manager/Spring-MenuCategoryViewPane.xml" />
+    <import resource="gui/manager/Spring-TaxRateViewPane.xml" />
+    <import resource="gui/manager/Spring-RoomViewPane.xml" />
+    <import resource="gui/manager/Spring-SalesViewPane.xml" />
+    <import resource="gui/manager/Spring-SalesDialogPane.xml" />
+    <import resource="gui/manager/Spring-StatisticViewPane.xml" />
+    <import resource="gui/manager/Spring-MenuDialogPane.xml" />
+    <import resource="gui/service/Spring-TableOverviewPane.xml" />
+    <import resource="gui/service/Spring-ReservationOverviewPane.xml" />
+    <import resource="gui/service/Spring-ReservationEditViewPane.xml" />
+    <import resource="gui/service/Spring-TableViewPane.xml" />
+    <import resource="gui/service/Spring-OrderOverviewPane.xml" />
+    <import resource="gui/service/Spring-OrderInputPane.xml" />
+    <import resource="gui/service/Spring-ServiceViewPane.xml" />
+    <import resource="gui/service/Spring-MenuCategoryOverviewPane.xml" />
+    <import resource="gui/service/Spring-MenuEntryOverviewPane.xml" />
+    <import resource="gui/service/Spring-MenuOverviewPane.xml" />
+    <import resource="gui/service/Spring-MenuDetailsPane.xml" />
+    <import resource="gui/service/Spring-InvoiceView.xml" />
 
 </beans>

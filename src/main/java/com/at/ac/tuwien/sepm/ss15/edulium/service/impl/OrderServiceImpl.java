@@ -1,8 +1,13 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.business.TableBusinessLogic;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.OrderDAO;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
@@ -14,8 +19,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,9 +34,12 @@ class OrderServiceImpl implements OrderService {
     private InvoiceService invoiceService;
     @Resource(name = "orderDAO")
     private DAO<Order> orderDAO;
+    @Resource(name = "orderDAO")
+    private OrderDAO findBetweenOrderDAO;
     @Resource(name = "orderValidator")
     private Validator<Order> orderValidator;
-
+    @Resource(name = "tableBusinessLogic")
+    private TableBusinessLogic tableBusinessLogic;
 
     @Override
     public void addOrder(Order order) throws ServiceException, ValidationException {
@@ -45,6 +53,7 @@ class OrderServiceImpl implements OrderService {
             saleService.applySales(entry);
             //Create the order with the updated price
             orderDAO.create(order);
+            tableBusinessLogic.addedOrder(order);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
             throw new ServiceException("An Error has occurred in the data access object");
@@ -66,7 +75,7 @@ class OrderServiceImpl implements OrderService {
             Order preOrder = preOrders.get(0);
             //if the order already had an invoice it is not allowed to be changed
             Invoice invoice = new Invoice();
-            invoice.setOrders(Arrays.asList(order));
+            invoice.setOrders(Collections.singletonList(order));
             if(invoiceService.findInvoices(invoice).size()>0){
                 LOGGER.error("It is not allowed to change an order with invoice");
                 throw new ServiceException("It is not allowed to change an order with invoice");
@@ -90,6 +99,12 @@ class OrderServiceImpl implements OrderService {
             }
             try {
                 orderDAO.update(order);
+
+                if (!order.getTable().equals(preOrder.getTable())) {
+                    // order has been moved to another table
+                    tableBusinessLogic.removedOrder(preOrder);
+                    tableBusinessLogic.addedOrder(order);
+                }
             } catch (DAOException e) {
                 LOGGER.error("An Error has occurred in the data access object", e);
                 throw new ServiceException("An Error has occurred in the data access object");
@@ -110,6 +125,8 @@ class OrderServiceImpl implements OrderService {
         }else {
             try {
                 orderDAO.delete(order);
+
+                tableBusinessLogic.removedOrder(order);
             } catch (DAOException e) {
                 LOGGER.error("An Error has occurred in the data access object", e);
                 throw new ServiceException("An Error has occurred in the data access object");
@@ -120,9 +137,20 @@ class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> findOrder(Order template) throws ServiceException {
         LOGGER.debug("Entering findOrder with parameter: " + template);
-
         try {
             return orderDAO.find(template);
+        } catch (DAOException e) {
+            LOGGER.error("An Error has occurred in the data access object", e);
+            throw new ServiceException("An Error has occurred in the data access object");
+        }
+    }
+
+    @Override
+    public List<Order> findOrderBetween(LocalDateTime from, LocalDateTime to) throws ServiceException {
+        LOGGER.debug("Entering findOrderBetween with parameters: " + from +", "+ to);
+
+        try {
+            return findBetweenOrderDAO.findBetween(from, to);
         } catch (DAOException e) {
             LOGGER.error("An Error has occurred in the data access object", e);
             throw new ServiceException("An Error has occurred in the data access object");

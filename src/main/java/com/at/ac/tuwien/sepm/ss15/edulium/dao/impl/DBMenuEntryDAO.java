@@ -11,7 +11,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -22,7 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -161,6 +160,7 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
             stmt.setObject(7, category == null ? null : category.getIdentity());
 
             ResultSet result = stmt.executeQuery();
+            LOGGER.info(stmt.toString());
             while (result.next()) {
                 try {
                     objects.add(parseResult(result));
@@ -290,13 +290,13 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
      * @throws DAOException if an error retrieving the taxRate/category occurred
      */
     private MenuEntry parseResult(ResultSet result) throws DAOException, ValidationException, SQLException {
-        List<TaxRate> taxRates = taxRateDAO.populate(Arrays.asList(TaxRate.withIdentity(result.getLong("taxRate_ID"))));
+        List<TaxRate> taxRates = taxRateDAO.populate(Collections.singletonList(TaxRate.withIdentity(result.getLong("taxRate_ID"))));
         if (taxRates.size() != 1) {
             LOGGER.error("retrieving taxRate failed");
             throw new DAOException("retrieving taxRate failed");
         }
 
-        List<MenuCategory> categories = menuCategoryDAO.populate(Arrays.asList(MenuCategory.withIdentity(result.getLong("category_ID"))));
+        List<MenuCategory> categories = menuCategoryDAO.populate(Collections.singletonList(MenuCategory.withIdentity(result.getLong("category_ID"))));
         if (categories.size() != 1) {
             LOGGER.error("retrieving category failed");
             throw new DAOException("retrieving category failed");
@@ -323,7 +323,7 @@ class DBMenuEntryDAO implements DAO<MenuEntry> {
      */
     private History<MenuEntry> parseHistoryEntry(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
+        List<User> storedUsers = userDAO.populate(Collections.singletonList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             LOGGER.error("user not found");
             throw new DAOException("user not found");

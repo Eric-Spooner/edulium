@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.domain;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.junit.Test;

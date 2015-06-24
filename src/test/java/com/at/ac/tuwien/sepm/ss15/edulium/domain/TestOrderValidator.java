@@ -4,12 +4,9 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import sun.security.validator.ValidatorException;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
 
 /**
  * Unit Test for the TaxRate validator
@@ -383,6 +380,7 @@ public class TestOrderValidator extends AbstractDomainTest {
         // GIVEN
         Order order = new Order();
         order.setIdentity(1L);
+        order.setTable(Table.withIdentity(Section.withIdentity(1L), 1L));
 
         // WHEN
         orderValidator.validateForDelete(order);

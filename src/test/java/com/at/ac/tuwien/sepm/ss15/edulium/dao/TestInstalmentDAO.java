@@ -2,7 +2,8 @@ package com.at.ac.tuwien.sepm.ss15.edulium.dao;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;

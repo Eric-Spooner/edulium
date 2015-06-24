@@ -10,7 +10,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -18,7 +17,7 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,13 +90,17 @@ class DBTableDAO implements DAO<Table> {
         validator.validateForUpdate(table);
 
         final String query = "UPDATE RestaurantTable SET " +
-                "seats = ?, tableRow = ?, tableColumn = ?, user_ID = ISNULL(?, user_ID) WHERE number = ? AND section_ID = ?";
+                "seats = ?, tableRow = ?, tableColumn = ?, user_ID = ? WHERE number = ? AND section_ID = ?";
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
             stmt.setInt(1, table.getSeats());
             stmt.setInt(2, table.getRow());
             stmt.setInt(3, table.getColumn());
-            stmt.setString(4, table.getUser() != null ? table.getUser().getIdentity() : null); // optional
+            if(table.getUser() == null){
+                stmt.setObject(4,null);
+            }else {
+                stmt.setString(4, table.getUser().getIdentity());
+            }
             stmt.setLong(5, table.getNumber());
             stmt.setLong(6, table.getSection().getIdentity());
 
@@ -344,7 +347,7 @@ class DBTableDAO implements DAO<Table> {
         // get user
         final String userId = result.getString("user_ID");
         if (userId != null) {  // optional
-            List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(userId)));
+            List<User> storedUsers = userDAO.populate(Collections.singletonList(User.withIdentity(userId)));
             if (storedUsers.size() != 1) {
                 throw new DAOException("user not found");
             }
@@ -353,7 +356,7 @@ class DBTableDAO implements DAO<Table> {
 
         // get section
         final long sectionId = result.getLong("section_ID");
-        List<Section> storedSections = sectionDAO.populate(Arrays.asList(Section.withIdentity(sectionId)));
+        List<Section> storedSections = sectionDAO.populate(Collections.singletonList(Section.withIdentity(sectionId)));
         if (storedSections.size() != 1) {
             throw new DAOException("section not found");
         }
@@ -372,7 +375,7 @@ class DBTableDAO implements DAO<Table> {
      */
     private History<Table> parseHistoryEntry(ResultSet result) throws DAOException, ValidationException, SQLException {
         // get user
-        List<User> storedUsers = userDAO.populate(Arrays.asList(User.withIdentity(result.getString("changeUser"))));
+        List<User> storedUsers = userDAO.populate(Collections.singletonList(User.withIdentity(result.getString("changeUser"))));
         if (storedUsers.size() != 1) {
             throw new DAOException("user not found");
         }

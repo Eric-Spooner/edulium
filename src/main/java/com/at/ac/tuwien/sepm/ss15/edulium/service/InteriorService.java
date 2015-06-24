@@ -4,15 +4,13 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
  * Section Service interface
  */
+@PreAuthorize("isAuthenticated()")
 public interface InteriorService extends Service {
     /**
      * writes the section to the underlying datasource;

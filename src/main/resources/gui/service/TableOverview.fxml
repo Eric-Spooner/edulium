@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="borderPane" prefHeight="683.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.service.TableOverviewController">
+   <bottom>
+      <Pane prefHeight="52.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="btnReservation" layoutX="6.0" layoutY="6.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Reservations">
+            <font>
+               <Font size="15.0" />
+            </font>
+            </Button>
+         </children>
+      </Pane>
+   </bottom>
+   <center>
+      <SplitPane fx:id="splitPane" dividerPositions="0.8" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <items>
+            <VBox alignment="TOP_CENTER" spacing="10.0">
+               <children>
+                  <Label text="Ready For Delivery" textAlignment="CENTER">
+                     <font>
+                        <Font size="30.0" />
+                     </font>
+                  </Label>
+                  <ListView fx:id="lvDelivery" onMouseClicked="#on_lvDelivery_clicked" VBox.vgrow="ALWAYS" />
+               </children>
+               <padding>
+                  <Insets left="5.0" right="5.0" />
+               </padding>
+            </VBox>
+         </items>
+      </SplitPane>
+   </center>
+</BorderPane>

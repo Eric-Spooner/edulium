@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import org.junit.Before;
@@ -29,12 +28,12 @@ public class TestUserDetailsService extends AbstractServiceTest {
     @Autowired
     private UserDetailsService userDetailsService;
     @Mock
-    private DAO<User> userDAO;
+    private UserService userService;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        ReflectionTestUtils.setField(getTargetObject(userDetailsService), "userDAO", userDAO);
+        ReflectionTestUtils.setField(getTargetObject(userDetailsService), "userService", userService);
     }
 
     @Test
@@ -45,13 +44,13 @@ public class TestUserDetailsService extends AbstractServiceTest {
         user.setName("Wily Werewolf");
         user.setRole("MANAGER");
 
-        Mockito.when(userDAO.find(User.withIdentity("werewolf"))).thenReturn(Arrays.asList(user));
+        Mockito.when(userService.findUsers(User.withIdentity("werewolf"))).thenReturn(Arrays.asList(user));
 
         // WHEN
         UserDetails userDetails = userDetailsService.loadUserByUsername("werewolf");
 
         // THEN
-        Mockito.verify(userDAO).find(User.withIdentity("werewolf"));
+        Mockito.verify(userService).findUsers(User.withIdentity("werewolf"));
 
         assertEquals("werewolf", userDetails.getUsername());
         assertTrue(userDetails.getPassword().isEmpty()); // not implemented
@@ -68,7 +67,7 @@ public class TestUserDetailsService extends AbstractServiceTest {
     @Test(expected = UsernameNotFoundException.class)
     public void testLoadUserByUsername_nonExistingUserShouldThrow() throws ServiceException, DAOException {
         // PREPARE
-        Mockito.when(userDAO.find(User.withIdentity("werewolf"))).thenReturn(Arrays.asList());
+        Mockito.when(userService.findUsers(User.withIdentity("werewolf"))).thenReturn(Arrays.asList());
 
         // WHEN
         UserDetails userDetails = userDetailsService.loadUserByUsername("werewolf");

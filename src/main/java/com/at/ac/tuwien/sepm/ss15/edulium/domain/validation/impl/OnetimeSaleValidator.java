@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 class OnetimeSaleValidator implements Validator<OnetimeSale> {
     @Autowired
+    private
     Validator<MenuEntry> menuEntryValidator;
 
     @Override

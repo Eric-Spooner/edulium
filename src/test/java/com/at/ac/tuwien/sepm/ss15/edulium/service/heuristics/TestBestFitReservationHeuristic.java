@@ -1,12 +1,10 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service.heuristics;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.dao.ReservationDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Reservation;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Section;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.AbstractServiceTest;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ReservationService;
@@ -33,7 +31,9 @@ import static org.junit.Assert.assertTrue;
  * Created by phili on 6/15/15.
  */
 public class TestBestFitReservationHeuristic extends AbstractServiceTest {
-    ReservationHeuristic reservationHeuristic = new BestFitReservationHeuristic();
+
+    @Autowired
+    ReservationHeuristic reservationHeuristic;
 
     @Mock
     ReservationService reservationService;

@@ -2,7 +2,10 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.OnetimeSale;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
@@ -33,6 +36,14 @@ class SaleServiceImpl implements SaleService {
     private Validator<OnetimeSale> onetimeSaleValidator;
     @Autowired
     private Validator<MenuEntry> menuEntryValidator;
+
+    @Override
+    public List<Sale> getAllSales() throws ServiceException {
+        List<Sale> sales = new ArrayList<>();
+        sales.addAll(getAllOnetimeSales());
+        sales.addAll(getAllIntermittentSales());
+        return sales;
+    }
 
     @Override
     public void addIntermittentSale(IntermittentSale intermittentSale) throws ValidationException, ServiceException {
@@ -212,7 +223,7 @@ class SaleServiceImpl implements SaleService {
             if (sale.isAt(LocalDateTime.now())) {
                 for (MenuEntry menuEntry1 : sale.getEntries()) {
                     //If possible, lower the price
-                    if (menuEntry1.getIdentity() == menuEntry.getIdentity()) {
+                    if (menuEntry1.getIdentity().equals(menuEntry.getIdentity())) {
                         price = price.min(menuEntry1.getPrice());
                     }
                 }

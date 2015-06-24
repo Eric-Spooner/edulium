@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox spacing="10.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.EmployeeViewController">
+   <children>
+      <TableView fx:id="tableViewEmployee" layoutX="14.0" layoutY="14.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="14.0" HBox.hgrow="ALWAYS">
+         <columns>
+            <TableColumn fx:id="employeeId" editable="false" prefWidth="138.0" text="ID" />
+            <TableColumn fx:id="employeeName" editable="false" prefWidth="190.0" text="Name" />
+            <TableColumn fx:id="employeeRole" editable="false" prefWidth="137.0" text="Role" />
+            <TableColumn fx:id="employeeTip" editable="false" prefWidth="100.0" text="Tip" />
+         </columns>
+      </TableView>
+      <VBox layoutX="94.0" layoutY="14.0" spacing="10.0" HBox.hgrow="NEVER">
+         <children>
+            <Button fx:id="buttonAdd" layoutX="534.0" layoutY="14.0" mnemonicParsing="false" onAction="#buttonEmployeesAddClicked" prefWidth="100.0" text="Add..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
+            <Button fx:id="buttonUpdate" disable="true" layoutX="494.0" layoutY="47.0" mnemonicParsing="false" onAction="#buttonEmployeesUpdateClicked" prefWidth="100.0" text="Update..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="49.0" />
+            <Button fx:id="buttonSearch" layoutX="494.0" layoutY="89.0" mnemonicParsing="false" onAction="#buttonEmployeesSearchClicked" prefWidth="100.0" text="Search..." AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="84.0" />
+            <Button fx:id="buttonRemove" disable="true" layoutX="494.0" layoutY="135.0" mnemonicParsing="false" onAction="#buttonEmployeesRemoveClicked" prefWidth="100.0" text="Remove" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="119.0" />
+            <Button fx:id="clearTipButton" disable="true" mnemonicParsing="false" onAction="#buttonClearTipClicked" prefWidth="100.0" text="Clear Tip" />
+            <Button fx:id="buttonShowAllEmployee" layoutX="494.0" layoutY="121.0" mnemonicParsing="false" onAction="#buttonEmployeesShowAll" prefWidth="100.0" text="Show All" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="154.0" />
+         </children>
+      </VBox>
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</HBox>

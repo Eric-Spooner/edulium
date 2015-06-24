@@ -169,8 +169,7 @@ public class Order {
 
         Order order = (Order) o;
 
-        if (additionalInformation != null ? !additionalInformation.equals(order.additionalInformation) : order.additionalInformation != null)
-            return false;
+
         if (brutto != null ? (brutto.compareTo(order.getBrutto())!=0) : order.brutto != null) return false;
         if (identity != null ? !identity.equals(order.identity) : order.identity != null) return false;
         if (menuEntry != null ? !menuEntry.equals(order.menuEntry) : order.menuEntry != null) return false;
@@ -178,8 +177,8 @@ public class Order {
         if (tax != null ? (tax.compareTo(order.getTax())!=0) : order.brutto != null) return false;
         if (time != null ? !time.equals(order.time) : order.time != null) return false;
         if (state != null ? !state.equals(order.state) : order.state != null) return false;
-
-        return true;
+        return !(additionalInformation != null ? (order.additionalInformation != null ? !additionalInformation.equals(order.additionalInformation) : !additionalInformation.isEmpty()) :
+                                                 (order.additionalInformation != null ? !order.additionalInformation.isEmpty() : false));
     }
 
     @Override
@@ -194,5 +193,18 @@ public class Order {
                 ", menuEntry=" + menuEntry +
                 ", state=" + state +
                 '}';
+    }
+
+    @Override
+    public int hashCode() {
+        int result = identity != null ? identity.hashCode() : 0;
+        result = 31 * result + (time != null ? time.hashCode() : 0);
+        result = 31 * result + (brutto != null ? brutto.hashCode() : 0);
+        result = 31 * result + (tax != null ? tax.hashCode() : 0);
+        result = 31 * result + (additionalInformation != null ? additionalInformation.hashCode() : 0);
+        result = 31 * result + (table != null ? table.hashCode() : 0);
+        result = 31 * result + (menuEntry != null ? menuEntry.hashCode() : 0);
+        result = 31 * result + (state != null ? state.hashCode() : 0);
+        return result;
     }
 }

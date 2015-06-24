@@ -3,3 +3,5 @@ edulium.iml
 .directory
 target
 .DS_Store
+edulium-data.mv.db
+edulium-data.trace.db
