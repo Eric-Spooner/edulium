@@ -5,7 +5,9 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import javafx.application.Platform;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -18,8 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Controller;
 
+import java.awt.*;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
 
 @Controller
@@ -38,6 +44,9 @@ public class MenuEntryOverviewController implements Initializable {
     private SortedList<MenuEntry> sortedMenuEntries;
 
     private Consumer<MenuEntry> menuEntryClickedConsumer = null;
+    private Consumer<MenuEntry> menuEntryLongPressedConsumer = null;
+
+    private TimerTask longPressTask;
 
     private class UserButtonCell extends GridCell<MenuEntry> {
         private final Button button = new Button();
@@ -46,7 +55,8 @@ public class MenuEntryOverviewController implements Initializable {
         public UserButtonCell() {
             button.setPrefSize(220, 80);
             button.setStyle("-fx-font-size: 18px;");
-            button.setOnAction(e -> onMenuEntryClicked(menuEntry));
+            button.setOnMouseReleased(e -> onMenuEntryReleased(menuEntry));
+            button.setOnMousePressed(e -> onMenuEntryPressed(menuEntry));
 
             setGraphic(button);
         }
@@ -102,10 +112,37 @@ public class MenuEntryOverviewController implements Initializable {
         this.menuEntryClickedConsumer = menuEntryClickedConsumer;
     }
 
-    private void onMenuEntryClicked(MenuEntry menuEntry)
+    public void setOnMenuEntryLongPressed(Consumer<MenuEntry> menuEntryLongPressedConsumer)
     {
-        if (menuEntryClickedConsumer != null) {
-            menuEntryClickedConsumer.accept(menuEntry);
+        this.menuEntryLongPressedConsumer = menuEntryLongPressedConsumer;
+    }
+
+    private void onMenuEntryReleased(MenuEntry menuEntry)
+    {
+        if(longPressTask != null) {
+            longPressTask.cancel();
+
+            if (menuEntryClickedConsumer != null) {
+                menuEntryClickedConsumer.accept(menuEntry);
+            }
         }
+    }
+
+    private void onMenuEntryPressed(MenuEntry menuEntry)
+    {
+        longPressTask = new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    if (menuEntryLongPressedConsumer != null) {
+                        menuEntryLongPressedConsumer.accept(menuEntry);
+                    }
+                    longPressTask = null;
+                });
+            }
+        };
+
+        Timer timer = new Timer();
+        timer.schedule(longPressTask, 500);
     }
 }

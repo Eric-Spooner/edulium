@@ -179,6 +179,18 @@ public class OrderInputController  implements Initializable {
             orders.compute(new OrderSingleMenuEntry(order), (key, amount) -> (amount == null) ? 1 : amount + 1);
         });
 
+        menuEntryOverviewController.setOnMenuEntryLongPressed(menuEntry -> {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Additional Info");
+            dialog.setHeaderText("Enter Additional Info");
+
+            Order order = new Order();
+            order.setMenuEntry(menuEntry);
+            dialog.showAndWait().ifPresent(info -> order.setAdditionalInformation(info));
+
+            orders.compute(new OrderSingleMenuEntry(order), (key, amount) -> (amount == null) ? 1 : amount + 1);
+        });
+
         menuDetailsController.setOnMenuAccepted(configuredMenu -> {
             List<Order> entries = new ArrayList<>();
             for (MenuEntry menuEntry : configuredMenu.getEntries()) {
