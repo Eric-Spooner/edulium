@@ -6,6 +6,9 @@ import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.GridView;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InteriorService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -25,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
+import java.util.logging.Filter;
 
 @Controller
 public class TableViewController implements Initializable {
@@ -86,21 +90,19 @@ public class TableViewController implements Initializable {
                 setGraphic(null);
             }
 
-            GridView<Table> gridView = new GridView<>();
-            gridView.setCellFactory(view -> new TableGridCell());
-            gridView.setAlignment(Pos.CENTER);
-            gridView.setItems(tables.filtered(table -> table.getSection().equals(item)));
-            gridView.setStyle("-fx-border-color: rgb(0, 0, 0);\n" +
-                    "    -fx-border-radius: 5;\n" +
-                    "    -fx-border-width: 2; \n" +
-                    "    -fx-padding: 10 10 10 10;");
-
-            HBox hBox = new HBox();
-            hBox.setAlignment(Pos.CENTER);
-            hBox.getChildren().add(gridView);
-
             if (item != null) {
-                sectionsMap.put(item, gridView);
+                GridView<Table> gridView = sectionsMap.get(item);
+                gridView.setAlignment(Pos.CENTER);
+
+                gridView.setStyle("-fx-border-color: rgb(0, 0, 0);\n" +
+                        "    -fx-border-radius: 5;\n" +
+                        "    -fx-border-width: 2; \n" +
+                        "    -fx-padding: 10 10 10 10;");
+
+                HBox hBox = new HBox();
+                hBox.setAlignment(Pos.CENTER);
+                hBox.getChildren().add(gridView);
+
 
                 Label titleLabel = new Label();
                 titleLabel.setFont(new Font(20.0));
@@ -141,6 +143,21 @@ public class TableViewController implements Initializable {
         });
         sections.startPolling();
 
+        sections.addListener(new ListChangeListener<Section>() {
+            @Override
+            public void onChanged(Change<? extends Section> c) {
+                while(c.next()) {
+                    c.getRemoved().forEach(s -> sectionsMap.remove(s));
+                    c.getAddedSubList().forEach(s -> {
+                        GridView<Table> gridView = new GridView<Table>();
+                        gridView.setItems(tables.filtered(table -> table.getSection().equals(s)));
+                        gridView.setCellFactory(view -> new TableGridCell());
+                        sectionsMap.put(s, gridView);
+                    });
+                }
+            }
+        });
+
         ListView<Section> listView = new ListView<>(sections);
         listView.setCellFactory(param -> new SectionListCell());
 
@@ -164,7 +181,9 @@ public class TableViewController implements Initializable {
         }
 
         Button btn = (Button) sectionsMap.get(t.getSection()).getNode(t);
-        btn.setTextFill(c);
+        if(btn != null) {
+            btn.setTextFill(c);
+        }
     }
 
     public void setTableDisable(Table t, boolean disabled) {
@@ -173,7 +192,9 @@ public class TableViewController implements Initializable {
         }
 
         Button btn = (Button) sectionsMap.get(t.getSection()).getNode(t);
-        btn.setDisable(disabled);
+        if(btn != null) {
+            btn.setDisable(disabled);
+        }
     }
 
     public void clear() {
