@@ -1,6 +1,5 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Table;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -128,10 +126,13 @@ public class OrderOverviewController implements Initializable {
     private FXMLPane tableViewPane; // for move to table pop over
     @Resource(name = "orderInputPane")
     private FXMLPane orderInputPane;
+    @Resource(name = "paymentSelectionPane")
+    private FXMLPane paymentSelectionPane;
 
     private AlertPopOver cancelPopOver;
     private PopOver moveToTablePopOver;
     private PopOver newOrderPopOver;
+    private PopOver paymentTypePopover;
 
     private PollingList<Order> queuedOrders;
     private PollingList<Order> inProgressOrders;
@@ -150,6 +151,7 @@ public class OrderOverviewController implements Initializable {
         initializeCancelPopOver();
         initializeMoveToTablePopOver();
         initializeNewOrderPopOver();
+        initializePaymentTypePopover();
 
         cancelButton.setDisable(true);
         deliverButton.setDisable(true);
@@ -294,6 +296,16 @@ public class OrderOverviewController implements Initializable {
         newOrderPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
     }
 
+    private void initializePaymentTypePopover() {
+        paymentSelectionPane.setStyle("-fx-padding: 5px");
+
+        paymentTypePopover = new PopOver(paymentSelectionPane);
+        paymentTypePopover.setHideOnEscape(true);
+        paymentTypePopover.setAutoHide(true);
+        paymentTypePopover.setDetachable(false);
+        paymentTypePopover.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
+    }
+
     @FXML
     public void onCancelButtonClicked() {
         if (cancelPopOver.isShowing()) {
@@ -349,30 +361,36 @@ public class OrderOverviewController implements Initializable {
 
     @FXML
     public void onPayButtonClicked(ActionEvent actionEvent) {
-        List<Order> orders = new ArrayList<>();
-        orders.addAll(queuedOrdersView.getSelectionModel().getSelectedItems());
-        orders.addAll(inProgressOrdersView.getSelectionModel().getSelectedItems());
-        orders.addAll(readyForDeliveryOrdersView.getSelectionModel().getSelectedItems());
-        orders.addAll(deliveredOrdersView.getSelectionModel().getSelectedItems());
-
-        Invoice invoice = new Invoice();
-        invoice.setOrders(orders);
-        invoice.setTime(LocalDateTime.now());
-        invoice.setCreator(getLoggedInUser());
-
-        try {
-            invoiceService.addInvoice(invoice);
-        } catch (ServiceException e) {
-            e.printStackTrace(); // TODO: handle exception
-        } catch (ValidationException e) {
-            e.printStackTrace(); // TODO: handle exception
+        if (paymentTypePopover.isShowing()) {
+            paymentTypePopover.hide();
+        } else {
+            paymentTypePopover.show(payButton);
         }
 
-        try {
-            invoiceManager.manageInvoice(invoice);
-        } catch (ServiceException e) {
-            e.printStackTrace(); // TODO: handle exception
-        }
+//        List<Order> orders = new ArrayList<>();
+//        orders.addAll(queuedOrdersView.getSelectionModel().getSelectedItems());
+//        orders.addAll(inProgressOrdersView.getSelectionModel().getSelectedItems());
+//        orders.addAll(readyForDeliveryOrdersView.getSelectionModel().getSelectedItems());
+//        orders.addAll(deliveredOrdersView.getSelectionModel().getSelectedItems());
+//
+//        Invoice invoice = new Invoice();
+//        invoice.setOrders(orders);
+//        invoice.setTime(LocalDateTime.now());
+//        invoice.setCreator(getLoggedInUser());
+//
+//        try {
+//            invoiceService.addInvoice(invoice);
+//        } catch (ServiceException e) {
+//            e.printStackTrace(); // TODO: handle exception
+//        } catch (ValidationException e) {
+//            e.printStackTrace(); // TODO: handle exception
+//        }
+//
+//        try {
+//            invoiceManager.manageInvoice(invoice);
+//        } catch (ServiceException e) {
+//            e.printStackTrace(); // TODO: handle exception
+//        }
     }
 
     public void onClearSelectionButtonClicked() {

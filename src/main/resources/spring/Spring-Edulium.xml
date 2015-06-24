@@ -83,5 +83,6 @@
     <import resource="gui/service/Spring-MenuEntryOverviewPane.xml" />
     <import resource="gui/service/Spring-MenuOverviewPane.xml" />
     <import resource="gui/service/Spring-MenuDetailsPane.xml" />
+    <import resource="gui/service/Spring-PaymentSelectionPane.xml" />
 
 </beans>
