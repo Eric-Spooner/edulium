@@ -31,7 +31,7 @@ public interface TableBusinessLogic extends BusinessLogic {
      * @param table the table, the orders have been paid
      */
     @PreAuthorize("hasRole('SERVICE')")
-    public void paidOrderFromTable(Table table) throws ServiceException, ValidationException;
+    public void removedOrderFromTable(Table table) throws ServiceException, ValidationException;
 
     /**
      *  Function is used to set the Table User new, if orders are beeing moved

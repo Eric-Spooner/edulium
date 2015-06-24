@@ -34,7 +34,7 @@ class TableBusinessLogicImpl implements TableBusinessLogic {
     }
 
     @Override
-    public void paidOrderFromTable(Table table) throws ServiceException, ValidationException{
+    public void removedOrderFromTable(Table table) throws ServiceException, ValidationException{
         if(checkIfNoOpenOrdersOnTable(table)){
             table.setUser(null);
             interiorService.updateTable(table);

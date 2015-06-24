@@ -81,7 +81,7 @@ public class TestTableBusinessLogic extends AbstractBusinessLogicTest {
 
     @Test
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
-    public void testPaidOrderFromTable_ShouldSetTableUserToNull() throws ValidationException, ServiceException{
+    public void testRemovedOrderFromTable_ShouldSetTableUserToNull() throws ValidationException, ServiceException{
         //Prepare
         Order order = createOrder(BigDecimal.valueOf(500), "Order Information", BigDecimal.valueOf(0.2),
                 LocalDateTime.now(), Order.State.QUEUED, 1);
@@ -108,7 +108,7 @@ public class TestTableBusinessLogic extends AbstractBusinessLogicTest {
         invoiceService.addInvoice(invoice);
 
         //WHEN
-        tableBusinessLogic.paidOrderFromTable(table);
+        tableBusinessLogic.removedOrderFromTable(table);
 
         //THEN
         List<Table> results = interiorService.findTables(Table.withIdentity(section, table.getNumber()));
