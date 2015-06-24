@@ -12,6 +12,7 @@ public class Invoice {
     private LocalDateTime time;
     private BigDecimal gross;
     private User creator;
+    private Boolean closed;
     private List<Order> orders;
 
     /**
@@ -82,6 +83,20 @@ public class Invoice {
     }
 
     /**
+     * @return Returns whether the invoice was paid or not (can be null)
+     */
+    public Boolean getClosed() {
+        return closed;
+    }
+
+    /**
+     * @param closed True if invoice was paid, or false otherwise
+     */
+    public void setClosed(Boolean closed) {
+        this.closed = closed;
+    }
+
+    /**
      * @return Returns the orders of the invoice (can be null)
      */
     public List<Order> getOrders() {
@@ -109,7 +124,7 @@ public class Invoice {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Invoice)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         Invoice invoice = (Invoice) o;
 
@@ -117,6 +132,7 @@ public class Invoice {
         if (time != null ? !time.equals(invoice.time) : invoice.time != null) return false;
         if (gross != null ? gross.compareTo(invoice.gross) != 0 : invoice.gross != null) return false;
         if (creator != null ? !creator.equals(invoice.creator) : invoice.creator != null) return false;
+        if (closed != null ? !closed.equals(invoice.closed) : invoice.closed != null) return false;
         return !(orders != null ? !orders.equals(invoice.orders) : invoice.orders != null);
 
     }
@@ -127,6 +143,7 @@ public class Invoice {
         result = 31 * result + (time != null ? time.hashCode() : 0);
         result = 31 * result + (gross != null ? gross.hashCode() : 0);
         result = 31 * result + (creator != null ? creator.hashCode() : 0);
+        result = 31 * result + (closed != null ? closed.hashCode() : 0);
         result = 31 * result + (orders != null ? orders.hashCode() : 0);
         return result;
     }
