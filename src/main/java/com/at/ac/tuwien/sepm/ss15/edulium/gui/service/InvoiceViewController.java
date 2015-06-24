@@ -130,20 +130,30 @@ public class InvoiceViewController  implements Initializable {
     private class InvoiceCell extends ListCell<Invoice> {
         private final Label nameLabel;
         private final Label grossLabel;
+        private final VBox layout;
 
         public InvoiceCell() {
             nameLabel = new Label();
             grossLabel = new Label();
+
+            layout = new VBox();
+            layout.getChildren().setAll(nameLabel, grossLabel);
+
+            setGraphic(layout);
         }
 
         @Override
         protected void updateItem(Invoice item, boolean empty) {
             super.updateItem(item, empty);
 
-            if (item == null)
-                return;
-            nameLabel.setText("" + item.getIdentity());
-            grossLabel.setText("" + item.getGross());
+            if (item != null) {
+                nameLabel.setText("" + item.getIdentity());
+                grossLabel.setText("" + item.getGross());
+
+                layout.setVisible(true);
+            } else {
+                layout.setVisible(false);
+            }
         }
     }
 
@@ -156,18 +166,15 @@ public class InvoiceViewController  implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         initializeAllOrders();
         initializeOrdersView();
-        initializeAllInvoices();
         initializeInvoiceView();
 
         reset();
     }
 
-    private void initializeAllInvoices() {
+    private void initializeInvoiceView() {
         allInvoices = new PollingList<>(taskScheduler);
         allInvoices.setInterval(1000);
-    }
 
-    private void initializeInvoiceView() {
 //        SortedList<Invoice> sortedInvoices = new SortedList<Invoice>(allInvoices);
         invoiceView.setCellFactory(view -> new InvoiceCell());
         invoiceView.setItems(allInvoices);
