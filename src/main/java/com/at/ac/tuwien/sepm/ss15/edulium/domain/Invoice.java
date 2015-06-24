@@ -13,6 +13,7 @@ public class Invoice {
     private BigDecimal gross;
     private User creator;
     private Boolean closed;
+    private String signature;
     private List<Order> orders;
 
     /**
@@ -97,6 +98,20 @@ public class Invoice {
     }
 
     /**
+     * @return the signature of the invoice
+     */
+    public String getSignature() {
+        return signature;
+    }
+
+    /**
+     * @param signature The signature of the invoice
+     */
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    /**
      * @return Returns the orders of the invoice (can be null)
      */
     public List<Order> getOrders() {
@@ -118,6 +133,8 @@ public class Invoice {
                 ", gross=" + gross +
                 ", creator=" + creator +
                 ", orders=" + orders +
+                ", signature=" + signature +
+                ", closed=" + closed +
                 "}";
     }
 
@@ -133,6 +150,7 @@ public class Invoice {
         if (gross != null ? gross.compareTo(invoice.gross) != 0 : invoice.gross != null) return false;
         if (creator != null ? !creator.equals(invoice.creator) : invoice.creator != null) return false;
         if (closed != null ? !closed.equals(invoice.closed) : invoice.closed != null) return false;
+        if (signature != null ? !signature.equals(invoice.signature) : invoice.signature != null) return false;
         return !(orders != null ? !orders.equals(invoice.orders) : invoice.orders != null);
 
     }
@@ -144,6 +162,7 @@ public class Invoice {
         result = 31 * result + (gross != null ? gross.hashCode() : 0);
         result = 31 * result + (creator != null ? creator.hashCode() : 0);
         result = 31 * result + (closed != null ? closed.hashCode() : 0);
+        result = 31 * result + (signature != null ? signature.hashCode() : 0);
         result = 31 * result + (orders != null ? orders.hashCode() : 0);
         return result;
     }

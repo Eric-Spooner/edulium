@@ -52,6 +52,7 @@
     <import resource="service/Spring-TipService.xml" />
     <import resource="service/Spring-InvoiceManager.xml" />
     <import resource="service/Spring-SaleService.xml" />
+    <import resource="service/Spring-InvoiceSigningService.xml" />
 
     <!-- Business Logic beans -->
     <import resource="business/Spring-TableBusinessLogic.xml" />

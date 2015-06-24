@@ -115,7 +115,7 @@ public class InvoiceViewController  implements Initializable {
                 increaseAmountButton.setDisable(available.equals(0));
                 decreaseAmountButton.setDisable(amount.equals(0));
 
-                nameLabel.setText(group.getMenuEntry().getName());setText(group.getMenuEntry().getName());
+                nameLabel.setText(group.getMenuEntry().getName());
                 additionalInformationLabel.setText(group.getAdditionalInformation());
                 amountLabel.setText(amount.toString());
                 availableLabel.setText("(" + available.toString() + ")");

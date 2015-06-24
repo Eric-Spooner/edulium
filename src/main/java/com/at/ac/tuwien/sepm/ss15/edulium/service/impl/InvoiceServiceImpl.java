@@ -13,6 +13,7 @@ import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ImmutableValidator;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceService;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceSigningService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,10 +44,16 @@ class InvoiceServiceImpl implements InvoiceService {
     @Resource(name = "tableBusinessLogic")
     private TableBusinessLogic tableBusinessLogic;
 
+    @Resource(name = "invoiceSigningService")
+    private InvoiceSigningService invoiceSigningService;
+
     @Override
     public void addInvoice(Invoice invoice) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addInvoice with parameters: " + invoice);
+
         updateGross(invoice);
+        invoiceSigningService.signInvoice(invoice);
+
         invoiceValidator.validateForCreate(invoice);
 
         try {
@@ -61,7 +68,10 @@ class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void updateInvoice(Invoice invoice) throws ServiceException, ValidationException {
         LOGGER.debug("Entering updateInvoice with parameters: " + invoice);
+
         updateGross(invoice);
+        invoiceSigningService.signInvoice(invoice);
+
         invoiceValidator.validateForUpdate(invoice);
 
         try {
