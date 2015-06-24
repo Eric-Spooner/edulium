@@ -119,7 +119,7 @@ public class TestTableBusinessLogic extends AbstractBusinessLogicTest {
 
     @Test
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
-    public void testMoveOrders_NewTableShouldGetOldUserOldTableUserShouldBeNull() throws ValidationException, ServiceException{
+    public void testMovedOrders_NewTableShouldGetOldUserOldTableUserShouldBeNull() throws ValidationException, ServiceException{
         //Prepare
         Order order = createOrder(BigDecimal.valueOf(500), "Order Information", BigDecimal.valueOf(0.2),
                 LocalDateTime.now(), Order.State.QUEUED, 1);
@@ -146,8 +146,9 @@ public class TestTableBusinessLogic extends AbstractBusinessLogicTest {
         tableBusinessLogic.addedOrderToTable(tableOld,order);
 
         //WHEN
-        tableBusinessLogic.moveOrders(tableOld, tableNew, Arrays.asList(order));
         order.setTable(tableNew);
+        orderService.updateOrder(order);
+        tableBusinessLogic.movedOrders(tableOld, tableNew, Arrays.asList(order));
 
         //THEN
         List<Table> resultsOld = interiorService.findTables(Table.withIdentity(section, tableOld.getNumber()));
@@ -161,7 +162,7 @@ public class TestTableBusinessLogic extends AbstractBusinessLogicTest {
 
     @Test
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
-    public void testMoveOrders_NewTableShouldGetOldUserOldTableUserShouldNotBeChanged() throws ValidationException, ServiceException{
+    public void testMovedOrders_NewTableShouldGetOldUserOldTableUserShouldNotBeChanged() throws ValidationException, ServiceException{
         //Prepare
         Order order = createOrder(BigDecimal.valueOf(500), "Order Information", BigDecimal.valueOf(0.2),
                 LocalDateTime.now(), Order.State.QUEUED, 1);
@@ -194,7 +195,7 @@ public class TestTableBusinessLogic extends AbstractBusinessLogicTest {
         tableBusinessLogic.addedOrderToTable(tableOld,order2);
 
         //WHEN
-        tableBusinessLogic.moveOrders(tableOld, tableNew, Arrays.asList(order));
+        tableBusinessLogic.movedOrders(tableOld, tableNew, Arrays.asList(order));
         order.setTable(tableNew);
 
         //THEN

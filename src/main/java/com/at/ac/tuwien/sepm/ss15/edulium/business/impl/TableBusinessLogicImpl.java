@@ -42,18 +42,10 @@ class TableBusinessLogicImpl implements TableBusinessLogic {
     }
 
     @Override
-    public void moveOrders(Table tableOld, Table tableNew, List<Order> ordersToMove) throws ServiceException, ValidationException{
-        if(checkIfNoOpenOrdersOnTable(tableNew)){
-            tableNew.setUser(tableOld.getUser());
-            interiorService.updateTable(tableNew);
-        }
-        Order template = new Order();
-        template.setTable(tableOld);
-        List<Order> orderList = orderService.findOrder(template);
-        ordersToMove.forEach(order -> orderList.remove(order));
-        if(checkIfEveryOrderIsPaid(orderList)){
-            tableOld.setUser(null);
-            interiorService.updateTable(tableOld);
+    public void movedOrders(Table tableOld, Table tableNew, List<Order> ordersToMove) throws ServiceException, ValidationException {
+        if (!ordersToMove.isEmpty()) {
+            addedOrderToTable(tableNew, ordersToMove.get(0));
+            removedOrderFromTable(tableOld);
         }
     }
 

@@ -45,5 +45,5 @@ public interface TableBusinessLogic extends BusinessLogic {
      * @param ordersToMove the orders, which should be moved from old to new
      */
     @PreAuthorize("hasRole('SERVICE')")
-    public void moveOrders(Table tableOld, Table tableNew, List<Order> ordersToMove) throws ServiceException, ValidationException;
+    public void movedOrders(Table tableOld, Table tableNew, List<Order> ordersToMove) throws ServiceException, ValidationException;
 }
