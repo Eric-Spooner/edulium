@@ -51,6 +51,10 @@ class InvoiceServiceImpl implements InvoiceService {
     public void addInvoice(Invoice invoice) throws ServiceException, ValidationException {
         LOGGER.debug("Entering addInvoice with parameters: " + invoice);
 
+        if (invoice == null) {
+            throw new ValidationException("Invoice must not be null");
+        }
+
         updateGross(invoice);
         invoiceSigningService.signInvoice(invoice);
 
@@ -68,6 +72,10 @@ class InvoiceServiceImpl implements InvoiceService {
     @Override
     public void updateInvoice(Invoice invoice) throws ServiceException, ValidationException {
         LOGGER.debug("Entering updateInvoice with parameters: " + invoice);
+
+        if (invoice == null) {
+            throw new ValidationException("Invoice must not be null");
+        }
 
         updateGross(invoice);
         invoiceSigningService.signInvoice(invoice);
