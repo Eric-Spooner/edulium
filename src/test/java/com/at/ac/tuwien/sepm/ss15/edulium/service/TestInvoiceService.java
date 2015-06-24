@@ -1,10 +1,13 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
+import com.at.ac.tuwien.sepm.ss15.edulium.business.TableBusinessLogic;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.ImmutableDAO;
+import com.at.ac.tuwien.sepm.ss15.edulium.dao.InvoiceDAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Instalment;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ImmutableValidator;
@@ -19,6 +22,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,17 +37,25 @@ public class TestInvoiceService extends AbstractServiceTest {
     @Autowired
     private InvoiceService invoiceService;
     @Mock
-    private DAO<Invoice> invoiceDAO;
+    private InvoiceDAO invoiceDAO;
     @Mock
     private ImmutableDAO<Instalment> instalmentDAO;
     @Mock
     private Validator<Invoice> invoiceValidator;
     @Mock
     private ImmutableValidator<Instalment> instalmentValidator;
+    @Mock
+    private TableBusinessLogic tableBusinessLogic;
+    @Mock
+    private InvoiceSigningService invoiceSigningService;
+
 
     private User creator1;
     private User creator2;
     private User creator3;
+
+    private Order order1;
+    private Order order2;
 
     @Before
     public void setUp() throws Exception {
@@ -65,12 +77,24 @@ public class TestInvoiceService extends AbstractServiceTest {
         creator3.setName("Joe");
         creator3.setRole("ROLE3");
 
+        // order 1
+        order1 = new Order();
+        order1.setIdentity(1L);
+        order1.setBrutto(BigDecimal.valueOf(10.0));
+
+        // order 2
+        order2 = new Order();
+        order2.setIdentity(2L);
+        order2.setBrutto(BigDecimal.valueOf(20.0));
+
         // init mocks
         MockitoAnnotations.initMocks(this);
         ReflectionTestUtils.setField(getTargetObject(invoiceService), "invoiceDAO", invoiceDAO);
         ReflectionTestUtils.setField(getTargetObject(invoiceService), "invoiceValidator", invoiceValidator);
         ReflectionTestUtils.setField(getTargetObject(invoiceService), "instalmentDAO", instalmentDAO);
         ReflectionTestUtils.setField(getTargetObject(invoiceService), "instalmentValidator", instalmentValidator);
+        ReflectionTestUtils.setField(getTargetObject(invoiceService), "tableBusinessLogic", tableBusinessLogic);
+        ReflectionTestUtils.setField(getTargetObject(invoiceService), "invoiceSigningService", invoiceSigningService);
     }
 
     @Test
@@ -81,6 +105,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
 
         // WHEN
         invoiceService.addInvoice(invoice);
@@ -96,6 +121,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
+        invoice.setOrders(Arrays.asList(order1, order2));
 
         // WHEN
         invoiceService.addInvoice(invoice);
@@ -145,6 +171,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("-15.6"));
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
         doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(invoice);
 
         // WHEN/THEN
@@ -158,6 +185,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
         doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(invoice);
 
         // WHEN/THEN
@@ -171,6 +199,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
         doThrow(new ValidationException("")).when(invoiceValidator).validateForCreate(invoice);
 
         // WHEN/THEN
@@ -195,6 +224,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
         invoiceService.addInvoice(invoice);
 
         // check if invoice was created
@@ -220,6 +250,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         Invoice invoice = new Invoice();
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
+        invoice.setOrders(Arrays.asList(order1, order2));
         invoiceService.addInvoice(invoice);
 
         // check if invoice was created
@@ -246,6 +277,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
         invoiceService.addInvoice(invoice);
 
         // update object
@@ -267,6 +299,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
         invoiceService.addInvoice(invoice);
         // after the invoice is being created, an identity must be assigned
         invoice.setIdentity(1L);
@@ -290,6 +323,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
         invoiceService.addInvoice(invoice);
         // after the invoice is being created, an identity must be assigned
         invoice.setIdentity(1L);
@@ -312,6 +346,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
         invoiceService.addInvoice(invoice);
         // after the invoice is being created, an identity must be assigned
         invoice.setIdentity(1L);
@@ -355,6 +390,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
 
         Long identity = 1L;
 
@@ -393,6 +429,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
         invoiceService.addInvoice(invoice);
         // after the invoice is being created, an identity must be assigned
         invoice.setIdentity(1L);
@@ -422,6 +459,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
 
         doThrow(new ValidationException("")).when(invoiceValidator).validateForDelete(invoice);
 
@@ -437,6 +475,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
         // after the invoice is being created, an identity must be assigned
         invoice.setIdentity(1L);
 
@@ -468,18 +507,21 @@ public class TestInvoiceService extends AbstractServiceTest {
         inv1.setTime(LocalDateTime.now());
         inv1.setGross(new BigDecimal("51.6"));
         inv1.setCreator(creator1);
+        inv1.setOrders(Arrays.asList(order1, order2));
 
         // Invoice 2
         Invoice inv2 = new Invoice();
         inv2.setTime(LocalDateTime.now());
         inv2.setGross(new BigDecimal("30"));
         inv2.setCreator(creator2);
+        inv2.setOrders(Arrays.asList(order1, order2));
 
         // invoice 3
         Invoice inv3 = new Invoice();
         inv3.setTime(LocalDateTime.now());
         inv3.setGross(new BigDecimal("1.6"));
         inv3.setCreator(creator3);
+        inv3.setOrders(Arrays.asList(order1, order2));
 
         // store invoices
         invoiceService.addInvoice(inv1);
@@ -532,18 +574,21 @@ public class TestInvoiceService extends AbstractServiceTest {
         inv1.setTime(LocalDateTime.now());
         inv1.setGross(new BigDecimal("51.6"));
         inv1.setCreator(creator1);
+        inv1.setOrders(Arrays.asList(order1, order2));
 
         // Invoice 2
         Invoice inv2 = new Invoice();
         inv2.setTime(LocalDateTime.now());
         inv2.setGross(new BigDecimal("30"));
         inv2.setCreator(creator2);
+        inv2.setOrders(Arrays.asList(order1, order2));
 
         // invoice 3
         Invoice inv3 = new Invoice();
         inv3.setTime(LocalDateTime.now());
         inv3.setGross(new BigDecimal("1.6"));
         inv3.setCreator(creator3);
+        inv3.setOrders(Arrays.asList(order1, order2));
 
         // store invoices
         invoiceService.addInvoice(inv1);
@@ -632,18 +677,21 @@ public class TestInvoiceService extends AbstractServiceTest {
         inv1.setTime(LocalDateTime.now());
         inv1.setGross(new BigDecimal("51.6"));
         inv1.setCreator(creator1);
+        inv1.setOrders(Arrays.asList(order1, order2));
 
         // Invoice 2
         Invoice inv2 = new Invoice();
         inv2.setTime(LocalDateTime.now());
         inv2.setGross(new BigDecimal("30"));
         inv2.setCreator(creator2);
+        inv2.setOrders(Arrays.asList(order1, order2));
 
         // invoice 3
         Invoice inv3 = new Invoice();
         inv3.setTime(LocalDateTime.now());
         inv3.setGross(new BigDecimal("1.6"));
         inv3.setCreator(creator3);
+        inv3.setOrders(Arrays.asList(order1, order2));
 
         // store invoices
         invoiceService.addInvoice(inv1);
@@ -721,6 +769,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
 
         // GIVEN
         Instalment instalment = new Instalment();
@@ -781,6 +830,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         invoice.setTime(LocalDateTime.now());
         invoice.setGross(new BigDecimal("15.6"));
         invoice.setCreator(creator1);
+        invoice.setOrders(Arrays.asList(order1, order2));
 
         // GIVEN
         // missing time and payment info
@@ -815,6 +865,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         inv1.setTime(LocalDateTime.now());
         inv1.setGross(new BigDecimal("51.6"));
         inv1.setCreator(creator1);
+        inv1.setOrders(Arrays.asList(order1, order2));
 
         // Invoice 2
         Invoice inv2 = new Invoice();
@@ -822,6 +873,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         inv2.setTime(LocalDateTime.now());
         inv2.setGross(new BigDecimal("30"));
         inv2.setCreator(creator2);
+        inv2.setOrders(Arrays.asList(order1, order2));
 
         // invoice 3
         Invoice inv3 = new Invoice();
@@ -829,6 +881,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         inv3.setTime(LocalDateTime.now());
         inv3.setGross(new BigDecimal("1.6"));
         inv3.setCreator(creator3);
+        inv3.setOrders(Arrays.asList(order1, order2));
 
         Instalment inst1 = new Instalment();
         inst1.setIdentity(1L); // after creation
@@ -897,6 +950,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         inv1.setTime(LocalDateTime.now());
         inv1.setGross(new BigDecimal("51.6"));
         inv1.setCreator(creator1);
+        inv1.setOrders(Arrays.asList(order1, order2));
 
         // Invoice 2
         Invoice inv2 = new Invoice();
@@ -904,6 +958,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         inv2.setTime(LocalDateTime.now());
         inv2.setGross(new BigDecimal("30"));
         inv2.setCreator(creator2);
+        inv2.setOrders(Arrays.asList(order1, order2));
 
         // invoice 3
         Invoice inv3 = new Invoice();
@@ -911,6 +966,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         inv3.setTime(LocalDateTime.now());
         inv3.setGross(new BigDecimal("1.6"));
         inv3.setCreator(creator3);
+        inv3.setOrders(Arrays.asList(order1, order2));
 
         Instalment inst1 = new Instalment();
         inst1.setIdentity(1L); // after creation
@@ -1011,6 +1067,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         inv1.setTime(LocalDateTime.now());
         inv1.setGross(new BigDecimal("51.6"));
         inv1.setCreator(creator1);
+        inv1.setOrders(Arrays.asList(order1, order2));
 
         // Invoice 2
         Invoice inv2 = new Invoice();
@@ -1018,6 +1075,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         inv2.setTime(LocalDateTime.now());
         inv2.setGross(new BigDecimal("30"));
         inv2.setCreator(creator2);
+        inv2.setOrders(Arrays.asList(order1, order2));
 
         // invoice 3
         Invoice inv3 = new Invoice();
@@ -1025,6 +1083,7 @@ public class TestInvoiceService extends AbstractServiceTest {
         inv3.setTime(LocalDateTime.now());
         inv3.setGross(new BigDecimal("1.6"));
         inv3.setCreator(creator3);
+        inv3.setOrders(Arrays.asList(order1, order2));
 
         Instalment inst1 = new Instalment();
         inst1.setIdentity(1L); // after creation
