@@ -176,19 +176,19 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
                     "i.brutto = ISNULL(?, i.brutto) AND " +
                     "i.user_ID = ISNULL(?, i.user_ID) AND " +
                     "i.closed = ISNULL(?, i.closed) AND " +
-                    "canceled = FALSE AND " +
+                    "i.canceled = FALSE AND " +
                     "EXISTS (SELECT 1 FROM RestaurantOrder o " +
                     "WHERE o.invoice_ID = i.ID AND o.ID IN (" +
                     invoice.getOrders().stream().map(o -> "?").collect(Collectors.joining(", ")) +
                     ") AND o.canceled = FALSE);";
         } else {
-            query = "SELECT * FROM InvoceExtended i WHERE " +
+            query = "SELECT * FROM InvoiceExtended i WHERE " +
                     "i.ID = ISNULL(?, i.ID) AND " +
                     "i.invoiceTime = ISNULL(?, i.invoiceTime) AND " +
                     "i.brutto = ISNULL(?, i.brutto) AND " +
                     "i.user_ID = ISNULL(?, i.user_ID) AND " +
                     "i.closed = ISNULL(?, i.closed) AND " +
-                    "canceled = FALSE;";
+                    "i.canceled = FALSE;";
         }
 
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
