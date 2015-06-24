@@ -23,6 +23,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.PopOver;
 import org.controlsfx.control.SegmentedButton;
 import org.springframework.stereotype.Controller;
 
@@ -167,35 +168,19 @@ public class OrderInputController  implements Initializable {
             headerLabel.setText(menu.getName());
         });
 
-        menuEntryOverviewController.setOnMenuEntryClicked(menuEntry -> {
-            Order order = new Order();
-            order.setMenuEntry(menuEntry);
-            order.setAdditionalInformation("blablabla");
-
+        menuEntryOverviewController.setOnMenuEntryClicked(order -> {
             orders.compute(new OrderSingleMenuEntry(order), (key, amount) -> (amount == null) ? 1 : amount + 1);
         });
 
-        menuEntryOverviewController.setOnMenuEntryLongPressed(menuEntry -> {
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Additional Info");
-            dialog.setHeaderText("Enter Additional Info");
+        menuDetailsController.setOnMenuAccepted(entries -> {
+            Menu menu = new Menu();
+            menu.setName(menuDetailsController.getMenuName());
 
-            Order order = new Order();
-            order.setMenuEntry(menuEntry);
-            dialog.showAndWait().ifPresent(info -> order.setAdditionalInformation(info));
-
-            orders.compute(new OrderSingleMenuEntry(order), (key, amount) -> (amount == null) ? 1 : amount + 1);
-        });
-
-        menuDetailsController.setOnMenuAccepted(configuredMenu -> {
-            List<Order> entries = new ArrayList<>();
-            for (MenuEntry menuEntry : configuredMenu.getEntries()) {
-                Order order = new Order();
-                order.setMenuEntry(menuEntry);
-                order.setAdditionalInformation(configuredMenu.getName() + " - " + "blablabla");
-                entries.add(order);
+            for(Order order : entries) {
+                String info = order.getAdditionalInformation();
+                order.setAdditionalInformation(menu.getName() + " - " + (info == null? "" : info));
             }
-            orders.compute(new OrderMenu(configuredMenu, entries), (key, amount) -> (amount == null) ? 1 : amount + 1);
+            orders.compute(new OrderMenu(menu, entries), (key, amount) -> (amount == null) ? 1 : amount + 1);
         });
     }
 

@@ -2,6 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuCategory;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.MenuService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
@@ -10,12 +11,18 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.*;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
+import org.controlsfx.control.PopOver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Controller;
@@ -43,8 +50,7 @@ public class MenuEntryOverviewController implements Initializable {
     private PollingList<MenuEntry> menuEntries;
     private SortedList<MenuEntry> sortedMenuEntries;
 
-    private Consumer<MenuEntry> menuEntryClickedConsumer = null;
-    private Consumer<MenuEntry> menuEntryLongPressedConsumer = null;
+    private Consumer<Order> menuEntryClickedConsumer = null;
 
     private TimerTask longPressTask;
 
@@ -56,7 +62,7 @@ public class MenuEntryOverviewController implements Initializable {
             button.setPrefSize(220, 80);
             button.setStyle("-fx-font-size: 18px;");
             button.setOnMouseReleased(e -> onMenuEntryReleased(menuEntry));
-            button.setOnMousePressed(e -> onMenuEntryPressed(menuEntry));
+            button.setOnMousePressed(e -> onMenuEntryPressed(menuEntry, button));
 
             setGraphic(button);
         }
@@ -107,14 +113,9 @@ public class MenuEntryOverviewController implements Initializable {
         menuEntries.startPolling();
     }
 
-    public void setOnMenuEntryClicked(Consumer<MenuEntry> menuEntryClickedConsumer)
+    public void setOnMenuEntryClicked(Consumer<Order> menuEntryClickedConsumer)
     {
         this.menuEntryClickedConsumer = menuEntryClickedConsumer;
-    }
-
-    public void setOnMenuEntryLongPressed(Consumer<MenuEntry> menuEntryLongPressedConsumer)
-    {
-        this.menuEntryLongPressedConsumer = menuEntryLongPressedConsumer;
     }
 
     private void onMenuEntryReleased(MenuEntry menuEntry)
@@ -123,21 +124,54 @@ public class MenuEntryOverviewController implements Initializable {
             longPressTask.cancel();
 
             if (menuEntryClickedConsumer != null) {
-                menuEntryClickedConsumer.accept(menuEntry);
+                Order order = new Order();
+                order.setAdditionalInformation("");
+                order.setMenuEntry(menuEntry);
+                menuEntryClickedConsumer.accept(order);
             }
         }
     }
 
-    private void onMenuEntryPressed(MenuEntry menuEntry)
+    private void onMenuEntryLongPressed(MenuEntry entry, String info) {
+        if(menuEntryClickedConsumer != null) {
+            Order order = new Order();
+            order.setMenuEntry(entry);
+            order.setAdditionalInformation(info);
+            menuEntryClickedConsumer.accept(order);
+        }
+    }
+
+    private void showAdditionalInfoPopOver(MenuEntry entry, Button button) {
+        longPressTask = null;
+        PopOver popOver = new PopOver();
+
+        TextField textField = new TextField();
+        Button okButton = new Button();
+        okButton.setText("OK");
+        okButton.setOnAction(e -> {
+            popOver.hide();
+            onMenuEntryLongPressed(entry, textField.getText());
+        });
+
+        VBox vBox = new VBox(10.0);
+        vBox.setPadding(new Insets(10.0, 10.0, 10.0, 10.0));
+        vBox.setAlignment(Pos.CENTER);
+        vBox.getChildren().addAll(textField, okButton);
+
+        popOver.setContentNode(vBox);
+        popOver.setAutoHide(false);
+        popOver.setHideOnEscape(false);
+
+        popOver.show(button);
+    }
+
+    private void onMenuEntryPressed(MenuEntry menuEntry, Button button)
     {
         longPressTask = new TimerTask() {
             @Override
             public void run() {
                 Platform.runLater(() -> {
-                    if (menuEntryLongPressedConsumer != null) {
-                        menuEntryLongPressedConsumer.accept(menuEntry);
-                    }
-                    longPressTask = null;
+                    showAdditionalInfoPopOver(menuEntry, button);
                 });
             }
         };
