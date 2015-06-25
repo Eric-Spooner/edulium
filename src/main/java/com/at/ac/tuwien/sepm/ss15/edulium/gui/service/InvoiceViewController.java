@@ -3,10 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.gui.service;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.PollingList;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceManager;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
+import com.at.ac.tuwien.sepm.ss15.edulium.service.*;
 import javafx.collections.*;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -57,6 +54,8 @@ public class InvoiceViewController  implements Initializable {
     private InvoiceService invoiceService;
     @Resource(name = "orderService")
     private OrderService orderService;
+    @Resource(name = "tipService")
+    private TipService tipService;
 
     private PollingList<Order> allOrders;
     private PollingList<Invoice> allInvoices;
@@ -230,6 +229,19 @@ public class InvoiceViewController  implements Initializable {
 
                 paidLabel.setText("Paid: " + paidAmount);
                 openAmountLabel.setText("Open: " + item.getGross().subtract(paidAmount));
+
+                if (paidAmount.compareTo(item.getGross()) > 0) {
+                    try {
+                        tipService.divideAndMatchTip(item, paidAmount.subtract(item.getGross()));
+                    } catch (ServiceException | ValidationException e) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Creating tip failed");
+                        alert.setHeaderText("The tip could not be added");
+                        alert.setContentText(e.getMessage());
+
+                        alert.showAndWait();
+                    }
+                }
 
                 layout.setVisible(true);
             } else {
