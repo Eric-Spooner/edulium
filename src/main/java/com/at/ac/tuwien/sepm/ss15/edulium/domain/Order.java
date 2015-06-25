@@ -15,6 +15,7 @@ public class Order {
     private Table table = null;
     private MenuEntry menuEntry = null;
     private State state = null;
+    private Boolean paid = null;
 
     public enum State {
         QUEUED,
@@ -162,6 +163,20 @@ public class Order {
         this.state = state;
     }
 
+    /**
+     * @return True if order has been paid false otherwise
+     */
+    public Boolean isPaid() {
+        return paid;
+    }
+
+    /**
+     * @param paid True if order has been paid false otherwise
+     */
+    public void setPaid(Boolean paid) {
+        this.paid = paid;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -177,6 +192,7 @@ public class Order {
         if (tax != null ? (tax.compareTo(order.getTax())!=0) : order.brutto != null) return false;
         if (time != null ? !time.equals(order.time) : order.time != null) return false;
         if (state != null ? !state.equals(order.state) : order.state != null) return false;
+        if (paid != null ? !paid.equals(order.paid) : order.paid != null) return false;
         return !(additionalInformation != null ? (order.additionalInformation != null ? !additionalInformation.equals(order.additionalInformation) : !additionalInformation.isEmpty()) :
                                                  (order.additionalInformation != null ? !order.additionalInformation.isEmpty() : false));
     }
@@ -192,6 +208,7 @@ public class Order {
                 ", table=" + table +
                 ", menuEntry=" + menuEntry +
                 ", state=" + state +
+                ", paid=" + paid +
                 '}';
     }
 
@@ -205,6 +222,7 @@ public class Order {
         result = 31 * result + (table != null ? table.hashCode() : 0);
         result = 31 * result + (menuEntry != null ? menuEntry.hashCode() : 0);
         result = 31 * result + (state != null ? state.hashCode() : 0);
+        result = 31 * result + (paid != null ? paid.hashCode() : 0);
         return result;
     }
 
@@ -219,6 +237,7 @@ public class Order {
         order.setTax(tax);
         order.setTime(time);
         order.setTable(table == null ? null : table.clone());
+        order.setPaid(paid);
         return order;
     }
 }
