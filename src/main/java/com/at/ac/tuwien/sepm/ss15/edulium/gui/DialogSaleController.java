@@ -248,7 +248,7 @@ public class DialogSaleController implements Initializable{
                         LocalTime fromTimeT = LocalTime.of(hr, min);
                         LocalDateTime fromTime = LocalDateTime.of(fromDate, fromTimeT);
                         onetimeSale.setFromTime(fromTime);
-                        LocalDate toDate = datePickerFromTime.getValue();
+                        LocalDate toDate = datePickerToTime.getValue();
                         if (toDate == null) {
                             showErrorDialog
                                     ("Input Validation Error", "Please specify a date");
@@ -362,7 +362,7 @@ public class DialogSaleController implements Initializable{
                         LocalTime fromTimeT = LocalTime.of(hr, min);
                         LocalDateTime fromTime = LocalDateTime.of(fromDate, fromTimeT);
                         ((OnetimeSale)sale).setFromTime(fromTime);
-                        LocalDate toDate = datePickerFromTime.getValue();
+                        LocalDate toDate = datePickerToTime.getValue();
                         if (toDate == null) {
                             showErrorDialog
                                     ("Input Validation Error", "Please specify a date");
