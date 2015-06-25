@@ -135,7 +135,7 @@ class DBOrderDAO implements DAO<Order>, OrderDAO {
             return new ArrayList<>();
         }
 
-        final String query = "SELECT * FROM RestaurantOrder WHERE " +
+        String query = "SELECT * FROM RestaurantOrder WHERE " +
                 "ID = ISNULL(?, ID) AND " +
                 "tax = ISNULL(?, tax) AND " +
                 "brutto = ISNULL(?, brutto) AND " +
@@ -146,6 +146,10 @@ class DBOrderDAO implements DAO<Order>, OrderDAO {
                 "menuEntry_ID = ISNULL(?, menuEntry_ID) AND " +
                 "state = ISNULL(?, state) AND " +
                 "canceled = false";
+
+        if (order.isPaid() != null) {
+            query += order.isPaid() ? " AND invoice_ID IS NOT NULL" : " AND invoice_ID IS NULL";
+        }
 
         final List<Order> objects = new ArrayList<>();
 
@@ -331,6 +335,7 @@ class DBOrderDAO implements DAO<Order>, OrderDAO {
         order.setTax(result.getBigDecimal("tax"));
         order.setTime(result.getTimestamp("orderTime").toLocalDateTime());
         order.setState(Order.State.valueOf(result.getString("state")));
+        order.setPaid(result.getBigDecimal("invoice_ID") != null);
 
         final List<MenuEntry> menuEntries = menuEntryDAO.populate(Collections.singletonList(MenuEntry.withIdentity(result.getLong("menuEntry_ID"))));
         if (menuEntries.size() != 1) {
