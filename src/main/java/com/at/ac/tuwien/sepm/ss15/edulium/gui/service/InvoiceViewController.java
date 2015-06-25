@@ -9,8 +9,6 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.collections.*;
 import javafx.collections.transformation.SortedList;
-import javafx.event.ActionEvent;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -19,19 +17,16 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.controlsfx.control.action.Action;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
-import java.beans.EventHandler;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 public class InvoiceViewController  implements Initializable {
@@ -148,9 +143,7 @@ public class InvoiceViewController  implements Initializable {
             printButton = new Button();
             printButton.setStyle("-fx-font-size: 18px");
             printButton.setText("Print");
-            printButton.setOnAction(event -> {
-                manageInvoice(tempInvoice);
-            });
+            printButton.setOnAction(event -> manageInvoice(tempInvoice));
 
             layout = new HBox(10);
             layout.getChildren().setAll(nameLabel, grossLabel, paidLabel, printButton);
