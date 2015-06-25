@@ -61,9 +61,9 @@
                   <Font size="18.0" />
                </font>
                <HBox.margin>
-                  <Insets />
+                  <Insets right="30.0" />
                </HBox.margin></Button>
-            <Button fx:id="payButton" mnemonicParsing="false" onAction="#onPayButtonClicked" text="Pay" HBox.hgrow="NEVER">
+            <Button fx:id="payButton" minWidth="70.0" mnemonicParsing="false" onAction="#onPayButtonClicked" text="Pay" HBox.hgrow="NEVER">
                <font>
                   <Font size="18.0" />
                </font>

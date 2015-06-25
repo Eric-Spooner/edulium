@@ -70,13 +70,13 @@ public class RoomViewController implements Initializable {
                 try {
                     Table clickedTable = rect.getTable(t.getX(), t.getY());
                     if(clickedTable != null) {
-                        System.out.println((String.valueOf(clickedTable.getNumber()) + " clicked"));
+                        //System.out.println((String.valueOf(clickedTable.getNumber()) + " clicked"));
                     }
                     Section clickedSection = rect.getSection(t.getX(), t.getY());
                     if(clickedSection != null) {
                         noSectionClicked = false;
                         clickedSectionId = clickedSection.getIdentity();
-                        System.out.println((String.valueOf(clickedSection.getName()) + " clicked" + clickedSection.getIdentity()));
+                        //System.out.println((String.valueOf(clickedSection.getName()) + " clicked" + clickedSection.getIdentity()));
                     }
                 } catch(ServiceException e) {
                     showErrorDialog("Error", e.getMessage());

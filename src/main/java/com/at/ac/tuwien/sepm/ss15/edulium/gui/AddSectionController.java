@@ -273,6 +273,11 @@ public class AddSectionController implements Initializable {
 
     public void createButtonClicked() {
         LOGGER.info("Create Section Button Click");
+        if(rects.isEmpty()) {
+            showErrorDialog("Name missing", "Please add Tables to this section!");
+            return;
+        }
+
         if(nameTF.getText().isEmpty()) {
             showErrorDialog("Name missing", "Please insert a name for the section!");
         } else {

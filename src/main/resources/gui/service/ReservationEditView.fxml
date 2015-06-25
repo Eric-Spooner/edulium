@@ -6,8 +6,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<?import com.at.ac.tuwien.sepm.ss15.edulium.gui.util.NumericTextField?>
-
+<?import jfxtras.labs.scene.control.BigDecimalField?>
 <BorderPane fx:id="borderPane" prefHeight="278.0" prefWidth="466.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.at.ac.tuwien.sepm.ss15.edulium.gui.service.ReservationEditViewController">
    <top>
       <HBox prefHeight="50.0" prefWidth="200.0" spacing="20.0" BorderPane.alignment="CENTER">
@@ -47,7 +46,7 @@
                         <Insets top="10.0" />
                      </VBox.margin>
                   </Label>
-                  <TextField fx:id="tfName" prefHeight="30.0" />
+                  <TextField prefWidth="80" fx:id="tfName" prefHeight="30.0" />
                   <Label text="Quantity:">
                      <font>
                         <Font size="15.0" />
@@ -56,7 +55,7 @@
                         <Insets top="10.0" />
                      </VBox.margin>
                   </Label>
-                  <NumericTextField fx:id="tfQuantity" prefHeight="30.0" text="0"/>
+                  <BigDecimalField  prefWidth="80" fx:id="tfQuantity" prefHeight="40.0" text="1"/>
                   <Label text="Duration">
                      <font>
                         <Font size="15.0" />
@@ -65,7 +64,12 @@
                         <Insets top="10.0" />
                      </VBox.margin>
                   </Label>
-                  <NumericTextField fx:id="tfDuration" prefHeight="30.0"  text="0"/>
+                  <HBox alignment="TOP_CENTER" spacing="20.0">
+                     <children>
+                     <BigDecimalField prefWidth="150" fx:id="tfDuration" prefHeight="40.0"  text="1"/>
+                     <Label prefHeight="22.0"  text="Hours" />
+                     </children>
+                  </HBox>
                   <Label text="Date:">
                      <font>
                         <Font size="15.0" />
@@ -74,7 +78,7 @@
                         <Insets top="10.0" />
                      </VBox.margin>
                   </Label>
-                  <DatePicker fx:id="datePicker" prefHeight="30.0" />
+                  <DatePicker fx:id="datePicker" prefWidth="150" prefHeight="40.0" />
                   <Label text="Time:">
                      <font>
                         <Font size="15.0" />
@@ -83,11 +87,11 @@
                         <Insets top="10.0" />
                      </VBox.margin>
                   </Label>
-                  <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
+                  <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="80.0">
                      <children>
-                        <NumericTextField fx:id="tfHour" prefHeight="30.0" prefWidth="45.0" text="0" />
+                        <BigDecimalField fx:id="tfHour" maxHeight="40.0" prefHeight="40.0" prefWidth="80.0" text="0" />
                         <Label prefHeight="22.0" prefWidth="7.0" text=":" />
-                        <NumericTextField fx:id="tfMinute" prefHeight="30.0" prefWidth="46.0" text="0" />
+                        <BigDecimalField fx:id="tfMinute" maxHeight="40.0" prefHeight="40.0" prefWidth="80.0" text="0" />
                      </children>
                   </HBox>
                   <Label fx:id="lblSeats" alignment="CENTER" text="0 / 0">

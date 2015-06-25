@@ -415,6 +415,7 @@ public class TestMenuService extends AbstractServiceTest {
     public void testRemoveMenuCategory_onDAOExceptionShouldThrow() throws ServiceException, ValidationException, DAOException {
         // PREPARE
         MenuCategory category = new MenuCategory();
+        category.setIdentity(1L);
         Mockito.doThrow(new DAOException("")).when(menuCategoryDAO).delete(category);
 
         // WHEN
@@ -439,6 +440,7 @@ public class TestMenuService extends AbstractServiceTest {
     public void testRemoveMenuCategory_shouldRemove() throws ValidationException, DAOException, ServiceException {
         // PREPARE
         MenuCategory category = new MenuCategory();
+        category.setIdentity(1L);
 
         // WHEN
         menuService.removeMenuCategory(category);

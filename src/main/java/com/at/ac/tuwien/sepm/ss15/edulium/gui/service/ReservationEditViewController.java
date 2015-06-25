@@ -13,10 +13,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
+import jfxtras.labs.scene.control.BigDecimalField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -43,13 +45,13 @@ public class ReservationEditViewController implements Initializable {
     @FXML
     private TextField tfName;
     @FXML
-    private NumericTextField tfQuantity;
+    private BigDecimalField tfQuantity;
     @FXML
-    private NumericTextField tfHour;
+    private BigDecimalField tfHour;
     @FXML
-    private NumericTextField tfMinute;
+    private BigDecimalField tfMinute;
     @FXML
-    private NumericTextField tfDuration;
+    private BigDecimalField tfDuration;
     @FXML
     private DatePicker datePicker;
     @FXML
@@ -101,13 +103,21 @@ public class ReservationEditViewController implements Initializable {
 
         // clear tables and update ui
         datePicker.valueProperty().addListener(changeListener);
-        tfDuration.textProperty().addListener(changeListener);
-        tfHour.textProperty().addListener(changeListener);
-        tfMinute.textProperty().addListener(changeListener);
-        tfQuantity.textProperty().addListener(changeListener);
+        tfDuration.numberProperty().addListener(changeListener);
+        tfHour.numberProperty().addListener(changeListener);
+        tfMinute.numberProperty().addListener(changeListener);
+        tfQuantity.numberProperty().addListener(changeListener);
 
-        tfHour.setMinMax(0, 24);
-        tfMinute.setMinMax(0, 60);
+        tfQuantity.setMinValue(BigDecimal.valueOf(1));
+        tfDuration.setMinValue(BigDecimal.valueOf(1));
+
+        tfHour.setMinValue(BigDecimal.valueOf(0));
+        tfHour.setMaxValue(BigDecimal.valueOf(23));
+        tfMinute.setMinValue(BigDecimal.valueOf(0));
+        tfMinute.setMaxValue(BigDecimal.valueOf(59));
+
+        tfHour.setStepwidth(BigDecimal.valueOf(1));
+        tfMinute.setStepwidth(BigDecimal.valueOf(1));
 
         initializePopOver();
     }
@@ -118,10 +128,11 @@ public class ReservationEditViewController implements Initializable {
 
         // clear inputs
         tfName.clear();
-        tfQuantity.clear();
-        tfDuration.clear();
-        tfHour.clear();
-        tfMinute.clear();
+        tfQuantity.setNumber(tfQuantity.getMinValue());
+        tfDuration.setNumber(tfDuration.getMinValue());
+        tfHour.setNumber(tfHour.getMinValue());
+        tfMinute.setNumber(tfMinute.getMinValue());
+
         datePicker.setValue(null);
         tableViewController.clear();
 
@@ -160,9 +171,11 @@ public class ReservationEditViewController implements Initializable {
         // display selected tables
         selectedTables.stream().forEach(t -> tableViewController.setTableColor(t, Color.BLUE));
 
+        LocalDateTime dateTime = getLocalDateTime();
+        boolean selectedDateInThePast = getLocalDateTime() == null ? true : dateTime.isBefore(LocalDateTime.now());
+
         // handle buttons
-        boolean notReady = tfDuration.isEmpty() || tfHour.isEmpty() || tfMinute.isEmpty()
-                || tfQuantity.isEmpty() || datePicker.getValue() == null;
+        boolean notReady = selectedDateInThePast || tfDuration.getNumber() == null || tfQuantity.getNumber() == null;
 
         btnAuto.setDisable(notReady);
         btnSave.setDisable(notReady || selectedTables.isEmpty() || tfName.getText().isEmpty());
@@ -182,11 +195,11 @@ public class ReservationEditViewController implements Initializable {
                 // edit mode: update reservation
                 reservationService.updateReservation(reservation);
             }
+
+            onAcceptedConsumer.accept(reservation);
         } catch (ServiceException | ValidationException e) {
             displayErrorMessage("error adding/editing reservation", e);
         }
-
-        onAcceptedConsumer.accept(reservation);
     }
 
     @FXML
@@ -239,8 +252,8 @@ public class ReservationEditViewController implements Initializable {
 
     private void setReservationData() {
         reservation.setName(tfName.getText());
-        reservation.setDuration(Duration.ofHours((long) tfDuration.getValue()));
-        reservation.setQuantity((int) tfQuantity.getValue());
+        reservation.setDuration(Duration.ofHours(tfDuration.getNumber().intValue()));
+        reservation.setQuantity(tfQuantity.getNumber().intValue());
         reservation.setTime(getLocalDateTime());
         reservation.setTables(new ArrayList<>(selectedTables));
     }
@@ -284,26 +297,28 @@ public class ReservationEditViewController implements Initializable {
         for(Table t : selectedTables) {
             sumSeats += t.getSeats();
         }
-        lblSeats.setText(sumSeats + " / " + (int) tfQuantity.getValue());
+
+        BigDecimal quantity = tfQuantity.getNumber();
+        lblSeats.setText(sumSeats + " / " + (quantity == null ? "0": quantity.toString()));
     }
 
     private LocalDateTime getLocalDateTime() {
         LocalDate date = datePicker.getValue();
-        if(date == null) {
+        if(date == null || tfMinute.getNumber() == null || tfHour.getNumber() == null) {
             return null;
         }
 
-        return LocalDateTime.of(datePicker.getValue(), LocalTime.of((int) tfHour.getValue(), (int) tfMinute.getValue()));
+        return LocalDateTime.of(datePicker.getValue(), LocalTime.of(tfHour.getNumber().intValue(), tfMinute.getNumber().intValue()));
     }
 
     private void updateOccupiedTables() {
         LocalDateTime start = getLocalDateTime();
 
-        if(start == null || tfDuration.isEmpty()) {
+        if(start == null || tfDuration.getNumber() == null || tfDuration.getNumber() == null) {
             return;
         }
 
-        Duration duration = Duration.ofMinutes((long) tfDuration.getValue());
+        Duration duration = Duration.ofMinutes(tfDuration.getNumber().intValue());
         List<Reservation> reservations = new ArrayList<>();
 
         // get other reservations

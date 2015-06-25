@@ -156,4 +156,16 @@ public class Table {
         result = 31 * result + (column != null ? column.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public Table clone() {
+        Table table = new Table();
+        table.setNumber(number);
+        table.setColumn(column);
+        table.setRow(row);
+        table.setUser(user.clone());
+        table.setSection(section.clone());
+        table.setSeats(seats);
+        return table;
+    }
 }

@@ -290,8 +290,8 @@ public class OrderOverviewController implements Initializable {
         orderInputPane.setStyle("-fx-padding: 5px;");
 
         newOrderPopOver = new PopOver(orderInputPane);
-        newOrderPopOver.setHideOnEscape(false);
-        newOrderPopOver.setAutoHide(false);
+        newOrderPopOver.setHideOnEscape(true);
+        newOrderPopOver.setAutoHide(true);
         newOrderPopOver.setDetachable(false);
         newOrderPopOver.setMinSize(1200, 700);
         newOrderPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_RIGHT);
