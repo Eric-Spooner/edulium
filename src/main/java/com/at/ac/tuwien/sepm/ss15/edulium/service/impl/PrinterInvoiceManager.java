@@ -77,6 +77,8 @@ class PrinterInvoiceManager implements InvoiceManager {
 
             ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
                     new Phrase("Invoice ID: " + invoice.getIdentity()), xPos, yPos, 0);
+            ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+                    new Phrase("Signature: " + invoice.getSignature()), xPos, yPos -= 15f, 0);
             LocalDateTime invoiceTime = invoice.getTime();
             ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
                     new Phrase("Date: " + invoiceTime.getDayOfMonth() +
@@ -183,8 +185,6 @@ class PrinterInvoiceManager implements InvoiceManager {
             }
             ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
                     new Phrase("Net sum: " + currencyFormat(net)), xPos, yPos, 0);
-            ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
-                    new Phrase("Signature: " + invoice.getSignature()), xPos, yPos -= 30, 0);
         } catch (DocumentException e) {
             LOGGER.error("An error occurred while creating the PDF stamper", e);
             throw new ServiceException("An error occurred while creating the PDF stamper", e);
