@@ -75,24 +75,7 @@ class TableBusinessLogicImpl implements TableBusinessLogic {
     private boolean checkIfNoOpenOrdersOnTable(Table table) throws ServiceException{
         Order template = new Order();
         template.setTable(table);
-        List<Order> orderList = orderService.findOrder(template);
-        return checkIfEveryOrderIsPaid(orderList);
-    }
-
-    /**
-     * This function is used, to check if the given orders have been paid already
-     * @param orders
-     * @return false, if there is one ore more open orders
-     *         true, if every order has an invoice
-     */
-    private boolean checkIfEveryOrderIsPaid(List<Order> orders) throws ServiceException{
-        for(Order order:orders){
-            Invoice invTemplate = new Invoice();
-            invTemplate.setOrders(Arrays.asList(order));
-            if(invoiceService.findInvoices(invTemplate).isEmpty()){
-                return false;
-            }
-        }
-        return true;
+        template.setPaid(false);
+        return orderService.findOrder(template).isEmpty();
     }
 }

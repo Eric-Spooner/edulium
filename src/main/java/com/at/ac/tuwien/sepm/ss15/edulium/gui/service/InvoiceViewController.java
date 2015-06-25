@@ -432,16 +432,8 @@ public class InvoiceViewController  implements Initializable {
             try {
                 Order orderMatcher = new Order();
                 orderMatcher.setTable(table);
-                return orderService.findOrder(orderMatcher).stream().filter(order -> {
-                    // show only orders which don't belong to an invoice yet
-                    try {
-                        Invoice invoiceMatcher = new Invoice();
-                        invoiceMatcher.setOrders(Collections.singletonList(order));
-                        return invoiceService.findInvoices(invoiceMatcher).isEmpty();
-                    } catch (ServiceException e) {
-                        return true;
-                    }
-                }).collect(Collectors.toList());
+                orderMatcher.setPaid(false);
+                return orderService.findOrder(orderMatcher);
             } catch (ServiceException e) {
                 return null;
             }

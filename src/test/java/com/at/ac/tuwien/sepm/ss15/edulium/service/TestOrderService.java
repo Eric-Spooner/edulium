@@ -3,9 +3,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service;
 import com.at.ac.tuwien.sepm.ss15.edulium.business.TableBusinessLogic;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Menu;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
@@ -61,12 +59,28 @@ public class TestOrderService extends AbstractServiceTest {
 
 
     private Order createOrder(BigDecimal value, String additionalInformation,
-                              BigDecimal taxRate, LocalDateTime time, Order.State state, int MenuEntryID) throws ServiceException{
+                              BigDecimal taxRate, LocalDateTime time, Order.State state, long MenuEntryID) throws ServiceException{
 
         Order order = new Order();
         order.setTable(interiorService.getAllTables().get(1));
         System.out.println(menuService.getAllMenuEntries());
-        order.setMenuEntry(menuService.findMenuEntry(MenuEntry.withIdentity(MenuEntryID)).get(0));
+
+        MenuCategory cat = MenuCategory.withIdentity(1L);
+        cat.setName("cat");
+
+        TaxRate tax = TaxRate.withIdentity(1L);
+        tax.setValue(BigDecimal.valueOf(0.2));
+
+        MenuEntry entry = new MenuEntry();
+        entry.setIdentity(MenuEntryID);
+        entry.setName("test");
+        entry.setPrice(BigDecimal.valueOf(2.0));
+        entry.setCategory(cat);
+        entry.setTaxRate(tax);
+        entry.setAvailable(true);
+        entry.setDescription("desc");
+
+        order.setMenuEntry(entry);
         order.setBrutto(value);
         order.setTax(taxRate);
         order.setAdditionalInformation(additionalInformation);
