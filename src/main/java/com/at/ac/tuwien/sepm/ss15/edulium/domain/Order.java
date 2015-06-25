@@ -192,10 +192,8 @@ public class Order {
         if (tax != null ? (tax.compareTo(order.getTax())!=0) : order.brutto != null) return false;
         if (time != null ? !time.equals(order.time) : order.time != null) return false;
         if (state != null ? !state.equals(order.state) : order.state != null) return false;
-        if (paid != null ? (order.paid != null ? !paid.equals(order.paid) : paid) :
-                           (order.paid != null ? order.paid : false)) return false;
-        return !(additionalInformation != null ? (order.additionalInformation != null ? !additionalInformation.equals(order.additionalInformation) : !additionalInformation.isEmpty()) :
-                                                 (order.additionalInformation != null ? !order.additionalInformation.isEmpty() : false));
+        if (paid != null && order.paid != null && !paid.equals(order.paid)) return false;
+        return !(additionalInformation != null && order.additionalInformation != null && !additionalInformation.equals(order.additionalInformation));
     }
 
     @Override
