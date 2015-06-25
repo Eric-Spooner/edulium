@@ -60,8 +60,9 @@ public class TestBestFitReservationHeuristic extends AbstractServiceTest {
         return t;
     }
 
-    private Reservation createReservation(int day, int hour, int min, List<Table> tables) {
+    private Reservation createReservation(long id, int day, int hour, int min, List<Table> tables) {
         Reservation reservation = new Reservation();
+        reservation.setIdentity(id);
         reservation.setDuration(Duration.ofMinutes(min));
         reservation.setTime(LocalDateTime.of(2099, 1, day, hour, 0));
         reservation.setTables(tables);
@@ -99,9 +100,9 @@ public class TestBestFitReservationHeuristic extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void test_OneTableFitsRequest_shouldReturnOneTable() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t1));
-        Reservation res2 = createReservation(1, 18, 120, Arrays.asList(t5));
-        Reservation res = createReservation(1, 18, 150, null);
+        Reservation res1 = createReservation(1L, 1, 18, 120, Arrays.asList(t1));
+        Reservation res2 = createReservation(2L, 1, 18, 120, Arrays.asList(t5));
+        Reservation res = createReservation(3L, 1, 18, 150, null);
         res.setQuantity(4);
 
         Mockito.when(reservationService.findReservationBetween(res.getTime(), res.getTime().plus(res.getDuration())))
@@ -120,8 +121,8 @@ public class TestBestFitReservationHeuristic extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void test_NoTableFitsRequest_shouldReturnTwoTablesNextToEachOther() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t3));
-        Reservation res = createReservation(1, 17, 150, null);
+        Reservation res1 = createReservation(1L, 1, 18, 120, Arrays.asList(t3));
+        Reservation res = createReservation(2L, 1, 17, 150, null);
         res.setQuantity(6);
 
         Mockito.when(reservationService.findReservationBetween(res.getTime(), res.getTime().plus(res.getDuration())))
@@ -142,8 +143,8 @@ public class TestBestFitReservationHeuristic extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void test_NoTablesNextToEachOtherFitRequest_shouldReturnThreeTables() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t3));
-        Reservation res = createReservation(1, 19, 120, null);
+        Reservation res1 = createReservation(1L, 1, 18, 120, Arrays.asList(t3));
+        Reservation res = createReservation(2L, 1, 19, 120, null);
         res.setQuantity(12);
         Mockito.when(reservationService.findReservationBetween(res.getTime(), res.getTime().plus(res.getDuration())))
                 .thenReturn(Arrays.asList(res1));
@@ -165,9 +166,9 @@ public class TestBestFitReservationHeuristic extends AbstractServiceTest {
     @WithMockUser(username = "servicetester", roles={"SERVICE"})
     public void test_notEnoughTablesFreeShouldFail() throws ServiceException, ValidationException, DAOException {
         // PREPARE
-        Reservation res1 = createReservation(1, 18, 120, Arrays.asList(t3));
-        Reservation res2 = createReservation(1, 17, 240, Arrays.asList(t5, t6));
-        Reservation res = createReservation(1, 19, 120, null);
+        Reservation res1 = createReservation(1L, 1, 18, 120, Arrays.asList(t3));
+        Reservation res2 = createReservation(2L, 1, 17, 240, Arrays.asList(t5, t6));
+        Reservation res = createReservation(3L, 1, 19, 120, null);
         res.setQuantity(12);
 
         Mockito.when(reservationService.findReservationBetween(res.getTime(), res.getTime().plus(res.getDuration())))
@@ -190,7 +191,7 @@ public class TestBestFitReservationHeuristic extends AbstractServiceTest {
             tables.add(createTable(100 + i, i%5, i/10, 4, room2));
         }
 
-        Reservation res = createReservation(1, 19, 120, null);
+        Reservation res = createReservation(1L, 1, 19, 120, null);
         res.setQuantity(8);
 
         // WHEN
@@ -221,7 +222,7 @@ public class TestBestFitReservationHeuristic extends AbstractServiceTest {
         tables.get(10).setSeats(3);
         tables.get(11).setSeats(3);
 
-        Reservation res = createReservation(1, 19, 120, null);
+        Reservation res = createReservation(1L, 1, 19, 120, null);
         res.setQuantity(6);
 
         // WHEN
@@ -249,7 +250,7 @@ public class TestBestFitReservationHeuristic extends AbstractServiceTest {
         tables.get(10).setSeats(3);
         tables.get(11).setSeats(3);
 
-        Reservation res = createReservation(1, 19, 120, null);
+        Reservation res = createReservation(1L, 1, 19, 120, null);
         res.setQuantity(5);
 
         // WHEN
@@ -277,7 +278,7 @@ public class TestBestFitReservationHeuristic extends AbstractServiceTest {
         tables.get(10).setSeats(3);
         tables.get(11).setSeats(3);
 
-        Reservation res = createReservation(1, 19, 120, null);
+        Reservation res = createReservation(1L, 1, 19, 120, null);
         res.setQuantity(26);
 
         // WHEN

@@ -19,9 +19,6 @@ import java.util.Set;
  * Selects only up to 4 tables in a reservation
  */
 class BestFitReservationHeuristic extends ReservationHeuristic {
-    @Resource(name = "reservationService")
-    private ReservationService reservationService;
-
     private final int MAX_TABLES_PER_RESERVATION = 4;
 
     private List<Table> currentSolution;
