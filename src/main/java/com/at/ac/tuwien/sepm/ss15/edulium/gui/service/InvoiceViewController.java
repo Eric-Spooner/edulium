@@ -9,6 +9,8 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.collections.*;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -137,6 +139,7 @@ public class InvoiceViewController  implements Initializable {
         private final Label paidLabel;
         private final Label openAmountLabel;
         private final Button printButton;
+        private final Button deleteButton;
         private final HBox layout;
         private Invoice tempInvoice;
 
@@ -150,9 +153,49 @@ public class InvoiceViewController  implements Initializable {
             printButton.setStyle("-fx-font-size: 18px");
             printButton.setText("Print");
             printButton.setOnAction(event -> manageInvoice(tempInvoice));
+            deleteButton = new Button();
+            deleteButton.setStyle("-fx-font-size: 18px; -fx-background-color: #E54E4D");
+            deleteButton.setText("Delete");
+            deleteButton.setOnAction(event -> {
+                Instalment matcher = new Instalment();
+                matcher.setInvoice(Invoice.withIdentity(tempInvoice.getIdentity()));
+                List<Instalment> instalments;
+                try {
+                    instalments = invoiceService.findInstalments(matcher);
+                } catch (ServiceException e) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Could not retrieve instalments");
+                    alert.setHeaderText("Instalments could not be retrieved");
+                    alert.setContentText(e.getMessage());
+
+                    alert.showAndWait();
+                    return;
+                }
+
+                if (instalments != null && instalments.size() == 0) {
+                    try {
+                        invoiceService.deleteInvoice(tempInvoice);
+                    } catch (ServiceException | ValidationException e) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Failed to delete invoice");
+                        alert.setHeaderText("Invoice could not be deleted");
+                        alert.setContentText(e.getMessage());
+
+                        alert.showAndWait();
+                    }
+
+                    allInvoices.immediateUpdate();
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Invoice already contains instalment(s)");
+                    alert.setHeaderText("An invoice cannot be deleted if it already contains instalments");
+
+                    alert.showAndWait();
+                }
+            });
 
             layout = new HBox(10);
-            layout.getChildren().setAll(nameLabel, grossLabel, paidLabel, openAmountLabel, printButton);
+            layout.getChildren().setAll(nameLabel, grossLabel, paidLabel, openAmountLabel, printButton, deleteButton);
 
             setGraphic(layout);
         }
