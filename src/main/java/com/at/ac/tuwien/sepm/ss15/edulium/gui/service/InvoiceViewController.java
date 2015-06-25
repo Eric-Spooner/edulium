@@ -25,6 +25,8 @@ import org.springframework.stereotype.Controller;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -42,6 +44,8 @@ public class InvoiceViewController  implements Initializable {
     private Label headerLabel;
     @FXML
     private HBox headerLayout;
+    @FXML
+    private TextField amountField;
 
     @Resource(name = "taskScheduler")
     private TaskScheduler taskScheduler;
@@ -161,8 +165,8 @@ public class InvoiceViewController  implements Initializable {
                 tempInvoice = item;
 
                 Instalment matcher = new Instalment();
-                matcher.setInvoice(item);
-                List<Instalment> instalments = null;
+                matcher.setInvoice(Invoice.withIdentity(item.getIdentity()));
+                List<Instalment> instalments;
                 try {
                     instalments = invoiceService.findInstalments(matcher);
                 } catch (ServiceException e) {
@@ -206,43 +210,135 @@ public class InvoiceViewController  implements Initializable {
         allInvoices = new PollingList<>(taskScheduler);
         allInvoices.setInterval(1000);
 
-//        SortedList<Invoice> sortedInvoices = new SortedList<Invoice>(allInvoices);
         invoiceView.setCellFactory(view -> new InvoiceCell());
         invoiceView.setItems(allInvoices);
         invoiceView.setStyle("-fx-font-size: 18px;");
     }
 
+    private <T> void forceListRefreshOn(ListView<T> lsv) {
+        ObservableList<T> items = lsv.<T>getItems();
+        lsv.<T>setItems(null);
+        lsv.<T>setItems(items);
+    }
+
     @FXML
     public void onCashButtonClicked() {
+        DecimalFormat df = new DecimalFormat();
+        df.setParseBigDecimal(true);
+        BigDecimal amount;
+        try {
+            amount = (BigDecimal) df.parse(amountField.getText());
+        } catch (ParseException e) {
+            LOGGER.error("The provided amount is not valid", e);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Invalid amount");
+            alert.setHeaderText("The amount you have provided is not a valid number");
+            alert.setContentText(e.getMessage());
+
+            alert.showAndWait();
+            return;
+        }
+
+        if (invoiceView.getSelectionModel().getSelectedItem() == null) {
+            LOGGER.error("No selected invoice");
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("No selected invoice");
+            alert.setHeaderText("You must select an invoice that you want to assign an instalment to");
+
+            alert.showAndWait();
+            return;
+        }
+
         Instalment instalment = new Instalment();
         instalment.setTime(LocalDateTime.now());
-        instalment.setAmount(new BigDecimal("5")); // TODO: get value from text field
+        instalment.setAmount(amount);
         instalment.setType("CASH");
         instalment.setPaymentInfo("Paid in cash");
-        instalment.setInvoice(null); // TODO get selected invoice
+        instalment.setInvoice(invoiceView.getSelectionModel().getSelectedItem());
         addInstalment(instalment);
+
+        allInvoices.immediateUpdate();
+        forceListRefreshOn(invoiceView);
     }
 
     @FXML
     public void onCreditButtonClicked() {
+        DecimalFormat df = new DecimalFormat();
+        df.setParseBigDecimal(true);
+        BigDecimal amount;
+        try {
+            amount = (BigDecimal) df.parse(amountField.getText());
+        } catch (ParseException e) {
+            LOGGER.error("The provided amount is not valid", e);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Invalid amount");
+            alert.setHeaderText("The amount you have provided is not a valid number");
+            alert.setContentText(e.getMessage());
+
+            alert.showAndWait();
+            return;
+        }
+
+        if (invoiceView.getSelectionModel().getSelectedItem() == null) {
+            LOGGER.error("No selected invoice");
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("No selected invoice");
+            alert.setHeaderText("You must select an invoice that you want to assign an instalment to");
+
+            alert.showAndWait();
+            return;
+        }
+
         Instalment instalment = new Instalment();
         instalment.setTime(LocalDateTime.now());
-        instalment.setAmount(new BigDecimal("5")); // TODO: get value from text field
+        instalment.setAmount(amount);
         instalment.setType("CREDIT");
         instalment.setPaymentInfo("Paid by credit card");
-        instalment.setInvoice(null); // TODO get selected invoice
+        instalment.setInvoice(invoiceView.getSelectionModel().getSelectedItem());
         addInstalment(instalment);
+
+        allInvoices.immediateUpdate();
+        forceListRefreshOn(invoiceView);
     }
 
     @FXML
     public void onDebitButtonClicked() {
+        DecimalFormat df = new DecimalFormat();
+        df.setParseBigDecimal(true);
+        BigDecimal amount;
+        try {
+            amount = (BigDecimal) df.parse(amountField.getText());
+        } catch (ParseException e) {
+            LOGGER.error("The provided amount is not valid", e);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Invalid amount");
+            alert.setHeaderText("The amount you have provided is not a valid number");
+            alert.setContentText(e.getMessage());
+
+            alert.showAndWait();
+            return;
+        }
+
+        if (invoiceView.getSelectionModel().getSelectedItem() == null) {
+            LOGGER.error("No selected invoice");
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("No selected invoice");
+            alert.setHeaderText("You must select an invoice that you want to assign an instalment to");
+
+            alert.showAndWait();
+            return;
+        }
+
         Instalment instalment = new Instalment();
         instalment.setTime(LocalDateTime.now());
-        instalment.setAmount(new BigDecimal("5")); // TODO: get value from text field
+        instalment.setAmount(amount);
         instalment.setType("DEBIT");
         instalment.setPaymentInfo("Paid by debit card");
-        instalment.setInvoice(null); // TODO get selected invoice
+        instalment.setInvoice(invoiceView.getSelectionModel().getSelectedItem());
         addInstalment(instalment);
+
+        allInvoices.immediateUpdate();
+        forceListRefreshOn(invoiceView);
     }
 
     @FXML
@@ -275,10 +371,10 @@ public class InvoiceViewController  implements Initializable {
             return;
         }
 
-        manageInvoice(invoice);
-
         allOrders.immediateUpdate();
         allInvoices.immediateUpdate();
+
+        manageInvoice(invoice);
     }
 
     private void manageInvoice(Invoice invoice) {

@@ -92,10 +92,10 @@ class DBInstalmentDAO implements ImmutableDAO<Instalment> {
             } else {
                 stmt.setLong(1, object.getIdentity());
             }
-            stmt.setTimestamp(2, object.getTime() == null ? null : Timestamp.valueOf(object.getTime()));
-            stmt.setString(3, object.getPaymentInfo());
-            stmt.setString(4, object.getType());
-            stmt.setBigDecimal(5, object.getAmount());
+            stmt.setObject(2, object.getTime() == null ? null : Timestamp.valueOf(object.getTime()));
+            stmt.setObject(3, object.getPaymentInfo());
+            stmt.setObject(4, object.getType());
+            stmt.setObject(5, object.getAmount());
             if (object.getInvoice() == null) {
                 stmt.setNull(6, Types.BIGINT);
             } else {
