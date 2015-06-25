@@ -1,9 +1,6 @@
 package com.at.ac.tuwien.sepm.ss15.edulium.service;
 
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.OnetimeSale;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -127,10 +124,10 @@ public interface SaleService extends Service {
 
     /**
      * Tries to find a sale for the given menuEntry and changes the price if possible.
-     * @param menuEntry the menuEntry that might be sold cheaper with the sale
+     * @param order the order that might be sold cheaper with the sale
      * @throws ValidationException if the menuEntry object parameters are
      *         not valid for this action
      * @throws ServiceException if an error in the service or persistence layer has occurred
      */
-    void applySales(MenuEntry menuEntry) throws ValidationException, ServiceException;
+    void applySales(Order order) throws ValidationException, ServiceException;
 }

@@ -44,8 +44,7 @@ class OrderServiceImpl implements OrderService {
 
         try {
             //Check if a sale is active and let the price be updated
-            MenuEntry entry = order.getMenuEntry();
-            saleService.applySales(entry);
+            saleService.applySales(order);
             //Create the order with the updated price
             orderDAO.create(order);
             tableBusinessLogic.addedOrder(order);

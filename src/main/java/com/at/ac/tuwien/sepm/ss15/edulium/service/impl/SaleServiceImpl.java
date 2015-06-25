@@ -2,10 +2,7 @@ package com.at.ac.tuwien.sepm.ss15.edulium.service.impl;
 
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.IntermittentSale;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.OnetimeSale;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Sale;
+import com.at.ac.tuwien.sepm.ss15.edulium.domain.*;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
@@ -15,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,8 +32,8 @@ class SaleServiceImpl implements SaleService {
     private Validator<IntermittentSale> intermittentSaleValidator;
     @Autowired
     private Validator<OnetimeSale> onetimeSaleValidator;
-    @Autowired
-    private Validator<MenuEntry> menuEntryValidator;
+    @Resource(name = "orderValidator")
+    private Validator<Order> orderValidator;
 
     @Override
     public List<Sale> getAllSales() throws ServiceException {
@@ -206,12 +204,15 @@ class SaleServiceImpl implements SaleService {
     }
 
     @Override
-    public void applySales(MenuEntry menuEntry) throws ValidationException, ServiceException {
-        LOGGER.debug("Entering applySales with parameter: "+ menuEntry);
+    public void applySales(Order order) throws ValidationException, ServiceException {
+        LOGGER.debug("Entering applySales with parameter: "+ order);
 
-        menuEntryValidator.validateForUpdate(menuEntry);
+        orderValidator.validateForCreate(order);
 
-        BigDecimal price = menuEntry.getPrice();
+        MenuEntry menuEntry = order.getMenuEntry();
+
+        BigDecimal bestPrice = order.getBrutto();
+        Sale bestSale = null;
 
         //Get all sales
         List<Sale> sales = new ArrayList<>();
@@ -223,13 +224,24 @@ class SaleServiceImpl implements SaleService {
             if (sale.isAt(LocalDateTime.now())) {
                 for (MenuEntry menuEntry1 : sale.getEntries()) {
                     //If possible, lower the price
-                    if (menuEntry1.getIdentity().equals(menuEntry.getIdentity())) {
-                        price = price.min(menuEntry1.getPrice());
+                    if (menuEntry1.getIdentity().equals(menuEntry.getIdentity()) && menuEntry1.getPrice().compareTo(bestPrice) < 0) {
+                        bestPrice = menuEntry1.getPrice();
+                        bestSale = sale;
                     }
                 }
             }
         }
 
-        menuEntry.setPrice(price);
+        if (bestSale != null) {
+            order.setBrutto(bestPrice);
+
+            String additionalInformation = order.getAdditionalInformation();
+            if (additionalInformation.isEmpty()) {
+                additionalInformation = bestSale.getName();
+            } else {
+                additionalInformation += " - " + bestSale.getName();
+            }
+            order.setAdditionalInformation(additionalInformation);
+        }
     }
 }
