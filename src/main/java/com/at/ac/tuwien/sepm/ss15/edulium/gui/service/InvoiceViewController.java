@@ -135,6 +135,7 @@ public class InvoiceViewController  implements Initializable {
         private final Label nameLabel;
         private final Label grossLabel;
         private final Label paidLabel;
+        private final Label openAmountLabel;
         private final Button printButton;
         private final HBox layout;
         private Invoice tempInvoice;
@@ -143,6 +144,7 @@ public class InvoiceViewController  implements Initializable {
             nameLabel = new Label();
             grossLabel = new Label();
             paidLabel = new Label();
+            openAmountLabel = new Label();
             tempInvoice = new Invoice();
             printButton = new Button();
             printButton.setStyle("-fx-font-size: 18px");
@@ -150,7 +152,7 @@ public class InvoiceViewController  implements Initializable {
             printButton.setOnAction(event -> manageInvoice(tempInvoice));
 
             layout = new HBox(10);
-            layout.getChildren().setAll(nameLabel, grossLabel, paidLabel, printButton);
+            layout.getChildren().setAll(nameLabel, grossLabel, paidLabel, openAmountLabel, printButton);
 
             setGraphic(layout);
         }
@@ -184,6 +186,7 @@ public class InvoiceViewController  implements Initializable {
                 }
 
                 paidLabel.setText("Paid: " + paidAmount);
+                openAmountLabel.setText("Open: " + item.getGross().subtract(paidAmount));
 
                 layout.setVisible(true);
             } else {
