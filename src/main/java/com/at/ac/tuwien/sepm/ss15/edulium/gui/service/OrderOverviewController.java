@@ -479,6 +479,7 @@ public class OrderOverviewController implements Initializable {
                 Order matcher = new Order();
                 matcher.setTable(table);
                 matcher.setState(Order.State.DELIVERED);
+                matcher.setPaid(false);
                 return orderService.findOrder(matcher);
             } catch (ServiceException e) {
                 LOGGER.error("Finding orders via order supplier has failed", e);
