@@ -50,10 +50,10 @@ CREATE TABLE IF NOT EXISTS Instalment (
     PRIMARY KEY(ID, invoice_ID)
 );
 
-CREATE VIEW IF NOT EXISTS InvoiceExtended AS
+CREATE OR REPLACE VIEW InvoiceExtended AS
     SELECT *, ((SELECT ISNULL(SUM(inst.amount), 0)
-                FROM Instalment AS inst JOIN Invoice AS inv ON inst.invoice_ID = inv.ID) >= brutto) AS closed
-    FROM Invoice;
+                FROM Instalment AS inst JOIN Invoice AS inv ON inst.invoice_ID = inv.ID AND inv.ID = i.ID) >= brutto) AS closed
+    FROM Invoice i;
 
 CREATE TABLE IF NOT EXISTS RestaurantSection (
     ID IDENTITY,
