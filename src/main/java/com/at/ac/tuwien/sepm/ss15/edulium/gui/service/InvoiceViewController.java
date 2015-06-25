@@ -9,6 +9,8 @@ import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
 import javafx.collections.*;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -17,12 +19,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.action.Action;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.Resource;
+import java.beans.EventHandler;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDateTime;
@@ -131,14 +135,25 @@ public class InvoiceViewController  implements Initializable {
     private class InvoiceCell extends ListCell<Invoice> {
         private final Label nameLabel;
         private final Label grossLabel;
-        private final VBox layout;
+        private final Label paidLabel;
+        private final Button printButton;
+        private final HBox layout;
+        private Invoice tempInvoice;
 
         public InvoiceCell() {
             nameLabel = new Label();
             grossLabel = new Label();
+            paidLabel = new Label();
+            tempInvoice = new Invoice();
+            printButton = new Button();
+            printButton.setStyle("-fx-font-size: 18px");
+            printButton.setText("Print");
+            printButton.setOnAction(event -> {
+                manageInvoice(tempInvoice);
+            });
 
-            layout = new VBox();
-            layout.getChildren().setAll(nameLabel, grossLabel);
+            layout = new HBox(10);
+            layout.getChildren().setAll(nameLabel, grossLabel, paidLabel, printButton);
 
             setGraphic(layout);
         }
@@ -148,8 +163,30 @@ public class InvoiceViewController  implements Initializable {
             super.updateItem(item, empty);
 
             if (item != null) {
-                nameLabel.setText("" + item.getIdentity());
-                grossLabel.setText("" + item.getGross());
+                nameLabel.setText("ID: " + item.getIdentity());
+                grossLabel.setText("Total: " + item.getGross());
+                tempInvoice = item;
+
+                Instalment matcher = new Instalment();
+                matcher.setInvoice(item);
+                List<Instalment> instalments = null;
+                try {
+                    instalments = invoiceService.findInstalments(matcher);
+                } catch (ServiceException e) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Could not retrieve instalments");
+                    alert.setHeaderText("Instalments could not be retrieved");
+                    alert.setContentText(e.getMessage());
+
+                    alert.showAndWait();
+                    return;
+                }
+                BigDecimal paidAmount = BigDecimal.ZERO;
+                for (Instalment i : instalments) {
+                    paidAmount = paidAmount.add(i.getAmount());
+                }
+
+                paidLabel.setText("Paid: " + paidAmount);
 
                 layout.setVisible(true);
             } else {
