@@ -4,14 +4,12 @@ import com.at.ac.tuwien.sepm.ss15.edulium.business.TableBusinessLogic;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAO;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.DAOException;
 import com.at.ac.tuwien.sepm.ss15.edulium.dao.OrderDAO;
-import com.at.ac.tuwien.sepm.ss15.edulium.domain.Invoice;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.MenuEntry;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.Order;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.User;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.history.History;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.ValidationException;
 import com.at.ac.tuwien.sepm.ss15.edulium.domain.validation.Validator;
-import com.at.ac.tuwien.sepm.ss15.edulium.service.InvoiceService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.OrderService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.SaleService;
 import com.at.ac.tuwien.sepm.ss15.edulium.service.ServiceException;
@@ -20,7 +18,6 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -30,8 +27,6 @@ class OrderServiceImpl implements OrderService {
     private static final Logger LOGGER = LogManager.getLogger(TaxRateServiceImpl.class);
     @Resource(name = "saleService")
     private SaleService saleService;
-    @Resource(name = "invoiceService")
-    private InvoiceService invoiceService;
     @Resource(name = "orderDAO")
     private DAO<Order> orderDAO;
     @Resource(name = "orderDAO")
@@ -74,9 +69,7 @@ class OrderServiceImpl implements OrderService {
         }else {
             Order preOrder = preOrders.get(0);
             //if the order already had an invoice it is not allowed to be changed
-            Invoice invoice = new Invoice();
-            invoice.setOrders(Collections.singletonList(order));
-            if(invoiceService.findInvoices(invoice).size()>0){
+            if(preOrder.isPaid()){
                 LOGGER.error("It is not allowed to change an order with invoice");
                 throw new ServiceException("It is not allowed to change an order with invoice");
             }
@@ -118,26 +111,33 @@ class OrderServiceImpl implements OrderService {
 
         orderValidator.validateForDelete(order);
 
-        if (order.getState() != Order.State.QUEUED){
-            LOGGER.error("The precondition of the function is not True, the order is not in State QUEUED");
-            throw new ServiceException("The precondition of the function is not True, the order is not in State QUEUED");
-        }
+        List<Order> preOrders = this.findOrder(Order.withIdentity(order.getIdentity()));
 
-        // check if invoice has been paid already
-        Invoice invoiceMatcher = new Invoice();
-        invoiceMatcher.setOrders(Collections.singletonList(order));
-        if (!invoiceService.findInvoices(invoiceMatcher).isEmpty()) {
-            LOGGER.error("The order has already been paid, can't cancel order");
-            throw new ServiceException("The order '" + order.getMenuEntry().getName() + "' has already been paid, can't cancel order");
-        }
+        if (preOrders.isEmpty()){
+            LOGGER.error("The order, you would like to delete does not exist");
+            throw new ServiceException("The order, you would like to delete does not exist");
+        } else {
+            Order preOrder = preOrders.get(0);
 
-        try {
-            orderDAO.delete(order);
+            if (preOrder.getState() != Order.State.QUEUED) {
+                LOGGER.error("The precondition of the function is not True, the order is not in State QUEUED");
+                throw new ServiceException("The precondition of the function is not True, the order is not in State QUEUED");
+            }
 
-            tableBusinessLogic.removedOrder(order);
-        } catch (DAOException e) {
-            LOGGER.error("An Error has occurred in the data access object", e);
-            throw new ServiceException("An Error has occurred in the data access object");
+            // check if invoice has been paid already
+            if (preOrder.isPaid()) {
+                LOGGER.error("The order has already been paid, can't cancel order");
+                throw new ServiceException("The order '" + order.getMenuEntry().getName() + "' has already been paid, can't cancel order");
+            }
+
+            try {
+                orderDAO.delete(order);
+
+                tableBusinessLogic.removedOrder(preOrder);
+            } catch (DAOException e) {
+                LOGGER.error("An Error has occurred in the data access object", e);
+                throw new ServiceException("An Error has occurred in the data access object");
+            }
         }
     }
 
