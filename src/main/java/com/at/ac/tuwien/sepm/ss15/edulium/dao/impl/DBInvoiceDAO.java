@@ -113,7 +113,7 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
                 invoice.getOrders().stream().map(u -> "?").collect(Collectors.joining(", ")) + ")";
 
         try (PreparedStatement orderStmt = dataSource.getConnection().prepareStatement(orderQuery)) {
-            orderStmt.setLong(1, invoice.getIdentity());
+            orderStmt.setObject(1, invoice.getIdentity());
 
             int index = 2;
             for (Order o : invoice.getOrders()) {
@@ -138,6 +138,9 @@ class DBInvoiceDAO implements DAO<Invoice>, InvoiceDAO {
         LOGGER.debug("Entering delete with parameters: " + invoice);
 
         invoiceValidator.validateForDelete(invoice);
+        Invoice inv = new Invoice();
+        inv.setOrders(invoice.getOrders());
+        updateOrders(inv);
 
         final String query = "UPDATE Invoice SET canceled = TRUE WHERE ID = ?;";
         try (PreparedStatement stmt = dataSource.getConnection().prepareStatement(query)) {
